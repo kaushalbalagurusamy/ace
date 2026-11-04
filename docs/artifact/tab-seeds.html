@@ -1,0 +1,74 @@
+<section id="seeds" class="tabpanel" role="tabpanel" aria-labelledby="t-seeds" hidden>
+  <header class="panelhead">
+    <h2>Research seeds</h2>
+    <p class="lede">The leads that look most promising for agent-built games and generated assets, ranked by how much they help this game and how well we know them. They are inputs to stage 1 research and to the experiments, not decisions. Each carries an evidence tag.</p>
+    <ul class="legend" aria-label="Evidence tags">
+      <li><span class="tag t-live">Verified live</span> quote re-fetched by the orchestrator on 2026-11-04</li>
+      <li><span class="tag t-prim">Primary, agent-read</span> quote fetched by a research agent from the vendor's page; not re-checked</li>
+      <li><span class="tag t-meas">Measured</span> local run, reproduced</li>
+      <li><span class="tag t-para">Paraphrase</span> a summary of a page, not a quote</li>
+      <li><span class="tag t-hyp">Hypothesis</span> our idea, nothing measured yet</li>
+    </ul>
+  </header>
+
+  <ol class="seeds">
+    <li class="seed">
+      <div class="seedhead"><h3>1. Make most of the game in code</h3><span class="tag t-hyp">Hypothesis</span></div>
+      <p>Draw ships, planets, trails, starfields, HUD and effects with Canvas or WebGL, and synthesise sound effects with Web Audio or jsfxr. There is no generator licence to read, no attribution to carry, and the style stays consistent because one code path draws everything. The lecture's <em>Aftershock</em> is built this way (slide 72), and Sprite Fusion publishes MIT pixel-effect code (slide 33).</p>
+      <p class="open"><b>To settle:</b> whether code-drawn art can clear the brief's visual bar by itself. Experiment: two short art-direction bake-offs, one code-only and one hybrid, rated blind by people who have not seen the build.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>2. Generated hero art, code for everything that moves</h3><span class="tag t-hyp">Hypothesis</span></div>
+      <p>Use image generation for the pieces where hand-drawing in code is weakest: nebula and planet backdrops, ship concepts, a title screen. Fix one style paragraph and one reference image and reuse them for every prompt (lecture slides 19–27). The lecture's generator for style tests is OpenAI native image generation.</p>
+      <p class="open"><b>To settle:</b> OpenAI's current output and commercial-use terms. The terms pages returned 403 to the research agent, so ownership rested on a secondary summary only. Read them in a browser before relying on them.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>3. Music and sound from a paid generator tier, not a free one</h3><span class="tag t-live">Verified live</span></div>
+      <p>ElevenLabs' terms say free users <q>may only use the Services for non-commercial purposes</q>; paid plans carry a commercial licence. Starter was listed at $1 for the first month, then $6 (agent-read summary of the pricing page). Suno Free is listed as <q>No commercial rights</q> with no downloads, Pro $8 as commercial, from a paraphrase of its pricing table.</p>
+      <p class="open"><b>To settle:</b> whether a class competition game counts as commercial. Neither vendor defines it, so the safe move is the cheapest paid tier for one month, or an answer from the organisers (finding F-016).</p>
+      <p class="tags"><span class="tag t-live">ElevenLabs free = non-commercial</span> <span class="tag t-para">Starter and Suno prices</span></p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>4. Orbits: planets on analytic rails, only ships integrated</h3><span class="tag t-meas">Measured</span></div>
+      <p>Two-body Kepler motion has a closed-form solution, so every client can compute where a planet is at any time <i>t</i> without stepping, with no drift and the same answer (primary reading, arXiv and Yoshida 1990, agent-read). Only the ships need a numerical integrator. In a local test (Node 24, one scenario, velocity-Verlet, dt 0.001, three gravity sources), summing the three pulls in a different order moved the ship by <b>0</b> at 1,000 steps, <b>1.7×10⁻¹³</b> at 10,000 and <b>9.7×10⁻¹⁰</b> at 100,000; a 1×10⁻¹² nudge to the start grew to 5.9×10⁻⁸ at 100,000. The orchestrator re-ran the script and got identical numbers.</p>
+      <p class="open"><b>Reading it:</b> over a race-length run the gap is tiny, and with two gravity sources it was exactly zero, so the hazard is real but small unless ships pass close to a body. The skeptic pass narrowed the claim: JavaScript fixes the order in which a given piece of code adds numbers, so identical code on every client sums identically; divergence needs different code paths (a server rewrite, a different iteration order), and the fixed body-index order is the guard. It also downgraded “clients will disagree” to plausible, because no second engine was run. <b>Limits:</b> one JavaScript engine only; the test ship was flung to about (−69, 28) by the last step; the ECMAScript spec only requires <code>+ − × ÷</code> and <code>sqrt</code> to match across engines, while <code>Math.sin</code>, <code>cos</code>, <code>pow</code> and the like may differ in the last bits. Use a fixed summation order, a fixed time step, and test Chrome, Safari and Firefox before trusting client-side prediction.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>5. Netcode and hosting that survive Friday morning</h3><span class="tag t-live">Verified live</span></div>
+      <p>The research README's host claims were checked against vendor pages, and a separate skeptic agent re-fetched the Render, Vercel Hobby and PartyKit pages and confirmed them (the Cloudflare, Railway and npm figures were not re-checked). Render's free web service sleeps after 15 minutes without inbound traffic and takes about a minute to wake, which loses in-memory rooms; open WebSockets count as traffic. Vercel Hobby <i>does</i> support WebSockets today (the README said it could not), but connections close at 300 seconds and the plan is non-commercial. Hosted PartyKit shut down on 23 October 2026; PartyServer on your own Cloudflare account is the successor. Libraries are current and MIT: Colyseus 0.18.10 (published 2026-10-22), ws 8.22.1, from the npm registry. Cloudflare's free tier is hard-capped at 100,000 requests a day, so a limit shows up as an outage, not a bill.</p>
+      <p class="open"><b>To settle:</b> real cold-start time and how many rooms one small instance holds. Nobody measured either, and Railway's WebSocket page returned 404. Experiment: deploy a stub, race eight simulated players, wake it from idle.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>6. Create, critique, in-game check, with a capped loop and a provenance row</h3><span class="tag t-hyp">Hypothesis</span></div>
+      <p>The lecture's loop (slides 10 and 28) is the right shape. Add what the sweep asked for: a cap on iterations, a manifest row per shipped asset (generator, prompt or code path, date, plan tier, verdict), and one human spot-check of the critic against the in-game result. The manifest is also the evidence for “all assets generated”.</p>
+      <p class="open"><b>To settle:</b> whether a same-family critic catches what a person would. Experiment: rate the same 20 frames by critic and by two people, compare.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>7. A bot that proves every track can be won</h3><span class="tag t-hyp">Hypothesis</span></div>
+      <p>The sweep asks whether a track on an orbit is winnable and whether progress can be ranked (F-027). An agent can write a solver or search bot that drives each track under the thrust cap many times and reports completion rate and best time. The same bot becomes a practice opponent, which helps the “easy to get into a match” line when only one person is online.</p>
+      <p class="open"><b>To settle:</b> not run. Needs the fixed-step simulation from seed 4 first.</p>
+    </li>
+
+    <li class="seed">
+      <div class="seedhead"><h3>8. Script Blender, do not connect to it</h3><span class="tag t-live">Verified live</span></div>
+      <p>The Blender MCP (MIT, 33.3k stars, actively maintained) exposes arbitrary Python execution on a local socket (default port 9876, localhost) with no authentication, and can import third-party models from Poly Haven and Sketchfab, which are premade assets. Stars are popularity, not vetting. If 3D is chosen, use Blender's command-line batch mode with scripts we wrote and reviewed (lecture slide 64), and keep imports out.</p>
+      <p class="open"><b>To settle:</b> not needed if the game is 2D. The Meshy route (free tier is CC BY 4.0 with credit, verified live; Pro $20 gives a private licence) is the generated-3D alternative.</p>
+    </li>
+  </ol>
+
+  <h3 class="sub">Avoid, with the reason</h3>
+  <ul class="avoid">
+    <li><b>Asset libraries</b> (Kenney, Poly Haven, Freesound, Mixamo and similar): the brief bans premade assets.</li>
+    <li><b>Free tiers that bar commercial use</b> (ElevenLabs Free, Suno Free): unclear whether a public competition game is commercial; no downloads on Suno Free.</li>
+    <li><b>Hosted PartyKit</b>: shut down 23 October 2026.</li>
+    <li><b>Vercel as the game server</b>: 300-second connection cap on Hobby; fine for the static client only.</li>
+    <li><b>Letting an agent install tools or MCP servers unprompted</b>: the MCP specification treats tools as arbitrary code and calls for explicit user consent.</li>
+    <li><b>The name “Final Frontier” without a check</b>: a pending US application for FINAL FRONTIER (class 9, multiplayer game software, filed 2026-08-04) turned up via an aggregator. Unconfirmed against the USPTO.</li>
+  </ul>
+</section>

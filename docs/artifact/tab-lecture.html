@@ -1,0 +1,86 @@
+<section id="lecture" class="tabpanel" role="tabpanel" aria-labelledby="t-lecture" hidden>
+  <header class="panelhead">
+    <h2>Lecture guidance</h2>
+    <p class="lede">Matt Hulme, “Game Assets”, Gauntlet, 2 November 2026. Slide numbers are from the saved copy in <code>docs/source/lecture-2026-11-02-game-assets.md</code>. Each card says what the slide teaches, then what it means for a space racer built under this brief.</p>
+  </header>
+
+  <div class="callout warn">
+    <strong>The lecture and the brief disagree.</strong>
+    <p>The brief says <q>All assets must be generated… Do not use pre-made assets.</q> The lecture presents asset libraries (Kenney, Poly Haven, Freesound, Mixamo) as one of three routes (slides 26, 34, 53) and shows a racing demo, <em>Sky Roadster</em>, credited <q>Library models + code-built scenery</q> (slide 70). Read plainly, the library route is outside what the brief allows. This is finding F-052 and is an open question for the organisers, so this page treats routes 1 and 2 as the working set.</p>
+  </div>
+
+  <div class="grid">
+    <article class="card">
+      <h3>Choose the look before you generate anything</h3>
+      <p class="slides">Slides 18, 25</p>
+      <p>Pick one art direction first (pixel, outlined vector, hand-painted, low-poly, stylised 3D, realistic). A coherent set shares palette, edges, scale and level of detail; individually good images still clash.</p>
+      <p class="apply"><b>For us:</b> the brief makes cohesion a pass/fail bar (<q>mismatched styles… will fail the assignment</q>). Write the style guide, with exact style wording as the lecture does on slides 19–24, before the first asset is made, and reuse it in every prompt.</p>
+    </article>
+
+    <article class="card">
+      <h3>Build the core interaction first, with plain shapes</h3>
+      <p class="slides">Slides 13–15</p>
+      <p>Prototype the thing the game depends on using simple collision shapes; a small playable slice gives each new asset a place to be tested. Art direction and small asset tests can run alongside.</p>
+      <p class="apply"><b>For us:</b> the thing the game depends on is steering a ship under gravity so that it feels good and a track is winnable. Grey-box that first. Two players in one room finishing a race with circles for ships is the smallest slice worth testing.</p>
+    </article>
+
+    <article class="card">
+      <h3>Three routes to assets</h3>
+      <p class="slides">Slides 26, 50</p>
+      <p>1 AI generation, 2 made with code, 3 asset libraries. The same split applies to audio.</p>
+      <p class="apply"><b>For us:</b> routes 1 and 2 only, mixed deliberately. Code does what code does well here (starfields, thrust and orbit trails, HUD, track overlays). Generation does hero art and music.</p>
+    </article>
+
+    <article class="card">
+      <h3>Create, critique with a separate agent, check in game, revise</h3>
+      <p class="slides">Slides 10, 28</p>
+      <p>Generate from a reference and a small brief. A separate agent inspects the exported frames. Test scale, timing and readability in the build. Fix the biggest issue and review again.</p>
+      <p class="apply"><b>For us:</b> keep it, with two cautions the sweep raised. A critic from the same model family may share the generator's blind spots (F-067), and it has not been checked against human ratings (F-068). Cap the loop (F-069) and keep a provenance row for each asset.</p>
+    </article>
+
+    <article class="card">
+      <h3>The nearest demos to this game</h3>
+      <p class="slides">Slides 69–73</p>
+      <p><em>Aftershock</em> (space combat) credits code-drawn pixel art, code-built particles, Web Audio synthesis for SFX and generated music. <em>Jelly Drop</em> credits AI-generated scene art, code-rendered jelly, Web Audio SFX, generated music. On their credit lines both stay inside the brief's rule. <em>Roofline</em> and <em>Dewbound</em> list <q>recorded</q> sound; <em>Sky Roadster</em> lists library models.</p>
+      <p class="apply"><b>For us:</b> Aftershock is the closest template for look, effects and sound. The credit lines do not say whether “recorded” audio was self-recorded or premade, so do not copy that part without asking.</p>
+    </article>
+
+    <article class="card">
+      <h3>Made-with-code effects and geometry</h3>
+      <p class="slides">Slides 31–33, 12, 62</p>
+      <p>Code can build an asset once and save it, or build it at start-up. Sprite Fusion publishes pixel-effect code (MIT TypeScript source, slide 33). Phaser is the 2D browser engine, Three.js the 3D one, each with a Vite starter.</p>
+      <p class="apply"><b>For us:</b> an orbital racer suits code: bodies, rings, trails, shields and boosts are shapes and particles. The engine choice is still an open decision (2D Phaser or 3D Three.js) for an ADR, not settled here.</p>
+    </article>
+
+    <article class="card">
+      <h3>Audio: generate or synthesise, then listen at real volume</h3>
+      <p class="slides">Slides 50–54, 59</p>
+      <p>ElevenLabs makes sound effects and music from a prompt; jsfxr, Bfxr and Web Audio make retro cues in code. <q>Play every sound in the game at its real volume before you keep it.</q> Keep a text equivalent for spoken information.</p>
+      <p class="apply"><b>For us:</b> in a race, position and hazards cannot live in audio alone or colour alone (F-005). Give every cue a second channel.</p>
+    </article>
+
+    <article class="card">
+      <h3>UI, backgrounds and light</h3>
+      <p class="slides">Slides 40, 41, 43</p>
+      <p>HUD, menus and type are assets too; keep key state visible and the selected thing obvious. Backgrounds can be layered images (2D) or a skybox (3D, slide 40; Skybox AI is listed on slide 36). Moving a light changes what players notice.</p>
+      <p class="apply"><b>For us:</b> the race HUD (position, lap, speed, boost) is the most-looked-at asset. Design it with the same care as the ships.</p>
+    </article>
+
+    <article class="card">
+      <h3>2D or 3D</h3>
+      <p class="slides">Slides 6, 11</p>
+      <p>2D gives direct control of the final image but needs more frames per view and action (QuizCaster drew five views per character). 3D reuses one model across angles but needs materials, lighting and rigs.</p>
+      <p class="apply"><b>For us (inference, not in the lecture):</b> a top-down 2D view lets code rotate one ship sprite, so it avoids the multi-view frame cost. Needs a quick check on how a rotated pixel sprite looks before committing.</p>
+    </article>
+
+    <article class="card">
+      <h3>Agent skills and editor tools</h3>
+      <p class="slides">Slides 60–64</p>
+      <p>A 77-skill game-dev collection, engine starters, and editor connections (Godot, Unity, Blender, Aseprite MCPs). Editors also have built-in automation: Blender Python and batch mode, Aseprite CLI plus Lua.</p>
+      <p class="apply"><b>For us:</b> prefer scripts over live connections. The Blender MCP executes arbitrary Python over an unauthenticated local socket and can import premade models (see Research seeds).</p>
+    </article>
+  </div>
+
+  <h3 class="sub">What the lecture does not cover</h3>
+  <p>Multiplayer networking, physics simulation, hosting, the terms of AI generators, and how to disclose AI content to players. No slide addresses them. For a multiplayer space racer those are the places where the sweep found the most risk, so they are covered in the Minesweeping and Research seeds tabs and not in the course material.</p>
+</section>
