@@ -1,0 +1,1850 @@
+{
+ "schema_version": 1,
+ "brief": {
+  "path": "docs/minesweep/2026-11-04-game-week-brief/brief.md",
+  "sha256": "f84b7ad9b10742b911ee5922d9361c60050d10830063cfbe03ee707c7178c668"
+ },
+ "lenses_applied": [
+  {
+   "id": "provider-terms",
+   "version": "0.1.0",
+   "why": "every AI generator has terms on output use/commercial use; brief mandates generated assets"
+  },
+  {
+   "id": "copyright-data-rights",
+   "version": "0.1.0",
+   "why": "AI output copyrightability and training-data/style-imitation exposure for a public game"
+  },
+  {
+   "id": "licensing",
+   "version": "0.1.0",
+   "why": "code and tool licences (engine, netcode, physics libs, MCPs); CC BY credit duty"
+  },
+  {
+   "id": "ai-regulation",
+   "version": "0.2.0",
+   "why": "public deployment of AI-generated media; disclosure/labelling duties"
+  },
+  {
+   "id": "accessibility",
+   "version": "0.1.0",
+   "why": "UI, colour-only position feedback, keyboard/pointer input, motion, audio-only cues"
+  },
+  {
+   "id": "privacy-regulated-data",
+   "version": "0.1.0",
+   "why": "public multiplayer: player names/IP/matchmaking; possibly minors. Planner hit 'phi' on 'physics'; re-justified on multiplayer identity data"
+  },
+  {
+   "id": "security-ethics",
+   "version": "0.1.0",
+   "why": "public join links, chat/names abuse, unauthenticated game server"
+  },
+  {
+   "id": "realtime-transport",
+   "version": "0.1.0",
+   "why": "multiplayer race: transport choice, latency, tick rate, reconnect"
+  },
+  {
+   "id": "distributed-systems",
+   "version": "0.1.0",
+   "why": "authoritative state across clients, desync, ordering, host failure"
+  },
+  {
+   "id": "numeric-representation",
+   "version": "0.1.0",
+   "why": "Kepler/n-body integration: float determinism across browsers, timestep, drift"
+  },
+  {
+   "id": "performance",
+   "version": "0.1.0",
+   "why": "n-body per tick, browser frame budget, mobile/low-end devices"
+  },
+  {
+   "id": "media-pipelines",
+   "version": "0.1.0",
+   "why": "generated image/audio formats, sizes, loops, sample rates, load time"
+  },
+  {
+   "id": "os-systems",
+   "version": "0.1.0",
+   "why": "browser memory/CPU/GPU limits and server idle-sleep. Planner hit 'oom' on 'room'; re-justified on host process limits"
+  },
+  {
+   "id": "theory-complexity",
+   "version": "0.1.0",
+   "why": "restricted n-body / three-body chaos and what can be guaranteed. Planner hit 'schedul' on schedule; re-justified on physics claims"
+  },
+  {
+   "id": "rubric-inversion",
+   "version": "0.1.0",
+   "why": "'look thrown together... will fail', 'beautiful', 'substantial': subjective judged rubric that can reward the wrong thing"
+  },
+  {
+   "id": "ml-evaluation",
+   "version": "0.1.0",
+   "why": "visual/audio cohesion judged by model or humans; eval design for generated assets"
+  },
+  {
+   "id": "supply-chain",
+   "version": "0.1.0",
+   "why": "npm deps, hosted SDKs, MCP servers (research README flags Blender MCP). Planner hit 'install' on 'not need to install'; re-justified on dependencies"
+  },
+  {
+   "id": "agent-security",
+   "version": "0.1.0",
+   "why": "agent tooling with arbitrary code execution (Blender MCP over unauthenticated socket) and prompt-injection via fetched pages"
+  },
+  {
+   "id": "agent-orchestration",
+   "version": "0.2.0",
+   "why": "multi-agent asset pipeline (create -> critic -> fix) failure modes"
+  },
+  {
+   "id": "market-reality",
+   "version": "0.1.0",
+   "why": "tool pricing/free-tier claims in the research README; cost of generation at jam scale"
+  },
+  {
+   "id": "company-context",
+   "version": "0.1.0",
+   "why": "always applies; Gauntlet as the organiser, public repo, judged by peers"
+  }
+ ],
+ "lenses_skipped": [
+  "professional-duty",
+  "cyber-physical",
+  "cryptography",
+  "databases"
+ ],
+ "claims": [
+  {
+   "id": "C-001",
+   "kind": "requirement",
+   "text": "Game Week: Build a game people want to play",
+   "locator": "L1-2",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-002",
+   "kind": "requirement",
+   "text": "Choose one of the genres below.",
+   "locator": "L4",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-003",
+   "kind": "assumption",
+   "text": "The examples are inspiration, not games to recreate; the game must not recreate the example games (Ecco the Dolphin, Zelda, Super Mario Bros., Celeste, Mario Kart).",
+   "locator": "L4",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-004",
+   "kind": "requirement",
+   "text": "Give your game its own identity, mechanics, and visual style.",
+   "locator": "L5",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-005",
+   "kind": "rubric",
+   "text": "CENTRAL FOCUS: Create a beautiful, unique, and clean game. (rewards subjective aesthetics; says nothing of how beauty/uniqueness is scored)",
+   "locator": "L6-7",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-006",
+   "kind": "requirement",
+   "text": "Use this week to practice generating the visual and audio assets that give your game its own identity, not just making the mechanics work.",
+   "locator": "L7-9",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-007",
+   "kind": "metric",
+   "text": "Game due Thursday @ Midnight (no timezone stated)",
+   "locator": "L10-12",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-008",
+   "kind": "metric",
+   "text": "Playing and judging Friday morning",
+   "locator": "L13",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-009",
+   "kind": "metric",
+   "text": "Winners announced Friday around lunch",
+   "locator": "L14",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-010",
+   "kind": "assumption",
+   "text": "Schedule table: three milestones (game due, playing and judging, winners announced); game week is roughly a few days (research README says 3-day fit); timezone and submission mechanism unstated.",
+   "locator": "L10-14",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-011",
+   "kind": "rubric",
+   "text": "The bar for every game: Your game should feel like a complete experience, not a tech demo or a single level.",
+   "locator": "L15-16",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-012",
+   "kind": "rubric",
+   "text": "Required design quality: Your game must have polished, high-quality graphics and a cohesive visual style.",
+   "locator": "L20-21",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-013",
+   "kind": "rubric",
+   "text": "Games with graphics that look thrown together, use mismatched styles, or are generally poor quality will fail the assignment. (pass/fail on subjective visual quality)",
+   "locator": "L21-22",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-014",
+   "kind": "rubric",
+   "text": "Make it substantial: enough original, meaningful gameplay to feel like a complete experience, not a single mechanic, a simple clone, or a short demo stretched across multiple screens.",
+   "locator": "L23-26",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-015",
+   "kind": "requirement",
+   "text": "Players should encounter varied challenges and a clear sense of progression.",
+   "locator": "L26",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-016",
+   "kind": "rubric",
+   "text": "Repetition or cosmetic changes alone do not count as depth.",
+   "locator": "L26-27",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-017",
+   "kind": "requirement",
+   "text": "A clear objective: Players know what they are trying to accomplish and how to play.",
+   "locator": "L28-29",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-018",
+   "kind": "requirement",
+   "text": "A beginning, middle, and end: Include an introduction, meaningful progression, and a satisfying conclusion or result.",
+   "locator": "L37-38",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-019",
+   "kind": "requirement",
+   "text": "More than one moment of gameplay: Players encounter new challenges, choices, or mechanics as they progress.",
+   "locator": "L39-40",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-020",
+   "kind": "requirement",
+   "text": "A unique, clean design: visually distinctive, polished, and cohesive.",
+   "locator": "L41-42",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-021",
+   "kind": "requirement",
+   "text": "Its look, sound, and feel should reinforce its world and make the experience meaningful.",
+   "locator": "L42-43",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-022",
+   "kind": "requirement",
+   "text": "Playable by someone else: A new player can get started without you standing beside them.",
+   "locator": "L44-45",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-023",
+   "kind": "requirement",
+   "text": "Include brief instructions where needed.",
+   "locator": "L45",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-024",
+   "kind": "requirement",
+   "text": "Browser access: Make your game playable in a web browser and provide a link others can use.",
+   "locator": "L46-47",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-025",
+   "kind": "requirement",
+   "text": "Players should not need to install the game.",
+   "locator": "L47",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-026",
+   "kind": "requirement",
+   "text": "Finish the details: Pay attention to layout, typography, animation, sound levels, and feedback.",
+   "locator": "L48-49",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-027",
+   "kind": "requirement",
+   "text": "Avoid a collection of default or mismatched assets; the result should feel like one intentionally designed game.",
+   "locator": "L49-50",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-028",
+   "kind": "requirement",
+   "text": "GENERATE ALL ASSETS: All assets must be generated for your game, including visuals and audio such as sprites, characters, environments, sound effects, and music.",
+   "locator": "L51-55",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-029",
+   "kind": "requirement",
+   "text": "Do not use pre-made assets. (ambiguity: whether code-made, procedural, library, fonts, engine defaults, or AI-tool outputs count as generated vs pre-made is unstated)",
+   "locator": "L55",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-030",
+   "kind": "requirement",
+   "text": "Choose assets appropriate to your genre and make them feel like they belong together.",
+   "locator": "L55-56",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-031",
+   "kind": "rubric",
+   "text": "POLISH OVER SIZE: A smaller, finished game is better than a larger, unfinished one.",
+   "locator": "L57-58",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-032",
+   "kind": "requirement",
+   "text": "Choose Your Game: Pick one of the three options below.",
+   "locator": "L59-60",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-033",
+   "kind": "requirement",
+   "text": "The table gives a quick comparison; each option is detailed in the sections that follow.",
+   "locator": "L60-61",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-034",
+   "kind": "requirement",
+   "text": "Comparison table, Option 1: Exploration / Adventure; inspiration Ecco the Dolphin, The Legend of Zelda.",
+   "locator": "L62-68",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-035",
+   "kind": "requirement",
+   "text": "Option 1 goal (table): Create a world that rewards players for exploring and gives them a reason to keep going.",
+   "locator": "L69-72",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-036",
+   "kind": "rubric",
+   "text": "Option 1 what makes it great (table): The world feels like a place, not a collection of rooms. Exploration and discovery matter.",
+   "locator": "L73-76",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-037",
+   "kind": "requirement",
+   "text": "Comparison table, Option 2: Platformer; inspiration Super Mario Bros., Celeste.",
+   "locator": "L77-78",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-038",
+   "kind": "requirement",
+   "text": "Option 2 goal (table): Create a game where movement is satisfying and players develop mastery as they progress.",
+   "locator": "L79-83",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-039",
+   "kind": "rubric",
+   "text": "Option 2 what makes it great (table): The controls feel good, the difficulty is intentional, and the game keeps finding interesting ways to use its mechanics.",
+   "locator": "L84-89",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-040",
+   "kind": "requirement",
+   "text": "Comparison table, Option 3: Multiplayer Racing; inspiration Mario Kart.",
+   "locator": "L91-93",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-041",
+   "kind": "requirement",
+   "text": "Option 3 goal (table): Create a short, exciting racing game that people can play together and want to replay.",
+   "locator": "L94-97",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-042",
+   "kind": "rubric",
+   "text": "Option 3 what makes it great (table): The racing feels good, it is easy to get into a match, and the experience is fun over repeated short sessions.",
+   "locator": "L98-102",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-043",
+   "kind": "requirement",
+   "text": "Option 1: Create a world that rewards players for exploring and gives them a reason to keep going.",
+   "locator": "L103-106",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-044",
+   "kind": "requirement",
+   "text": "Option 1 must include a clear central goal and a beginning-to-end story or journey.",
+   "locator": "L107-109",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-045",
+   "kind": "metric",
+   "text": "Option 1: At least three distinct, connected areas that players can explore and revisit.",
+   "locator": "L110-111",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-046",
+   "kind": "metric",
+   "text": "Option 1: At least three meaningful obstacles or puzzles that require more than simply finding the exit.",
+   "locator": "L112-114",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-047",
+   "kind": "requirement",
+   "text": "Option 1: A sense of progression: an ability, item, discovery, or change in the world opens a new path.",
+   "locator": "L115-117",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-048",
+   "kind": "requirement",
+   "text": "Option 1: A world with a consistent visual identity and an ending that resolves the central goal.",
+   "locator": "L118-120",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-049",
+   "kind": "metric",
+   "text": "Option 1: Aim for a complete game that takes a new player roughly 10-15 minutes to finish.",
+   "locator": "L121-123",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-050",
+   "kind": "requirement",
+   "text": "Option 1: ...with genuinely distinct challenges along the way.",
+   "locator": "L123",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-051",
+   "kind": "rubric",
+   "text": "Option 1: The 10-15 minute figure is a target, not a stopwatch-based pass/fail rule.",
+   "locator": "L123-124",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-052",
+   "kind": "rubric",
+   "text": "Option 1 what makes it great: The world feels like a place, not a collection of rooms. Exploration and discovery matter to the experience.",
+   "locator": "L125-126",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-053",
+   "kind": "requirement",
+   "text": "Option 2: Platformer; inspiration Super Mario Bros., Celeste; Create a game where movement is satisfying and players develop mastery as they progress.",
+   "locator": "L127-130",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-054",
+   "kind": "requirement",
+   "text": "Option 2: Responsive movement and a core mechanic that remains fun throughout the game.",
+   "locator": "L132-134",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-055",
+   "kind": "metric",
+   "text": "Option 2: At least three distinct stages or sections, connected by a clear progression.",
+   "locator": "L135-136",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-056",
+   "kind": "requirement",
+   "text": "Option 2: Increasing challenge: introduce an obstacle or mechanic, then build on it.",
+   "locator": "L137-138",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-057",
+   "kind": "requirement",
+   "text": "Option 2: A reasonable retry system so players can learn from failure without excessive frustration.",
+   "locator": "L140-142",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-058",
+   "kind": "requirement",
+   "text": "Option 2: A final challenge and a clear ending.",
+   "locator": "L144-145",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-059",
+   "kind": "requirement",
+   "text": "Option 2: Build an entire game, not just a single level.",
+   "locator": "L145",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-060",
+   "kind": "metric",
+   "text": "Option 2: Aim for a complete game that takes a new player roughly 10-15 minutes to finish, with genuinely distinct challenges along the way.",
+   "locator": "L146-147",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-061",
+   "kind": "rubric",
+   "text": "Option 2: The 10-15 minute figure is a target, not a stopwatch-based pass/fail rule.",
+   "locator": "L147-148",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-062",
+   "kind": "rubric",
+   "text": "Option 2 what makes it great: The controls feel good, the difficulty is intentional, and the game keeps finding interesting ways to use its mechanics.",
+   "locator": "L149-150",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-063",
+   "kind": "requirement",
+   "text": "Option 3: Multiplayer Racing; inspiration Mario Kart; Create a short, exciting racing game that people can play together and want to replay.",
+   "locator": "L151-153",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-064",
+   "kind": "metric",
+   "text": "Option 3: At least two people racing together, with a clear way to join the same game.",
+   "locator": "L155-156",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-065",
+   "kind": "metric",
+   "text": "Option 3: At least two distinct tracks or courses with different layouts or challenges.",
+   "locator": "L157-158",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-066",
+   "kind": "requirement",
+   "text": "Option 3: A complete race flow: start, race, finish, results, and a way to play again.",
+   "locator": "L159-160",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-067",
+   "kind": "requirement",
+   "text": "Option 3: Clear feedback on position or progress and who won.",
+   "locator": "L161-162",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-068",
+   "kind": "requirement",
+   "text": "Option 3: At least one mechanic beyond basic steering and acceleration, such as boosts, hazards, drifting, or power-ups.",
+   "locator": "L163-165",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-069",
+   "kind": "requirement",
+   "text": "Option 3: Multiplayer that works reliably enough for players to complete a race together. (no reliability number, network conditions or player count beyond two)",
+   "locator": "L166-167",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-070",
+   "kind": "requirement",
+   "text": "Option 3: Individual races can be short, but the game should offer enough variety and multiplayer polish to make people want to race again.",
+   "locator": "L168-169",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-071",
+   "kind": "rubric",
+   "text": "Option 3 what makes it great: The racing feels good, it is easy to get into a match, and the experience is fun over repeated short sessions.",
+   "locator": "L170-171",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-072",
+   "kind": "dependency",
+   "text": "Web browser as the runtime/platform for the game (any browser, no install); a shareable URL/hosting for the game link.",
+   "locator": "L46-47",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-073",
+   "kind": "dependency",
+   "text": "Multiplayer (Option 3) implies a networking transport and a server/hosting or relay for matchmaking and joining the same game.",
+   "locator": "L155-156",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-074",
+   "kind": "assumption",
+   "text": "The judges (Friday morning) will play every game in a browser from the link, on unknown devices, network and browser; judging is by people (subjective).",
+   "locator": "L10-14",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-075",
+   "kind": "assumption",
+   "text": "Brief does not state who owns the generated assets or the game, who the audience/judges are, or any licence for the deliverable.",
+   "locator": "L1-171",
+   "pass": 1,
+   "origin": "brief"
+  },
+  {
+   "id": "C-076",
+   "kind": "requirement",
+   "text": "Operator is building the Game Week game in gauntlet-game-week, hosted at labs.gauntletai.com.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-077",
+   "kind": "requirement",
+   "text": "The repository is public.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-078",
+   "kind": "assumption",
+   "text": "The repository is currently empty (\"public, empty\"): no prior code or assets.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-079",
+   "kind": "requirement",
+   "text": "Leading idea: Final Frontier, a multiplayer space racer (Option 3: Multiplayer Racing).",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-080",
+   "kind": "requirement",
+   "text": "The game uses Kepler (orbital) physics.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-081",
+   "kind": "requirement",
+   "text": "The game uses restricted n-body physics.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-082",
+   "kind": "requirement",
+   "text": "Racing takes place in orbital physics (racers move under gravity of bodies rather than conventional car/kart steering).",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-083",
+   "kind": "requirement",
+   "text": "All assets are generated.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-084",
+   "kind": "requirement",
+   "text": "Do not start developing yet; begin with the profile and the minesweeper sweep.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-085",
+   "kind": "dependency",
+   "text": "Hosting/domain labs.gauntletai.com for the repository and (implied) the game.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-086",
+   "kind": "dependency",
+   "text": "Multiplayer networking layer (transport, server or relay) for the space racer.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-087",
+   "kind": "dependency",
+   "text": "Physics simulation code: Kepler orbit solver and restricted n-body integrator (library or hand-written, unspecified).",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-088",
+   "kind": "dependency",
+   "text": "Generation tools/providers for visual and audio assets (unspecified).",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-089",
+   "kind": "assumption",
+   "text": "All clients agree on physics state: n-body integration is deterministic across browsers/devices (floating-point, timestep) or a server is authoritative, otherwise players desync.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-090",
+   "kind": "assumption",
+   "text": "Players can steer and win under orbital dynamics: the controls feel good and a new player can understand the objective and play without instruction.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-091",
+   "kind": "assumption",
+   "text": "A restricted n-body model (a few massive bodies, negligible-mass ships) is cheap enough to run per tick in a browser for all players.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-092",
+   "kind": "assumption",
+   "text": "Space racing is compatible with the brief's race flow (two or more distinct tracks/courses, position feedback, mechanic beyond steering) under orbital physics.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-093",
+   "kind": "assumption",
+   "text": "A public repo is acceptable alongside generated assets, any AI-provider terms, and any licence/credit duties on tools used.",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-094",
+   "kind": "assumption",
+   "text": "Final Frontier is a name chosen by the operator; it may collide with existing games/trademarks (unchecked).",
+   "locator": "proposal L3",
+   "pass": 1,
+   "origin": "proposal"
+  },
+  {
+   "id": "C-095",
+   "kind": "dependency",
+   "text": "1. The brief bans premade assets; the lecture's asset-library route (Kenney, Poly Haven, Quaternius, KayKit, Freesound, Fab, Mixamo, etc.) therefore likely breaks the rule; only AI generation and made-with-code routes are safe; Mixamo animations are arguably premade too.",
+   "locator": "research-README:item 1",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-096",
+   "kind": "assumption",
+   "text": "2. Several free AI tiers bar commercial use or downloads: Recraft free outputs not licensed for commercial use.",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-097",
+   "kind": "assumption",
+   "text": "2. Scenario free tier is personal/evaluation only.",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-098",
+   "kind": "assumption",
+   "text": "2. Suno free tier has no commercial rights and no downloads.",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-099",
+   "kind": "assumption",
+   "text": "2. Sloyd guest tier has a personal-use licence.",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-100",
+   "kind": "assumption",
+   "text": "2. Stable Audio free tier is non-commercial per sources (unverified).",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-101",
+   "kind": "assumption",
+   "text": "2. Whether a class/competition game counts as commercial must be checked before relying on any free tier.",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-102",
+   "kind": "dependency",
+   "text": "2. Meshy free tier is CC BY 4.0 (commercial allowed with credit).",
+   "locator": "research-README:item 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-103",
+   "kind": "metric",
+   "text": "3. ElevenLabs Starter costs $6/mo ($1 first month) and gives generated music/SFX with a commercial licence.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-104",
+   "kind": "metric",
+   "text": "3. Suno Pro costs $8/mo as an alternative for music.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-105",
+   "kind": "dependency",
+   "text": "3. jsfxr / Web Audio are free, code-made audio.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-106",
+   "kind": "metric",
+   "text": "3. Meshy: free 100 credits/mo, CC BY 4.0; Pro $20/mo for API.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-107",
+   "kind": "dependency",
+   "text": "3. Fully procedural three.js geometry and shaders are free 3D.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-108",
+   "kind": "dependency",
+   "text": "3. PixelLab is the strongest fit for 2D pixel art; pricing unverified.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-109",
+   "kind": "metric",
+   "text": "3. Retro Diffusion is pay-per-image at about $0.01 (third-party source).",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-110",
+   "kind": "metric",
+   "text": "3. AutoSprite Starter costs $12/mo for animated sheets.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-111",
+   "kind": "dependency",
+   "text": "3. Three.js / Phaser / PixiJS are MIT licensed and free.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-112",
+   "kind": "dependency",
+   "text": "3. Piskel, LibreSprite, Pillow and Blender are free editing and scripting tools.",
+   "locator": "research-README:item 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-113",
+   "kind": "assumption",
+   "text": "4. Godot web export exists but is limited: GDScript only on web, single-thread default, WebSocket/WebRTC networking.",
+   "locator": "research-README:item 4",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-114",
+   "kind": "assumption",
+   "text": "4. Unity web builds are heavy.",
+   "locator": "research-README:item 4",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-115",
+   "kind": "assumption",
+   "text": "4. Unreal has no official web export (secondary source).",
+   "locator": "research-README:item 4",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-116",
+   "kind": "assumption",
+   "text": "4. Plain Three.js or Phaser is the best 3-day fit.",
+   "locator": "research-README:item 4",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-117",
+   "kind": "assumption",
+   "text": "5. Vercel Hobby is non-commercial, has a 300 s function cap and no shared state across instances; host the static client there at most.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-118",
+   "kind": "metric",
+   "text": "5. Render free tier: 750 h/mo, 15 min idle sleep, about 1 min cold start.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-119",
+   "kind": "metric",
+   "text": "5. Railway offers a $5 trial credit.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-120",
+   "kind": "metric",
+   "text": "5. Cloudflare Durable Objects free tier: 100k requests/day, incoming WebSocket messages billed 20:1.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-121",
+   "kind": "assumption",
+   "text": "5. Hosted PartyKit shut down on 23 Oct 2026 per the agent's read of its docs; successor is PartyServer on your own Cloudflare.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-122",
+   "kind": "assumption",
+   "text": "5. PeerJS is a no-server fallback; NAT reliability unverified.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-123",
+   "kind": "dependency",
+   "text": "5. Colyseus or a small ws Node server are candidate multiplayer servers.",
+   "locator": "research-README:item 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-124",
+   "kind": "dependency",
+   "text": "6. Blender MCP: MIT licence, about 33k stars, runs arbitrary Python over an unauthenticated socket.",
+   "locator": "research-README:item 6",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-125",
+   "kind": "dependency",
+   "text": "6. gamedev-skills repo is Apache-2.0.",
+   "locator": "research-README:item 6",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-126",
+   "kind": "assumption",
+   "text": "6. Blender MCP can import Poly Haven/Sketchfab assets; this import path should be avoided under the no-premade rule. Unity/Godot/Aseprite MCPs only if those tools are picked.",
+   "locator": "research-README:item 6",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-127",
+   "kind": "assumption",
+   "text": "Could not verify: OpenAI per-image price and ChatGPT free limits; PixelLab pricing and credits (pricing page 404); Retro Diffusion (third-party only); Ludo.ai, AutoSprite, Layer free-tier terms; Recraft paid prices.",
+   "locator": "research-README:could-not-verify 1",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-128",
+   "kind": "assumption",
+   "text": "Could not verify: Tripo and Stable Audio official pricing (403/empty page; aggregator figures only).",
+   "locator": "research-README:could-not-verify 2",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-129",
+   "kind": "assumption",
+   "text": "Could not verify: Aseprite price, Audacity licence text, A Sound Effect, Quaternius/KayKit/0x72 licences, official OpenGameArt/Fab/Synty/Mixamo pages.",
+   "locator": "research-README:could-not-verify 3",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-130",
+   "kind": "assumption",
+   "text": "Could not verify: Unreal cost/royalty, Godot licence, Unity build size, blender-mcp last commit, PeerJS free-broker limits and TURN details.",
+   "locator": "research-README:could-not-verify 4",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-131",
+   "kind": "assumption",
+   "text": "Could not verify: Three.js/Phaser/PixiJS pages were not fetched (MIT per the libraries file only).",
+   "locator": "research-README:could-not-verify 5",
+   "pass": 1,
+   "origin": "research-README"
+  },
+  {
+   "id": "C-132",
+   "kind": "requirement",
+   "text": "Slide 10: Asset workflow is Creator -> separate critic -> fixes -> in-game check.",
+   "locator": "lecture:slide 10",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-133",
+   "kind": "dependency",
+   "text": "Slide 10: Existing tools used for QuizCaster: Phaser (game rendering and interaction), jsfxr (sound-effect generation), Aseprite (pixel edits and sprite export).",
+   "locator": "lecture:slide 10",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-134",
+   "kind": "dependency",
+   "text": "Slide 10: PixelLab art was used for character views, spell sprites and animation, and generated pickup art; HUD bars, beam paths, world layout and weather were made with code.",
+   "locator": "lecture:slide 10",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-135",
+   "kind": "assumption",
+   "text": "Slide 26: Three ways to get visual assets: (1) AI generation: PixelLab, Retro Diffusion, Meshy.",
+   "locator": "lecture:slide 26",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-136",
+   "kind": "assumption",
+   "text": "Slide 26: (2) Made with code: the agent writes code that draws shapes, particle effects and materials (procedural); e.g. a coin in a few lines of SVG.",
+   "locator": "lecture:slide 26",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-137",
+   "kind": "assumption",
+   "text": "Slide 26: (3) Asset libraries: packs and models artists have already made (Kenney, Poly Haven, itch.io).",
+   "locator": "lecture:slide 26",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-138",
+   "kind": "requirement",
+   "text": "Slide 28: Give a separate critic the actual asset: Create (from a reference and small brief), Independent critique (separate agent inspects exported frames), In-game check (scale, timing, readability in the build), Revise (fix biggest issue, review again).",
+   "locator": "lecture:slide 28",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-139",
+   "kind": "assumption",
+   "text": "Slide 34: Look for a coherent library pack with the scale, camera, and license your game needs; examples Kenney Tiny Dungeon (2D), Poly Haven Ship Pinnace (3D), Quaternius.",
+   "locator": "lecture:slide 34",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-140",
+   "kind": "dependency",
+   "text": "Slide 35: 2D AI generation tools: OpenAI built-in image generation, Layer, PixelLab, Retro Diffusion, AutoSprite, Ludo.ai, Scenario, Recraft.",
+   "locator": "lecture:slide 35",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-141",
+   "kind": "dependency",
+   "text": "Slide 35: 2D made-with-code tools: Sprite Fusion VFX, Phaser, Pillow, Aseprite CLI + Lua.",
+   "locator": "lecture:slide 35",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-142",
+   "kind": "dependency",
+   "text": "Slide 35: 2D libraries: Kenney (CC0), 0x72, CraftPix, GameArt2D, itch.io (creator terms), OpenGameArt (varied licenses); touch-up: Aseprite (paid), Piskel (free), LibreSprite (free).",
+   "locator": "lecture:slide 35",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-143",
+   "kind": "assumption",
+   "text": "Slide 35: Built-in generation uses plan limits; specialist services have their own plans or credits.",
+   "locator": "lecture:slide 35",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-144",
+   "kind": "dependency",
+   "text": "Slide 36: 3D AI generation tools: Meshy, Tripo, Rodin/Hyper3D, Sloyd, Skybox AI, Layer.",
+   "locator": "lecture:slide 36",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-145",
+   "kind": "dependency",
+   "text": "Slide 36: 3D made-with-code tools: Three.js, Blender Python, Blender MCP (lets the agent run Blender), Claude of Duty.",
+   "locator": "lecture:slide 36",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-146",
+   "kind": "dependency",
+   "text": "Slide 36: 3D libraries: Poly Haven (CC0), Quaternius, KayKit, ambientCG, Fab, Synty (paid); rig/animate: Mixamo, Quaternius animations (CC0), Fox sample, glTF/GLB.",
+   "locator": "lecture:slide 36",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-147",
+   "kind": "assumption",
+   "text": "Slide 36: Generated models still need a check of shape, textures and rig in your engine.",
+   "locator": "lecture:slide 36",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-148",
+   "kind": "assumption",
+   "text": "Slide 50: Three ways to get audio: (1) AI generation (ElevenLabs sound effects and music, prompt -> audio file); (2) made with code (jsfxr, Bfxr, Web Audio); (3) asset libraries (Kenney, Freesound, Sonniss; artist-made recordings).",
+   "locator": "lecture:slide 50",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-149",
+   "kind": "assumption",
+   "text": "Slide 53: Sound libraries (Kenney, Freesound, OpenGameArt, Sonniss, A Sound Effect) are free and paid collections; check the terms of the pack you pick.",
+   "locator": "lecture:slide 53",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-150",
+   "kind": "dependency",
+   "text": "Slide 54: Audio AI tools: ElevenLabs, Layer, Suno, Stable Audio; code tools: jsfxr, jsfxr library, Bfxr, Bfxr source; libraries: Kenney Impact/Interface/Voiceover (CC0), Freesound (per-sound licenses), Sonniss, A Sound Effect (paid); edit: Audacity, Godot/Unreal audio import.",
+   "locator": "lecture:slide 54",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-151",
+   "kind": "requirement",
+   "text": "Slide 54: Play every sound in the game at its real volume before you keep it.",
+   "locator": "lecture:slide 54",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-152",
+   "kind": "example",
+   "text": "Slide 69 Roofline: Art code-drawn pixel art; Animation code-drawn; SFX recorded foley + synthesized cues; Music generated with ElevenLabs.",
+   "locator": "lecture:slide 69",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-153",
+   "kind": "example",
+   "text": "Slide 70 Sky Roadster (checkpoint racing): Art library models + code-built scenery; Animation in code; SFX recorded vehicle and air sounds; Music generated with ElevenLabs.",
+   "locator": "lecture:slide 70",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-154",
+   "kind": "example",
+   "text": "Slide 71 Dewbound: Art code-drawn 2D; Animation articulated in code; SFX recorded sounds + synthesized layers; Music generated with ElevenLabs.",
+   "locator": "lecture:slide 71",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-155",
+   "kind": "example",
+   "text": "Slide 72 Aftershock (chain-reaction space combat): Art code-drawn pixel art; Animation code-built particles; SFX Web Audio synthesis; Music generated with ElevenLabs.",
+   "locator": "lecture:slide 72",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-156",
+   "kind": "example",
+   "text": "Slide 73 Jelly Drop: Art AI-generated scene art + code-rendered jelly; Animation soft-body physics; SFX Web Audio synthesis; Music generated with ElevenLabs.",
+   "locator": "lecture:slide 73",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-157",
+   "kind": "assumption",
+   "text": "Slides 69-73: demo games use library models (Sky Roadster) and recorded (non-generated) SFX, so they may not themselves satisfy the brief's \"all assets generated\" rule.",
+   "locator": "lecture:slides 69-73",
+   "pass": 1,
+   "origin": "lecture"
+  },
+  {
+   "id": "C-158",
+   "kind": "omission",
+   "text": "The brief names each external model or API provider and the agreement or tier it will be used under (consumer, free, paid API, enterprise).",
+   "locator": "provider-terms.provider-and-agreement",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-159",
+   "kind": "omission",
+   "text": "The brief states what happens to provider outputs beyond showing them to the user (stored, used for training or evaluation, redistributed).",
+   "locator": "provider-terms.output-use",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-160",
+   "kind": "omission",
+   "text": "The brief states what classes of data are sent to each provider.",
+   "locator": "provider-terms.data-sent",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-161",
+   "kind": "omission",
+   "text": "The brief states where every training or mined content source comes from and the legal basis or licence for using it.",
+   "locator": "copyright-data-rights.content-provenance",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-162",
+   "kind": "omission",
+   "text": "Where content is crawled or mined, the brief states how rightholder reservations (robots directives, machine-readable TDM opt-outs) are honoured.",
+   "locator": "copyright-data-rights.opt-out-handling",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-163",
+   "kind": "omission",
+   "text": "The brief states, or requires producing, the licence (SPDX id and version) of every third-party component, model and dataset the deliverable uses.",
+   "locator": "licensing.dependency-licence-inventory",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-164",
+   "kind": "omission",
+   "text": "The brief states whether the deliverable is commercial (sold, revenue-bearing, or used for commercial advantage), so non-commercial assets can be excluded.",
+   "locator": "licensing.commercial-use",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-165",
+   "kind": "omission",
+   "text": "The brief states whether the AI system is used on people in the EU and, if so, its risk classification under the EU AI Act (prohibited, high-risk under Article 6, transparency-only, or minimal).",
+   "locator": "ai-regulation.ai-act-classification",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-166",
+   "kind": "omission",
+   "text": "For any automated decision about a person (hiring, credit, grading, eligibility), the brief states who can review, override or halt it, and that decisions are logged.",
+   "locator": "ai-regulation.human-oversight",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-167",
+   "kind": "omission",
+   "text": "For any conversational or voice AI facing the public, the brief states that users are told they are interacting with an AI.",
+   "locator": "ai-regulation.ai-disclosure",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-168",
+   "kind": "omission",
+   "text": "The brief states the accessibility standard and level the UI targets (for example WCAG 2.2 Level AA) and treats it as an acceptance gate.",
+   "locator": "accessibility.a11y-standard",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-169",
+   "kind": "omission",
+   "text": "The brief states whether the product is a US public-entity service (ADA Title II) or an EAA-covered EU consumer service, which set a binding accessibility floor.",
+   "locator": "accessibility.legal-coverage",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-170",
+   "kind": "omission",
+   "text": "The brief states that information and operation do not depend on a single sense or input (not colour-only, keyboard operable, works without a precise drag).",
+   "locator": "accessibility.non-visual-operable",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-171",
+   "kind": "omission",
+   "text": "The brief lists the classes of personal data processed, flagging regulated ones (health, special-category, children's, financial).",
+   "locator": "privacy-regulated-data.data-classes",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-172",
+   "kind": "omission",
+   "text": "The brief names every third party that receives personal data and the agreement covering it (BAA, Article 28 processor contract, DPA).",
+   "locator": "privacy-regulated-data.processors-and-agreements",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-173",
+   "kind": "omission",
+   "text": "The brief states where personal data is stored, cached and processed, and how long each class is retained.",
+   "locator": "privacy-regulated-data.residency-and-retention",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-174",
+   "kind": "omission",
+   "text": "The brief states which systems the tool may actively test and how the owner's authorisation for each is obtained and checked.",
+   "locator": "security-ethics.authorised-targets",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-175",
+   "kind": "omission",
+   "text": "The brief states how findings about systems the operator does not own are reported (privately to the owner, vendor or a coordinator) and when, if ever, they are published.",
+   "locator": "security-ethics.disclosure-route",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-176",
+   "kind": "omission",
+   "text": "The brief states what the tool does when it meets personal or other sensitive data during testing (stop, do not retain or display, notify the owner).",
+   "locator": "security-ethics.sensitive-data-handling",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-177",
+   "kind": "omission",
+   "text": "The brief states the network path assumptions - expected packet loss, round-trip time, jitter and MTU (or that the MTU is discovered) - the live channel must work over.",
+   "locator": "realtime-transport.network-path",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-178",
+   "kind": "omission",
+   "text": "The brief states an end-to-end latency budget for the live channel (for example mouth-to-ear) and how it splits across capture, processing, network, buffering and playout.",
+   "locator": "realtime-transport.latency-budget",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-179",
+   "kind": "omission",
+   "text": "The brief states the fault model: whether participants may only crash or may behave arbitrarily (Byzantine), and how many simultaneous faults f must be tolerated.",
+   "locator": "distributed-systems.fault-model",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-180",
+   "kind": "omission",
+   "text": "The brief states which nodes, relays and operators are trusted, and how messages and membership are authenticated.",
+   "locator": "distributed-systems.trust-boundary",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-181",
+   "kind": "omission",
+   "text": "The brief states message delivery and retry semantics (at-most-once or at-least-once) and the idempotency key that makes retries safe.",
+   "locator": "distributed-systems.delivery-semantics",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-182",
+   "kind": "omission",
+   "text": "The brief states what ordering is guaranteed (per key, per source, total, causal) and what assigns it (a log sequence, logical clocks), rather than relying on wall-clock time.",
+   "locator": "distributed-systems.ordering-guarantees",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-183",
+   "kind": "omission",
+   "text": "Where money appears, the brief states the numeric type (integer minor units or fixed-scale decimal), the currency scale, and the rounding rule and where rounding happens.",
+   "locator": "numeric-representation.money-type-and-rounding",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-184",
+   "kind": "omission",
+   "text": "Where times are stored or compared, the brief states that instants are stored in UTC or with an offset and how user time zones and daylight-saving changes are handled.",
+   "locator": "numeric-representation.time-representation",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-185",
+   "kind": "omission",
+   "text": "Where counters, ids or running totals are stored, the brief states their maximum lifetime value or width and what happens on overflow.",
+   "locator": "numeric-representation.integer-ranges",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-186",
+   "kind": "omission",
+   "text": "The brief states the load model - peak arrival rate, payload size distribution and concurrency - that its performance targets must hold under.",
+   "locator": "performance.load-model",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-187",
+   "kind": "omission",
+   "text": "Every latency target names a percentile and where it is measured (for example p99 at the API edge).",
+   "locator": "performance.latency-slo-percentile",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-188",
+   "kind": "omission",
+   "text": "The brief states a cost ceiling per unit (per user, request, device or GB) that infrastructure and data-transfer costs must stay under.",
+   "locator": "performance.cost-ceiling-per-unit",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-189",
+   "kind": "omission",
+   "text": "The brief states the media parameters the pipeline must handle - maximum resolution, frame count or frame rate, bit depth, colour space and transfer function - for input and output.",
+   "locator": "media-pipelines.media-format",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-190",
+   "kind": "omission",
+   "text": "The brief states the memory budget per worker and how many media requests a worker processes at once.",
+   "locator": "media-pipelines.memory-budget-per-worker",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-191",
+   "kind": "omission",
+   "text": "The brief states a memory budget per worker or container and the peak input size and concurrency it must hold.",
+   "locator": "os-systems.memory-budget-per-worker",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-192",
+   "kind": "omission",
+   "text": "The brief states the concurrency model (pooled connections, bounded worker pool or event loop) and the peak concurrent connections, threads and open files per host.",
+   "locator": "os-systems.concurrency-model",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-193",
+   "kind": "omission",
+   "text": "For any optimisation feature, the brief states whether it needs the exact optimum or an approximation, and if an approximation, the acceptable optimality gap and the time budget per solve.",
+   "locator": "theory-complexity.optimality-target",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-194",
+   "kind": "omission",
+   "text": "The brief states the maximum problem size the optimiser or checker must handle (entities, nodes, constraints) together with the latency it must meet at that size.",
+   "locator": "theory-complexity.instance-size",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-195",
+   "kind": "omission",
+   "text": "Where users supply rules, scripts or patterns, the brief states the language's expressiveness and the run-time limits (steps or time, memory, recursion or trigger depth) that bound execution.",
+   "locator": "theory-complexity.rule-execution-bounds",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-196",
+   "kind": "omission",
+   "text": "For each scored metric or KPI, the brief states the underlying goal the metric is a proxy for.",
+   "locator": "rubric-inversion.proxy-target",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-197",
+   "kind": "omission",
+   "text": "For each scored metric, the brief names a counter-metric or budget that worsens when the metric is gamed (for example precision against recall, defects escaped against tests written, human-rated quality against an automated score).",
+   "locator": "rubric-inversion.counter-metric",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-198",
+   "kind": "omission",
+   "text": "The brief states how evaluation data is separated from training data (chronological cutoff, entity-grouped split, or why i.i.d. random splitting is valid) and that all fitted preprocessing uses training data only.",
+   "locator": "ml-evaluation.split-method",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-199",
+   "kind": "omission",
+   "text": "Where model scores are shown or used as probabilities or confidence, the brief states the calibration method and the calibration error target measured on held-out data.",
+   "locator": "ml-evaluation.calibration-target",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-200",
+   "kind": "omission",
+   "text": "The brief states the expected base rate of each class (or of the rare event) in deployment and the trivial baseline the model must beat.",
+   "locator": "ml-evaluation.base-rates",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-201",
+   "kind": "omission",
+   "text": "The brief states where dependencies come from (registries or an allowlisted mirror) and how a new dependency is vetted before first use.",
+   "locator": "supply-chain.dependency-vetting",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-202",
+   "kind": "omission",
+   "text": "The brief states that dependencies are pinned (lockfile, hashes or digests) and how updates are reviewed.",
+   "locator": "supply-chain.pinning-policy",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-203",
+   "kind": "omission",
+   "text": "The brief states whether automated agents may add or install packages, and what human approval that requires.",
+   "locator": "supply-chain.agent-install-policy",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-204",
+   "kind": "omission",
+   "text": "The brief states which identity and scopes each tool or downstream call runs with, and how the invoking user is authenticated.",
+   "locator": "agent-security.delegated-authority",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-205",
+   "kind": "omission",
+   "text": "The brief states which tool servers are trusted, how their definitions are reviewed and pinned, and what happens when a definition changes.",
+   "locator": "agent-security.tool-trust",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-206",
+   "kind": "omission",
+   "text": "The brief states which agent actions require explicit human confirmation and what the confirmation shows.",
+   "locator": "agent-security.human-approval",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-207",
+   "kind": "omission",
+   "text": "The brief states which inputs the agent reads are untrusted (emails, web pages, documents, tool output) and what tools may run while they are in context.",
+   "locator": "agent-security.untrusted-inputs",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-208",
+   "kind": "omission",
+   "text": "The brief states each agent loop's iteration cap, token or cost ceiling and wall-clock limit, and the halting condition that stops the loop when the goal is not reached (with the hand-off that follows).",
+   "locator": "agent-orchestration.loop-budget",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-209",
+   "kind": "omission",
+   "text": "The brief lists which agent actions are irreversible or externally visible (payments, refunds, deletions, outbound messages, deploys, physical actuation) and, for each, the human approval gate and the compensation or idempotency path.",
+   "locator": "agent-orchestration.irreversible-actions",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-210",
+   "kind": "omission",
+   "text": "The brief states which credentials each agent and sub-agent holds, their scope and lifetime, and whose authority each action is executed under.",
+   "locator": "agent-orchestration.credential-scope",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-211",
+   "kind": "omission",
+   "text": "The brief states that agent tool calls, their arguments, the acting identity and their outcomes are recorded in a log that operators can review.",
+   "locator": "agent-orchestration.action-audit",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-212",
+   "kind": "omission",
+   "text": "The brief states the target customer, the price they pay, and the expected volume (users and requests per user per period).",
+   "locator": "market-reality.customer-price-volume",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-213",
+   "kind": "omission",
+   "text": "The brief states the correctness floor, the one capability that must work for the product to have value to that customer.",
+   "locator": "market-reality.correctness-floor",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-214",
+   "kind": "omission",
+   "text": "The brief states or bounds the marginal cost to serve one user or request, with the provider prices it rests on.",
+   "locator": "market-reality.cost-to-serve",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-215",
+   "kind": "omission",
+   "text": "The brief names the organisation the product serves and who pays for it (the buyer, as distinct from the user and the evaluator).",
+   "locator": "company-context.organisation-and-payer",
+   "pass": 1,
+   "origin": "omission"
+  },
+  {
+   "id": "C-216",
+   "kind": "omission",
+   "text": "The brief names the regulator or regulators that govern the organisation's sector, or states that none applies and why.",
+   "locator": "company-context.governing-regulators",
+   "pass": 1,
+   "origin": "omission"
+  }
+ ]
+}

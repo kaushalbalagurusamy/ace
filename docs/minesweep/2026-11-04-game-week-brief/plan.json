@@ -1,0 +1,415 @@
+{
+  "brief": {
+    "path": "docs/minesweep/2026-11-04-game-week-brief/brief.md",
+    "sha256": "f84b7ad9b10742b911ee5922d9361c60050d10830063cfbe03ee707c7178c668"
+  },
+  "groups": {
+    "law-terms-ethics": {
+      "title": "Law, terms and ethics",
+      "model": "sonnet",
+      "lenses": [
+        {
+          "id": "accessibility",
+          "version": "0.1.0",
+          "why": "signals: ui",
+          "calibrated": false,
+          "read": [
+            "lenses/accessibility/lens.md",
+            "lenses/accessibility/traps.yaml"
+          ],
+          "required_statements": [
+            "accessibility.a11y-standard: The brief states the accessibility standard and level the UI targets (for example WCAG 2.2 Level AA) and treats it as an acceptance gate.",
+            "accessibility.legal-coverage: The brief states whether the product is a US public-entity service (ADA Title II) or an EAA-covered EU consumer service, which set a binding accessibility floor.",
+            "accessibility.non-visual-operable: The brief states that information and operation do not depend on a single sense or input (not colour-only, keyboard operable, works without a precise drag)."
+          ],
+          "traps": [
+            {
+              "id": "accessibility.information-by-single-sense",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.not-keyboard-or-pointer-operable",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.public-entity-below-wcag-aa",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.covered-service-not-accessible",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "privacy-regulated-data",
+          "version": "0.1.0",
+          "why": "signals: phi",
+          "calibrated": false,
+          "read": [
+            "lenses/privacy-regulated-data/lens.md",
+            "lenses/privacy-regulated-data/traps.yaml"
+          ],
+          "required_statements": [
+            "privacy-regulated-data.data-classes: The brief lists the classes of personal data processed, flagging regulated ones (health, special-category, children's, financial).",
+            "privacy-regulated-data.processors-and-agreements: The brief names every third party that receives personal data and the agreement covering it (BAA, Article 28 processor contract, DPA).",
+            "privacy-regulated-data.residency-and-retention: The brief states where personal data is stored, cached and processed, and how long each class is retained."
+          ],
+          "traps": [
+            {
+              "id": "privacy-regulated-data.phi-to-general-model-endpoint",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.special-category-global-edge-cache",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.collect-all-keep-forever",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.children-data-without-parental-consent",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "business": {
+      "title": "Business context",
+      "model": "sonnet",
+      "lenses": [
+        {
+          "id": "company-context",
+          "version": "0.1.0",
+          "why": "always",
+          "calibrated": false,
+          "read": [
+            "lenses/company-context/lens.md",
+            "lenses/company-context/traps.yaml"
+          ],
+          "required_statements": [
+            "company-context.organisation-and-payer: The brief names the organisation the product serves and who pays for it (the buyer, as distinct from the user and the evaluator).",
+            "company-context.governing-regulators: The brief names the regulator or regulators that govern the organisation's sector, or states that none applies and why."
+          ],
+          "traps": [
+            {
+              "id": "company-context.contradicts-published-policy",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "company-context.ignores-sector-regulator",
+              "status": "verified",
+              "kind": "omission"
+            },
+            {
+              "id": "company-context.metric-serves-evaluator",
+              "status": "unverified",
+              "kind": "metric"
+            },
+            {
+              "id": "company-context.assumed-data-rights",
+              "status": "unverified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "theory-measurement": {
+      "title": "Theory and measurement",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "numeric-representation",
+          "version": "0.1.0",
+          "why": "signals: schedule",
+          "calibrated": false,
+          "read": [
+            "lenses/numeric-representation/lens.md",
+            "lenses/numeric-representation/traps.yaml"
+          ],
+          "required_statements": [
+            "numeric-representation.money-type-and-rounding: Where money appears, the brief states the numeric type (integer minor units or fixed-scale decimal), the currency scale, and the rounding rule and where rounding happens.",
+            "numeric-representation.time-representation: Where times are stored or compared, the brief states that instants are stored in UTC or with an offset and how user time zones and daylight-saving changes are handled.",
+            "numeric-representation.integer-ranges: Where counters, ids or running totals are stored, the brief states their maximum lifetime value or width and what happens on overflow."
+          ],
+          "traps": [
+            {
+              "id": "numeric-representation.money-in-binary-float",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.float-equality",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.order-dependent-float-aggregation",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.naive-local-timestamps",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.fixed-width-counter-overflow",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "theory-complexity",
+          "version": "0.1.0",
+          "why": "signals: schedul",
+          "calibrated": false,
+          "read": [
+            "lenses/theory-complexity/lens.md",
+            "lenses/theory-complexity/traps.yaml"
+          ],
+          "required_statements": [
+            "theory-complexity.optimality-target: For any optimisation feature, the brief states whether it needs the exact optimum or an approximation, and if an approximation, the acceptable optimality gap and the time budget per solve.",
+            "theory-complexity.instance-size: The brief states the maximum problem size the optimiser or checker must handle (entities, nodes, constraints) together with the latency it must meet at that size.",
+            "theory-complexity.rule-execution-bounds: Where users supply rules, scripts or patterns, the brief states the language's expressiveness and the run-time limits (steps or time, memory, recursion or trigger depth) that bound execution."
+          ],
+          "traps": [
+            {
+              "id": "theory-complexity.np-hard-optimal-at-scale",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.undecidable-rule-verification",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.perfect-semantic-detection",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.backtracking-regex-on-untrusted-input",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "systems-performance": {
+      "title": "Systems and performance",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "os-systems",
+          "version": "0.1.0",
+          "why": "signals: oom",
+          "calibrated": false,
+          "read": [
+            "lenses/os-systems/lens.md",
+            "lenses/os-systems/traps.yaml"
+          ],
+          "required_statements": [
+            "os-systems.memory-budget-per-worker: The brief states a memory budget per worker or container and the peak input size and concurrency it must hold.",
+            "os-systems.concurrency-model: The brief states the concurrency model (pooled connections, bounded worker pool or event loop) and the peak concurrent connections, threads and open files per host."
+          ],
+          "traps": [
+            {
+              "id": "os-systems.ephemeral-port-exhaustion",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.fd-limit-exhaustion",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.memory-limit-oom-kill",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.thread-or-process-per-request",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.page-cache-as-free-memory",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "performance",
+          "version": "0.1.0",
+          "why": "signals: retry",
+          "calibrated": false,
+          "read": [
+            "lenses/performance/lens.md",
+            "lenses/performance/traps.yaml"
+          ],
+          "required_statements": [
+            "performance.load-model: The brief states the load model - peak arrival rate, payload size distribution and concurrency - that its performance targets must hold under.",
+            "performance.latency-slo-percentile: Every latency target names a percentile and where it is measured (for example p99 at the API edge).",
+            "performance.cost-ceiling-per-unit: The brief states a cost ceiling per unit (per user, request, device or GB) that infrastructure and data-transfer costs must stay under."
+          ],
+          "traps": [
+            {
+              "id": "performance.fanout-tail-amplification",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.egress-unit-economics",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.high-cardinality-metric-labels",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.unbounded-queue",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.percentile-slo-without-load-model",
+              "status": "verified",
+              "kind": "omission"
+            }
+          ]
+        },
+        {
+          "id": "realtime-transport",
+          "version": "0.1.0",
+          "why": "signals: quic, multiplayer",
+          "calibrated": false,
+          "read": [
+            "lenses/realtime-transport/lens.md",
+            "lenses/realtime-transport/traps.yaml"
+          ],
+          "required_statements": [
+            "realtime-transport.network-path: The brief states the network path assumptions - expected packet loss, round-trip time, jitter and MTU (or that the MTU is discovered) - the live channel must work over.",
+            "realtime-transport.latency-budget: The brief states an end-to-end latency budget for the live channel (for example mouth-to-ear) and how it splits across capture, processing, network, buffering and playout."
+          ],
+          "traps": [
+            {
+              "id": "realtime-transport.live-media-over-reliable-stream",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.no-jitter-buffer",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.datagram-exceeds-path-mtu",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.translation-ahead-of-input",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "supply-chain-security-crypto": {
+      "title": "Supply chain, agent security and cryptography",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "supply-chain",
+          "version": "0.1.0",
+          "why": "signals: install",
+          "calibrated": false,
+          "read": [
+            "lenses/supply-chain/lens.md",
+            "lenses/supply-chain/traps.yaml"
+          ],
+          "required_statements": [
+            "supply-chain.dependency-vetting: The brief states where dependencies come from (registries or an allowlisted mirror) and how a new dependency is vetted before first use.",
+            "supply-chain.pinning-policy: The brief states that dependencies are pinned (lockfile, hashes or digests) and how updates are reviewed.",
+            "supply-chain.agent-install-policy: The brief states whether automated agents may add or install packages, and what human approval that requires."
+          ],
+          "traps": [
+            {
+              "id": "supply-chain.unverified-package-name",
+              "status": "verified",
+              "kind": "dependency"
+            },
+            {
+              "id": "supply-chain.autonomous-agent-install",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.install-time-scripts",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.unpinned-dependencies",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.unverified-provenance",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "lenses_applied": 9,
+  "lenses_skipped": [
+    "agent-orchestration",
+    "agent-security",
+    "ai-regulation",
+    "copyright-data-rights",
+    "cryptography",
+    "cyber-physical",
+    "databases",
+    "distributed-systems",
+    "licensing",
+    "market-reality",
+    "media-pipelines",
+    "ml-evaluation",
+    "professional-duty",
+    "provider-terms",
+    "rubric-inversion",
+    "security-ethics"
+  ],
+  "calibrated": false,
+  "models": {
+    "extractor": "sonnet",
+    "sweeper": "sonnet",
+    "grounder": "sonnet",
+    "skeptic": "opus",
+    "reframer": "sonnet"
+  }
+}

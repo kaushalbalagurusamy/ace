@@ -1,0 +1,3894 @@
+[
+{
+"claim_id": "C-005",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"visual pass/fail, no contrast"
+],
+"reason": "Pass/fail rests on visual quality with no contrast, text-size or colour-independence requirement."
+},
+{
+"claim_id": "C-006",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Mandates AI-generated assets but names no generator, tier or agreement; free/consumer tiers often bar commercial use or downloads, so the tier choice decides whether the game may be published."
+},
+{
+"claim_id": "C-006",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI output ownership",
+"training provenance"
+],
+"reason": "All-generated assets mean the game's art/audio may not be copyrightable by the operator and generators carry training-data provenance risk; nothing addresses either."
+},
+{
+"claim_id": "C-006",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI-generated media disclosure"
+],
+"reason": "Public deployment of wholly AI-generated art/audio; AI Act Art 50 marking/disclosure duties and platform labelling expectations are unaddressed."
+},
+{
+"claim_id": "C-012",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"visual pass/fail, no contrast"
+],
+"reason": "Pass/fail rests on visual quality with no contrast, text-size or colour-independence requirement."
+},
+{
+"claim_id": "C-013",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"visual pass/fail, no contrast"
+],
+"reason": "Pass/fail rests on visual quality with no contrast, text-size or colour-independence requirement."
+},
+{
+"claim_id": "C-017",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"instructions"
+],
+"reason": "Instructions need to be text, readable and not only shown visually/with pointer."
+},
+{
+"claim_id": "C-020",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"visual pass/fail, no contrast"
+],
+"reason": "Pass/fail rests on visual quality with no contrast, text-size or colour-independence requirement."
+},
+{
+"claim_id": "C-021",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"audio cues"
+],
+"reason": "Audio is mandated as part of identity; cues must have visual equivalents and a mute control."
+},
+{
+"claim_id": "C-023",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"instructions"
+],
+"reason": "Instructions need to be text, readable and not only shown visually/with pointer."
+},
+{
+"claim_id": "C-024",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.gpl-in-distributed-proprietary",
+"cues_matched": [
+"browser delivery ships code to every user"
+],
+"reason": "Browser delivery sends JS and assets to each player, so any copyleft library bundled counts as distributed; component licences are not specified."
+},
+{
+"claim_id": "C-024",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"browser, unknown devices"
+],
+"reason": "Judges use unknown devices and browsers; keyboard, touch and screen-size support unspecified."
+},
+{
+"claim_id": "C-025",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"browser, unknown devices"
+],
+"reason": "Judges use unknown devices and browsers; keyboard, touch and screen-size support unspecified."
+},
+{
+"claim_id": "C-026",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"sound levels",
+"animation"
+],
+"reason": "Mentions sound levels, animation, typography without mute/volume control, reduced motion, or captions for audio cues."
+},
+{
+"claim_id": "C-028",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Mandates AI-generated assets but names no generator, tier or agreement; free/consumer tiers often bar commercial use or downloads, so the tier choice decides whether the game may be published."
+},
+{
+"claim_id": "C-028",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI output ownership",
+"training provenance"
+],
+"reason": "All-generated assets mean the game's art/audio may not be copyrightable by the operator and generators carry training-data provenance risk; nothing addresses either."
+},
+{
+"claim_id": "C-028",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI-generated media disclosure"
+],
+"reason": "Public deployment of wholly AI-generated art/audio; AI Act Art 50 marking/disclosure duties and platform labelling expectations are unaddressed."
+},
+{
+"claim_id": "C-028",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"audio cues"
+],
+"reason": "Audio is mandated as part of identity; cues must have visual equivalents and a mute control."
+},
+{
+"claim_id": "C-029",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"ambiguity generated vs pre-made"
+],
+"reason": "Which tool outputs count as generated is unstated, so a builder may pick a generator whose terms (personal-use, no-download, no-commercial) do not permit a public game."
+},
+{
+"claim_id": "C-029",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"ambiguity generated vs pre-made"
+],
+"reason": "Unclear status of code-made, library and AI assets leaves origin and rights of each asset unrecorded."
+},
+{
+"claim_id": "C-030",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"audio cues"
+],
+"reason": "Audio is mandated as part of identity; cues must have visual equivalents and a mute control."
+},
+{
+"claim_id": "C-042",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"join flow"
+],
+"reason": "Join/ready flow must be keyboard operable and text-based (typed code), not drag or link-only."
+},
+{
+"claim_id": "C-042",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"public lobbies",
+"names on results"
+],
+"reason": "Easy public matches and who-won display expose chosen names and IPs to strangers."
+},
+{
+"claim_id": "C-042",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"abusive names"
+],
+"reason": "Players choose names visible to strangers: abuse and moderation vector."
+},
+{
+"claim_id": "C-064",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"join flow"
+],
+"reason": "Join/ready flow must be keyboard operable and text-based (typed code), not drag or link-only."
+},
+{
+"claim_id": "C-064",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"matchmaking",
+"join"
+],
+"reason": "Multiplayer server inevitably sees player names, IP addresses and session ids; collection and retention are unstated."
+},
+{
+"claim_id": "C-064",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"join links, unauthenticated server"
+],
+"reason": "Public join links/rooms on an unauthenticated game server enable room hijacking and flooding; lens is about testing ethics, flagged under abuse vectors."
+},
+{
+"claim_id": "C-066",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"results"
+],
+"reason": "Results screen requires text results rather than colour or ordering only."
+},
+{
+"claim_id": "C-067",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"position by colour"
+],
+"reason": "Position/progress/winner feedback is likely colour-coded racers or visual only; needs non-colour and non-visual redundancy."
+},
+{
+"claim_id": "C-067",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"public lobbies",
+"names on results"
+],
+"reason": "Easy public matches and who-won display expose chosen names and IPs to strangers."
+},
+{
+"claim_id": "C-067",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"abusive names"
+],
+"reason": "Players choose names visible to strangers: abuse and moderation vector."
+},
+{
+"claim_id": "C-068",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"hazards, boosts"
+],
+"reason": "Hazard/boost mechanics usually conveyed by colour or sound only."
+},
+{
+"claim_id": "C-072",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.gpl-in-distributed-proprietary",
+"cues_matched": [
+"browser delivery ships code to every user"
+],
+"reason": "Browser delivery sends JS and assets to each player, so any copyleft library bundled counts as distributed; component licences are not specified."
+},
+{
+"claim_id": "C-073",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"matchmaking",
+"join"
+],
+"reason": "Multiplayer server inevitably sees player names, IP addresses and session ids; collection and retention are unstated."
+},
+{
+"claim_id": "C-073",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"join links, unauthenticated server"
+],
+"reason": "Public join links/rooms on an unauthenticated game server enable room hijacking and flooding; lens is about testing ethics, flagged under abuse vectors."
+},
+{
+"claim_id": "C-074",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"browser, unknown devices"
+],
+"reason": "Judges use unknown devices and browsers; keyboard, touch and screen-size support unspecified."
+},
+{
+"claim_id": "C-074",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"audience may include minors"
+],
+"reason": "Players are peers/staff and possibly others via the public link; age not stated."
+},
+{
+"claim_id": "C-075",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"ownership unstated"
+],
+"reason": "Brief is silent on who owns generated outputs; ownership and permitted use are set by each provider's terms and differ by tier."
+},
+{
+"claim_id": "C-075",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"ownership unstated"
+],
+"reason": "No statement on who owns generated assets or the game, nor any licence; AI-output copyrightability is uncertain."
+},
+{
+"claim_id": "C-075",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no deliverable licence"
+],
+"reason": "Brief states no licence for the deliverable."
+},
+{
+"claim_id": "C-075",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no AI disclosure/credit statement"
+],
+"reason": "Brief requires AI-generated assets but is silent on telling players or judges the assets are AI-generated."
+},
+{
+"claim_id": "C-077",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"public repo redistributes assets"
+],
+"reason": "Public repo redistributes generated assets to everyone; the operator's rights in them (and any provider restrictions) are unverified."
+},
+{
+"claim_id": "C-077",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"public repo without licence"
+],
+"reason": "Public repo with no stated licence for code or assets leaves reuse terms undefined and may violate attribution duties of included components."
+},
+{
+"claim_id": "C-077",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"secrets in public repo"
+],
+"reason": "Public, empty repo growing under deadline pressure; API keys or generator credentials committed would leak."
+},
+{
+"claim_id": "C-079",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"name/trademark",
+"style imitation"
+],
+"reason": "Name Final Frontier (and a space racer concept) unchecked against existing games/marks; trademark is outside the catalogue but is a rights exposure."
+},
+{
+"claim_id": "C-080",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"physics library unspecified"
+],
+"reason": "Orbital/n-body code may use a third-party physics library whose licence (GPL/LGPL vs MIT) is unnamed."
+},
+{
+"claim_id": "C-081",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"physics library unspecified"
+],
+"reason": "Orbital/n-body code may use a third-party physics library whose licence (GPL/LGPL vs MIT) is unnamed."
+},
+{
+"claim_id": "C-083",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Mandates AI-generated assets but names no generator, tier or agreement; free/consumer tiers often bar commercial use or downloads, so the tier choice decides whether the game may be published."
+},
+{
+"claim_id": "C-083",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI output ownership",
+"training provenance"
+],
+"reason": "All-generated assets mean the game's art/audio may not be copyrightable by the operator and generators carry training-data provenance risk; nothing addresses either."
+},
+{
+"claim_id": "C-083",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI-generated media disclosure"
+],
+"reason": "Public deployment of wholly AI-generated art/audio; AI Act Art 50 marking/disclosure duties and platform labelling expectations are unaddressed."
+},
+{
+"claim_id": "C-086",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unspecified component"
+],
+"reason": "Networking layer / generation tooling is unspecified, so its licence cannot be known (Colyseus MIT, but unchosen)."
+},
+{
+"claim_id": "C-086",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"matchmaking",
+"join"
+],
+"reason": "Multiplayer server inevitably sees player names, IP addresses and session ids; collection and retention are unstated."
+},
+{
+"claim_id": "C-086",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"join links, unauthenticated server"
+],
+"reason": "Public join links/rooms on an unauthenticated game server enable room hijacking and flooding; lens is about testing ethics, flagged under abuse vectors."
+},
+{
+"claim_id": "C-087",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"physics library unspecified"
+],
+"reason": "Orbital/n-body code may use a third-party physics library whose licence (GPL/LGPL vs MIT) is unnamed."
+},
+{
+"claim_id": "C-088",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Mandates AI-generated assets but names no generator, tier or agreement; free/consumer tiers often bar commercial use or downloads, so the tier choice decides whether the game may be published."
+},
+{
+"claim_id": "C-088",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI output ownership",
+"training provenance"
+],
+"reason": "All-generated assets mean the game's art/audio may not be copyrightable by the operator and generators carry training-data provenance risk; nothing addresses either."
+},
+{
+"claim_id": "C-088",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unspecified component"
+],
+"reason": "Networking layer / generation tooling is unspecified, so its licence cannot be known (Colyseus MIT, but unchosen)."
+},
+{
+"claim_id": "C-089",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"trust boundary, client authority"
+],
+"reason": "Client-trusting physics lets a player cheat or poison a room; trust model unstated."
+},
+{
+"claim_id": "C-090",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.not-keyboard-or-pointer-operable",
+"cues_matched": [
+"controls"
+],
+"reason": "Orbital thrust controls unspecified; need full keyboard operability, remappable and not pointer-precision-only."
+},
+{
+"claim_id": "C-092",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"position under orbital physics"
+],
+"reason": "Position under orbital motion is hard to show; relies on visual cues only."
+},
+{
+"claim_id": "C-093",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"public repo + provider terms"
+],
+"reason": "Operator explicitly doubts whether public redistribution of generated assets is allowed under provider terms; terms of the chosen generators are unread."
+},
+{
+"claim_id": "C-093",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"public repo redistributes assets"
+],
+"reason": "Public repo redistributes generated assets to everyone; the operator's rights in them (and any provider restrictions) are unverified."
+},
+{
+"claim_id": "C-093",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"licence/credit duties"
+],
+"reason": "Operator flags licence/credit duties as unchecked; CC BY credit and tool licences are open."
+},
+{
+"claim_id": "C-094",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"name/trademark",
+"style imitation"
+],
+"reason": "Name Final Frontier (and a space racer concept) unchecked against existing games/marks; trademark is outside the catalogue but is a rights exposure."
+},
+{
+"claim_id": "C-095",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-095",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-096",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier bars commercial use"
+],
+"reason": "Lead says this generator's free/guest tier is non-commercial or personal-use (or no downloads); using it for a public game would be a tier mismatch. Secondary lead, ground against current provider terms."
+},
+{
+"claim_id": "C-096",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-097",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier bars commercial use"
+],
+"reason": "Lead says this generator's free/guest tier is non-commercial or personal-use (or no downloads); using it for a public game would be a tier mismatch. Secondary lead, ground against current provider terms."
+},
+{
+"claim_id": "C-097",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-098",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier bars commercial use"
+],
+"reason": "Lead says this generator's free/guest tier is non-commercial or personal-use (or no downloads); using it for a public game would be a tier mismatch. Secondary lead, ground against current provider terms."
+},
+{
+"claim_id": "C-098",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-099",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier bars commercial use"
+],
+"reason": "Lead says this generator's free/guest tier is non-commercial or personal-use (or no downloads); using it for a public game would be a tier mismatch. Secondary lead, ground against current provider terms."
+},
+{
+"claim_id": "C-099",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-100",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier bars commercial use"
+],
+"reason": "Lead says this generator's free/guest tier is non-commercial or personal-use (or no downloads); using it for a public game would be a tier mismatch. Secondary lead, ground against current provider terms."
+},
+{
+"claim_id": "C-100",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-101",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"commercial-use ambiguity"
+],
+"reason": "Whether a class/competition public game counts as commercial under each provider's terms is unresolved and gates every free tier."
+},
+{
+"claim_id": "C-101",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"non-commercial asset"
+],
+"reason": "Free-tier outputs described as personal/non-commercial; if public/competition use is commercial, using them breaks the licence. Secondary lead."
+},
+{
+"claim_id": "C-102",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier terms",
+"credit"
+],
+"reason": "Meshy free-tier output terms (CC BY, credit duty, tier-dependent API access) are asserted by a secondary lead and must be checked against current terms."
+},
+{
+"claim_id": "C-102",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"CC BY credit duty"
+],
+"reason": "CC BY 4.0 output requires attribution; the game and repo need visible credit and nothing in the brief provides a credits requirement."
+},
+{
+"claim_id": "C-103",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"paid tier licence"
+],
+"reason": "Relies on a paid tier granting commercial licence; licence status at generation time vs later cancellation, and price/terms, are unverified secondary-lead claims."
+},
+{
+"claim_id": "C-103",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"licence at generation time"
+],
+"reason": "Commercial licence depends on the paid plan active when output was generated; record needed."
+},
+{
+"claim_id": "C-104",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"paid tier licence"
+],
+"reason": "Relies on a paid tier granting commercial licence; licence status at generation time vs later cancellation, and price/terms, are unverified secondary-lead claims."
+},
+{
+"claim_id": "C-104",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"licence at generation time"
+],
+"reason": "Commercial licence depends on the paid plan active when output was generated; record needed."
+},
+{
+"claim_id": "C-106",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"free tier terms",
+"credit"
+],
+"reason": "Meshy free-tier output terms (CC BY, credit duty, tier-dependent API access) are asserted by a secondary lead and must be checked against current terms."
+},
+{
+"claim_id": "C-106",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"CC BY credit duty"
+],
+"reason": "CC BY 4.0 output requires attribution; the game and repo need visible credit and nothing in the brief provides a credits requirement."
+},
+{
+"claim_id": "C-108",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unverified pricing/terms"
+],
+"reason": "Tool recommended with pricing and terms unverified; asset-output terms for this tier unknown."
+},
+{
+"claim_id": "C-109",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unverified pricing/terms"
+],
+"reason": "Tool recommended with pricing and terms unverified; asset-output terms for this tier unknown."
+},
+{
+"claim_id": "C-110",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unverified pricing/terms"
+],
+"reason": "Tool recommended with pricing and terms unverified; asset-output terms for this tier unknown."
+},
+{
+"claim_id": "C-117",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"Hobby non-commercial"
+],
+"reason": "Vercel Hobby tier is non-commercial per lead; hosting a public (possibly org-branded) game on it is a tier condition to check."
+},
+{
+"claim_id": "C-120",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.special-category-global-edge-cache",
+"cues_matched": [
+"hosting processor, global edge"
+],
+"reason": "Hosting/relay provider processes player connection data (IPs, ids), possibly outside the user's region; no agreement discussed."
+},
+{
+"claim_id": "C-121",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.special-category-global-edge-cache",
+"cues_matched": [
+"hosting processor, global edge"
+],
+"reason": "Hosting/relay provider processes player connection data (IPs, ids), possibly outside the user's region; no agreement discussed."
+},
+{
+"claim_id": "C-122",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.special-category-global-edge-cache",
+"cues_matched": [
+"peer-to-peer IP exposure"
+],
+"reason": "PeerJS peer connections reveal player IP addresses to the other player and use a third-party broker."
+},
+{
+"claim_id": "C-122",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party broker"
+],
+"reason": "Peer exposure and public broker abuse (IP-targeted attacks)."
+},
+{
+"claim_id": "C-123",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.special-category-global-edge-cache",
+"cues_matched": [
+"hosting processor, global edge"
+],
+"reason": "Hosting/relay provider processes player connection data (IPs, ids), possibly outside the user's region; no agreement discussed."
+},
+{
+"claim_id": "C-126",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-126",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-127",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"could not verify terms"
+],
+"reason": "Provider free-tier terms and limits explicitly unverified; unread terms cannot be assumed to permit this use."
+},
+{
+"claim_id": "C-128",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"could not verify terms"
+],
+"reason": "Provider free-tier terms and limits explicitly unverified; unread terms cannot be assumed to permit this use."
+},
+{
+"claim_id": "C-129",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"could not verify licences"
+],
+"reason": "Licences of Quaternius, KayKit, 0x72, Freesound-type sources unverified."
+},
+{
+"claim_id": "C-129",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"licence unverified"
+],
+"reason": "Licence text explicitly unverified (including Phaser/Three.js \"MIT per libraries file only\")."
+},
+{
+"claim_id": "C-131",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"licence unverified"
+],
+"reason": "Licence text explicitly unverified (including Phaser/Three.js \"MIT per libraries file only\")."
+},
+{
+"claim_id": "C-134",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PixelLab terms"
+],
+"reason": "Lecture demo used PixelLab output; its tier and output terms for public games are not shown."
+},
+{
+"claim_id": "C-135",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"list of generator tools"
+],
+"reason": "Lists AI generators without terms; each has its own output-use, commercial and download conditions that vary by plan."
+},
+{
+"claim_id": "C-135",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generator training provenance"
+],
+"reason": "Named AI generators (e.g. music and image tools) have contested training-data provenance and outputs may resemble protected works."
+},
+{
+"claim_id": "C-137",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-137",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-139",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-139",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-140",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"list of generator tools"
+],
+"reason": "Lists AI generators without terms; each has its own output-use, commercial and download conditions that vary by plan."
+},
+{
+"claim_id": "C-140",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generator training provenance"
+],
+"reason": "Named AI generators (e.g. music and image tools) have contested training-data provenance and outputs may resemble protected works."
+},
+{
+"claim_id": "C-142",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-142",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-143",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.limit-evasion-multi-account",
+"cues_matched": [
+"plan limits"
+],
+"reason": "Built-in generation is capped by plan limits; a week-long asset push under a deadline invites multiple accounts or limit workarounds that terms prohibit."
+},
+{
+"claim_id": "C-144",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"list of generator tools"
+],
+"reason": "Lists AI generators without terms; each has its own output-use, commercial and download conditions that vary by plan."
+},
+{
+"claim_id": "C-144",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generator training provenance"
+],
+"reason": "Named AI generators (e.g. music and image tools) have contested training-data provenance and outputs may resemble protected works."
+},
+{
+"claim_id": "C-146",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-146",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-148",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"list of generator tools"
+],
+"reason": "Lists AI generators without terms; each has its own output-use, commercial and download conditions that vary by plan."
+},
+{
+"claim_id": "C-148",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generator training provenance"
+],
+"reason": "Named AI generators (e.g. music and image tools) have contested training-data provenance and outputs may resemble protected works."
+},
+{
+"claim_id": "C-148",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"synthetic audio/voice"
+],
+"reason": "AI-generated music/voice-capable audio shipped to the public; labelling of synthetic audio is not covered."
+},
+{
+"claim_id": "C-149",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-149",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-150",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"list of generator tools"
+],
+"reason": "Lists AI generators without terms; each has its own output-use, commercial and download conditions that vary by plan."
+},
+{
+"claim_id": "C-150",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"third-party asset libraries"
+],
+"reason": "Third-party libraries (Mixamo, Freesound, OpenGameArt, Fab, itch.io, Poly Haven import) carry per-asset licences, some non-commercial or attribution-bound, and may be disallowed as pre-made."
+},
+{
+"claim_id": "C-150",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library licence variety"
+],
+"reason": "Library assets have varied licences (CC0, CC BY, CC BY-NC, creator terms); non-commercial or attribution terms could be broken in a public game."
+},
+{
+"claim_id": "C-151",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"audio"
+],
+"reason": "Sound check does not address mute, volume control, or captions."
+},
+{
+"claim_id": "C-152",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"ElevenLabs music"
+],
+"reason": "Music generated with ElevenLabs: commercial rights depend on the paid plan in force; tier unstated in the demo."
+},
+{
+"claim_id": "C-153",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"ElevenLabs music"
+],
+"reason": "Music generated with ElevenLabs: commercial rights depend on the paid plan in force; tier unstated in the demo."
+},
+{
+"claim_id": "C-153",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library models, recorded SFX"
+],
+"reason": "Demo uses library models and recorded SFX; as precedent it normalises assets whose rights are third-party and not generated."
+},
+{
+"claim_id": "C-153",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library models"
+],
+"reason": "Library models used in a demo; licence of those models unstated."
+},
+{
+"claim_id": "C-156",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"ElevenLabs music"
+],
+"reason": "Music generated with ElevenLabs: commercial rights depend on the paid plan in force; tier unstated in the demo."
+},
+{
+"claim_id": "C-157",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"library models, recorded SFX"
+],
+"reason": "Demo uses library models and recorded SFX; as precedent it normalises assets whose rights are third-party and not generated."
+},
+{
+"claim_id": "C-158",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "provider-terms.unsupported-region-or-tier",
+"cues_matched": [
+"omission"
+],
+"reason": "Omission is a real gap: brief mandates generated assets yet names no provider or tier (free vs paid) it may be done under."
+},
+{
+"claim_id": "C-159",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"omission"
+],
+"reason": "Omission is a real gap: nothing says whether generated outputs may be stored, redistributed in a public repo, or kept in the game after the subscription ends."
+},
+{
+"claim_id": "C-160",
+"lens": "provider-terms",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"omission"
+],
+"reason": "Gap, though low: prompts and reference images go to providers (and a separate critic model); free tiers may train on them. Nothing says what may be sent."
+},
+{
+"claim_id": "C-161",
+"lens": "copyright-data-rights",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"omission"
+],
+"reason": "Gap: brief never asks for provenance or generation records of each asset (tool, prompt, date, licence), needed to defend rights and to remove an asset later."
+},
+{
+"claim_id": "C-163",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: no requirement to list the licence of every library, tool and generated asset used in a public repo."
+},
+{
+"claim_id": "C-164",
+"lens": "licensing",
+"verdict": "suspect",
+"trap_id": "licensing.non-commercial-asset-in-paid-product",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: commercial status is unstated yet decides whether free-tier and NC assets are usable."
+},
+{
+"claim_id": "C-165",
+"lens": "ai-regulation",
+"verdict": "suspect",
+"trap_id": "ai-regulation.undisclosed-ai-interaction",
+"cues_matched": [
+"omission"
+],
+"reason": "Gap, probably minimal-risk: public web game reachable by EU users but classification is stated nowhere."
+},
+{
+"claim_id": "C-168",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: no accessibility standard or acceptance gate stated."
+},
+{
+"claim_id": "C-169",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: no accessibility standard or acceptance gate stated."
+},
+{
+"claim_id": "C-170",
+"lens": "accessibility",
+"verdict": "suspect",
+"trap_id": "accessibility.information-by-single-sense",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: no accessibility standard or acceptance gate stated."
+},
+{
+"claim_id": "C-171",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: public multiplayer processes names/IPs but data classes, processors and retention are unstated."
+},
+{
+"claim_id": "C-172",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: public multiplayer processes names/IPs but data classes, processors and retention are unstated."
+},
+{
+"claim_id": "C-173",
+"lens": "privacy-regulated-data",
+"verdict": "suspect",
+"trap_id": "privacy-regulated-data.collect-all-keep-forever",
+"cues_matched": [
+"omission"
+],
+"reason": "Real gap: public multiplayer processes names/IPs but data classes, processors and retention are unstated."
+},
+{
+"claim_id": "C-174",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"omission",
+"load testing"
+],
+"reason": "Low gap: load/abuse testing of hosted free-tier infrastructure is not authorised or scoped."
+},
+{
+"claim_id": "C-180",
+"lens": "security-ethics",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"trust boundary, client authority"
+],
+"reason": "Client-trusting physics lets a player cheat or poison a room; trust model unstated."
+},
+{
+"claim_id": "C-006",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generate all visuals and audio"
+],
+"reason": "No asset format, resolution, sample rate, size or loop spec; generated sprites/audio vary and may not tile or loop."
+},
+{
+"claim_id": "C-007",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "numeric-representation.naive-local-timestamps",
+"cues_matched": [
+"Thursday @ Midnight",
+"no timezone stated"
+],
+"reason": "Deadline is a naive local time with no zone; ambiguous by hours for a distributed class. Affects submission, not the game, but is a time-representation gap."
+},
+{
+"claim_id": "C-010",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "numeric-representation.naive-local-timestamps",
+"cues_matched": [
+"Thursday @ Midnight",
+"no timezone stated"
+],
+"reason": "Deadline is a naive local time with no zone; ambiguous by hours for a distributed class. Affects submission, not the game, but is a time-representation gap."
+},
+{
+"claim_id": "C-024",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"playable in browser, no install"
+],
+"reason": "First-load time and size on judges' devices unstated; generated audio/art plus engine can be tens of MB."
+},
+{
+"claim_id": "C-025",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"playable in browser, no install"
+],
+"reason": "First-load time and size on judges' devices unstated; generated audio/art plus engine can be tens of MB."
+},
+{
+"claim_id": "C-026",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"sound levels, animation, feedback"
+],
+"reason": "Sound levels is a media-format property (loudness/normalisation); no spec."
+},
+{
+"claim_id": "C-028",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"all assets generated"
+],
+"reason": "Generated art/audio are often large PNG/WAV/MP3/GLB; load size and decode time on first load are unbounded unless budgeted."
+},
+{
+"claim_id": "C-028",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generate all visuals and audio"
+],
+"reason": "No asset format, resolution, sample rate, size or loop spec; generated sprites/audio vary and may not tile or loop."
+},
+{
+"claim_id": "C-042",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"racing feels good",
+"easy to get into a match"
+],
+"reason": "Feel is a latency/jitter property; no budget for input-to-display or match-join time."
+},
+{
+"claim_id": "C-042",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "performance.percentile-slo-without-load-model",
+"cues_matched": [
+"easy to get into a match",
+"fun over repeated short sessions"
+],
+"reason": "Join/match time and responsiveness left qualitative; no time-to-race or load stated."
+},
+{
+"claim_id": "C-064",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"people racing together",
+"join the same game"
+],
+"reason": "Two or more live racers imply a live state channel, but no RTT/loss/jitter assumptions or tick rate are given; steering feel depends on them."
+},
+{
+"claim_id": "C-064",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"clear way to join the same game"
+],
+"reason": "Joining the same game needs room identity, membership and a lobby authority; mechanism unstated (code, link, matchmaking)."
+},
+{
+"claim_id": "C-064",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"multiple rooms"
+],
+"reason": "Rooms imply concurrent sockets per server process; limits not stated."
+},
+{
+"claim_id": "C-065",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"two distinct tracks with different layouts"
+],
+"reason": "Each track must be validated winnable; no verification method."
+},
+{
+"claim_id": "C-066",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"start, race, finish"
+],
+"reason": "A synchronised countdown start across clients with different RTTs needs a stated start-time scheme; none given."
+},
+{
+"claim_id": "C-066",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "distributed-systems.two-generals-simultaneous-action",
+"cues_matched": [
+"start together once all ready"
+],
+"reason": "Race start and finish need all parties to agree on go/finish; over lossy links it cannot be certain, so a host-decided start time and finish rule is required."
+},
+{
+"claim_id": "C-067",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "distributed-systems.wall-clock-ordering",
+"cues_matched": [
+"who won"
+],
+"reason": "Winner is an ordering of finish events; if decided by client clocks it is wall-clock ordering; needs server tick or logical time."
+},
+{
+"claim_id": "C-067",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "numeric-representation.float-equality",
+"cues_matched": [
+"clear feedback on position/progress and who won"
+],
+"reason": "Ranking by computed float progress/finish time invites ties and equality edge cases; a tiebreak rule is needed."
+},
+{
+"claim_id": "C-067",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"position or progress feedback"
+],
+"reason": "Defining progress and ranking on a non-monotone orbital path (angle wraps, retrograde) has no obvious metric; needs checkpoint order."
+},
+{
+"claim_id": "C-068",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"hazards, power-ups"
+],
+"reason": "Boosts/hazards/power-ups are discrete events that must be seen consistently by all racers; delivery latency and loss tolerance for them are unstated."
+},
+{
+"claim_id": "C-068",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "distributed-systems.lock-without-fencing-token",
+"cues_matched": [
+"power-ups",
+"hazards"
+],
+"reason": "Contested pickups/hits must have exactly one outcome across peers; needs an authority and sequence, not each client deciding."
+},
+{
+"claim_id": "C-069",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"reliably enough",
+"no network conditions"
+],
+"reason": "'Reliable enough' multiplayer with no loss, RTT, jitter or reconnect target; unstated network path is the lens's required statement."
+},
+{
+"claim_id": "C-069",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "distributed-systems.consensus-guaranteed-termination",
+"cues_matched": [
+"multiplayer works reliably enough to complete a race"
+],
+"reason": "Completing a race despite a disconnect or host loss needs a stated fault model and reconnect/host-migration behaviour; none given."
+},
+{
+"claim_id": "C-069",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "performance.percentile-slo-without-load-model",
+"cues_matched": [
+"works reliably enough"
+],
+"reason": "No target such as race completion rate, player count or latency percentile."
+},
+{
+"claim_id": "C-073",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "realtime-transport.live-media-over-reliable-stream",
+"cues_matched": [
+"use a reliable TCP connection for the real-time channel"
+],
+"reason": "Transport left open; browser default (WebSocket/TCP) gives head-of-line blocking on loss, which stalls a racing state stream; WebRTC DataChannel or UDP-like semantics are the alternative."
+},
+{
+"claim_id": "C-073",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"server/hosting or relay for matchmaking"
+],
+"reason": "Who owns authoritative state (server, host peer, relay) is not decided; this is the core distributed-systems choice."
+},
+{
+"claim_id": "C-073",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "os-systems.fd-limit-exhaustion",
+"cues_matched": [
+"keep a socket open per connected client"
+],
+"reason": "Server holds one socket per client; fine for a class, but limits and idle timeouts on a free host are unstated."
+},
+{
+"claim_id": "C-074",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"unknown devices, network"
+],
+"reason": "Judges play on unknown networks (campus/home wifi, VPN, possibly in the same room as other judges); path assumptions unstated."
+},
+{
+"claim_id": "C-074",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"judges play from link on unknown network"
+],
+"reason": "Many judges may open the game at once, create rooms concurrently, or reload mid-race; no session/idempotent-join semantics stated."
+},
+{
+"claim_id": "C-074",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"judges play from link, unknown devices"
+],
+"reason": "Unknown device class (laptop vs phone, integrated GPU) and everyone hitting the link in the same morning window; no load model or device floor."
+},
+{
+"claim_id": "C-074",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"judges play every game"
+],
+"reason": "Many judges at the same minute; a free-tier single instance may have 512 MB and limited CPU."
+},
+{
+"claim_id": "C-079",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"space racer under orbital dynamics"
+],
+"reason": "Orbital motion is smooth and predictable between inputs so extrapolation is cheap, but the live-channel requirements (tick, interpolation delay) are not set for it."
+},
+{
+"claim_id": "C-079",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"restricted n-body racing"
+],
+"reason": "Physics model chosen before authority: replicated state under a chaotic model drifts unless a single simulator is authoritative."
+},
+{
+"claim_id": "C-079",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Kepler orbits"
+],
+"reason": "Kepler requires solving M = E - e sin E and trig functions whose last-bit results differ across JS engines (Math.sin/cos are implementation-approximated), so cross-browser bit equality is not available."
+},
+{
+"claim_id": "C-079",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"racing under gravity"
+],
+"reason": "A fair race needs guaranteed reachability of checkpoints under thrust limits; under chaotic dynamics that is not guaranteed."
+},
+{
+"claim_id": "C-080",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Kepler physics"
+],
+"reason": "Kepler solver iteration (Newton) is convergence-dependent and near e->1 ill-conditioned; results depend on iteration count and Math.* differences across browsers."
+},
+{
+"claim_id": "C-080",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Kepler orbits"
+],
+"reason": "Kepler orbits are exact only for two bodies; with more than one massive body it is an approximation (patched conics) and may mismatch the n-body path."
+},
+{
+"claim_id": "C-081",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"restricted n-body"
+],
+"reason": "Chaotic sensitive dependence amplifies 1-ulp differences exponentially; float64 gives agreement only for a bounded time unless states are resynced."
+},
+{
+"claim_id": "C-081",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"restricted n-body"
+],
+"reason": "The general n-body problem has no closed form and is chaotic; restricted (negligible-mass ships) is integrable only in special cases, so long-horizon outcomes are not predictable or guaranteeable."
+},
+{
+"claim_id": "C-082",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"space racer under orbital dynamics"
+],
+"reason": "Orbital motion is smooth and predictable between inputs so extrapolation is cheap, but the live-channel requirements (tick, interpolation delay) are not set for it."
+},
+{
+"claim_id": "C-082",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"restricted n-body racing"
+],
+"reason": "Physics model chosen before authority: replicated state under a chaotic model drifts unless a single simulator is authoritative."
+},
+{
+"claim_id": "C-082",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"racing in orbital physics"
+],
+"reason": "Large dynamic range (orbit radii vs ship-scale distances) strains float32 (GPU/Float32Array) and loses precision far from origin."
+},
+{
+"claim_id": "C-082",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"racing under gravity"
+],
+"reason": "A fair race needs guaranteed reachability of checkpoints under thrust limits; under chaotic dynamics that is not guaranteed."
+},
+{
+"claim_id": "C-083",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"all assets generated"
+],
+"reason": "Generated art/audio are often large PNG/WAV/MP3/GLB; load size and decode time on first load are unbounded unless budgeted."
+},
+{
+"claim_id": "C-083",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generate all visuals and audio"
+],
+"reason": "No asset format, resolution, sample rate, size or loop spec; generated sprites/audio vary and may not tile or loop."
+},
+{
+"claim_id": "C-086",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "realtime-transport.live-media-over-reliable-stream",
+"cues_matched": [
+"transport, server or relay"
+],
+"reason": "Transport choice unspecified; WebSocket over TCP stalls all later state after one lost packet, which hurts a fast racer more than a turn-based game."
+},
+{
+"claim_id": "C-086",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"transport, server or relay"
+],
+"reason": "Server vs relay vs P2P unspecified; determines who is authoritative and what a host crash does."
+},
+{
+"claim_id": "C-086",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "os-systems.fd-limit-exhaustion",
+"cues_matched": [
+"keep a socket open per connected client"
+],
+"reason": "Server holds one socket per client; fine for a class, but limits and idle timeouts on a free host are unstated."
+},
+{
+"claim_id": "C-087",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Kepler solver and n-body integrator, library or hand-written"
+],
+"reason": "Integrator choice (symplectic leapfrog vs RK4), step size and library are open; energy drift and close-approach blowup depend on them, floating-point order matters."
+},
+{
+"claim_id": "C-087",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Kepler solver and n-body integrator"
+],
+"reason": "Kepler's equation must be solved iteratively (convergence near e->1); n-body accuracy vs cost trade-off needs an explicit error budget."
+},
+{
+"claim_id": "C-088",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Output formats (PNG alpha, WebP, SVG, MP3/OGG, GLB) depend on the tool; unspecified."
+},
+{
+"claim_id": "C-089",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "realtime-transport.no-jitter-buffer",
+"cues_matched": [
+"all clients agree on physics state"
+],
+"reason": "Agreement implies a snapshot/input rate and an interpolation (jitter) buffer; none is stated, and lockstep would stall on the slowest client."
+},
+{
+"claim_id": "C-089",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"all clients agree"
+],
+"reason": "Consistency design (authoritative server + snapshots vs deterministic lockstep) is stated as a requirement but not chosen; lockstep needs identical inputs delivery and identical float results."
+},
+{
+"claim_id": "C-089",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "numeric-representation.order-dependent-float-aggregation",
+"cues_matched": [
+"deterministic across browsers/devices (floating-point, timestep)"
+],
+"reason": "JS doubles are IEEE-754 but Math.sin/cos/pow/exp are engine-dependent and summation order of gravity terms changes results; bit-identical cross-browser determinism is not guaranteed without own math or fixed-point."
+},
+{
+"claim_id": "C-089",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"tick rate"
+],
+"reason": "Tick rate and snapshot size drive CPU and bandwidth and are not set."
+},
+{
+"claim_id": "C-089",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"deterministic across browsers"
+],
+"reason": "Chaotic dynamics make small numerical differences grow without bound; agreement can only hold for a finite horizon without periodic resync."
+},
+{
+"claim_id": "C-090",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"controls feel good"
+],
+"reason": "Control feel under orbital lag (thrust effect is delayed by gravity already) is amplified by RTT; input-to-screen latency budget is missing."
+},
+{
+"claim_id": "C-090",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"steer and win under orbital dynamics"
+],
+"reason": "Sensitive dependence means small input timing differences flip outcomes; desired controllability depends on step size and integrator error."
+},
+{
+"claim_id": "C-090",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"controls feel good"
+],
+"reason": "Frame rate and input latency targets unstated; low frame rate breaks fixed-step accumulation."
+},
+{
+"claim_id": "C-090",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"steer and win under orbital dynamics"
+],
+"reason": "Controllability of a spacecraft in a perturbed field is limited by thrust and fuel; a new player intuiting orbital mechanics (prograde burn raises the opposite side) is a known hard UX problem; winnability unproven."
+},
+{
+"claim_id": "C-091",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"per tick for all players"
+],
+"reason": "Per-tick cost implies a tick rate, which sets bandwidth and latency; the tick rate and what is sent (inputs vs state) are not given."
+},
+{
+"claim_id": "C-091",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"restricted n-body, per tick"
+],
+"reason": "Fixed vs variable timestep: variable dt per client frame (requestAnimationFrame) breaks agreement; fixed substep accumulator needed and not stated."
+},
+{
+"claim_id": "C-091",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"cheap enough to run per tick in a browser for all players"
+],
+"reason": "Trivial in compute (a few bodies x few ships is O(n*m)) but stated without frame budget; correctness hinges on substeps per frame, rendering cost, and low-end devices."
+},
+{
+"claim_id": "C-091",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"n-body per tick"
+],
+"reason": "If the server simulates every room per tick on a single Node event loop, long simulation steps block socket handling; load/tick budget unstated."
+},
+{
+"claim_id": "C-091",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"cheap enough per tick"
+],
+"reason": "Cost O(N*M) per step is cheap for few bodies, but accuracy for close encounters needs adaptive steps or softening which is not cheap or deterministic."
+},
+{
+"claim_id": "C-092",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"tracks under orbital physics"
+],
+"reason": "A track as a closed orbit is not stable under perturbation; tolerances for checkpoints vs orbit drift are numeric choices unstated."
+},
+{
+"claim_id": "C-092",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"tracks under orbital physics"
+],
+"reason": "Designing two distinct tracks as orbit/checkpoint layouts that are solvable and balanced is a trajectory-design problem, not guaranteed to exist for arbitrary layouts."
+},
+{
+"claim_id": "C-103",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"ElevenLabs generated music/SFX"
+],
+"reason": "Output length, sample rate and loopability for music/SFX are tool-bound; looping music needs seamless loop points."
+},
+{
+"claim_id": "C-105",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "media-pipelines.decoded-frames-exceed-memory",
+"cues_matched": [
+"jsfxr / Web Audio"
+],
+"reason": "Code-made audio is small but decoded AudioBuffers are PCM float32 in RAM; many SFX plus music can be large; also autoplay unlock."
+},
+{
+"claim_id": "C-106",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Meshy / GLB / rig check"
+],
+"reason": "Generated 3D models: polygon count, texture sizes and axis/scale conventions are uncontrolled; draw-call and VRAM cost on judges' GPUs."
+},
+{
+"claim_id": "C-107",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"procedural three.js geometry and shaders"
+],
+"reason": "Shader cost on integrated GPUs and mobile is a real frame-budget risk; no target frame rate."
+},
+{
+"claim_id": "C-107",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"procedural geometry and shaders"
+],
+"reason": "Procedural assets avoid file formats but shader precision (mediump vs highp) matters for orbit-scale coordinates."
+},
+{
+"claim_id": "C-108",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "media-pipelines.decoded-frames-exceed-memory",
+"cues_matched": [
+"pixel art sprite sheets, animated sheets"
+],
+"reason": "Sprite sheets decode to RGBA in VRAM; large sheets/atlases exceed texture size limits on low-end GPUs; pixel art needs nearest-neighbour scaling."
+},
+{
+"claim_id": "C-110",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "media-pipelines.decoded-frames-exceed-memory",
+"cues_matched": [
+"pixel art sprite sheets, animated sheets"
+],
+"reason": "Sprite sheets decode to RGBA in VRAM; large sheets/atlases exceed texture size limits on low-end GPUs; pixel art needs nearest-neighbour scaling."
+},
+{
+"claim_id": "C-113",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "realtime-transport.live-media-over-reliable-stream",
+"cues_matched": [
+"WebSocket/WebRTC networking"
+],
+"reason": "Godot web offers only WebSocket (TCP) or WebRTC; a pick without a loss/latency rationale."
+},
+{
+"claim_id": "C-113",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"WebSocket/WebRTC"
+],
+"reason": "Both transports leave the authority and reconnect model open."
+},
+{
+"claim_id": "C-113",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"single-thread default"
+],
+"reason": "Godot web single-thread default limits audio and physics threading (SharedArrayBuffer needs COOP/COEP headers)."
+},
+{
+"claim_id": "C-114",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Unity web builds heavy"
+],
+"reason": "Build size is a load-time issue; 'heavy' unquantified and unverified (C-130)."
+},
+{
+"claim_id": "C-114",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Unity web builds heavy"
+],
+"reason": "Large WASM memory footprint risks tab OOM on low-RAM devices."
+},
+{
+"claim_id": "C-116",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Three.js or Phaser best 3-day fit"
+],
+"reason": "Engine choice without frame budget or device floor; 3D with generated assets raises GPU/memory risk on judges' laptops."
+},
+{
+"claim_id": "C-117",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no shared state across instances"
+],
+"reason": "Serverless instances share no state; rooms cannot live there. Real constraint on where the authority runs."
+},
+{
+"claim_id": "C-117",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"300 s function cap"
+],
+"reason": "Request-duration cap makes serverless unsuitable for a held game session; real latency/cost constraint."
+},
+{
+"claim_id": "C-117",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no shared state across instances, function cap"
+],
+"reason": "Serverless cannot hold sockets; real concurrency model limit."
+},
+{
+"claim_id": "C-118",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"15 min idle sleep, ~1 min cold start"
+],
+"reason": "A sleeping host loses in-memory rooms; a cold start can drop a connected race; rooms are not durable and reconnect after restart is undefined."
+},
+{
+"claim_id": "C-118",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"15 min idle sleep, ~1 min cold start"
+],
+"reason": "A cold start at the moment a judge opens the link (first join of the morning) means a ~1 min dead page; plausible fail on first impression; needs warm-up/ping."
+},
+{
+"claim_id": "C-118",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "os-systems.memory-limit-oom-kill",
+"cues_matched": [
+"Render free tier 750h, 15 min idle sleep"
+],
+"reason": "Free instance has small RAM (about 512 MB) and CPU and sleeps; process restart drops all sockets."
+},
+{
+"claim_id": "C-119",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"$5 trial credit"
+],
+"reason": "Trial credit runs out; not a cost ceiling per day or per player; hosting must survive Friday judging."
+},
+{
+"claim_id": "C-120",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"incoming WebSocket messages billed 20:1"
+],
+"reason": "20:1 message billing and a 100k/day cap bound the usable tick rate (say 20 Hz x 4 players x 3 min); transport rate is coupled to the quota."
+},
+{
+"claim_id": "C-120",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Durable Objects free tier"
+],
+"reason": "Durable Object gives single-writer room authority and hibernation, but WebSocket hibernation/eviction semantics affect in-memory state."
+},
+{
+"claim_id": "C-120",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "performance.egress-unit-economics",
+"cues_matched": [
+"incoming WebSocket messages billed 20:1",
+"100k requests/day"
+],
+"reason": "At 20:1, 100k/day is 5k messages/day; at 20 Hz x 4 players that is ~minutes of play; free tier may be exhausted by one judging session."
+},
+{
+"claim_id": "C-120",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Durable Objects free tier"
+],
+"reason": "DO CPU and memory per object limits and eviction are real runtime constraints."
+},
+{
+"claim_id": "C-121",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PartyKit hosted shut down"
+],
+"reason": "A coordination layer reported shut down; fallback implies re-architecting room authority late in the week."
+},
+{
+"claim_id": "C-121",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"server for multiplayer"
+],
+"reason": "Server capacity and per-room CPU/bandwidth unstated."
+},
+{
+"claim_id": "C-122",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PeerJS no-server fallback, NAT reliability unverified"
+],
+"reason": "WebRTC peer path depends on NAT traversal/TURN; judges on campus/corporate networks may fail to connect; loss/RTT unknown."
+},
+{
+"claim_id": "C-122",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PeerJS no-server fallback"
+],
+"reason": "Host-peer topology: host tab closing ends the race; broker availability and NAT failures unaddressed."
+},
+{
+"claim_id": "C-122",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PeerJS fallback"
+],
+"reason": "Browser WebRTC connection limits and host tab backgrounding (timer throttling) affect a host peer."
+},
+{
+"claim_id": "C-123",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "realtime-transport.live-media-over-reliable-stream",
+"cues_matched": [
+"small ws Node server"
+],
+"reason": "ws is TCP: head-of-line blocking on lossy links; for a racer that means stale-state bursts rather than dropped frames."
+},
+{
+"claim_id": "C-123",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Colyseus or ws Node server"
+],
+"reason": "Single-process room authority is fine for class scale but process restart loses all rooms; Colyseus offers reconnection tokens, bare ws does not."
+},
+{
+"claim_id": "C-123",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"server for multiplayer"
+],
+"reason": "Server capacity and per-room CPU/bandwidth unstated."
+},
+{
+"claim_id": "C-123",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "os-systems.thread-or-process-per-request",
+"cues_matched": [
+"Colyseus or ws Node server"
+],
+"reason": "Per-room process/worker policy unspecified; unbounded rooms per process is a memory risk."
+},
+{
+"claim_id": "C-134",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "media-pipelines.decoded-frames-exceed-memory",
+"cues_matched": [
+"pixel art sprite sheets, animated sheets"
+],
+"reason": "Sprite sheets decode to RGBA in VRAM; large sheets/atlases exceed texture size limits on low-end GPUs; pixel art needs nearest-neighbour scaling."
+},
+{
+"claim_id": "C-135",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI generation tools list"
+],
+"reason": "Generated asset sizes and generation latency/credit costs not bounded."
+},
+{
+"claim_id": "C-140",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI generation tools list"
+],
+"reason": "Generated asset sizes and generation latency/credit costs not bounded."
+},
+{
+"claim_id": "C-144",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI generation tools list"
+],
+"reason": "Generated asset sizes and generation latency/credit costs not bounded."
+},
+{
+"claim_id": "C-144",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Meshy / GLB / rig check"
+],
+"reason": "Generated 3D models: polygon count, texture sizes and axis/scale conventions are uncontrolled; draw-call and VRAM cost on judges' GPUs."
+},
+{
+"claim_id": "C-146",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Meshy / GLB / rig check"
+],
+"reason": "Generated 3D models: polygon count, texture sizes and axis/scale conventions are uncontrolled; draw-call and VRAM cost on judges' GPUs."
+},
+{
+"claim_id": "C-147",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Meshy / GLB / rig check"
+],
+"reason": "Generated 3D models: polygon count, texture sizes and axis/scale conventions are uncontrolled; draw-call and VRAM cost on judges' GPUs."
+},
+{
+"claim_id": "C-148",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI/code audio and volume"
+],
+"reason": "Generated audio loudness is inconsistent; normalisation to common loudness and loop/clip trimming are unspecified."
+},
+{
+"claim_id": "C-150",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI/code audio and volume"
+],
+"reason": "Generated audio loudness is inconsistent; normalisation to common loudness and loop/clip trimming are unspecified."
+},
+{
+"claim_id": "C-151",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"AI/code audio and volume"
+],
+"reason": "Generated audio loudness is inconsistent; normalisation to common loudness and loop/clip trimming are unspecified."
+},
+{
+"claim_id": "C-152",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Generated music tracks are tens of MB in WAV and slow to load unless compressed."
+},
+{
+"claim_id": "C-152",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Long generated tracks are large if shipped as WAV; MP3/OGG encoding and decode memory not stated."
+},
+{
+"claim_id": "C-153",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Generated music tracks are tens of MB in WAV and slow to load unless compressed."
+},
+{
+"claim_id": "C-153",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Long generated tracks are large if shipped as WAV; MP3/OGG encoding and decode memory not stated."
+},
+{
+"claim_id": "C-154",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Long generated tracks are large if shipped as WAV; MP3/OGG encoding and decode memory not stated."
+},
+{
+"claim_id": "C-155",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Generated music tracks are tens of MB in WAV and slow to load unless compressed."
+},
+{
+"claim_id": "C-155",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Long generated tracks are large if shipped as WAV; MP3/OGG encoding and decode memory not stated."
+},
+{
+"claim_id": "C-156",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Music generated with ElevenLabs"
+],
+"reason": "Long generated tracks are large if shipped as WAV; MP3/OGG encoding and decode memory not stated."
+},
+{
+"claim_id": "C-177",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no network path assumptions"
+],
+"reason": "Real gap: brief states no loss/RTT/jitter assumptions for a real-time game over unknown judge networks."
+},
+{
+"claim_id": "C-178",
+"lens": "realtime-transport",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no latency budget"
+],
+"reason": "Real gap: no input-to-display latency budget for a racer; needed for tick rate and interpolation decisions."
+},
+{
+"claim_id": "C-179",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no fault model"
+],
+"reason": "Real gap: brief does not say whether a dropped player, a closed host tab or a cheating client must be tolerated."
+},
+{
+"claim_id": "C-180",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no trust boundary"
+],
+"reason": "Real gap but low stakes: client-reported positions are trusted unless server-authoritative; anyone with the link can join."
+},
+{
+"claim_id": "C-181",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no delivery semantics"
+],
+"reason": "Gap: input/pickup/finish messages need defined loss/duplicate behaviour (snapshots unreliable, events reliable with ids)."
+},
+{
+"claim_id": "C-182",
+"lens": "distributed-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no ordering guarantee"
+],
+"reason": "Gap: finish and pickup order must come from tick/sequence numbers not client clocks."
+},
+{
+"claim_id": "C-184",
+"lens": "numeric-representation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"time representation"
+],
+"reason": "Race clock/finish times are compared across clients; monotonic time vs wall-clock (performance.now vs Date.now) and tick-based time are unspecified."
+},
+{
+"claim_id": "C-186",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no load model"
+],
+"reason": "Real gap: peak concurrent players/rooms and judge simultaneous load unstated; small but unknown."
+},
+{
+"claim_id": "C-187",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "performance.percentile-slo-without-load-model",
+"cues_matched": [
+"latency target without percentile"
+],
+"reason": "Real gap: no latency target at all, let alone percentile."
+},
+{
+"claim_id": "C-188",
+"lens": "performance",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no cost ceiling"
+],
+"reason": "Real gap: hosting and generation spend ceiling unstated (free tiers vs $20/mo)."
+},
+{
+"claim_id": "C-189",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no media parameters"
+],
+"reason": "Real gap but small: no texture size, sample rate, format or loop specs for the generated assets."
+},
+{
+"claim_id": "C-190",
+"lens": "media-pipelines",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no memory budget"
+],
+"reason": "Real gap but small: browser tab memory budget, especially on phones, unstated."
+},
+{
+"claim_id": "C-191",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "os-systems.memory-limit-oom-kill",
+"cues_matched": [
+"no memory budget per worker"
+],
+"reason": "Real gap: server memory limit (Render free 512 MB) and client tab budget unstated."
+},
+{
+"claim_id": "C-192",
+"lens": "os-systems",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no concurrency model"
+],
+"reason": "Real gap: peak concurrent connections/rooms per host not stated."
+},
+{
+"claim_id": "C-193",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no optimality target"
+],
+"reason": "Marginal: no optimiser in the game except possible AI/bot pathing and track-solvability checks; small gap."
+},
+{
+"claim_id": "C-194",
+"lens": "theory-complexity",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no instance size"
+],
+"reason": "Real gap: number of bodies and ships (N) and substeps needed for the physics are not stated."
+},
+{
+"claim_id": "C-005",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"beautiful, unique, and clean",
+"judged by peers"
+],
+"reason": "Beauty/uniqueness scored by a peer in minutes rewards first-impression polish (title screen, palette, screenshots) over the whole game; no goal behind the proxy and no counter-metric stated."
+},
+{
+"claim_id": "C-007",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"no timezone"
+],
+"reason": "Organiser deadline in an unstated timezone; late-submission penalty unknown; only ask-owner can settle."
+},
+{
+"claim_id": "C-011",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"complete experience"
+],
+"reason": "\"Complete experience\" is satisfiable by adding a title card and results screen around thin gameplay; nothing checks depth."
+},
+{
+"claim_id": "C-012",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"polished, cohesive visual style"
+],
+"reason": "Cohesion can be faked with one global filter/palette over mismatched assets; no defined measure."
+},
+{
+"claim_id": "C-013",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"will fail the assignment"
+],
+"reason": "Binary pass/fail on subjective graphics quality pushes toward hiding weaknesses and cutting scope; unmeasurable threshold."
+},
+{
+"claim_id": "C-013",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.metric-serves-evaluator",
+"cues_matched": [
+"will fail the assignment"
+],
+"reason": "Success defined by the evaluating peers' impression, with a hard fail, not by players' experience."
+},
+{
+"claim_id": "C-014",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"substantial",
+"enough original gameplay"
+],
+"reason": "\"Substantial\" judged in a few minutes rewards visible volume (levels, screens) the brief itself warns can be stretched; no counter-metric."
+},
+{
+"claim_id": "C-016",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"repetition or cosmetic changes do not count"
+],
+"reason": "The anti-gaming clause has no defined test of depth, so a peer judge cannot enforce it in minutes."
+},
+{
+"claim_id": "C-018",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"beginning, middle, and end"
+],
+"reason": "Satisfied cheaply by intro card plus results screen; presence of segments is the proxy, not meaningful progression."
+},
+{
+"claim_id": "C-019",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"more than one moment of gameplay"
+],
+"reason": "Counted by number of challenges/mechanics; reskinned repeats pass."
+},
+{
+"claim_id": "C-020",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"visually distinctive, polished, cohesive"
+],
+"reason": "Distinctiveness is judged against peers in minutes; rewards gimmick style over playable quality."
+},
+{
+"claim_id": "C-021",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"look, sound, feel reinforce world"
+],
+"reason": "Subjective, no measurable form; satisfiable with themed skin only."
+},
+{
+"claim_id": "C-027",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"avoid default or mismatched assets"
+],
+"reason": "Gameable by uniform post-processing that hides provenance mismatch rather than achieving a designed whole."
+},
+{
+"claim_id": "C-029",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"do not use pre-made assets"
+],
+"reason": "\"Generated\" is self-attested with no verifier; the proxy (declared provenance) can be met by laundering library assets through img2img, and the definition is ambiguous."
+},
+{
+"claim_id": "C-029",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"do not use pre-made assets"
+],
+"reason": "Organiser's own lecture endorses libraries (route 3); which source governs is unstated."
+},
+{
+"claim_id": "C-030",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"feel like they belong together"
+],
+"reason": "Cohesion judged by eye; no critic or in-game measure is specified, so any consistent look passes."
+},
+{
+"claim_id": "C-042",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"fun over repeated short sessions"
+],
+"reason": "Replay fun cannot be observed in one judging session; judges will use first-minute feel as proxy."
+},
+{
+"claim_id": "C-065",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"at least two distinct tracks"
+],
+"reason": "Count threshold met by two reskinned or trivially different tracks."
+},
+{
+"claim_id": "C-068",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"at least one mechanic beyond steering"
+],
+"reason": "Count threshold met by a trivial boost with no depth."
+},
+{
+"claim_id": "C-069",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Reliability \"enough to complete a race\" is a floor with no number or conditions."
+},
+{
+"claim_id": "C-070",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"enough variety and multiplayer polish to want to race again"
+],
+"reason": "Unobservable in a judging session; proxy will be surface polish."
+},
+{
+"claim_id": "C-071",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"fun over repeated short sessions"
+],
+"reason": "Same as C-042: replay value judged on a short play, rewards first-impression."
+},
+{
+"claim_id": "C-074",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"judges play every game",
+"people"
+],
+"reason": "Peer judges are also competitors (winners announced at lunch), so the grader is not independent of the candidates; a few minutes per game on unknown devices."
+},
+{
+"claim_id": "C-074",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.metric-serves-evaluator",
+"cues_matched": [
+"the judges will play every game"
+],
+"reason": "Evaluators are peers who are themselves competitors; scoring serves the demo/lunch moment."
+},
+{
+"claim_id": "C-075",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.assumed-data-rights",
+"cues_matched": [
+"no owner or licence stated"
+],
+"reason": "Brief is silent on ownership of generated assets and the game, which the organiser may claim or require to be public."
+},
+{
+"claim_id": "C-076",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"labs.gauntletai.com"
+],
+"reason": "Hosting student work on the organiser's domain implies acceptable-use and branding rules the operator has not looked up."
+},
+{
+"claim_id": "C-077",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.irreversible-action-without-gate",
+"cues_matched": [
+"public repository"
+],
+"reason": "A coding agent committing to a public repo publishes content (keys, generator prompts, assets) irreversibly in practice; no gate."
+},
+{
+"claim_id": "C-077",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"public repo"
+],
+"reason": "Public repo could expose lecture material, keys, or contradict organiser rules; unchecked."
+},
+{
+"claim_id": "C-085",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.irreversible-action-without-gate",
+"cues_matched": [
+"deploys to labs.gauntletai.com"
+],
+"reason": "Deploy to an organiser-owned domain is externally visible; no approval or rollback path stated."
+},
+{
+"claim_id": "C-085",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"labs.gauntletai.com"
+],
+"reason": "Domain use depends on organiser permission and policy; not confirmed."
+},
+{
+"claim_id": "C-086",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-package-name",
+"cues_matched": [
+"networking layer unspecified"
+],
+"reason": "Netcode/relay library is unchosen; an agent will pick and install one without vetting or pinning."
+},
+{
+"claim_id": "C-087",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-package-name",
+"cues_matched": [
+"library or hand-written, unspecified"
+],
+"reason": "Physics library choice open; an agent may install an unvetted npm package for orbit/n-body."
+},
+{
+"claim_id": "C-088",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.autonomous-agent-install",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Asset generators may arrive as CLIs, npm packages or MCP servers installed by the coding agent with no vetting."
+},
+{
+"claim_id": "C-088",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-tool-servers",
+"cues_matched": [
+"generation tools unspecified"
+],
+"reason": "Generation tooling may be community MCP servers whose descriptions the agent trusts."
+},
+{
+"claim_id": "C-088",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.standing-broad-credentials",
+"cues_matched": [
+"generation providers"
+],
+"reason": "Paid provider keys and credits held by build agents with no scope or spend cap."
+},
+{
+"claim_id": "C-093",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.assumed-data-rights",
+"cues_matched": [
+"public repo acceptable"
+],
+"reason": "Assumes AI-provider terms and tool credit duties permit a public repo; organiser policy untested."
+},
+{
+"claim_id": "C-094",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"Final Frontier"
+],
+"reason": "Name collision with existing games/trademarks, and with organiser branding, unchecked."
+},
+{
+"claim_id": "C-095",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"asset-library route breaks the rule"
+],
+"reason": "The organiser's lecture teaches route 3 (libraries) against its own brief ban; the research note rightly flags it."
+},
+{
+"claim_id": "C-101",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.assumed-data-rights",
+"cues_matched": [
+"class game commercial?"
+],
+"reason": "Whether a class/competition entry (with prizes) counts as commercial is the organiser's call; ask-owner."
+},
+{
+"claim_id": "C-103",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "ElevenLabs $6/mo, $1 first month: vendor price from the agent's read, unsourced and unrefreshed; commercial licence at that tier unchecked."
+},
+{
+"claim_id": "C-104",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Suno Pro $8/mo is a single unrefreshed price figure."
+},
+{
+"claim_id": "C-105",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-package-name",
+"cues_matched": [
+"jsfxr"
+],
+"reason": "jsfxr is an npm/CDN package with several forks of similar name; registry identity, version and pinning unchecked."
+},
+{
+"claim_id": "C-106",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Meshy 100 credits/mo vs the number of 3D assets a racer needs; cap unquantified; Pro API price unsourced."
+},
+{
+"claim_id": "C-108",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "PixelLab pricing admitted unverified (pricing page 404) yet called the strongest fit."
+},
+{
+"claim_id": "C-109",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Retro Diffusion ~$0.01/image from a third-party source only."
+},
+{
+"claim_id": "C-110",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "AutoSprite $12/mo single unverified figure; fit for non-sprite space racer unclear."
+},
+{
+"claim_id": "C-117",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Vercel Hobby non-commercial and 300 s cap: terms and limits stated from memory; matters for where WebSockets can run on judging morning."
+},
+{
+"claim_id": "C-118",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "market-reality.latency-over-correctness-floor",
+"cues_matched": [
+"cold start vs correctness floor"
+],
+"reason": "Render free tier sleeps after 15 min and cold starts about a minute: the server can be asleep when the first judge joins, defeating the floor that a match starts easily."
+},
+{
+"claim_id": "C-119",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Railway $5 trial credit may run out before judging; unrefreshed."
+},
+{
+"claim_id": "C-120",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "market-reality.unbounded-free-tier",
+"cues_matched": [
+"free tier with metered cap"
+],
+"reason": "Durable Objects free cap of 100k requests/day with 20:1 WebSocket billing could be exhausted by a racing tick rate across a class playing at once."
+},
+{
+"claim_id": "C-121",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"PartyKit shut down; successor PartyServer"
+],
+"reason": "Principle: a named dependency may be abandoned; if the shutdown date is wrong or the successor package differs, the build breaks or pulls a lookalike. Claim comes from an agent read of docs."
+},
+{
+"claim_id": "C-121",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Hosted PartyKit shutdown on 23 Oct 2026 asserted from an agent read; if wrong or right, host plan changes. Unverified date."
+},
+{
+"claim_id": "C-122",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "PeerJS NAT reliability unverified; if joins fail the correctness floor (a match starts) fails."
+},
+{
+"claim_id": "C-123",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unpinned-dependencies",
+"cues_matched": [
+"Colyseus or ws"
+],
+"reason": "Server dependency run publicly against player input; no pin, vetting or audit stated."
+},
+{
+"claim_id": "C-124",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-provenance",
+"cues_matched": [
+"Blender MCP",
+"about 33k stars"
+],
+"reason": "Installed from a third-party repo via uvx/pip, popularity (stars) cited as trust; last commit not verified (C-130)."
+},
+{
+"claim_id": "C-124",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.local-server-command-execution",
+"cues_matched": [
+"arbitrary Python over an unauthenticated socket"
+],
+"reason": "Blender MCP listens on a local socket and executes any Python it receives with the user's privileges; any local process or web page reaching the port gets code execution."
+},
+{
+"claim_id": "C-124",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.irreversible-action-without-gate",
+"cues_matched": [
+"arbitrary Python"
+],
+"reason": "Agent can run any Python through Blender MCP, including file deletion or network calls, without a gate."
+},
+{
+"claim_id": "C-125",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-provenance",
+"cues_matched": [
+"gamedev-skills repo"
+],
+"reason": "Third-party skills repo whose content steers the coding agent; licence cited, provenance and review not."
+},
+{
+"claim_id": "C-125",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-tool-servers",
+"cues_matched": [
+"third-party skills repo"
+],
+"reason": "Skill/instruction files from a third-party repo load into the agent context as trusted guidance."
+},
+{
+"claim_id": "C-126",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-provenance",
+"cues_matched": [
+"Unity/Godot/Aseprite MCPs only if picked"
+],
+"reason": "More third-party MCP servers pulled in conditionally with no vetting rule."
+},
+{
+"claim_id": "C-126",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-content-drives-tools",
+"cues_matched": [
+"import Poly Haven/Sketchfab assets"
+],
+"reason": "Imported third-party models/files enter a session that can run arbitrary Python via the same MCP; the import is also an extra servers-in-one-context risk."
+},
+{
+"claim_id": "C-127",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Admits OpenAI image price, PixelLab, Retro Diffusion and others unverified, so the cost estimate rests on gaps."
+},
+{
+"claim_id": "C-128",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Tripo and Stable Audio pricing only from aggregators."
+},
+{
+"claim_id": "C-132",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.llm-judge-self-grading",
+"cues_matched": [
+"separate critic agent",
+"independent critique"
+],
+"reason": "The critic is another agent from the same model family as the creator, so \"separate\" does not make it independent; its approval is the acceptance measure for cohesion and is not calibrated against a human."
+},
+{
+"claim_id": "C-132",
+"lens": "ml-evaluation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"critic judgement"
+],
+"reason": "Principle: automated judge needs validation against human labels; no held-out set or agreement measure for the critic."
+},
+{
+"claim_id": "C-132",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.unbounded-agent-loop",
+"cues_matched": [
+"creator -> critic -> fixes"
+],
+"reason": "Loop has no iteration/cost/time cap or halt hand-off; in a one-week build it can burn credits or time."
+},
+{
+"claim_id": "C-137",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"asset libraries Kenney, Poly Haven, itch.io"
+],
+"reason": "Lecture presents libraries as a normal route although the brief bans pre-made assets."
+},
+{
+"claim_id": "C-138",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.llm-judge-self-grading",
+"cues_matched": [
+"separate critic agent",
+"independent critique"
+],
+"reason": "The critic is another agent from the same model family as the creator, so \"separate\" does not make it independent; its approval is the acceptance measure for cohesion and is not calibrated against a human."
+},
+{
+"claim_id": "C-138",
+"lens": "ml-evaluation",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"independent critique of exported frames"
+],
+"reason": "Principle: judge needs human-label validation; critique of frames is not checked against held-out human ratings and sees only the assets it was prompted on (in-distribution)."
+},
+{
+"claim_id": "C-138",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-content-drives-tools",
+"cues_matched": [
+"critic inspects exported frames"
+],
+"reason": "Critic reads images that generator tools produced (can carry text instructions); low risk but the critic should hold no powerful tools."
+},
+{
+"claim_id": "C-138",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.unbounded-agent-loop",
+"cues_matched": [
+"Revise (fix biggest issue, review again)"
+],
+"reason": "\"Review again\" repeats until satisfied; no cap and no stop condition."
+},
+{
+"claim_id": "C-139",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"coherent library pack"
+],
+"reason": "Lecture recommends picking a library pack, contradicting \"do not use pre-made assets\"."
+},
+{
+"claim_id": "C-141",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.local-server-command-execution",
+"cues_matched": [
+"Aseprite CLI + Lua"
+],
+"reason": "Agent-written Lua run through Aseprite CLI executes on the host unsandboxed."
+},
+{
+"claim_id": "C-142",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"2D libraries"
+],
+"reason": "Lists libraries as sources while the brief bans them."
+},
+{
+"claim_id": "C-143",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Built-in generation limited by plan limits; cost/quotas unquantified for the asset volume needed."
+},
+{
+"claim_id": "C-145",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-package-name",
+"cues_matched": [
+"Blender MCP",
+"Claude of Duty"
+],
+"reason": "Names Blender MCP and an unidentified \"Claude of Duty\" as tools; neither checked against a registry or source."
+},
+{
+"claim_id": "C-145",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.local-server-command-execution",
+"cues_matched": [
+"Blender MCP lets the agent run Blender"
+],
+"reason": "Gives the agent Blender's Python on the host through the unauthenticated MCP socket."
+},
+{
+"claim_id": "C-146",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"3D libraries",
+"Mixamo"
+],
+"reason": "Lists 3D libraries and Mixamo as sources against the ban."
+},
+{
+"claim_id": "C-148",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"audio asset libraries"
+],
+"reason": "Presents audio libraries as route 3 against the ban."
+},
+{
+"claim_id": "C-149",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"sound libraries free and paid"
+],
+"reason": "Recommends sound libraries and checking terms, against the ban."
+},
+{
+"claim_id": "C-150",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"libraries Kenney, Freesound, Sonniss"
+],
+"reason": "Lists audio libraries in the tool list against the ban."
+},
+{
+"claim_id": "C-152",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"recorded foley"
+],
+"reason": "Organiser demo uses recorded foley, which is not generated."
+},
+{
+"claim_id": "C-153",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"library models",
+"recorded vehicle sounds"
+],
+"reason": "Organiser demo uses library models and recorded sounds against the ban."
+},
+{
+"claim_id": "C-154",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"recorded sounds"
+],
+"reason": "Organiser demo uses recorded sounds, not generated."
+},
+{
+"claim_id": "C-157",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"demo games use library models and recorded SFX"
+],
+"reason": "Judges may anchor on the lecture demos, so the de facto bar differs from the written rule; implicit rubric diverges from stated rubric."
+},
+{
+"claim_id": "C-157",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.contradicts-published-policy",
+"cues_matched": [
+"demos may not satisfy"
+],
+"reason": "Confirms the organiser's own demos may break the rule; raises how judges will actually apply it."
+},
+{
+"claim_id": "C-163",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-provenance",
+"cues_matched": [
+"no licence/component inventory"
+],
+"reason": "No inventory of components, models and generated-asset sources, which is also the basis for vetting provenance of what ships."
+},
+{
+"claim_id": "C-188",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "No cost ceiling for generation credits and server hosting."
+},
+{
+"claim_id": "C-196",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"no proxy stated"
+],
+"reason": "Brief scores beauty, uniqueness, substance but never says what real goal these proxy for."
+},
+{
+"claim_id": "C-197",
+"lens": "rubric-inversion",
+"verdict": "suspect",
+"trap_id": "rubric-inversion.proxy-metric-as-target",
+"cues_matched": [
+"no counter-metric"
+],
+"reason": "No counter-metric (e.g. playability, stability, load time) against over-optimising looks for the judging window."
+},
+{
+"claim_id": "C-201",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unverified-package-name",
+"cues_matched": [
+"no dependency vetting statement"
+],
+"reason": "Brief gives no rule on where dependencies come from or how they are vetted; agents will add npm packages in a public repo."
+},
+{
+"claim_id": "C-202",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.unpinned-dependencies",
+"cues_matched": [
+"no pinning policy"
+],
+"reason": "No lockfile/pin requirement; a transitive update overnight before judging could break the build."
+},
+{
+"claim_id": "C-203",
+"lens": "supply-chain",
+"verdict": "suspect",
+"trap_id": "supply-chain.autonomous-agent-install",
+"cues_matched": [
+"no agent install policy"
+],
+"reason": "Brief is silent on whether the coding agent may install packages or MCP servers unattended."
+},
+{
+"claim_id": "C-204",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.confused-deputy",
+"cues_matched": [
+"omission"
+],
+"reason": "No statement of which identity and API keys (generation providers, hosting) agents run with."
+},
+{
+"claim_id": "C-205",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-tool-servers",
+"cues_matched": [
+"omission"
+],
+"reason": "No list of trusted tool servers, no review/pinning, despite README recommending MCPs."
+},
+{
+"claim_id": "C-206",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-content-drives-tools",
+"cues_matched": [
+"omission"
+],
+"reason": "No human-approval rule for agent actions such as MCP execution, pushes to a public repo, or deploys."
+},
+{
+"claim_id": "C-207",
+"lens": "agent-security",
+"verdict": "suspect",
+"trap_id": "agent-security.untrusted-content-drives-tools",
+"cues_matched": [
+"omission"
+],
+"reason": "Fetched docs, asset-pack READMEs and tool output are untrusted input to the build agents; brief says nothing."
+},
+{
+"claim_id": "C-208",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.unbounded-agent-loop",
+"cues_matched": [
+"omission"
+],
+"reason": "No iteration, token or wall-clock cap on the generate-critique loop, with the deadline fixed."
+},
+{
+"claim_id": "C-209",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.irreversible-action-without-gate",
+"cues_matched": [
+"omission"
+],
+"reason": "Pushes to the public repo, domain deploys and paid generation credits are irreversible or externally visible, with no gate listed."
+},
+{
+"claim_id": "C-210",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.standing-broad-credentials",
+"cues_matched": [
+"omission"
+],
+"reason": "No statement of which keys (GitHub, hosting, generators) agents hold or their scope."
+},
+{
+"claim_id": "C-211",
+"lens": "agent-orchestration",
+"verdict": "suspect",
+"trap_id": "agent-orchestration.no-action-audit-trail",
+"cues_matched": [
+"omission"
+],
+"reason": "No log of which tool generated each asset; also the only evidence for the \"all assets generated\" rule."
+},
+{
+"claim_id": "C-213",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Correctness floor (a second player can join and finish a race) is never stated as the one thing that must work."
+},
+{
+"claim_id": "C-214",
+"lens": "market-reality",
+"verdict": "suspect",
+"trap_id": "novel",
+"cues_matched": [
+"price/free tier unsourced"
+],
+"reason": "Cost to serve (server, generation credits) neither stated nor bounded, with provider prices unsourced."
+},
+{
+"claim_id": "C-215",
+"lens": "company-context",
+"verdict": "suspect",
+"trap_id": "company-context.metric-serves-evaluator",
+"cues_matched": [
+"no organisation or payer named"
+],
+"reason": "Brief names no organisation, payer or prize; organiser (Gauntlet) appears only in the proposal, and the evaluator is also the customer."
+}
+]

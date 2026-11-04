@@ -1,0 +1,339 @@
+{
+ "note": "Manual lens override of the keyword planner (plan.json). Planner false positives and false negatives recorded in reasons.",
+ "groups": {
+  "A-law-terms-ethics": {
+   "model": "sonnet",
+   "lenses": [
+    {
+     "id": "provider-terms",
+     "why": "every AI generator has terms on output use/commercial use; brief mandates generated assets",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/provider-terms/lens.md",
+      "lenses/provider-terms/traps.yaml"
+     ],
+     "required_statements": [
+      "provider-terms.provider-and-agreement: The brief names each external model or API provider and the agreement or tier it will be used under (consumer, free, paid API, enterprise).",
+      "provider-terms.output-use: The brief states what happens to provider outputs beyond showing them to the user (stored, used for training or evaluation, redistributed).",
+      "provider-terms.data-sent: The brief states what classes of data are sent to each provider."
+     ]
+    },
+    {
+     "id": "copyright-data-rights",
+     "why": "AI output copyrightability and training-data/style-imitation exposure for a public game",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/copyright-data-rights/lens.md",
+      "lenses/copyright-data-rights/traps.yaml"
+     ],
+     "required_statements": [
+      "copyright-data-rights.content-provenance: The brief states where every training or mined content source comes from and the legal basis or licence for using it.",
+      "copyright-data-rights.opt-out-handling: Where content is crawled or mined, the brief states how rightholder reservations (robots directives, machine-readable TDM opt-outs) are honoured."
+     ]
+    },
+    {
+     "id": "licensing",
+     "why": "code and tool licences (engine, netcode, physics libs, MCPs); CC BY credit duty",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/licensing/lens.md",
+      "lenses/licensing/traps.yaml"
+     ],
+     "required_statements": [
+      "licensing.dependency-licence-inventory: The brief states, or requires producing, the licence (SPDX id and version) of every third-party component, model and dataset the deliverable uses.",
+      "licensing.distribution-model: The brief states how the deliverable reaches users (shipped binary, mobile app, device image, on-prem install, or hosted service only), since copyleft triggers depend on it.",
+      "licensing.commercial-use: The brief states whether the deliverable is commercial (sold, revenue-bearing, or used for commercial advantage), so non-commercial assets can be excluded."
+     ]
+    },
+    {
+     "id": "ai-regulation",
+     "why": "public deployment of AI-generated media; disclosure/labelling duties",
+     "version": "0.2.0",
+     "calibrated": false,
+     "read": [
+      "lenses/ai-regulation/lens.md",
+      "lenses/ai-regulation/traps.yaml"
+     ],
+     "required_statements": [
+      "ai-regulation.ai-act-classification: The brief states whether the AI system is used on people in the EU and, if so, its risk classification under the EU AI Act (prohibited, high-risk under Article 6, transparency-only, or minimal).",
+      "ai-regulation.human-oversight: For any automated decision about a person (hiring, credit, grading, eligibility), the brief states who can review, override or halt it, and that decisions are logged.",
+      "ai-regulation.ai-disclosure: For any conversational or voice AI facing the public, the brief states that users are told they are interacting with an AI."
+     ]
+    },
+    {
+     "id": "accessibility",
+     "why": "UI, colour-only position feedback, keyboard/pointer input, motion, audio-only cues",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/accessibility/lens.md",
+      "lenses/accessibility/traps.yaml"
+     ],
+     "required_statements": [
+      "accessibility.a11y-standard: The brief states the accessibility standard and level the UI targets (for example WCAG 2.2 Level AA) and treats it as an acceptance gate.",
+      "accessibility.legal-coverage: The brief states whether the product is a US public-entity service (ADA Title II) or an EAA-covered EU consumer service, which set a binding accessibility floor.",
+      "accessibility.non-visual-operable: The brief states that information and operation do not depend on a single sense or input (not colour-only, keyboard operable, works without a precise drag)."
+     ]
+    },
+    {
+     "id": "privacy-regulated-data",
+     "why": "public multiplayer: player names/IP/matchmaking; possibly minors. Planner hit 'phi' on 'physics'; re-justified on multiplayer identity data",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/privacy-regulated-data/lens.md",
+      "lenses/privacy-regulated-data/traps.yaml"
+     ],
+     "required_statements": [
+      "privacy-regulated-data.data-classes: The brief lists the classes of personal data processed, flagging regulated ones (health, special-category, children's, financial).",
+      "privacy-regulated-data.processors-and-agreements: The brief names every third party that receives personal data and the agreement covering it (BAA, Article 28 processor contract, DPA).",
+      "privacy-regulated-data.residency-and-retention: The brief states where personal data is stored, cached and processed, and how long each class is retained."
+     ]
+    },
+    {
+     "id": "security-ethics",
+     "why": "public join links, chat/names abuse, unauthenticated game server",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/security-ethics/lens.md",
+      "lenses/security-ethics/traps.yaml"
+     ],
+     "required_statements": [
+      "security-ethics.authorised-targets: The brief states which systems the tool may actively test and how the owner's authorisation for each is obtained and checked.",
+      "security-ethics.disclosure-route: The brief states how findings about systems the operator does not own are reported (privately to the owner, vendor or a coordinator) and when, if ever, they are published.",
+      "security-ethics.sensitive-data-handling: The brief states what the tool does when it meets personal or other sensitive data during testing (stop, do not retain or display, notify the owner)."
+     ]
+    }
+   ]
+  },
+  "B-systems": {
+   "model": "sonnet",
+   "lenses": [
+    {
+     "id": "realtime-transport",
+     "why": "multiplayer race: transport choice, latency, tick rate, reconnect",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/realtime-transport/lens.md",
+      "lenses/realtime-transport/traps.yaml"
+     ],
+     "required_statements": [
+      "realtime-transport.network-path: The brief states the network path assumptions - expected packet loss, round-trip time, jitter and MTU (or that the MTU is discovered) - the live channel must work over.",
+      "realtime-transport.latency-budget: The brief states an end-to-end latency budget for the live channel (for example mouth-to-ear) and how it splits across capture, processing, network, buffering and playout."
+     ]
+    },
+    {
+     "id": "distributed-systems",
+     "why": "authoritative state across clients, desync, ordering, host failure",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/distributed-systems/lens.md",
+      "lenses/distributed-systems/traps.yaml"
+     ],
+     "required_statements": [
+      "distributed-systems.fault-model: The brief states the fault model: whether participants may only crash or may behave arbitrarily (Byzantine), and how many simultaneous faults f must be tolerated.",
+      "distributed-systems.trust-boundary: The brief states which nodes, relays and operators are trusted, and how messages and membership are authenticated.",
+      "distributed-systems.delivery-semantics: The brief states message delivery and retry semantics (at-most-once or at-least-once) and the idempotency key that makes retries safe.",
+      "distributed-systems.ordering-guarantees: The brief states what ordering is guaranteed (per key, per source, total, causal) and what assigns it (a log sequence, logical clocks), rather than relying on wall-clock time."
+     ]
+    },
+    {
+     "id": "numeric-representation",
+     "why": "Kepler/n-body integration: float determinism across browsers, timestep, drift",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/numeric-representation/lens.md",
+      "lenses/numeric-representation/traps.yaml"
+     ],
+     "required_statements": [
+      "numeric-representation.money-type-and-rounding: Where money appears, the brief states the numeric type (integer minor units or fixed-scale decimal), the currency scale, and the rounding rule and where rounding happens.",
+      "numeric-representation.time-representation: Where times are stored or compared, the brief states that instants are stored in UTC or with an offset and how user time zones and daylight-saving changes are handled.",
+      "numeric-representation.integer-ranges: Where counters, ids or running totals are stored, the brief states their maximum lifetime value or width and what happens on overflow."
+     ]
+    },
+    {
+     "id": "performance",
+     "why": "n-body per tick, browser frame budget, mobile/low-end devices",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/performance/lens.md",
+      "lenses/performance/traps.yaml"
+     ],
+     "required_statements": [
+      "performance.load-model: The brief states the load model - peak arrival rate, payload size distribution and concurrency - that its performance targets must hold under.",
+      "performance.latency-slo-percentile: Every latency target names a percentile and where it is measured (for example p99 at the API edge).",
+      "performance.cost-ceiling-per-unit: The brief states a cost ceiling per unit (per user, request, device or GB) that infrastructure and data-transfer costs must stay under."
+     ]
+    },
+    {
+     "id": "media-pipelines",
+     "why": "generated image/audio formats, sizes, loops, sample rates, load time",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/media-pipelines/lens.md",
+      "lenses/media-pipelines/traps.yaml"
+     ],
+     "required_statements": [
+      "media-pipelines.media-format: The brief states the media parameters the pipeline must handle - maximum resolution, frame count or frame rate, bit depth, colour space and transfer function - for input and output.",
+      "media-pipelines.memory-budget-per-worker: The brief states the memory budget per worker and how many media requests a worker processes at once."
+     ]
+    },
+    {
+     "id": "os-systems",
+     "why": "browser memory/CPU/GPU limits and server idle-sleep. Planner hit 'oom' on 'room'; re-justified on host process limits",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/os-systems/lens.md",
+      "lenses/os-systems/traps.yaml"
+     ],
+     "required_statements": [
+      "os-systems.memory-budget-per-worker: The brief states a memory budget per worker or container and the peak input size and concurrency it must hold.",
+      "os-systems.concurrency-model: The brief states the concurrency model (pooled connections, bounded worker pool or event loop) and the peak concurrent connections, threads and open files per host."
+     ]
+    },
+    {
+     "id": "theory-complexity",
+     "why": "restricted n-body / three-body chaos and what can be guaranteed. Planner hit 'schedul' on schedule; re-justified on physics claims",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/theory-complexity/lens.md",
+      "lenses/theory-complexity/traps.yaml"
+     ],
+     "required_statements": [
+      "theory-complexity.optimality-target: For any optimisation feature, the brief states whether it needs the exact optimum or an approximation, and if an approximation, the acceptable optimality gap and the time budget per solve.",
+      "theory-complexity.instance-size: The brief states the maximum problem size the optimiser or checker must handle (entities, nodes, constraints) together with the latency it must meet at that size.",
+      "theory-complexity.rule-execution-bounds: Where users supply rules, scripts or patterns, the brief states the language's expressiveness and the run-time limits (steps or time, memory, recursion or trigger depth) that bound execution."
+     ]
+    }
+   ]
+  },
+  "C-measurement-supply-business": {
+   "model": "sonnet",
+   "lenses": [
+    {
+     "id": "rubric-inversion",
+     "why": "'look thrown together... will fail', 'beautiful', 'substantial': subjective judged rubric that can reward the wrong thing",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/rubric-inversion/lens.md",
+      "lenses/rubric-inversion/traps.yaml"
+     ],
+     "required_statements": [
+      "rubric-inversion.proxy-target: For each scored metric or KPI, the brief states the underlying goal the metric is a proxy for.",
+      "rubric-inversion.counter-metric: For each scored metric, the brief names a counter-metric or budget that worsens when the metric is gamed (for example precision against recall, defects escaped against tests written, human-rated quality against an automated score)."
+     ]
+    },
+    {
+     "id": "ml-evaluation",
+     "why": "visual/audio cohesion judged by model or humans; eval design for generated assets",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/ml-evaluation/lens.md",
+      "lenses/ml-evaluation/traps.yaml"
+     ],
+     "required_statements": [
+      "ml-evaluation.split-method: The brief states how evaluation data is separated from training data (chronological cutoff, entity-grouped split, or why i.i.d. random splitting is valid) and that all fitted preprocessing uses training data only.",
+      "ml-evaluation.calibration-target: Where model scores are shown or used as probabilities or confidence, the brief states the calibration method and the calibration error target measured on held-out data.",
+      "ml-evaluation.base-rates: The brief states the expected base rate of each class (or of the rare event) in deployment and the trivial baseline the model must beat."
+     ]
+    },
+    {
+     "id": "supply-chain",
+     "why": "npm deps, hosted SDKs, MCP servers (research README flags Blender MCP). Planner hit 'install' on 'not need to install'; re-justified on dependencies",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/supply-chain/lens.md",
+      "lenses/supply-chain/traps.yaml"
+     ],
+     "required_statements": [
+      "supply-chain.dependency-vetting: The brief states where dependencies come from (registries or an allowlisted mirror) and how a new dependency is vetted before first use.",
+      "supply-chain.pinning-policy: The brief states that dependencies are pinned (lockfile, hashes or digests) and how updates are reviewed.",
+      "supply-chain.agent-install-policy: The brief states whether automated agents may add or install packages, and what human approval that requires."
+     ]
+    },
+    {
+     "id": "agent-security",
+     "why": "agent tooling with arbitrary code execution (Blender MCP over unauthenticated socket) and prompt-injection via fetched pages",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/agent-security/lens.md",
+      "lenses/agent-security/traps.yaml"
+     ],
+     "required_statements": [
+      "agent-security.delegated-authority: The brief states which identity and scopes each tool or downstream call runs with, and how the invoking user is authenticated.",
+      "agent-security.tool-trust: The brief states which tool servers are trusted, how their definitions are reviewed and pinned, and what happens when a definition changes.",
+      "agent-security.human-approval: The brief states which agent actions require explicit human confirmation and what the confirmation shows.",
+      "agent-security.untrusted-inputs: The brief states which inputs the agent reads are untrusted (emails, web pages, documents, tool output) and what tools may run while they are in context."
+     ]
+    },
+    {
+     "id": "agent-orchestration",
+     "why": "multi-agent asset pipeline (create -> critic -> fix) failure modes",
+     "version": "0.2.0",
+     "calibrated": false,
+     "read": [
+      "lenses/agent-orchestration/lens.md",
+      "lenses/agent-orchestration/traps.yaml"
+     ],
+     "required_statements": [
+      "agent-orchestration.loop-budget: The brief states each agent loop's iteration cap, token or cost ceiling and wall-clock limit, and the halting condition that stops the loop when the goal is not reached (with the hand-off that follows).",
+      "agent-orchestration.irreversible-actions: The brief lists which agent actions are irreversible or externally visible (payments, refunds, deletions, outbound messages, deploys, physical actuation) and, for each, the human approval gate and the compensation or idempotency path.",
+      "agent-orchestration.credential-scope: The brief states which credentials each agent and sub-agent holds, their scope and lifetime, and whose authority each action is executed under.",
+      "agent-orchestration.action-audit: The brief states that agent tool calls, their arguments, the acting identity and their outcomes are recorded in a log that operators can review."
+     ]
+    },
+    {
+     "id": "market-reality",
+     "why": "tool pricing/free-tier claims in the research README; cost of generation at jam scale",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/market-reality/lens.md",
+      "lenses/market-reality/traps.yaml"
+     ],
+     "required_statements": [
+      "market-reality.customer-price-volume: The brief states the target customer, the price they pay, and the expected volume (users and requests per user per period).",
+      "market-reality.correctness-floor: The brief states the correctness floor, the one capability that must work for the product to have value to that customer.",
+      "market-reality.cost-to-serve: The brief states or bounds the marginal cost to serve one user or request, with the provider prices it rests on."
+     ]
+    },
+    {
+     "id": "company-context",
+     "why": "always applies; Gauntlet as the organiser, public repo, judged by peers",
+     "version": "0.1.0",
+     "calibrated": false,
+     "read": [
+      "lenses/company-context/lens.md",
+      "lenses/company-context/traps.yaml"
+     ],
+     "required_statements": [
+      "company-context.organisation-and-payer: The brief names the organisation the product serves and who pays for it (the buyer, as distinct from the user and the evaluator).",
+      "company-context.governing-regulators: The brief names the regulator or regulators that govern the organisation's sector, or states that none applies and why."
+     ]
+    }
+   ]
+  }
+ },
+ "skipped": {
+  "professional-duty": "not engaged",
+  "cyber-physical": "not engaged",
+  "cryptography": "not engaged",
+  "databases": "not engaged"
+ },
+ "calibrated": false
+}

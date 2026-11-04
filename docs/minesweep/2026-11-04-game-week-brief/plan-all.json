@@ -1,0 +1,1099 @@
+{
+  "brief": {
+    "path": "docs/minesweep/2026-11-04-game-week-brief/brief.md",
+    "sha256": "f84b7ad9b10742b911ee5922d9361c60050d10830063cfbe03ee707c7178c668"
+  },
+  "groups": {
+    "law-terms-ethics": {
+      "title": "Law, terms and ethics",
+      "model": "sonnet",
+      "lenses": [
+        {
+          "id": "accessibility",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/accessibility/lens.md",
+            "lenses/accessibility/traps.yaml"
+          ],
+          "required_statements": [
+            "accessibility.a11y-standard: The brief states the accessibility standard and level the UI targets (for example WCAG 2.2 Level AA) and treats it as an acceptance gate.",
+            "accessibility.legal-coverage: The brief states whether the product is a US public-entity service (ADA Title II) or an EAA-covered EU consumer service, which set a binding accessibility floor.",
+            "accessibility.non-visual-operable: The brief states that information and operation do not depend on a single sense or input (not colour-only, keyboard operable, works without a precise drag)."
+          ],
+          "traps": [
+            {
+              "id": "accessibility.information-by-single-sense",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.not-keyboard-or-pointer-operable",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.public-entity-below-wcag-aa",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "accessibility.covered-service-not-accessible",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "ai-regulation",
+          "version": "0.2.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/ai-regulation/lens.md",
+            "lenses/ai-regulation/traps.yaml"
+          ],
+          "required_statements": [
+            "ai-regulation.ai-act-classification: The brief states whether the AI system is used on people in the EU and, if so, its risk classification under the EU AI Act (prohibited, high-risk under Article 6, transparency-only, or minimal).",
+            "ai-regulation.human-oversight: For any automated decision about a person (hiring, credit, grading, eligibility), the brief states who can review, override or halt it, and that decisions are logged.",
+            "ai-regulation.ai-disclosure: For any conversational or voice AI facing the public, the brief states that users are told they are interacting with an AI."
+          ],
+          "traps": [
+            {
+              "id": "ai-regulation.emotion-inference-work-education",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ai-regulation.annex-iii-without-oversight-or-logs",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ai-regulation.undisclosed-ai-interaction",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ai-regulation.untargeted-face-scraping",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "copyright-data-rights",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/copyright-data-rights/lens.md",
+            "lenses/copyright-data-rights/traps.yaml"
+          ],
+          "required_statements": [
+            "copyright-data-rights.content-provenance: The brief states where every training or mined content source comes from and the legal basis or licence for using it.",
+            "copyright-data-rights.opt-out-handling: Where content is crawled or mined, the brief states how rightholder reservations (robots directives, machine-readable TDM opt-outs) are honoured."
+          ],
+          "traps": [
+            {
+              "id": "copyright-data-rights.tdm-ignoring-opt-out",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "copyright-data-rights.circumvent-access-controls",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "copyright-data-rights.gpai-without-copyright-policy-or-summary",
+              "status": "verified",
+              "kind": "omission"
+            }
+          ]
+        },
+        {
+          "id": "licensing",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/licensing/lens.md",
+            "lenses/licensing/traps.yaml"
+          ],
+          "required_statements": [
+            "licensing.dependency-licence-inventory: The brief states, or requires producing, the licence (SPDX id and version) of every third-party component, model and dataset the deliverable uses.",
+            "licensing.distribution-model: The brief states how the deliverable reaches users (shipped binary, mobile app, device image, on-prem install, or hosted service only), since copyleft triggers depend on it.",
+            "licensing.commercial-use: The brief states whether the deliverable is commercial (sold, revenue-bearing, or used for commercial advantage), so non-commercial assets can be excluded."
+          ],
+          "traps": [
+            {
+              "id": "licensing.gpl-in-distributed-proprietary",
+              "status": "verified",
+              "kind": "dependency"
+            },
+            {
+              "id": "licensing.agpl-modified-network-service",
+              "status": "verified",
+              "kind": "dependency"
+            },
+            {
+              "id": "licensing.source-available-managed-service",
+              "status": "verified",
+              "kind": "dependency"
+            },
+            {
+              "id": "licensing.non-commercial-asset-in-paid-product",
+              "status": "verified",
+              "kind": "dependency"
+            }
+          ]
+        },
+        {
+          "id": "privacy-regulated-data",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/privacy-regulated-data/lens.md",
+            "lenses/privacy-regulated-data/traps.yaml"
+          ],
+          "required_statements": [
+            "privacy-regulated-data.data-classes: The brief lists the classes of personal data processed, flagging regulated ones (health, special-category, children's, financial).",
+            "privacy-regulated-data.processors-and-agreements: The brief names every third party that receives personal data and the agreement covering it (BAA, Article 28 processor contract, DPA).",
+            "privacy-regulated-data.residency-and-retention: The brief states where personal data is stored, cached and processed, and how long each class is retained."
+          ],
+          "traps": [
+            {
+              "id": "privacy-regulated-data.phi-to-general-model-endpoint",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.special-category-global-edge-cache",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.collect-all-keep-forever",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "privacy-regulated-data.children-data-without-parental-consent",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "professional-duty",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/professional-duty/lens.md",
+            "lenses/professional-duty/traps.yaml"
+          ],
+          "required_statements": [
+            "professional-duty.approval-basis: The brief states what evidence (tests, review, risk assessment) a release approval or sign-off attests to, rather than treating the signature itself as the gate.",
+            "professional-duty.escalation-path: The brief states how an engineer who finds a danger or a likely failure records it and reports it to someone able to act.",
+            "professional-duty.clinical-oversight: For clinical recommendation software, the brief states that a qualified human can review the basis of each recommendation and remains the decision-maker."
+          ],
+          "traps": [
+            {
+              "id": "professional-duty.sign-off-without-basis",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "professional-duty.suppress-danger-disclosure",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "professional-duty.deceptive-capability-claims",
+              "status": "verified",
+              "kind": "rubric"
+            },
+            {
+              "id": "professional-duty.clinical-advice-without-reviewable-basis",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "provider-terms",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/provider-terms/lens.md",
+            "lenses/provider-terms/traps.yaml"
+          ],
+          "required_statements": [
+            "provider-terms.provider-and-agreement: The brief names each external model or API provider and the agreement or tier it will be used under (consumer, free, paid API, enterprise).",
+            "provider-terms.output-use: The brief states what happens to provider outputs beyond showing them to the user (stored, used for training or evaluation, redistributed).",
+            "provider-terms.data-sent: The brief states what classes of data are sent to each provider."
+          ],
+          "traps": [
+            {
+              "id": "provider-terms.output-distillation",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "provider-terms.unauthorised-resale-proxy",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "provider-terms.limit-evasion-multi-account",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "provider-terms.unsupported-region-or-tier",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "provider-terms.sensitive-data-on-unpaid-tier",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "security-ethics",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/security-ethics/lens.md",
+            "lenses/security-ethics/traps.yaml"
+          ],
+          "required_statements": [
+            "security-ethics.authorised-targets: The brief states which systems the tool may actively test and how the owner's authorisation for each is obtained and checked.",
+            "security-ethics.disclosure-route: The brief states how findings about systems the operator does not own are reported (privately to the owner, vendor or a coordinator) and when, if ever, they are published.",
+            "security-ethics.sensitive-data-handling: The brief states what the tool does when it meets personal or other sensitive data during testing (stop, do not retain or display, notify the owner)."
+          ],
+          "traps": [
+            {
+              "id": "security-ethics.exploit-and-dump-to-prove",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "security-ethics.unauthorised-third-party-scanning",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "security-ethics.weaponised-exploit-beyond-proof",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "security-ethics.public-disclosure-before-fix",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "agents-cyber-physical": {
+      "title": "Agents and cyber-physical systems",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "agent-orchestration",
+          "version": "0.2.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/agent-orchestration/lens.md",
+            "lenses/agent-orchestration/traps.yaml"
+          ],
+          "required_statements": [
+            "agent-orchestration.loop-budget: The brief states each agent loop's iteration cap, token or cost ceiling and wall-clock limit, and the halting condition that stops the loop when the goal is not reached (with the hand-off that follows).",
+            "agent-orchestration.irreversible-actions: The brief lists which agent actions are irreversible or externally visible (payments, refunds, deletions, outbound messages, deploys, physical actuation) and, for each, the human approval gate and the compensation or idempotency path.",
+            "agent-orchestration.credential-scope: The brief states which credentials each agent and sub-agent holds, their scope and lifetime, and whose authority each action is executed under.",
+            "agent-orchestration.action-audit: The brief states that agent tool calls, their arguments, the acting identity and their outcomes are recorded in a log that operators can review."
+          ],
+          "traps": [
+            {
+              "id": "agent-orchestration.unbounded-agent-loop",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-orchestration.irreversible-action-without-gate",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-orchestration.non-idempotent-retry",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-orchestration.standing-broad-credentials",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-orchestration.delegation-without-least-privilege",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-orchestration.no-action-audit-trail",
+              "status": "verified",
+              "kind": "omission"
+            }
+          ]
+        },
+        {
+          "id": "cyber-physical",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/cyber-physical/lens.md",
+            "lenses/cyber-physical/traps.yaml"
+          ],
+          "required_statements": [
+            "cyber-physical.safety-function-ownership: The brief names the safety functions protecting the physical process (interlocks, safety instrumented systems, emergency shutdown), who owns them, and states that the software does not modify, bypass or depend on them being bypassed.",
+            "cyber-physical.actuation-write-path: The brief states whether any write path from the software (cloud services, analytics, agents) reaches a controller, setpoint or actuator, and if so how that path is authenticated, bounded and approved, and what happens locally when it fails.",
+            "cyber-physical.regulatory-regime: The brief states the regulatory regime for the physical assets, for example whether they are part of the bulk electric system and their NERC CIP impact rating, or process-safety rules for the site, or that none applies and who confirmed it.",
+            "cyber-physical.network-zones: The brief states the network zones between enterprise IT, cloud and OT and every conduit between them, including vendor and remote-access paths."
+          ],
+          "traps": [
+            {
+              "id": "cyber-physical.standing-vendor-remote-access",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.unauthenticated-ot-write-path",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.unattended-patch-reboot",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.no-internal-network-monitoring",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.safety-interlock-bypass",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.cloud-hard-realtime-loop",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.flat-it-ot-network",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cyber-physical.bes-cip-deferred",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "supply-chain-security-crypto": {
+      "title": "Supply chain, agent security and cryptography",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "agent-security",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/agent-security/lens.md",
+            "lenses/agent-security/traps.yaml"
+          ],
+          "required_statements": [
+            "agent-security.delegated-authority: The brief states which identity and scopes each tool or downstream call runs with, and how the invoking user is authenticated.",
+            "agent-security.tool-trust: The brief states which tool servers are trusted, how their definitions are reviewed and pinned, and what happens when a definition changes.",
+            "agent-security.human-approval: The brief states which agent actions require explicit human confirmation and what the confirmation shows.",
+            "agent-security.untrusted-inputs: The brief states which inputs the agent reads are untrusted (emails, web pages, documents, tool output) and what tools may run while they are in context."
+          ],
+          "traps": [
+            {
+              "id": "agent-security.token-passthrough",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.confused-deputy",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.guessable-state-handle",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.untrusted-tool-servers",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.silent-tool-redefinition",
+              "status": "verified",
+              "kind": "omission"
+            },
+            {
+              "id": "agent-security.cross-server-tool-shadowing",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.untrusted-content-drives-tools",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "agent-security.local-server-command-execution",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "cryptography",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/cryptography/lens.md",
+            "lenses/cryptography/traps.yaml"
+          ],
+          "required_statements": [
+            "cryptography.key-nonce-management: The brief states how keys are generated, stored and rotated, and how nonce uniqueness per key is guaranteed.",
+            "cryptography.protection-lifetime: The brief states the adversary and how long confidentiality and signature validity must hold.",
+            "cryptography.standard-algorithms: The brief names standard algorithms and maintained libraries rather than leaving the construction open."
+          ],
+          "traps": [
+            {
+              "id": "cryptography.gcm-deterministic-nonce",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cryptography.gcm-random-nonce-volume",
+              "status": "verified",
+              "kind": "metric"
+            },
+            {
+              "id": "cryptography.non-csprng",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cryptography.quantum-vulnerable-long-term-secrecy",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cryptography.pq-signature-size-mtu",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cryptography.stateful-hbs-state-reuse",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "cryptography.custom-crypto-construction",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "supply-chain",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/supply-chain/lens.md",
+            "lenses/supply-chain/traps.yaml"
+          ],
+          "required_statements": [
+            "supply-chain.dependency-vetting: The brief states where dependencies come from (registries or an allowlisted mirror) and how a new dependency is vetted before first use.",
+            "supply-chain.pinning-policy: The brief states that dependencies are pinned (lockfile, hashes or digests) and how updates are reviewed.",
+            "supply-chain.agent-install-policy: The brief states whether automated agents may add or install packages, and what human approval that requires."
+          ],
+          "traps": [
+            {
+              "id": "supply-chain.unverified-package-name",
+              "status": "verified",
+              "kind": "dependency"
+            },
+            {
+              "id": "supply-chain.autonomous-agent-install",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.install-time-scripts",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.unpinned-dependencies",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "supply-chain.unverified-provenance",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "business": {
+      "title": "Business context",
+      "model": "sonnet",
+      "lenses": [
+        {
+          "id": "company-context",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/company-context/lens.md",
+            "lenses/company-context/traps.yaml"
+          ],
+          "required_statements": [
+            "company-context.organisation-and-payer: The brief names the organisation the product serves and who pays for it (the buyer, as distinct from the user and the evaluator).",
+            "company-context.governing-regulators: The brief names the regulator or regulators that govern the organisation's sector, or states that none applies and why."
+          ],
+          "traps": [
+            {
+              "id": "company-context.contradicts-published-policy",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "company-context.ignores-sector-regulator",
+              "status": "verified",
+              "kind": "omission"
+            },
+            {
+              "id": "company-context.metric-serves-evaluator",
+              "status": "unverified",
+              "kind": "metric"
+            },
+            {
+              "id": "company-context.assumed-data-rights",
+              "status": "unverified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "market-reality",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/market-reality/lens.md",
+            "lenses/market-reality/traps.yaml"
+          ],
+          "required_statements": [
+            "market-reality.customer-price-volume: The brief states the target customer, the price they pay, and the expected volume (users and requests per user per period).",
+            "market-reality.correctness-floor: The brief states the correctness floor, the one capability that must work for the product to have value to that customer.",
+            "market-reality.cost-to-serve: The brief states or bounds the marginal cost to serve one user or request, with the provider prices it rests on."
+          ],
+          "traps": [
+            {
+              "id": "market-reality.negative-unit-economics",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "market-reality.top-down-tam",
+              "status": "unverified",
+              "kind": "metric"
+            },
+            {
+              "id": "market-reality.unsourced-willingness-to-pay",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "market-reality.latency-over-correctness-floor",
+              "status": "unverified",
+              "kind": "metric"
+            },
+            {
+              "id": "market-reality.unbounded-free-tier",
+              "status": "unverified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "distributed-data": {
+      "title": "Distributed systems and data",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "databases",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/databases/lens.md",
+            "lenses/databases/traps.yaml"
+          ],
+          "required_statements": [
+            "databases.consistency-model: The brief states the consistency model required for each class of data (linearizable, read-your-writes, eventual with a staleness bound).",
+            "databases.partition-behaviour: The brief states what the system does when replicas or regions cannot reach each other: reject or queue writes, or accept divergent writes and how they are merged.",
+            "databases.isolation-level: The brief states the transaction isolation level, or the mechanism that enforces each multi-row invariant under concurrent access.",
+            "databases.cross-store-atomicity: Where one operation updates more than one store (database, broker, cache, index), the brief states how they are kept consistent (outbox, change data capture, saga) and the idempotency key consumers use."
+          ],
+          "traps": [
+            {
+              "id": "databases.cap-strong-and-available",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "databases.dual-write-without-outbox",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "databases.isolation-anomaly",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "databases.monotonic-key-hot-partition",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "databases.secondary-index-read-after-write",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "distributed-systems",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/distributed-systems/lens.md",
+            "lenses/distributed-systems/traps.yaml"
+          ],
+          "required_statements": [
+            "distributed-systems.fault-model: The brief states the fault model: whether participants may only crash or may behave arbitrarily (Byzantine), and how many simultaneous faults f must be tolerated.",
+            "distributed-systems.trust-boundary: The brief states which nodes, relays and operators are trusted, and how messages and membership are authenticated.",
+            "distributed-systems.delivery-semantics: The brief states message delivery and retry semantics (at-most-once or at-least-once) and the idempotency key that makes retries safe.",
+            "distributed-systems.ordering-guarantees: The brief states what ordering is guaranteed (per key, per source, total, causal) and what assigns it (a log sequence, logical clocks), rather than relying on wall-clock time."
+          ],
+          "traps": [
+            {
+              "id": "distributed-systems.cft-in-byzantine-setting",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.unauthenticated-relay",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.two-generals-simultaneous-action",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.lock-without-fencing-token",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.wall-clock-ordering",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.consensus-guaranteed-termination",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "distributed-systems.exactly-once-delivery",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "systems-performance": {
+      "title": "Systems and performance",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "media-pipelines",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/media-pipelines/lens.md",
+            "lenses/media-pipelines/traps.yaml"
+          ],
+          "required_statements": [
+            "media-pipelines.media-format: The brief states the media parameters the pipeline must handle - maximum resolution, frame count or frame rate, bit depth, colour space and transfer function - for input and output.",
+            "media-pipelines.memory-budget-per-worker: The brief states the memory budget per worker and how many media requests a worker processes at once."
+          ],
+          "traps": [
+            {
+              "id": "media-pipelines.decoded-frames-exceed-memory",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "media-pipelines.hdr-quantized-to-8bit",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "media-pipelines.uncompressed-bandwidth",
+              "status": "unverified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "os-systems",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/os-systems/lens.md",
+            "lenses/os-systems/traps.yaml"
+          ],
+          "required_statements": [
+            "os-systems.memory-budget-per-worker: The brief states a memory budget per worker or container and the peak input size and concurrency it must hold.",
+            "os-systems.concurrency-model: The brief states the concurrency model (pooled connections, bounded worker pool or event loop) and the peak concurrent connections, threads and open files per host."
+          ],
+          "traps": [
+            {
+              "id": "os-systems.ephemeral-port-exhaustion",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.fd-limit-exhaustion",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.memory-limit-oom-kill",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.thread-or-process-per-request",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "os-systems.page-cache-as-free-memory",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "performance",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/performance/lens.md",
+            "lenses/performance/traps.yaml"
+          ],
+          "required_statements": [
+            "performance.load-model: The brief states the load model - peak arrival rate, payload size distribution and concurrency - that its performance targets must hold under.",
+            "performance.latency-slo-percentile: Every latency target names a percentile and where it is measured (for example p99 at the API edge).",
+            "performance.cost-ceiling-per-unit: The brief states a cost ceiling per unit (per user, request, device or GB) that infrastructure and data-transfer costs must stay under."
+          ],
+          "traps": [
+            {
+              "id": "performance.fanout-tail-amplification",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.egress-unit-economics",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.high-cardinality-metric-labels",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.unbounded-queue",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "performance.percentile-slo-without-load-model",
+              "status": "verified",
+              "kind": "omission"
+            }
+          ]
+        },
+        {
+          "id": "realtime-transport",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/realtime-transport/lens.md",
+            "lenses/realtime-transport/traps.yaml"
+          ],
+          "required_statements": [
+            "realtime-transport.network-path: The brief states the network path assumptions - expected packet loss, round-trip time, jitter and MTU (or that the MTU is discovered) - the live channel must work over.",
+            "realtime-transport.latency-budget: The brief states an end-to-end latency budget for the live channel (for example mouth-to-ear) and how it splits across capture, processing, network, buffering and playout."
+          ],
+          "traps": [
+            {
+              "id": "realtime-transport.live-media-over-reliable-stream",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.no-jitter-buffer",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.datagram-exceeds-path-mtu",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "realtime-transport.translation-ahead-of-input",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    },
+    "theory-measurement": {
+      "title": "Theory and measurement",
+      "model": "opus",
+      "lenses": [
+        {
+          "id": "ml-evaluation",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/ml-evaluation/lens.md",
+            "lenses/ml-evaluation/traps.yaml"
+          ],
+          "required_statements": [
+            "ml-evaluation.split-method: The brief states how evaluation data is separated from training data (chronological cutoff, entity-grouped split, or why i.i.d. random splitting is valid) and that all fitted preprocessing uses training data only.",
+            "ml-evaluation.calibration-target: Where model scores are shown or used as probabilities or confidence, the brief states the calibration method and the calibration error target measured on held-out data.",
+            "ml-evaluation.base-rates: The brief states the expected base rate of each class (or of the rare event) in deployment and the trivial baseline the model must beat."
+          ],
+          "traps": [
+            {
+              "id": "ml-evaluation.preprocessing-leakage",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ml-evaluation.random-split-on-dependent-data",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ml-evaluation.uncalibrated-scores-as-probabilities",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "ml-evaluation.accuracy-on-imbalanced-classes",
+              "status": "verified",
+              "kind": "metric"
+            },
+            {
+              "id": "ml-evaluation.benchmark-contamination",
+              "status": "verified",
+              "kind": "metric"
+            },
+            {
+              "id": "ml-evaluation.in-distribution-only-evaluation",
+              "status": "verified",
+              "kind": "metric"
+            }
+          ]
+        },
+        {
+          "id": "numeric-representation",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/numeric-representation/lens.md",
+            "lenses/numeric-representation/traps.yaml"
+          ],
+          "required_statements": [
+            "numeric-representation.money-type-and-rounding: Where money appears, the brief states the numeric type (integer minor units or fixed-scale decimal), the currency scale, and the rounding rule and where rounding happens.",
+            "numeric-representation.time-representation: Where times are stored or compared, the brief states that instants are stored in UTC or with an offset and how user time zones and daylight-saving changes are handled.",
+            "numeric-representation.integer-ranges: Where counters, ids or running totals are stored, the brief states their maximum lifetime value or width and what happens on overflow."
+          ],
+          "traps": [
+            {
+              "id": "numeric-representation.money-in-binary-float",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.float-equality",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.order-dependent-float-aggregation",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.naive-local-timestamps",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "numeric-representation.fixed-width-counter-overflow",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        },
+        {
+          "id": "rubric-inversion",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/rubric-inversion/lens.md",
+            "lenses/rubric-inversion/traps.yaml"
+          ],
+          "required_statements": [
+            "rubric-inversion.proxy-target: For each scored metric or KPI, the brief states the underlying goal the metric is a proxy for.",
+            "rubric-inversion.counter-metric: For each scored metric, the brief names a counter-metric or budget that worsens when the metric is gamed (for example precision against recall, defects escaped against tests written, human-rated quality against an automated score)."
+          ],
+          "traps": [
+            {
+              "id": "rubric-inversion.proxy-metric-as-target",
+              "status": "verified",
+              "kind": "rubric"
+            },
+            {
+              "id": "rubric-inversion.coverage-or-test-count-target",
+              "status": "unverified",
+              "kind": "rubric"
+            },
+            {
+              "id": "rubric-inversion.zero-misses-without-false-alarm-budget",
+              "status": "verified",
+              "kind": "rubric"
+            },
+            {
+              "id": "rubric-inversion.llm-judge-self-grading",
+              "status": "verified",
+              "kind": "rubric"
+            }
+          ]
+        },
+        {
+          "id": "theory-complexity",
+          "version": "0.1.0",
+          "why": "--all",
+          "calibrated": false,
+          "read": [
+            "lenses/theory-complexity/lens.md",
+            "lenses/theory-complexity/traps.yaml"
+          ],
+          "required_statements": [
+            "theory-complexity.optimality-target: For any optimisation feature, the brief states whether it needs the exact optimum or an approximation, and if an approximation, the acceptable optimality gap and the time budget per solve.",
+            "theory-complexity.instance-size: The brief states the maximum problem size the optimiser or checker must handle (entities, nodes, constraints) together with the latency it must meet at that size.",
+            "theory-complexity.rule-execution-bounds: Where users supply rules, scripts or patterns, the brief states the language's expressiveness and the run-time limits (steps or time, memory, recursion or trigger depth) that bound execution."
+          ],
+          "traps": [
+            {
+              "id": "theory-complexity.np-hard-optimal-at-scale",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.undecidable-rule-verification",
+              "status": "unverified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.perfect-semantic-detection",
+              "status": "verified",
+              "kind": "requirement"
+            },
+            {
+              "id": "theory-complexity.backtracking-regex-on-untrusted-input",
+              "status": "verified",
+              "kind": "requirement"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "lenses_applied": 25,
+  "lenses_skipped": [],
+  "calibrated": false,
+  "models": {
+    "extractor": "sonnet",
+    "sweeper": "sonnet",
+    "grounder": "sonnet",
+    "skeptic": "opus",
+    "reframer": "sonnet"
+  }
+}
