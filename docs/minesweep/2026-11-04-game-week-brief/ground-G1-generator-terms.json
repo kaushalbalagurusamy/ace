@@ -1,0 +1,605 @@
+{
+ "outcomes": [
+  {
+   "finding_id": "F-002",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "you may only use the Services for non-commercial purposes",
+     "locator": "Free plan use",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "you retain all rights in and to your Output",
+     "locator": "Ownership of Output",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+     "locator": "free tier output clause",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+     "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "CC BY 4.0 license (commercial use with attribution).",
+     "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+     "locator": "Pro plan card",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/pricing",
+     "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+     "locator": "plan table",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://skybox.blockadelabs.com/plans",
+     "quote": "essential 100 credits/month '4K exports'; standard 300 credits; business 500 credits, '16K export options', 'Commercial licensing' (listed only under business); no free plan listed; two price sets shown ($20/$48/$112 and $24/$60/$140)",
+     "locator": "plans page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Terms differ sharply by tier. ElevenLabs, Suno, Meshy, Skybox fetched. Output is generally the user's (ElevenLabs q2, Suno paid q9) but commercial use, downloads and licence depend on the paid tier. Data-sent/retention/training clauses were not extracted. OpenAI, Stable Audio, PixelLab not fetchable (see could_not_verify), so the per-generator check is incomplete.",
+   "severity_hint": "high",
+   "disposition": "comply-safely"
+  },
+  {
+   "finding_id": "F-015",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "you may only use the Services for non-commercial purposes",
+     "locator": "Free plan use",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/pricing",
+     "quote": "Starter adds 'Commercial License' (Starter $1 first month then $6/mo, 30k credits; Free $0, 10k credits; 'Music commercial use' on Starter)",
+     "locator": "plan cards (WebFetch summary, paraphrased around short quotes)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+     "locator": "free tier output clause",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/pricing",
+     "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+     "locator": "plan table",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "CC BY 4.0 license (commercial use with attribution).",
+     "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Free tiers that bar commercial use or downloads: ElevenLabs Free (non-commercial only), Suno Free (no commercial rights, no song downloads), Meshy Free (CC BY 4.0, only 10 downloads/mo; commercial allowed with attribution). Stable Audio Free: aggregator sources conflict (non-commercial vs commercial), unverified. Recraft/Scenario/Sloyd not checked.",
+   "severity_hint": "high",
+   "disposition": "comply-safely"
+  },
+  {
+   "finding_id": "F-016",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "you may only use the Services for non-commercial purposes",
+     "locator": "Free plan use",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+     "locator": "free tier output clause",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Vendor clauses are explicit for ElevenLabs Free and Suno Free ('non-commercial'), but neither defines whether a class competition game with prizes/organiser branding is commercial. Safe rule: use Starter ($6/mo ElevenLabs) or Suno Pro ($8/mo) for any shipped audio, or skip those tools.",
+   "would_settle": "Owner fact: whether Game Week offers prizes or organiser branding; vendor definition of commercial (ElevenLabs terms define it? not extracted) or written vendor/organiser answer."
+  },
+  {
+   "finding_id": "F-003",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+     "quote": "Copyright does not extend to purely AI-generated material, or material where there is insufficient human control over the expressive elements.",
+     "locator": "Executive summary / conclusions",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+     "quote": "given current generally available technology, prompts alone do not provide sufficient human control to make users of an AI system the authors of the output.",
+     "locator": "Part 2 conclusions",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.copyright.gov/ai/",
+     "quote": "Part 2 was published on January 29, 2025, and addresses the copyrightability of outputs created using generative AI.",
+     "locator": "landing page (latest report listed; no newer position found in this run)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "you retain all rights in and to your Output",
+     "locator": "Ownership of Output",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+     "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://openai.com/policies/terms-of-use/ (search result summary only)",
+     "quote": "OpenAI assigns to the user whatever rights it holds in Output, 'if any'; excludes other users' output (summary, not fetched)",
+     "locator": "Ownership of content",
+     "tier": "secondary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "US Copyright Office Part 2 (Jan 29 2025, latest listed): purely AI-generated material and prompt-only output is not copyrightable; human selection/arrangement/modification can be. Vendors assign what rights they have (ElevenLabs q2, Suno q9 with explicit no-warranty that copyright vests) so the team may own nothing exclusive in raw outputs. Code, game design, and human edits remain protectable. OpenAI clause is secondary only (page 403).",
+   "severity_hint": "medium",
+   "disposition": "reframe"
+  },
+  {
+   "finding_id": "F-012",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "CC BY 4.0 license (commercial use with attribution).",
+     "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+     "locator": "Pro plan card",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/terms-of-use",
+     "quote": "The terms don't include an attribution requirement (fetch summary); brand 'may not be copied, imitated or used... without our prior written permission'",
+     "locator": "brand use",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/terms",
+     "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+     "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Meshy Free: CC BY 4.0, attribution required (credit Meshy in the game/readme); Pro and above: private license, no attribution. Licence tied to the plan at generation time per brief claims; Meshy help/terms pages 404 so the exact attribution wording and plan-at-generation rule were not quoted. ElevenLabs has no attribution duty (q4); Suno none but do not strip watermark/metadata (q9). Library licences (F-012 second half) not checked in this run.",
+   "severity_hint": "medium",
+   "disposition": "comply-safely"
+  },
+  {
+   "finding_id": "F-004",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://artificialintelligenceact.eu/article/50/",
+     "quote": "shall disclose that the content has been artificially generated or manipulated. ... Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme,",
+     "locator": "Art. 50(4); also 50(2) 'marked in a machine-readable format and detectable as artificially generated'",
+     "tier": "secondary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Art. 50(4) (secondary mirror of the Regulation) requires deployers to disclose artificially generated content that could pass as real, with a lighter duty for evidently artistic/fictional works; Art. 50(2) places machine-readable marking on providers (the generators). No platform/organiser rule fetched. Whether a stylised space game triggers any duty is a legal question left to the owner.",
+   "would_settle": "Official EUR-Lex text of Reg. 2024/1689 Art. 50 and its application date, plus the organiser's rules on AI disclosure."
+  },
+  {
+   "finding_id": "F-019",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://artificialintelligenceact.eu/article/50/",
+     "quote": "shall disclose that the content has been artificially generated or manipulated. ... Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme,",
+     "locator": "Art. 50(4); also 50(2) 'marked in a machine-readable format and detectable as artificially generated'",
+     "tier": "secondary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Same as F-004: Art. 50 is the only relevant text found; risk-class not assessed. Likely only transparency tier at most; not established.",
+   "would_settle": "EUR-Lex Art. 50 and Art. 2 scope; owner answer on EU availability."
+  },
+  {
+   "finding_id": "F-011",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://trademarkregistration.app/Trademark/Details/50030136",
+     "quote": "FINAL FRONTIER (U.S. Serial No. 50030136), owner Decimal Games LLC, Scottsdale AZ, Class 009 downloadable computer/multiplayer game software, filed Aug 4, 2026, status Active, not yet registered",
+     "locator": "aggregator record",
+     "tier": "secondary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://store.steampowered.com/app/1733400",
+     "quote": "The Final Frontier is a retro multi-directional shooter inspired by the likes of Asteroids and Galaga.",
+     "locator": "Steam, DJ Games, released Sep 12, 2021",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Hits: a pending US application FINAL FRONTIER (Serial 50030136, Decimal Games LLC, Class 9 downloadable and multiplayer game software, filed 2026-08-04, not yet registered); existing Steam games 'The Final Frontier' (DJ Games, 2021, an Asteroids-like shooter) and a Steam 'Final Frontier' strategy game (app 1157830, 2020); a 1988 BBS game Final Frontier. Collision risk is real for a class project's use but not legal advice; consider a distinct subtitle. USPTO TSDR itself not fetched.",
+   "would_settle": "USPTO TSDR record for 50030136 and EUIPO search."
+  },
+  {
+   "finding_id": "F-060",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://elevenlabs.io/pricing",
+     "quote": "Starter adds 'Commercial License' (Starter $1 first month then $6/mo, 30k credits; Free $0, 10k credits; 'Music commercial use' on Starter)",
+     "locator": "plan cards (WebFetch summary, paraphrased around short quotes)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "CC BY 4.0 license (commercial use with attribution).",
+     "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.meshy.ai/pricing",
+     "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+     "locator": "Pro plan card",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://suno.com/pricing",
+     "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+     "locator": "plan table",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://skybox.blockadelabs.com/plans",
+     "quote": "essential 100 credits/month '4K exports'; standard 300 credits; business 500 credits, '16K export options', 'Commercial licensing' (listed only under business); no free plan listed; two price sets shown ($20/$48/$112 and $24/$60/$140)",
+     "locator": "plans page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Primary prices fetched: ElevenLabs Free 10k credits, Starter $1 first month then $6 (30k credits; SFX 200 credits each, Eleven Music 900 credits/min); Meshy Free 100 credits, Pro $20 (1,000 credits); Suno Free 50/day, Pro $8, Premier $24; Skybox has no free plan on its plans page and shows two conflicting price sets. PixelLab, OpenAI free limits, Stable Audio not verified; Stable Audio aggregators conflict (Free commercial or not), so brief figures from aggregators there must be treated as unverified.",
+   "severity_hint": "medium",
+   "disposition": "comply-safely"
+  }
+ ],
+ "quotes": {
+  "q1": {
+   "kind": "quote",
+   "ref": "https://elevenlabs.io/terms-of-use",
+   "quote": "you may only use the Services for non-commercial purposes",
+   "locator": "Free plan use",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q2": {
+   "kind": "quote",
+   "ref": "https://elevenlabs.io/terms-of-use",
+   "quote": "you retain all rights in and to your Output",
+   "locator": "Ownership of Output",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q3": {
+   "kind": "quote",
+   "ref": "https://elevenlabs.io/pricing",
+   "quote": "Starter adds 'Commercial License' (Starter $1 first month then $6/mo, 30k credits; Free $0, 10k credits; 'Music commercial use' on Starter)",
+   "locator": "plan cards (WebFetch summary, paraphrased around short quotes)",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q4": {
+   "kind": "quote",
+   "ref": "https://elevenlabs.io/terms-of-use",
+   "quote": "The terms don't include an attribution requirement (fetch summary); brand 'may not be copied, imitated or used... without our prior written permission'",
+   "locator": "brand use",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q5": {
+   "kind": "quote",
+   "ref": "https://www.meshy.ai/pricing",
+   "quote": "CC BY 4.0 license (commercial use with attribution).",
+   "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q6": {
+   "kind": "quote",
+   "ref": "https://www.meshy.ai/pricing",
+   "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+   "locator": "Pro plan card",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q7": {
+   "kind": "quote",
+   "ref": "https://suno.com/pricing",
+   "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+   "locator": "plan table",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q8": {
+   "kind": "quote",
+   "ref": "https://suno.com/terms",
+   "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+   "locator": "free tier output clause",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q9": {
+   "kind": "quote",
+   "ref": "https://suno.com/terms",
+   "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+   "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q10": {
+   "kind": "quote",
+   "ref": "https://skybox.blockadelabs.com/plans",
+   "quote": "essential 100 credits/month '4K exports'; standard 300 credits; business 500 credits, '16K export options', 'Commercial licensing' (listed only under business); no free plan listed; two price sets shown ($20/$48/$112 and $24/$60/$140)",
+   "locator": "plans page",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q11": {
+   "kind": "quote",
+   "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+   "quote": "Copyright does not extend to purely AI-generated material, or material where there is insufficient human control over the expressive elements.",
+   "locator": "Executive summary / conclusions",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q12": {
+   "kind": "quote",
+   "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+   "quote": "given current generally available technology, prompts alone do not provide sufficient human control to make users of an AI system the authors of the output.",
+   "locator": "Part 2 conclusions",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q13": {
+   "kind": "quote",
+   "ref": "https://www.copyright.gov/ai/",
+   "quote": "Part 2 was published on January 29, 2025, and addresses the copyrightability of outputs created using generative AI.",
+   "locator": "landing page (latest report listed; no newer position found in this run)",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q14": {
+   "kind": "quote",
+   "ref": "https://artificialintelligenceact.eu/article/50/",
+   "quote": "shall disclose that the content has been artificially generated or manipulated. ... Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme,",
+   "locator": "Art. 50(4); also 50(2) 'marked in a machine-readable format and detectable as artificially generated'",
+   "tier": "secondary",
+   "date": "2026-11-04"
+  },
+  "q15": {
+   "kind": "quote",
+   "ref": "https://trademarkregistration.app/Trademark/Details/50030136",
+   "quote": "FINAL FRONTIER (U.S. Serial No. 50030136), owner Decimal Games LLC, Scottsdale AZ, Class 009 downloadable computer/multiplayer game software, filed Aug 4, 2026, status Active, not yet registered",
+   "locator": "aggregator record",
+   "tier": "secondary",
+   "date": "2026-11-04"
+  },
+  "q16": {
+   "kind": "quote",
+   "ref": "https://store.steampowered.com/app/1733400",
+   "quote": "The Final Frontier is a retro multi-directional shooter inspired by the likes of Asteroids and Galaga.",
+   "locator": "Steam, DJ Games, released Sep 12, 2021",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  "q17": {
+   "kind": "quote",
+   "ref": "https://openai.com/policies/terms-of-use/ (search result summary only)",
+   "quote": "OpenAI assigns to the user whatever rights it holds in Output, 'if any'; excludes other users' output (summary, not fetched)",
+   "locator": "Ownership of content",
+   "tier": "secondary",
+   "date": "2026-11-04"
+  }
+ },
+ "vendor_table": [
+  {
+   "vendor": "ElevenLabs",
+   "tier": "Free",
+   "commercial": "no",
+   "attribution": "none stated",
+   "download": "yes where offered",
+   "quotes": [
+    "q1",
+    "q3"
+   ]
+  },
+  {
+   "vendor": "ElevenLabs",
+   "tier": "Starter ($6/mo)",
+   "commercial": "yes (Commercial License; music commercial use)",
+   "attribution": "none stated",
+   "download": "yes",
+   "quotes": [
+    "q3",
+    "q4"
+   ]
+  },
+  {
+   "vendor": "Meshy",
+   "tier": "Free",
+   "commercial": "yes, CC BY 4.0",
+   "attribution": "required",
+   "download": "10 models/mo",
+   "quotes": [
+    "q5"
+   ]
+  },
+  {
+   "vendor": "Meshy",
+   "tier": "Pro ($20/mo)",
+   "commercial": "yes, private license",
+   "attribution": "not required",
+   "download": "unlimited",
+   "quotes": [
+    "q6"
+   ]
+  },
+  {
+   "vendor": "Suno",
+   "tier": "Free",
+   "commercial": "no",
+   "attribution": "n/a",
+   "download": "none",
+   "quotes": [
+    "q7",
+    "q8"
+   ]
+  },
+  {
+   "vendor": "Suno",
+   "tier": "Pro ($8/mo)",
+   "commercial": "yes",
+   "attribution": "none; do not strip watermark/metadata",
+   "download": "20 songs/mo",
+   "quotes": [
+    "q7",
+    "q9"
+   ]
+  },
+  {
+   "vendor": "Skybox AI",
+   "tier": "no free plan listed; Business has Commercial licensing",
+   "commercial": "listed only under Business (search snippet said all plans; conflict)",
+   "attribution": "unknown",
+   "download": "4K/8K/16K by plan",
+   "quotes": [
+    "q10"
+   ]
+  },
+  {
+   "vendor": "OpenAI image gen",
+   "tier": "Free ChatGPT / paid",
+   "commercial": "unverified (user owns output per secondary summary)",
+   "attribution": "unverified",
+   "download": "unverified",
+   "quotes": [
+    "q17"
+   ]
+  },
+  {
+   "vendor": "Stable Audio",
+   "tier": "Free / paid",
+   "commercial": "unverified, sources conflict",
+   "attribution": "unverified",
+   "download": "unverified",
+   "quotes": []
+  },
+  {
+   "vendor": "PixelLab",
+   "tier": "all",
+   "commercial": "unverified (secondary: paid tiers commercial)",
+   "attribution": "unverified",
+   "download": "unverified",
+   "quotes": []
+  }
+ ],
+ "could_not_verify": [
+  "OpenAI terms-of-use, row-terms, www.openai.com/terms, help.openai.com articles: HTTP 403. Output ownership only via secondary search summary; free ChatGPT image limits not found.",
+  "Stable Audio terms/pricing/faqs: pages returned title only (JS-rendered); free-vs-paid licence unverified, aggregators conflict.",
+  "PixelLab pricing: 404; docs host does not resolve; only secondary reviews.",
+  "Skybox: blockadelabs.com/pricing 404; skybox plans page lists no free plan, price sets conflict, terms page not fetched.",
+  "Meshy terms and help-centre licence pages 404: attribution wording and plan-at-generation rule not quoted. ElevenLabs help article 403.",
+  "Recraft, Scenario, Sloyd, Retro Diffusion, AutoSprite not checked (time).",
+  "Vendor definitions of commercial use, data retention and training-on-inputs clauses not extracted.",
+  "EU AI Act checked on a non-official mirror only; no platform/organiser AI-disclosure policy fetched; no US state law checked.",
+  "F-012 library licences (physics libs etc.) not checked.",
+  "USPTO TSDR and EUIPO not queried directly; trademark hits are from an aggregator and search snippets."
+ ]
+}

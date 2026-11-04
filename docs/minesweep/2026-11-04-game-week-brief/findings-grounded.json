@@ -1,0 +1,2786 @@
+[
+ {
+  "id": "F-001",
+  "claim_ids": [
+   "C-005",
+   "C-012",
+   "C-013",
+   "C-017",
+   "C-020",
+   "C-023",
+   "C-151"
+  ],
+  "lens": "accessibility",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "audio",
+   "instructions",
+   "visual pass/fail, no contrast"
+  ],
+  "status": "suspect",
+  "route": "retrieval",
+  "route_reason": "WCAG success-criteria text defines the baseline; choosing a level is an owner decision.",
+  "evidence": [],
+  "would_settle": "WCAG 2.2 contrast, text-alternative and audio-control criteria",
+  "title": "Visual pass/fail with no contrast, text or mute baseline",
+  "statement": "C-005, C-012, C-013, C-020 judge by looks, and C-017/C-023 (instructions) and C-151 (sound check) never require readable contrast, text instructions, mute or captions."
+ },
+ {
+  "id": "F-002",
+  "claim_ids": [
+   "C-006",
+   "C-028",
+   "C-029",
+   "C-083",
+   "C-088",
+   "C-093",
+   "C-101",
+   "C-108",
+   "C-109",
+   "C-110",
+   "C-127",
+   "C-128",
+   "C-134",
+   "C-135",
+   "C-140",
+   "C-144",
+   "C-148",
+   "C-150",
+   "C-159",
+   "C-160"
+  ],
+  "lens": "provider-terms",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "PixelLab terms",
+   "ambiguity generated vs pre-made",
+   "commercial-use ambiguity",
+   "could not verify terms",
+   "generation tools unspecified",
+   "list of generator tools",
+   "omission",
+   "public repo + provider terms",
+   "unverified pricing/terms"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Decidable per generator from its current terms page.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "you may only use the Services for non-commercial purposes",
+    "locator": "Free plan use",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "you retain all rights in and to your Output",
+    "locator": "Ownership of Output",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+    "locator": "free tier output clause",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+    "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "CC BY 4.0 license (commercial use with attribution).",
+    "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+    "locator": "Pro plan card",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/pricing",
+    "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+    "locator": "plan table",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://skybox.blockadelabs.com/plans",
+    "quote": "essential 100 credits/month '4K exports'; standard 300 credits; business 500 credits, '16K export options', 'Commercial licensing' (listed only under business); no free plan listed; two price sets shown ($20/$48/$112 and $24/$60/$140)",
+    "locator": "plans page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Each chosen generator's current terms page (output ownership, commercial, download, retention, training)",
+  "owner_question": "Will Game Week entries be treated as commercial, and may generated assets sit in a public repo?",
+  "title": "Generator terms for output use, tier and data sent are unread",
+  "statement": "C-006/C-028 mandate generated assets but name no generator or tier; C-029, C-093, C-101, C-127/C-128, C-135-150, C-159-160 show terms for output use, redistribution in a public repo, commercial status and prompt retention are unread.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Terms differ sharply by tier. ElevenLabs, Suno, Meshy, Skybox fetched. Output is generally the user's (ElevenLabs q2, Suno paid q9) but commercial use, downloads and licence depend on the paid tier. Data-sent/retention/training clauses were not extracted. OpenAI, Stable Audio, PixelLab not fetchable (see could_not_verify), so the per-generator check is incomplete."
+ },
+ {
+  "id": "F-003",
+  "claim_ids": [
+   "C-006",
+   "C-028",
+   "C-029",
+   "C-075",
+   "C-077",
+   "C-083",
+   "C-088",
+   "C-093",
+   "C-135",
+   "C-140",
+   "C-144",
+   "C-148",
+   "C-161"
+  ],
+  "lens": "copyright-data-rights,licensing,provider-terms",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "AI output ownership",
+   "ambiguity generated vs pre-made",
+   "generator training provenance",
+   "no deliverable licence",
+   "omission",
+   "ownership unstated",
+   "public repo redistributes assets",
+   "public repo without licence",
+   "training provenance"
+  ],
+  "status": "confirmed",
+  "route": "deep-research",
+  "route_reason": "A synthesis of AI-output copyright and provider terms, not one fact.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+    "quote": "Copyright does not extend to purely AI-generated material, or material where there is insufficient human control over the expressive elements.",
+    "locator": "Executive summary / conclusions",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.copyright.gov/ai/Copyright-and-Artificial-Intelligence-Part-2-Copyrightability-Report.pdf",
+    "quote": "given current generally available technology, prompts alone do not provide sufficient human control to make users of an AI system the authors of the output.",
+    "locator": "Part 2 conclusions",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.copyright.gov/ai/",
+    "quote": "Part 2 was published on January 29, 2025, and addresses the copyrightability of outputs created using generative AI.",
+    "locator": "landing page (latest report listed; no newer position found in this run)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "you retain all rights in and to your Output",
+    "locator": "Ownership of Output",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+    "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://openai.com/policies/terms-of-use/ (search result summary only)",
+    "quote": "OpenAI assigns to the user whatever rights it holds in Output, 'if any'; excludes other users' output (summary, not fetched)",
+    "locator": "Ownership of content",
+    "tier": "secondary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "US Copyright Office AI guidance, the chosen providers' ownership clauses, and a per-asset provenance log",
+  "owner_question": "Who is the rights-holder of the game, and what licence should the public repo carry?",
+  "title": "Ownership, copyrightability and provenance of all-generated assets",
+  "statement": "C-006/C-028/C-083 make every asset AI-generated, and C-075/C-077/C-093 leave ownership, repo licence and copyrightability open; C-029 and C-161 mean the origin of each asset is unrecorded and training-data provenance risk (C-135-148) is unaddressed.",
+  "grounded_by": "G1-generator-terms",
+  "note": "US Copyright Office Part 2 (Jan 29 2025, latest listed): purely AI-generated material and prompt-only output is not copyrightable; human selection/arrangement/modification can be. Vendors assign what rights they have (ElevenLabs q2, Suno q9 with explicit no-warranty that copyright vests) so the team may own nothing exclusive in raw outputs. Code, game design, and human edits remain protectable. OpenAI clause is secondary only (page 403)."
+ },
+ {
+  "id": "F-004",
+  "claim_ids": [
+   "C-006",
+   "C-028",
+   "C-075",
+   "C-083",
+   "C-148"
+  ],
+  "lens": "ai-regulation",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "AI-generated media disclosure",
+   "no AI disclosure/credit statement",
+   "synthetic audio/voice"
+  ],
+  "status": "plausible",
+  "route": "deep-research",
+  "route_reason": "Legal synthesis (AI Act Art 50, platform rules).",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://artificialintelligenceact.eu/article/50/",
+    "quote": "shall disclose that the content has been artificially generated or manipulated. ... Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme,",
+    "locator": "Art. 50(4); also 50(2) 'marked in a machine-readable format and detectable as artificially generated'",
+    "tier": "secondary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Official EUR-Lex text of Reg. 2024/1689 Art. 50 and its application date, plus the organiser's rules on AI disclosure.",
+  "owner_question": "Should the game show an AI-generated credit, and is it required by the organisers?",
+  "title": "No notice to players that assets are AI-generated",
+  "statement": "C-006, C-028, C-075 and C-148 ship wholly AI-generated art and audio to the public with no disclosure or synthetic-audio labelling.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Art. 50(4) (secondary mirror of the Regulation) requires deployers to disclose artificially generated content that could pass as real, with a lighter duty for evidently artistic/fictional works; Art. 50(2) places machine-readable marking on providers (the generators). No platform/organiser rule fetched. Whether a stylised space game triggers any duty is a legal question left to the owner."
+ },
+ {
+  "id": "F-005",
+  "claim_ids": [
+   "C-021",
+   "C-026",
+   "C-028",
+   "C-030",
+   "C-066",
+   "C-067",
+   "C-068",
+   "C-092",
+   "C-168",
+   "C-169",
+   "C-170"
+  ],
+  "lens": "accessibility",
+  "trap_id": "accessibility.information-by-single-sense",
+  "trap_status": "verified",
+  "cues_matched": [
+   "animation",
+   "audio cues",
+   "hazards, boosts",
+   "omission",
+   "position by colour",
+   "position under orbital physics",
+   "results",
+   "sound levels"
+  ],
+  "status": "suspect",
+  "route": "retrieval",
+  "route_reason": "WCAG 1.4.1/1.2 text settles what is required; whether the judges need it is a scope choice.",
+  "evidence": [],
+  "would_settle": "WCAG 2.2 success criteria text (use of colour, captions) plus a decision on target level",
+  "title": "Audio and colour carry game information with no second channel",
+  "statement": "C-028 mandates generated audio and C-067/C-068 need position and pickup feedback; nothing requires a visual twin for sound cues, a mute control, or non-colour cues, and C-168-170 (accessibility standard, single-sense) are unstated."
+ },
+ {
+  "id": "F-006",
+  "claim_ids": [
+   "C-024",
+   "C-072"
+  ],
+  "lens": "licensing",
+  "trap_id": "licensing.gpl-in-distributed-proprietary",
+  "trap_status": "verified",
+  "cues_matched": [
+   "browser delivery ships code to every user"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "A licence scan of the chosen dependencies' manifests decides it mechanically.",
+  "evidence": [],
+  "would_settle": "SPDX licence of each chosen dependency (package.json/lockfile) once picked",
+  "title": "A copyleft library bundled into the browser build",
+  "statement": "C-024/C-072 ship JS to every player's browser, so any GPL/LGPL physics or netcode library pulled in (C-087 leaves it open) counts as distributed in a public repo."
+ },
+ {
+  "id": "F-007",
+  "claim_ids": [
+   "C-024",
+   "C-025",
+   "C-042",
+   "C-064",
+   "C-074",
+   "C-090"
+  ],
+  "lens": "accessibility",
+  "trap_id": "accessibility.not-keyboard-or-pointer-operable",
+  "trap_status": "verified",
+  "cues_matched": [
+   "browser, unknown devices",
+   "controls",
+   "join flow"
+  ],
+  "status": "suspect",
+  "route": "retrieval",
+  "route_reason": "WCAG 2.1.1 text plus a decision on supported input set.",
+  "evidence": [],
+  "would_settle": "WCAG 2.1.1/2.5 criteria text and the organisers' statement of judge devices",
+  "owner_question": "Which devices and input methods will judges use on Friday (laptop keyboard, touch, phone)?",
+  "title": "Input method and device support unspecified for judges",
+  "statement": "C-024/C-074 say the game must run in any browser for judges on unknown devices, but C-042/C-064/C-090 never say whether keyboard, touch or gamepad steering must work or how a lobby is operated without a mouse."
+ },
+ {
+  "id": "F-008",
+  "claim_ids": [
+   "C-042",
+   "C-064",
+   "C-067",
+   "C-073",
+   "C-086",
+   "C-171",
+   "C-172",
+   "C-173"
+  ],
+  "lens": "privacy-regulated-data",
+  "trap_id": "privacy-regulated-data.collect-all-keep-forever",
+  "trap_status": "verified",
+  "cues_matched": [
+   "join",
+   "matchmaking",
+   "names on results",
+   "omission",
+   "public lobbies"
+  ],
+  "status": "suspect",
+  "route": "grounded-research",
+  "route_reason": "One decidable fact per host: what connection data it logs and retains.",
+  "evidence": [],
+  "would_settle": "Chosen host's data-processing/logging terms and a stated retention for names and results",
+  "title": "Player names, IPs and rooms stored with no retention rule",
+  "statement": "C-064/C-073 (join link, matchmaking) and C-042/C-067 (who won) imply names, IPs and results are collected and shown; C-171-173 (data classes, storage location, retention) are not stated."
+ },
+ {
+  "id": "F-009",
+  "claim_ids": [
+   "C-042",
+   "C-064",
+   "C-067",
+   "C-073",
+   "C-074",
+   "C-086",
+   "C-122"
+  ],
+  "lens": "privacy-regulated-data,security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "abusive names",
+   "audience may include minors",
+   "join links, unauthenticated server",
+   "third-party broker"
+  ],
+  "status": "suspect",
+  "route": "deep-research",
+  "route_reason": "Moderation and minors rules are a synthesis.",
+  "evidence": [],
+  "would_settle": "Platform rules for name moderation, COPPA/age expectations for a public web game",
+  "owner_question": "Who may play (age, public vs class-only), and is name moderation required?",
+  "title": "Public rooms, player names and unknown-age audience",
+  "statement": "C-042/C-067 (names), C-064/C-073/C-086 (join links on an unauthenticated server), C-122 (public broker) and C-074 (age unstated) open abuse, room hijack and minors questions."
+ },
+ {
+  "id": "F-010",
+  "claim_ids": [
+   "C-077"
+  ],
+  "lens": "security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "secrets in public repo"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Secret scan and pre-commit hook.",
+  "evidence": [],
+  "would_settle": "gitleaks-style scan of repo history and an enabled pre-commit/push-protection setting",
+  "title": "API keys or prompts could be committed to the public repo",
+  "statement": "C-077 says the repo is public and C-078 empty; generator credentials or prompts committed during the deadline push would leak."
+ },
+ {
+  "id": "F-011",
+  "claim_ids": [
+   "C-079",
+   "C-094"
+  ],
+  "lens": "company-context,copyright-data-rights",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "Final Frontier",
+   "name/trademark",
+   "style imitation"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "A trademark and store search is a decidable fact.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://trademarkregistration.app/Trademark/Details/50030136",
+    "quote": "FINAL FRONTIER (U.S. Serial No. 50030136), owner Decimal Games LLC, Scottsdale AZ, Class 009 downloadable computer/multiplayer game software, filed Aug 4, 2026, status Active, not yet registered",
+    "locator": "aggregator record",
+    "tier": "secondary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://store.steampowered.com/app/1733400",
+    "quote": "The Final Frontier is a retro multi-directional shooter inspired by the likes of Asteroids and Galaga.",
+    "locator": "Steam, DJ Games, released Sep 12, 2021",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "USPTO TSDR record for 50030136 and EUIPO search.",
+  "title": "Name 'Final Frontier' may collide with existing games or marks",
+  "statement": "C-079 and C-094: the title is unchecked against existing games, trademarks or organiser branding.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Hits: a pending US application FINAL FRONTIER (Serial 50030136, Decimal Games LLC, Class 9 downloadable and multiplayer game software, filed 2026-08-04, not yet registered); existing Steam games 'The Final Frontier' (DJ Games, 2021, an Asteroids-like shooter) and a Steam 'Final Frontier' strategy game (app 1157830, 2020); a 1988 BBS game Final Frontier. Collision risk is real for a class project's use but not legal advice; consider a distinct subtitle. USPTO TSDR itself not fetched."
+ },
+ {
+  "id": "F-012",
+  "claim_ids": [
+   "C-080",
+   "C-081",
+   "C-086",
+   "C-087",
+   "C-088",
+   "C-093",
+   "C-102",
+   "C-103",
+   "C-104",
+   "C-106",
+   "C-129",
+   "C-131"
+  ],
+  "lens": "licensing",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "CC BY credit duty",
+   "licence at generation time",
+   "licence unverified",
+   "licence/credit duties",
+   "physics library unspecified",
+   "unspecified component"
+  ],
+  "status": "confirmed",
+  "route": "retrieval",
+  "route_reason": "Licence texts are primary sources to quote.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "CC BY 4.0 license (commercial use with attribution).",
+    "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+    "locator": "Pro plan card",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "The terms don't include an attribution requirement (fetch summary); brand 'may not be copied, imitated or used... without our prior written permission'",
+    "locator": "brand use",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "Suno hereby assigns to you all of its right, title and interest in and to any Output owned by Suno",
+    "locator": "paid-tier ownership; also 'makes no representation or warranty to you that any copyright will vest in any Output'; no attribution duty but must not remove 'any fingerprint, watermark or metadata'",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "CC BY 4.0 text and each library's LICENSE file",
+  "title": "Attribution and licence duties for libraries and CC BY output",
+  "statement": "C-102/C-106 (Meshy CC BY 4.0), C-103/C-104 (licence tied to plan active at generation), C-093 and C-129/C-131 (library licences 'unverified') leave credits and licence texts unrecorded in a public game.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Meshy Free: CC BY 4.0, attribution required (credit Meshy in the game/readme); Pro and above: private license, no attribution. Licence tied to the plan at generation time per brief claims; Meshy help/terms pages 404 so the exact attribution wording and plan-at-generation rule were not quoted. ElevenLabs has no attribution duty (q4); Suno none but do not strip watermark/metadata (q9). Library licences (F-012 second half) not checked in this run."
+ },
+ {
+  "id": "F-013",
+  "claim_ids": [
+   "C-064",
+   "C-073",
+   "C-079",
+   "C-082",
+   "C-086",
+   "C-089",
+   "C-113",
+   "C-180",
+   "C-182",
+   "C-184"
+  ],
+  "lens": "distributed-systems,numeric-representation,security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "WebSocket/WebRTC",
+   "all clients agree",
+   "clear way to join the same game",
+   "no ordering guarantee",
+   "no trust boundary",
+   "restricted n-body racing",
+   "server/hosting or relay for matchmaking",
+   "time representation",
+   "transport, server or relay",
+   "trust boundary, client authority"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "It is a design decision verified by a written architecture note.",
+  "evidence": [],
+  "would_settle": "An ADR naming the authority, message ordering and trust model",
+  "title": "Who is authoritative and trusted: server, host peer or relay",
+  "statement": "C-073, C-086, C-089, C-093, C-113, C-180 and C-179 leave server vs relay vs P2P, lockstep vs snapshots, and trust of client-reported positions undecided; C-182-184 (ordering, clocks) hang on it."
+ },
+ {
+  "id": "F-014",
+  "claim_ids": [
+   "C-095",
+   "C-126",
+   "C-129",
+   "C-137",
+   "C-139",
+   "C-142",
+   "C-146",
+   "C-149",
+   "C-150",
+   "C-153",
+   "C-157"
+  ],
+  "lens": "copyright-data-rights,licensing",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "could not verify licences",
+   "library licence variety",
+   "library models",
+   "library models, recorded SFX",
+   "third-party asset libraries"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "Per-library licence page decides; the rule question belongs to the organisers.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "docs/source/brief.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "'GENERATE ALL ASSETS' box",
+    "quote": "Do not use pre-made assets."
+   }
+  ],
+  "would_settle": "Organiser answer, then each library's own licence page.",
+  "owner_question": "Same as F-052: are CC0 library packs (Kenney, Poly Haven) acceptable under 'do not use pre-made assets'?",
+  "title": "Library-asset route contradicts the brief's ban and carries per-asset licences",
+  "statement": "C-095, C-126, C-137, C-139, C-142, C-146, C-149 and C-150 offer Kenney, Poly Haven, Mixamo, Freesound and OpenGameArt whose licences vary (CC0, CC BY, non-commercial) and which C-029 says not to use; C-153/C-157 demos normalise it.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "The rule question is the same as F-052 (settled as a conflict). Per-library licences (Kenney and Poly Haven CC0 per the lecture slides 'CC0') were not fetched from the library pages in this run, so the licence half stays unverified."
+ },
+ {
+  "id": "F-015",
+  "claim_ids": [
+   "C-096",
+   "C-097",
+   "C-098",
+   "C-099",
+   "C-100",
+   "C-102",
+   "C-103",
+   "C-104",
+   "C-106",
+   "C-117",
+   "C-152",
+   "C-153",
+   "C-156",
+   "C-158"
+  ],
+  "lens": "provider-terms",
+  "trap_id": "provider-terms.unsupported-region-or-tier",
+  "trap_status": "verified",
+  "cues_matched": [
+   "ElevenLabs music",
+   "Hobby non-commercial",
+   "credit",
+   "free tier bars commercial use",
+   "free tier terms",
+   "omission",
+   "paid tier licence"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Each is a decidable fact on a vendor terms page, and terms change (freshness 30 days).",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "you may only use the Services for non-commercial purposes",
+    "locator": "Free plan use",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/pricing",
+    "quote": "Starter adds 'Commercial License' (Starter $1 first month then $6/mo, 30k credits; Free $0, 10k credits; 'Music commercial use' on Starter)",
+    "locator": "plan cards (WebFetch summary, paraphrased around short quotes)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+    "locator": "free tier output clause",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/pricing",
+    "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+    "locator": "plan table",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "CC BY 4.0 license (commercial use with attribution).",
+    "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Current terms/pricing page of each generator and host at the tier actually used (fetched now)",
+  "title": "Free or guest tiers named that bar commercial use or downloads",
+  "statement": "C-096-100 list Recraft, Scenario, Suno, Sloyd and Stable Audio free tiers as personal-use or non-commercial, and C-102-104/C-117 rely on tier-specific terms; a public judged game on those tiers may breach them.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Free tiers that bar commercial use or downloads: ElevenLabs Free (non-commercial only), Suno Free (no commercial rights, no song downloads), Meshy Free (CC BY 4.0, only 10 downloads/mo; commercial allowed with attribution). Stable Audio Free: aggregator sources conflict (non-commercial vs commercial), unverified. Recraft/Scenario/Sloyd not checked."
+ },
+ {
+  "id": "F-016",
+  "claim_ids": [
+   "C-096",
+   "C-097",
+   "C-098",
+   "C-099",
+   "C-100",
+   "C-101",
+   "C-163",
+   "C-164"
+  ],
+  "lens": "licensing",
+  "trap_id": "licensing.non-commercial-asset-in-paid-product",
+  "trap_status": "verified",
+  "cues_matched": [
+   "non-commercial asset",
+   "omission"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "Needs the provider's definition of commercial; the organiser's status is an owner fact.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/terms-of-use",
+    "quote": "you may only use the Services for non-commercial purposes",
+    "locator": "Free plan use",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/terms",
+    "quote": "you will only use such Outputs for your lawful, personal and non-commercial purposes",
+    "locator": "free tier output clause",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Owner fact: whether Game Week offers prizes or organiser branding; vendor definition of commercial (ElevenLabs terms define it? not extracted) or written vendor/organiser answer.",
+  "owner_question": "Is Game Week entry commercial use (prizes, organiser branding, public hosting at labs.gauntletai.com)?",
+  "title": "Non-commercial free-tier output used in a public competition game",
+  "statement": "C-096-100 say free-tier outputs are non-commercial, and C-101 admits nobody has checked whether a competition game counts as commercial; C-163/C-164 (licence list, commercial status) are unstated.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Vendor clauses are explicit for ElevenLabs Free and Suno Free ('non-commercial'), but neither defines whether a class competition game with prizes/organiser branding is commercial. Safe rule: use Starter ($6/mo ElevenLabs) or Suno Pro ($8/mo) for any shipped audio, or skip those tools."
+ },
+ {
+  "id": "F-017",
+  "claim_ids": [
+   "C-120",
+   "C-121",
+   "C-122",
+   "C-123"
+  ],
+  "lens": "privacy-regulated-data",
+  "trap_id": "privacy-regulated-data.special-category-global-edge-cache",
+  "trap_status": "verified",
+  "cues_matched": [
+   "hosting processor, global edge",
+   "peer-to-peer IP exposure"
+  ],
+  "status": "suspect",
+  "route": "grounded-research",
+  "route_reason": "Decidable per provider from its privacy/DPA page.",
+  "evidence": [],
+  "would_settle": "Chosen relay/host DPA or privacy policy and where connection data is processed",
+  "title": "Relay or hosting provider processes player IPs with no agreement",
+  "statement": "C-120-123 (Durable Objects, PartyKit, PeerJS, Colyseus/ws) route player connections through third parties; C-172 (who receives personal data) is unstated."
+ },
+ {
+  "id": "F-018",
+  "claim_ids": [
+   "C-143"
+  ],
+  "lens": "provider-terms",
+  "trap_id": "provider-terms.limit-evasion-multi-account",
+  "trap_status": "verified",
+  "cues_matched": [
+   "plan limits"
+  ],
+  "status": "suspect",
+  "route": "retrieval",
+  "route_reason": "Provider terms text on multiple accounts settles whether it is barred.",
+  "evidence": [],
+  "would_settle": "The generator's terms clause on multiple accounts/credit abuse",
+  "title": "Plan limits could tempt multi-account asset generation",
+  "statement": "C-143 says built-in generation uses plan limits; a one-week all-generated build (C-028) invites extra accounts to get more credits."
+ },
+ {
+  "id": "F-019",
+  "claim_ids": [
+   "C-165"
+  ],
+  "lens": "ai-regulation",
+  "trap_id": "ai-regulation.undisclosed-ai-interaction",
+  "trap_status": "verified",
+  "cues_matched": [
+   "omission"
+  ],
+  "status": "plausible",
+  "route": "deep-research",
+  "route_reason": "A legal synthesis (Art 50 scope for games) not one fact.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://artificialintelligenceact.eu/article/50/",
+    "quote": "shall disclose that the content has been artificially generated or manipulated. ... Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme,",
+    "locator": "Art. 50(4); also 50(2) 'marked in a machine-readable format and detectable as artificially generated'",
+    "tier": "secondary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "EUR-Lex Art. 50 and Art. 2 scope; owner answer on EU availability.",
+  "owner_question": "Is the game offered to EU users, and who decides disclosure wording?",
+  "title": "EU risk classification and AI disclosure never stated",
+  "statement": "C-165 is an omission: a public web game with AI-generated assets reachable from the EU has no stated risk class or notice.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Same as F-004: Art. 50 is the only relevant text found; risk-class not assessed. Likely only transparency tier at most; not established."
+ },
+ {
+  "id": "F-020",
+  "claim_ids": [
+   "C-174"
+  ],
+  "lens": "security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "load testing",
+   "omission"
+  ],
+  "status": "suspect",
+  "route": "retrieval",
+  "route_reason": "Host acceptable-use text decides.",
+  "evidence": [],
+  "would_settle": "Host acceptable-use policy on load testing",
+  "title": "Load-testing the free hosts is not authorised",
+  "statement": "C-174 is an omission: stress or abuse tests of free-tier hosting are not scoped, and may breach their terms."
+ },
+ {
+  "id": "F-021",
+  "claim_ids": [
+   "C-006",
+   "C-024",
+   "C-025",
+   "C-026",
+   "C-028",
+   "C-083",
+   "C-088",
+   "C-103",
+   "C-106",
+   "C-114",
+   "C-135",
+   "C-140",
+   "C-144",
+   "C-146",
+   "C-147",
+   "C-148",
+   "C-150",
+   "C-151",
+   "C-152",
+   "C-153",
+   "C-154",
+   "C-155",
+   "C-156",
+   "C-189"
+  ],
+  "lens": "media-pipelines,performance",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "AI generation tools list",
+   "AI/code audio and volume",
+   "ElevenLabs generated music/SFX",
+   "Meshy / GLB / rig check",
+   "Music generated with ElevenLabs",
+   "Unity web builds heavy",
+   "all assets generated",
+   "generate all visuals and audio",
+   "generation tools unspecified",
+   "no media parameters",
+   "playable in browser, no install",
+   "sound levels, animation, feedback"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Measured file sizes against a stated budget.",
+  "evidence": [],
+  "would_settle": "Total build size and load time measured against a stated budget",
+  "title": "Generated asset format, size and loop specs are unspecified",
+  "statement": "C-006, C-028, C-083, C-088 and C-189 set no format, resolution, sample rate or loop spec; large PNG/WAV/GLB assets (C-152-156) and engine weight (C-114) make first load for judges (C-024, C-025) unbounded."
+ },
+ {
+  "id": "F-022",
+  "claim_ids": [
+   "C-007",
+   "C-010"
+  ],
+  "lens": "numeric-representation",
+  "trap_id": "numeric-representation.naive-local-timestamps",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Thursday @ Midnight",
+   "no timezone stated"
+  ],
+  "status": "suspect",
+  "route": "none",
+  "route_reason": "ask-owner: only the Gauntlet organisers can say.",
+  "evidence": [],
+  "would_settle": "The Gauntlet organisers' stated timezone and late policy",
+  "owner_question": "What timezone is 'Thursday @ Midnight', and is the cutoff hard?",
+  "title": "Deadline 'Thursday @ Midnight' has no timezone",
+  "statement": "C-007 and the C-010 schedule give no zone, so the cutoff is ambiguous by hours for a distributed class."
+ },
+ {
+  "id": "F-023",
+  "claim_ids": [
+   "C-042",
+   "C-090",
+   "C-178"
+  ],
+  "lens": "numeric-representation,realtime-transport,theory-complexity",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "controls feel good",
+   "easy to get into a match",
+   "no latency budget",
+   "racing feels good",
+   "steer and win under orbital dynamics"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Feel is measured with players under injected latency.",
+  "evidence": [],
+  "would_settle": "Playtest with 100-150 ms RTT and novice players",
+  "title": "Control feel under orbital lag and network delay",
+  "statement": "C-090 requires controls that feel good and are learnable, but thrust effects under gravity are delayed (C-082), sensitive to input timing, and C-042/C-178 give no latency budget."
+ },
+ {
+  "id": "F-024",
+  "claim_ids": [
+   "C-042",
+   "C-069",
+   "C-187"
+  ],
+  "lens": "performance",
+  "trap_id": "performance.percentile-slo-without-load-model",
+  "trap_status": "verified",
+  "cues_matched": [
+   "easy to get into a match",
+   "fun over repeated short sessions",
+   "latency target without percentile",
+   "works reliably enough"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "A join-time measurement under a stated load decides it.",
+  "evidence": [],
+  "would_settle": "Measured p95 time-to-race with N concurrent judges on the chosen host",
+  "title": "'Easy to get into a match' with no time-to-race number",
+  "statement": "C-042, C-069 and C-187 leave join time and responsiveness qualitative with no percentile or load."
+ },
+ {
+  "id": "F-025",
+  "claim_ids": [
+   "C-064",
+   "C-066",
+   "C-068",
+   "C-069",
+   "C-074",
+   "C-079",
+   "C-082",
+   "C-089",
+   "C-091",
+   "C-177",
+   "C-181"
+  ],
+  "lens": "distributed-systems,performance,realtime-transport",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "hazards, power-ups",
+   "join the same game",
+   "no delivery semantics",
+   "no network conditions",
+   "no network path assumptions",
+   "people racing together",
+   "per tick for all players",
+   "reliably enough",
+   "space racer under orbital dynamics",
+   "start, race, finish",
+   "tick rate",
+   "unknown devices, network"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Only measurement under shaped network conditions settles values.",
+  "evidence": [],
+  "would_settle": "Chosen tick rate tested under 50-150 ms RTT and 2% loss",
+  "title": "Netcode parameters unspecified: loss, RTT, tick rate, reliability",
+  "statement": "C-064, C-066, C-068, C-069, C-082, C-089, C-091 and C-177 give no RTT, loss, tick rate, countdown sync or event reliability, and C-074 judges are on unknown networks."
+ },
+ {
+  "id": "F-026",
+  "claim_ids": [
+   "C-064",
+   "C-074",
+   "C-091",
+   "C-121",
+   "C-123",
+   "C-186",
+   "C-192"
+  ],
+  "lens": "distributed-systems,os-systems,performance",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "judges play every game",
+   "judges play from link on unknown network",
+   "multiple rooms",
+   "n-body per tick",
+   "no concurrency model",
+   "no load model",
+   "server for multiplayer"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "A load test of the chosen server settles it.",
+  "evidence": [],
+  "would_settle": "Load test: N concurrent rooms and sockets on the chosen host",
+  "owner_question": "How many judges and games are expected in the Friday morning window?",
+  "title": "Judging-morning concurrency and server capacity",
+  "statement": "C-074 has every judge opening the link in the same window; C-186/C-192 give no peak rooms or connections, and C-091 per-room simulation on one Node loop (C-123) is unbudgeted."
+ },
+ {
+  "id": "F-027",
+  "claim_ids": [
+   "C-065",
+   "C-067",
+   "C-079",
+   "C-082",
+   "C-092",
+   "C-193"
+  ],
+  "lens": "numeric-representation,theory-complexity",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "no optimality target",
+   "position or progress feedback",
+   "racing under gravity",
+   "tracks under orbital physics",
+   "two distinct tracks with different layouts"
+  ],
+  "status": "plausible",
+  "route": "experiment",
+  "route_reason": "Playtests or a solver run show winnability.",
+  "evidence": [],
+  "would_settle": "Automated solver run per track under thrust limits plus rank-inversion count between candidate progress metrics.",
+  "title": "Tracks may not be winnable; progress on an orbit is hard to rank",
+  "statement": "C-065 and C-092 need two distinct, solvable orbital tracks, while C-067 needs ranking on a non-monotone orbital path (angle wraps, retrograde); C-193 mentions bot or solvability checks.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Not run. Experiment: for each track, (1) define the course as ordered checkpoints and a thrust cap; (2) run a bot/solver (e.g. random-shooting or CMA-ES over a thrust schedule, or a greedy-plus-search controller) with the shared fixed-step sim for many seeded trials; record completion rate and best time; a track is winnable if completion rate > 0 under the cap with a margin, and ranked fairly if two runs' progress metric is monotone along the reference solution. (3) Define progress as accumulated checkpoint index plus distance-to-next-checkpoint rather than orbital angle, and test that it never decreases for a known-good lap and handles retrograde/angle wrap (compare against angle-based progress on recorded runs). Also check no checkpoint requires a dv above the cap. Report completion rate, time spread, and rank inversions."
+ },
+ {
+  "id": "F-028",
+  "claim_ids": [
+   "C-066"
+  ],
+  "lens": "distributed-systems",
+  "trap_id": "distributed-systems.two-generals-simultaneous-action",
+  "trap_status": "verified",
+  "cues_matched": [
+   "start together once all ready"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Whether a server-stamped start looks simultaneous is measured, not looked up.",
+  "evidence": [],
+  "would_settle": "Start-time skew measured across clients with realistic RTT",
+  "title": "Synchronised race start over lossy links",
+  "statement": "C-066 (complete race flow: start, race, finish) needs all clients to start together; no scheme (server-stamped start time) is stated."
+ },
+ {
+  "id": "F-029",
+  "claim_ids": [
+   "C-067"
+  ],
+  "lens": "distributed-systems",
+  "trap_id": "distributed-systems.wall-clock-ordering",
+  "trap_status": "verified",
+  "cues_matched": [
+   "who won"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "A design review against tick/sequence-based ordering settles it.",
+  "evidence": [],
+  "would_settle": "Spec stating server tick or sequence number assigns finish order",
+  "title": "Winner decided by client clocks",
+  "statement": "C-067 (clear feedback on position and who won) does not say what orders finish events; client wall-clocks cannot be trusted."
+ },
+ {
+  "id": "F-030",
+  "claim_ids": [
+   "C-067"
+  ],
+  "lens": "numeric-representation",
+  "trap_id": "numeric-representation.float-equality",
+  "trap_status": "verified",
+  "cues_matched": [
+   "clear feedback on position/progress and who won"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "A unit test with equal-progress inputs decides it.",
+  "evidence": [],
+  "would_settle": "A tiebreak rule and test cases with equal progress/time",
+  "title": "Ties and float equality in ranking",
+  "statement": "C-067 ranks racers by a computed float progress or finish time; ties and equality edge cases need a tiebreak rule."
+ },
+ {
+  "id": "F-031",
+  "claim_ids": [
+   "C-068"
+  ],
+  "lens": "distributed-systems",
+  "trap_id": "distributed-systems.lock-without-fencing-token",
+  "trap_status": "verified",
+  "cues_matched": [
+   "hazards",
+   "power-ups"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Design review of who adjudicates a pickup.",
+  "evidence": [],
+  "would_settle": "Spec naming the single adjudicator and sequence for contested events",
+  "title": "Contested pickups or hits resolved by each client",
+  "statement": "C-068 (boosts, hazards) needs exactly one outcome per pickup across racers; no authority or sequence is stated."
+ },
+ {
+  "id": "F-032",
+  "claim_ids": [
+   "C-069"
+  ],
+  "lens": "distributed-systems",
+  "trap_id": "distributed-systems.consensus-guaranteed-termination",
+  "trap_status": "unverified",
+  "cues_matched": [
+   "multiplayer works reliably enough to complete a race"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Kill-a-client and kill-the-host tests decide it.",
+  "evidence": [],
+  "would_settle": "Fault-injection run: drop one racer, drop the host, observe race outcome",
+  "title": "Race completion despite disconnect or host loss",
+  "statement": "C-069 ('reliably enough to complete a race') has no fault model for a dropped player or a closed host tab."
+ },
+ {
+  "id": "F-033",
+  "claim_ids": [
+   "C-073",
+   "C-086",
+   "C-113",
+   "C-123"
+  ],
+  "lens": "realtime-transport",
+  "trap_id": "realtime-transport.live-media-over-reliable-stream",
+  "trap_status": "verified",
+  "cues_matched": [
+   "WebSocket/WebRTC networking",
+   "small ws Node server",
+   "transport, server or relay",
+   "use a reliable TCP connection for the real-time channel"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Only a loss-injected measurement shows whether it matters at this tick rate.",
+  "evidence": [],
+  "would_settle": "Race-state latency under 2-5% packet loss for WebSocket vs WebRTC datachannel",
+  "title": "WebSocket/TCP stalls a live racing state stream",
+  "statement": "C-073, C-086, C-113 and C-123 leave transport open; the browser default WebSocket gives head-of-line blocking on loss, which stalls a race."
+ },
+ {
+  "id": "F-034",
+  "claim_ids": [
+   "C-073",
+   "C-086"
+  ],
+  "lens": "os-systems",
+  "trap_id": "os-systems.fd-limit-exhaustion",
+  "trap_status": "verified",
+  "cues_matched": [
+   "keep a socket open per connected client"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "One decidable fact on the host's plan limits.",
+  "evidence": [
+   {
+    "id": "Q-render-free",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+    "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-vc-ws",
+    "kind": "quote",
+    "ref": "https://vercel.com/docs/functions/websockets",
+    "quote": "> WebSockets are available on all plans ... Vercel Functions can serve WebSocket connections ... A single WebSocket connection is pinned to one Vercel Function instance. ... WebSocket connections close when a Vercel Function reaches its maximum duration. ... Store durable state, presence, counters, rooms, and pub/sub coordination in an external data store instead of relying on in-memory variables.",
+    "locator": "WebSockets doc, last_updated 2026-08-10",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-colyseus-dep",
+    "kind": "quote",
+    "ref": "https://docs.colyseus.io/deployment",
+    "quote": "deploys \"no different than deploying a regular Node.js application\"; \"IMPORTANT: DO NOT use 'cluster' mode.\"; gives no limits on rooms or connections per process; Render/Railway not mentioned; memory not covered",
+    "locator": "deployment doc",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-rail-nows",
+    "kind": "quote",
+    "ref": "https://docs.railway.com/reference/pricing/plans",
+    "quote": "The document does not mention WebSockets. (docs.railway.com/reference/websockets returned 404)",
+    "locator": "plans page; websockets URL 404",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Render and Railway proxy idle-timeout and max-connection docs (not located), or a client heartbeat design that sends a ping inside any host idle window.",
+  "title": "Socket and idle-timeout limits on the free host",
+  "statement": "C-073 and C-086 imply one socket per player per room; limits and idle timeouts on the free host are unstated.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Render: 15 min idle spin-down (WebSocket messages count as activity); Vercel: connection closes at 300 s max duration on Hobby; Colyseus doc sets proxy_read_timeout 86400s only for self-run Nginx. No connection-count or WebSocket idle-timeout limit found on Render or Railway pages (Railway websockets URL 404)."
+ },
+ {
+  "id": "F-035",
+  "claim_ids": [
+   "C-074",
+   "C-090",
+   "C-091",
+   "C-107",
+   "C-113",
+   "C-114",
+   "C-116",
+   "C-190"
+  ],
+  "lens": "media-pipelines,os-systems,performance",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "Three.js or Phaser best 3-day fit",
+   "Unity web builds heavy",
+   "cheap enough to run per tick in a browser for all players",
+   "controls feel good",
+   "judges play from link, unknown devices",
+   "no memory budget",
+   "procedural three.js geometry and shaders",
+   "single-thread default"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Frame time on low-end hardware is measured.",
+  "evidence": [],
+  "would_settle": "Frame-time and memory capture on an integrated-GPU laptop and a phone",
+  "title": "Device floor, frame rate and memory on judge laptops",
+  "statement": "C-074, C-080-091 and C-107/C-116 give no device class, frame-rate target or tab memory budget; n-body, shaders and 3D assets may miss it on integrated GPUs."
+ },
+ {
+  "id": "F-036",
+  "claim_ids": [
+   "C-079",
+   "C-080",
+   "C-081",
+   "C-082",
+   "C-087",
+   "C-089",
+   "C-091",
+   "C-107"
+  ],
+  "lens": "media-pipelines,numeric-representation,theory-complexity",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "Kepler orbits",
+   "Kepler physics",
+   "Kepler solver and n-body integrator, library or hand-written",
+   "deterministic across browsers",
+   "procedural geometry and shaders",
+   "racing in orbital physics",
+   "restricted n-body",
+   "restricted n-body, per tick"
+  ],
+  "status": "confirmed",
+  "route": "experiment",
+  "route_reason": "A same-seed run hashed across engines is the decider.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://tc39.es/ecma262/",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "6.1.6.1 The Number Type",
+    "quote": "The Number type has exactly 18,437,736,874,454,810,627 (that is, 264 - 253 + 3) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://tc39.es/ecma262/",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "21.3.2.33 Math.sqrt ( x )",
+    "quote": "Return \ud835\udd3d(the square root of \u211d(n))."
+   },
+   {
+    "kind": "quote",
+    "ref": "https://tc39.es/ecma262/",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "21.3.2.31 Math.sin ( x )",
+    "quote": "Return an implementation-approximated Number value representing the sine of \u211d(n)."
+   },
+   {
+    "kind": "quote",
+    "ref": "https://tc39.es/ecma262/",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Conformance: kinds of deferral",
+    "quote": "An implementation-approximated facility is one that defers its definition to an external source while recommending an ideal behaviour. While conforming implementations are free to choose any behaviour within the constraints put forth by this specification, they are encouraged to strive to approximate the ideal. Some mathematical operations, such as Math.exp, are implementation-approximated."
+   },
+   {
+    "kind": "experiment",
+    "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+    "date": "2026-11-04",
+    "locator": "node run",
+    "quote": "perturb 1e-12 -> 5.9e-8 after 1e5 steps; order change -> 9.65e-10"
+   }
+  ],
+  "would_settle": "Determinism test on Chrome, Safari, Firefox with fixed-step integrator and resync interval",
+  "title": "N-body state agreement across browsers and devices",
+  "statement": "C-089 requires all clients to agree on n-body state, but Math.sin/cos differ per engine, summation order matters, chaotic dynamics (C-081) amplify 1-ulp errors and C-091 variable dt breaks agreement; float32 range at orbital scale (C-082) adds loss.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Spec requires bit-exact IEEE binary64 for + - * / and correctly-rounded sqrt (sqrt is defined as the square root of the real value, rounded to a Number), so these agree across engines. Math.sin/cos/exp/pow-class functions are 'implementation-approximated': engines may differ in last bits. A shared n-body step using them cannot be assumed bit-identical across browsers; chaotic/sensitive dynamics then amplify the difference (about 6e4x over 1e5 steps here). Mitigation space: avoid transcendental calls in the sim loop (use only + - * / sqrt, own sin/cos polynomials), fixed step, server-authoritative state with periodic resync. Math.pow/atan2 text not separately quoted; they sit in the same approximated family per spec text for sin (not verified verbatim here). Cross-browser run not performed.",
+  "measured": {
+   "script": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+   "runtime": "node v24.21.0",
+   "model": "massless ship, 3 analytic-orbit sources (masses 1,0.5,0.3), G=1, velocity-Verlet dt=0.001, float64, single run each",
+   "results": {
+    "1e3": {
+     "order_diff": 0.0,
+     "perturb_1e-12": 9.74e-13
+    },
+    "1e4": {
+     "order_diff": 1.734e-13,
+     "perturb_1e-12": 1.172e-11
+    },
+    "1e5": {
+     "order_diff": 9.654e-10,
+     "perturb_1e-12": 5.906e-08
+    }
+   },
+   "note": "order_diff = |position(sum order a+b+c) - position(c+b+a)|, same engine, same machine. A first run with only 2 sources gave order_diff exactly 0 at all N because a+b==b+a in IEEE 754; order dependence needs >=3 terms. Perturbation grows ~12x per decade of steps (1e-12 -> 5.9e-8 after 1e5 steps, ~5.9e4x amplification). Not measured: cross-engine Math.sin/cos differences (only V8 available here); no timeout wrapper (macOS has none); run took <1 s."
+  }
+ },
+ {
+  "id": "F-037",
+  "claim_ids": [
+   "C-080",
+   "C-081",
+   "C-087",
+   "C-091",
+   "C-194"
+  ],
+  "lens": "theory-complexity",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "Kepler orbits",
+   "Kepler solver and n-body integrator",
+   "cheap enough per tick",
+   "no instance size",
+   "restricted n-body"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Decidable from orbital mechanics references plus a chosen design.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://arxiv.org/html/2506.17867",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "arXiv 2506.17867 (Liu & Salomao), section 1",
+    "quote": "Consider two primaries moving along circular orbits about their center of mass. A massless satellite moves in the same plane under Newtonian attraction."
+   },
+   {
+    "kind": "quote",
+    "ref": "https://arxiv.org/html/2506.17867",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "section 4",
+    "quote": "Hamilton's equations of E_mu are equivalent to q'' = -mu (q-m(t))/|q-m(t)|^3 - (1-mu)(q-e(t))/|q-e(t)|^3"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://tlakoba.w3.uvm.edu/math337/for_final_topics/SSM_1990_Yoshida.pdf",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Yoshida, Phys. Lett. A 150 (1990), Introduction",
+    "quote": "the discrete mapping obtained describes the exact time evolution of a slightly perturbed Hamiltonian system and thus possesses the perturbed Hamiltonian as a conserved quantity. This guarantees that there is no secular change in the error of the total energy"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://tlakoba.w3.uvm.edu/math337/for_final_topics/SSM_1990_Yoshida.pdf",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "same",
+    "quote": "If the integrator is not symplectic, the error of the total energy grows secularly in general."
+   },
+   {
+    "kind": "experiment",
+    "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+    "date": "2026-11-04",
+    "locator": "node run",
+    "quote": "ship position difference vs 1e-12 perturbation: 5.9e-8 at 1e5 steps"
+   }
+  ],
+  "would_settle": "Reference on two-body vs restricted n-body and a stated body count and error budget",
+  "title": "Kepler orbits vs restricted n-body model mismatch and accuracy budget",
+  "statement": "C-080 (Kepler) and C-081/C-087 (restricted n-body) are different models, exact only for two bodies; C-194 leaves body count and substeps unstated.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Kepler two-body motion is analytic: position at any time t comes from a closed-form solve of Kepler's equation, so any client can evaluate state at any t without stepping (random access, no drift, cheap, identical inputs give the same output up to the solver's tolerance). In the restricted problem the primaries can still be put on analytic Kepler orbits (the quoted model prescribes m(t), e(t)), but the ship's trajectory has no closed form and must be stepped; error then accumulates (phase error grows, symplectic bound applies to energy only, and only for constant step as Yoshida states; the Lee-Duncan-Levison abstract notes that naively varying the step destroys the property). Race consequences: ship state is a function of the whole input history, so all clients need fixed dt and identical inputs/ordering or an authoritative server; track checkpoints/ranking cannot be computed in closed form for the ship; if bodies are N>2 mutually interacting, even the bodies are not analytic. Body count, dt and error budget are still unspecified in the brief (C-194); here dt=0.001 with 3 sources gave 1e-12 -> 6e-8 in 1e5 steps."
+ },
+ {
+  "id": "F-038",
+  "claim_ids": [
+   "C-089"
+  ],
+  "lens": "realtime-transport",
+  "trap_id": "realtime-transport.no-jitter-buffer",
+  "trap_status": "verified",
+  "cues_matched": [
+   "all clients agree on physics state"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Feel under jitter is a measurement.",
+  "evidence": [],
+  "would_settle": "Visual smoothness test under injected jitter with chosen buffer",
+  "title": "No snapshot rate or interpolation buffer",
+  "statement": "C-089 wants all clients to agree on physics state but states no snapshot/input rate or jitter buffer."
+ },
+ {
+  "id": "F-039",
+  "claim_ids": [
+   "C-089"
+  ],
+  "lens": "numeric-representation",
+  "trap_id": "numeric-representation.order-dependent-float-aggregation",
+  "trap_status": "verified",
+  "cues_matched": [
+   "deterministic across browsers/devices (floating-point, timestep)"
+  ],
+  "status": "confirmed",
+  "route": "experiment",
+  "route_reason": "A cross-browser run settles it.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://tc39.es/ecma262/",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "6.1.6.1 The Number Type",
+    "quote": "The Number type has exactly 18,437,736,874,454,810,627 (that is, 264 - 253 + 3) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic"
+   },
+   {
+    "kind": "experiment",
+    "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+    "date": "2026-11-04",
+    "locator": "node run, 3 sources",
+    "quote": "order_diff 0 at 1e3, 1.73e-13 at 1e4, 9.65e-10 at 1e5 steps"
+   }
+  ],
+  "would_settle": "Same-seed simulation hashed on Chrome, Safari and Firefox",
+  "title": "Summing gravity terms in different orders gives different bits",
+  "statement": "C-089's 'all clients agree' fails if Math.sin/cos/pow differ per engine and gravity terms sum in different orders.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Float addition is not associative; reordering three gravity terms changed ship position by 9.65e-10 after 1e5 steps on one machine. With only two terms the difference is exactly 0 (commutative), so the hazard needs 3+ bodies. Requirement: fixed summation order (by body index) in every client and server.",
+  "measured": {
+   "script": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+   "runtime": "node v24.21.0",
+   "model": "massless ship, 3 analytic-orbit sources (masses 1,0.5,0.3), G=1, velocity-Verlet dt=0.001, float64, single run each",
+   "results": {
+    "1e3": {
+     "order_diff": 0.0,
+     "perturb_1e-12": 9.74e-13
+    },
+    "1e4": {
+     "order_diff": 1.734e-13,
+     "perturb_1e-12": 1.172e-11
+    },
+    "1e5": {
+     "order_diff": 9.654e-10,
+     "perturb_1e-12": 5.906e-08
+    }
+   },
+   "note": "order_diff = |position(sum order a+b+c) - position(c+b+a)|, same engine, same machine. A first run with only 2 sources gave order_diff exactly 0 at all N because a+b==b+a in IEEE 754; order dependence needs >=3 terms. Perturbation grows ~12x per decade of steps (1e-12 -> 5.9e-8 after 1e5 steps, ~5.9e4x amplification). Not measured: cross-engine Math.sin/cos differences (only V8 available here); no timeout wrapper (macOS has none); run took <1 s."
+  }
+ },
+ {
+  "id": "F-040",
+  "claim_ids": [
+   "C-105",
+   "C-108",
+   "C-110",
+   "C-134"
+  ],
+  "lens": "media-pipelines",
+  "trap_id": "media-pipelines.decoded-frames-exceed-memory",
+  "trap_status": "verified",
+  "cues_matched": [
+   "jsfxr / Web Audio",
+   "pixel art sprite sheets, animated sheets"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Arithmetic from clip length x sample rate x channels gives the size.",
+  "evidence": [],
+  "would_settle": "Computed decoded size of the final audio set",
+  "title": "Decoded audio held as PCM in RAM",
+  "statement": "C-105/C-108/C-110/C-134 (code-made audio, jsfxr, sprite sheets): many SFX plus music decode to large float32 buffers, and autoplay unlock is unaddressed."
+ },
+ {
+  "id": "F-041",
+  "claim_ids": [
+   "C-117",
+   "C-120",
+   "C-121"
+  ],
+  "lens": "distributed-systems,market-reality,os-systems,performance,supply-chain",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "300 s function cap",
+   "Durable Objects free tier",
+   "PartyKit hosted shut down",
+   "PartyKit shut down; successor PartyServer",
+   "no shared state across instances",
+   "no shared state across instances, function cap",
+   "price/free tier unsourced"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Each is one decidable fact on current vendor docs.",
+  "evidence": [
+   {
+    "id": "Q-vc-hobby",
+    "kind": "quote",
+    "ref": "https://vercel.com/docs/plans/hobby",
+    "quote": "the Hobby plan restricts users to non-commercial, personal use only. / Vercel Function maximum duration | 300s (5 minutes)",
+    "locator": "Hobby plan page, last_updated 2026-09-14",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-vc-ws",
+    "kind": "quote",
+    "ref": "https://vercel.com/docs/functions/websockets",
+    "quote": "> WebSockets are available on all plans ... Vercel Functions can serve WebSocket connections ... A single WebSocket connection is pinned to one Vercel Function instance. ... WebSocket connections close when a Vercel Function reaches its maximum duration. ... Store durable state, presence, counters, rooms, and pub/sub coordination in an external data store instead of relying on in-memory variables.",
+    "locator": "WebSockets doc, last_updated 2026-08-10",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-pk-shut",
+    "kind": "quote",
+    "ref": "https://docs.partykit.io/guides/migrate-to-partyserver/",
+    "quote": "The hosted PartyKit platform is shutting down. Deploys stop on 16 October and the platform shuts down on 23 October 2026. / 23 October 2026: `npx partykit deploy` to your own Cloudflare account stops working. Workers already in your account keep running.",
+    "locator": "migration guide intro + timeline (also docs.partykit.io home banner)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-cf-do",
+    "kind": "quote",
+    "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+    "locator": "DO pricing page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-render-free",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+    "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Current Vercel, Cloudflare and PartySocket/PartyServer documentation pages",
+  "title": "Named hosting options each carry a hard constraint",
+  "statement": "C-117 (Vercel serverless holds no sockets or shared state, 300 s cap, non-commercial), C-120 (Durable Objects eviction/limits) and C-121 (hosted PartyKit shut down 23 Oct 2026, from an agent's read) each limit where rooms can run.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Mixed. Vercel Hobby: non-commercial and 300 s cap CONFIRMED; but C-117 'holds no sockets' is REFUTED for today: WebSockets are supported on all plans, though a connection closes at max duration (300 s on Hobby, so races under 5 min only, with reconnect) and rooms must live in an external store, not memory. Hosted PartyKit shutdown CONFIRMED. DO free limits confirmed. Net: every named option has a hard constraint, but Vercel is not 'no sockets'. Correct C-117."
+ },
+ {
+  "id": "F-042",
+  "claim_ids": [
+   "C-118"
+  ],
+  "lens": "distributed-systems,performance",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "15 min idle sleep, ~1 min cold start"
+  ],
+  "status": "confirmed",
+  "route": "experiment",
+  "route_reason": "Cold-start time on the real plan is measured.",
+  "evidence": [
+   {
+    "id": "Q-render-free",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+    "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-render-ws",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "existing WebSocket messages count as activity that prevents spin-down; new WebSocket connections wake a spun-down service (paraphrase by fetch tool, not verbatim)",
+    "locator": "free-instances page, traffic section",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Measured cold start on the deployed service plus a keep-warm ping plan (experiment; not run, no deploys allowed).",
+  "title": "Host sleep and cold start on judging morning",
+  "statement": "C-118 (Render: 15 min idle sleep, ~1 min cold start) means the first Friday join may hit a dead page, and a sleeping host loses in-memory rooms.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Render free web service sleeps after 15 min without inbound traffic and takes about one minute to spin up; in-memory rooms are lost on sleep. Open WebSockets count as traffic, so a live session keeps it awake, but the first judge after idle hits a ~1 min loading page. Cold-start duration is the vendor's figure, not measured here."
+ },
+ {
+  "id": "F-043",
+  "claim_ids": [
+   "C-118",
+   "C-191"
+  ],
+  "lens": "os-systems",
+  "trap_id": "os-systems.memory-limit-oom-kill",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Render free tier 750h, 15 min idle sleep",
+   "no memory budget per worker"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "Plan RAM/restart behaviour is a fact on the host's docs.",
+  "evidence": [
+   {
+    "id": "Q-render-nomem",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "Memory/CPU limits: The page doesn't specify any.",
+    "locator": "free page; render.com/pricing returned no plan rows",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-rail-plan",
+    "kind": "quote",
+    "ref": "https://docs.railway.com/reference/pricing/plans",
+    "quote": "\"$1 of free credit per month.\" / \"Users who create a new Trial account receive a free one-time grant of $5.\" / Free: half a gigabyte of RAM and one vCPU; Trial: 1 GB of RAM and 2 vCPUs / if balance hits zero Railway will \"stop all of your workloads\"",
+    "locator": "plans reference",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Render instance-types page (free RAM) and its restart-on-OOM text.",
+  "title": "Small free instance can be OOM-killed or restarted",
+  "statement": "C-118 (Render free: sleeps, ~512 MB) and C-191 (memory budget unstated) mean the process can restart and drop all rooms mid-judging.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Render free page states no memory/CPU limit; the '512 MB' in C-118 was not confirmed from a primary page. Railway Free is 0.5 GB RAM / 1 vCPU, Trial 1 GB / 2 vCPU. OOM-restart behaviour not documented in fetched pages."
+ },
+ {
+  "id": "F-044",
+  "claim_ids": [
+   "C-119",
+   "C-120",
+   "C-188",
+   "C-214"
+  ],
+  "lens": "market-reality,performance,realtime-transport",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "$5 trial credit",
+   "incoming WebSocket messages billed 20:1",
+   "no cost ceiling",
+   "price/free tier unsourced"
+  ],
+  "status": "confirmed",
+  "route": "check",
+  "route_reason": "Arithmetic from the owner's budget and current prices.",
+  "evidence": [
+   {
+    "id": "Q-rail-plan",
+    "kind": "quote",
+    "ref": "https://docs.railway.com/reference/pricing/plans",
+    "quote": "\"$1 of free credit per month.\" / \"Users who create a new Trial account receive a free one-time grant of $5.\" / Free: half a gigabyte of RAM and one vCPU; Trial: 1 GB of RAM and 2 vCPUs / if balance hits zero Railway will \"stop all of your workloads\"",
+    "locator": "plans reference",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-cf-do",
+    "kind": "quote",
+    "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+    "locator": "DO pricing page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-vc-hobby",
+    "kind": "quote",
+    "ref": "https://vercel.com/docs/plans/hobby",
+    "quote": "the Hobby plan restricts users to non-commercial, personal use only. / Vercel Function maximum duration | 300s (5 minutes)",
+    "locator": "Hobby plan page, last_updated 2026-09-14",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "check",
+    "ref": "python3 inline calc",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+    "locator": "calc"
+   }
+  ],
+  "would_settle": "Owner's budget figure.",
+  "owner_question": "What is the maximum spend for hosting and generation this week?",
+  "title": "Free-tier quotas and no cost ceiling",
+  "statement": "C-103/C-104 (credits), C-119 (Railway $5 trial), C-125/C-150/C-152/C-188/C-214 (no spend ceiling) leave judging-day hosting and generation cost unbounded; C-120 caps interact with tick rate.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Free tiers are hard-capped, not billed: Railway trial is a one-time $5 and workloads stop at zero balance; Cloudflare free caps 100k req/day; Vercel Hobby pauses ~30 days on overage. So the exposure is outage, not surprise cost, on free plans; no spend ceiling exists in the brief for any paid fallback. Owner question stands: maximum spend this week."
+ },
+ {
+  "id": "F-045",
+  "claim_ids": [
+   "C-120"
+  ],
+  "lens": "performance",
+  "trap_id": "performance.egress-unit-economics",
+  "trap_status": "verified",
+  "cues_matched": [
+   "100k requests/day",
+   "incoming WebSocket messages billed 20:1"
+  ],
+  "status": "dismissed",
+  "route": "check",
+  "route_reason": "Arithmetic from the stated numbers.",
+  "evidence": [
+   {
+    "id": "Q-cf-do",
+    "kind": "quote",
+    "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+    "locator": "DO pricing page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "check",
+    "ref": "python3 inline calc",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+    "locator": "calc"
+   }
+  ],
+  "would_settle": "Cloudflare pricing example text that states '20 messages = 1 request'.",
+  "title": "Durable Objects message billing vs tick rate",
+  "statement": "C-120: 100k requests/day with 20:1 WebSocket billing is about 5k messages a day, so one judging session at a racing tick rate can exhaust it.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Residual risk is real but smaller than claimed: also cap tick rate and send client input only on change. Outgoing messages are not counted in the quoted line.",
+  "dismissal_reason": "Claim says 100k requests with 20:1 billing is about 5k messages/day. The page gives 100,000 requests/day and bills incoming WebSocket messages at 20:1, which (reading it as 20 messages = 1 request) is about 2,000,000 incoming messages/day, not 5k. Calc: one 8-player room at 20 Hz uses ~3.5 h of quota, so one class session fits; sustained multi-room all-day load does not. Direction of the ratio is not spelled out in the fetched quote, so treat the arithmetic as inferred."
+ },
+ {
+  "id": "F-046",
+  "claim_ids": [
+   "C-122"
+  ],
+  "lens": "distributed-systems,market-reality,os-systems,realtime-transport",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "PeerJS fallback",
+   "PeerJS no-server fallback",
+   "PeerJS no-server fallback, NAT reliability unverified",
+   "price/free tier unsourced"
+  ],
+  "status": "plausible",
+  "route": "experiment",
+  "route_reason": "Connection tests across NAT types settle it.",
+  "evidence": [
+   {
+    "id": "Q-peerjs",
+    "kind": "quote",
+    "ref": "https://peerjs.com/",
+    "quote": "\"Use our free cloud server or host your own PeerServer.\" (site gives no broker limits, no TURN/STUN/NAT statement; peerjs.com/docs also silent)",
+    "locator": "home + docs pages",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "check",
+    "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+    "locator": "dist-tags.latest + time"
+   }
+  ],
+  "would_settle": "Connection test from 3 network types with and without a TURN server; PeerJS GitHub README for default ICE servers.",
+  "title": "WebRTC/PeerJS NAT traversal may fail on judge networks",
+  "statement": "C-122 calls PeerJS a no-server fallback with NAT reliability unverified; campus or corporate networks may block peers, and a closed host tab ends the race.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "PeerJS free cloud broker exists but no limits, STUN/TURN defaults or NAT statement on peerjs.com; last release 1.5.5 on 2025-06-07. Cannot be settled without network tests. A host tab closing ends the race by design."
+ },
+ {
+  "id": "F-047",
+  "claim_ids": [
+   "C-123",
+   "C-179"
+  ],
+  "lens": "distributed-systems",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "Colyseus or ws Node server",
+   "no fault model"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Kill tests decide it.",
+  "evidence": [],
+  "would_settle": "Fault-injection run on the chosen server",
+  "title": "Reconnect, host loss and restart behaviour undefined",
+  "statement": "C-123 (bare ws loses rooms on restart, Colyseus reconnection tokens) and C-179 give no reconnect or host-migration rule for C-069."
+ },
+ {
+  "id": "F-048",
+  "claim_ids": [
+   "C-123"
+  ],
+  "lens": "os-systems",
+  "trap_id": "os-systems.thread-or-process-per-request",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Colyseus or ws Node server"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "A decidable fact about the chosen server library's room model.",
+  "evidence": [
+   {
+    "id": "Q-colyseus-dep",
+    "kind": "quote",
+    "ref": "https://docs.colyseus.io/deployment",
+    "quote": "deploys \"no different than deploying a regular Node.js application\"; \"IMPORTANT: DO NOT use 'cluster' mode.\"; gives no limits on rooms or connections per process; Render/Railway not mentioned; memory not covered",
+    "locator": "deployment doc",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-colyseus-lic",
+    "kind": "quote",
+    "ref": "https://github.com/colyseus/colyseus",
+    "quote": "License: MIT. No per-process room limit stated; \"Go from 10 to 10,000+ CCU by scaling vertically or horizontally with Redis and load balancers.\"",
+    "locator": "repo README; GitHub releases section empty in fetch",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Own load test of one room-per-class, or Colyseus benchmark page.",
+  "title": "Unbounded rooms per process",
+  "statement": "C-123 (Colyseus or a small ws server) leaves rooms-per-process policy unspecified.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Colyseus docs state no rooms-per-process or connection limit and say not to use PM2 cluster mode; scaling multi-process needs Redis presence/driver. No documented number for a single small instance; do not invent one."
+ },
+ {
+  "id": "F-049",
+  "claim_ids": [
+   "C-005",
+   "C-011",
+   "C-012",
+   "C-013",
+   "C-014",
+   "C-016",
+   "C-018",
+   "C-019",
+   "C-020",
+   "C-021",
+   "C-027",
+   "C-029",
+   "C-030",
+   "C-042",
+   "C-065",
+   "C-068",
+   "C-070",
+   "C-071",
+   "C-074",
+   "C-157",
+   "C-196",
+   "C-197"
+  ],
+  "lens": "rubric-inversion",
+  "trap_id": "rubric-inversion.proxy-metric-as-target",
+  "trap_status": "verified",
+  "cues_matched": [
+   "at least one mechanic beyond steering",
+   "at least two distinct tracks",
+   "avoid default or mismatched assets",
+   "beautiful, unique, and clean",
+   "beginning, middle, and end",
+   "complete experience",
+   "demo games use library models and recorded SFX",
+   "do not use pre-made assets",
+   "enough original gameplay",
+   "enough variety and multiplayer polish to want to race again",
+   "feel like they belong together",
+   "fun over repeated short sessions",
+   "judged by peers",
+   "judges play every game",
+   "look, sound, feel reinforce world",
+   "more than one moment of gameplay",
+   "no counter-metric",
+   "no proxy stated",
+   "people",
+   "polished, cohesive visual style",
+   "repetition or cosmetic changes do not count",
+   "substantial",
+   "visually distinctive, polished, cohesive",
+   "will fail the assignment"
+  ],
+  "status": "suspect",
+  "route": "deep-research",
+  "route_reason": "Needs a synthesis of how judged jams reward polish vs completeness.",
+  "evidence": [],
+  "would_settle": "Past Game Week judging criteria and examples; the organisers' actual rubric",
+  "owner_question": "How will peers judge: how long per game, and is there a written rubric beyond the brief?",
+  "title": "A peer-judged 'beautiful, unique, polished' rubric rewards first impressions",
+  "statement": "C-005, C-012, C-013 ('thrown together ... will fail') and C-020 score look and feel judged by peers in minutes; this rewards title-screen polish over a finished game, which C-031 says to prefer."
+ },
+ {
+  "id": "F-050",
+  "claim_ids": [
+   "C-007"
+  ],
+  "lens": "company-context",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "no timezone"
+  ],
+  "status": "suspect",
+  "route": "none",
+  "route_reason": "ask-owner: only the organisers can say.",
+  "evidence": [],
+  "would_settle": "The Gauntlet organisers' schedule page",
+  "owner_question": "What timezone and cutoff apply to 'Thursday @ Midnight', and is late submission penalised?",
+  "title": "Deadline timezone and late rule unstated",
+  "statement": "C-007 'Thursday @ Midnight' has no zone and no late-submission penalty is stated."
+ },
+ {
+  "id": "F-051",
+  "claim_ids": [
+   "C-013",
+   "C-074",
+   "C-215"
+  ],
+  "lens": "company-context",
+  "trap_id": "company-context.metric-serves-evaluator",
+  "trap_status": "unverified",
+  "cues_matched": [
+   "no organisation or payer named",
+   "the judges will play every game",
+   "will fail the assignment"
+  ],
+  "status": "suspect",
+  "route": "none",
+  "route_reason": "ask-owner: whom the game serves is the owner's call.",
+  "evidence": [],
+  "would_settle": "The owner's statement of the game's real audience",
+  "owner_question": "Is the goal to impress the Friday judges or to make a game players replay?",
+  "title": "Success is defined by the evaluating peers' impression",
+  "statement": "C-013, C-074 and C-215: the hard-fail line and the judges' Friday-morning play define success by evaluators, not by players."
+ },
+ {
+  "id": "F-052",
+  "claim_ids": [
+   "C-029",
+   "C-076",
+   "C-077",
+   "C-085",
+   "C-095",
+   "C-137",
+   "C-139",
+   "C-142",
+   "C-146",
+   "C-148",
+   "C-149",
+   "C-150",
+   "C-152",
+   "C-153",
+   "C-154",
+   "C-157"
+  ],
+  "lens": "company-context",
+  "trap_id": "company-context.contradicts-published-policy",
+  "trap_status": "verified",
+  "cues_matched": [
+   "2D libraries",
+   "3D libraries",
+   "Mixamo",
+   "asset libraries Kenney, Poly Haven, itch.io",
+   "asset-library route breaks the rule",
+   "audio asset libraries",
+   "coherent library pack",
+   "demos may not satisfy",
+   "do not use pre-made assets",
+   "labs.gauntletai.com",
+   "libraries Kenney, Freesound, Sonniss",
+   "library models",
+   "public repo",
+   "recorded foley",
+   "recorded sounds",
+   "recorded vehicle sounds",
+   "sound libraries free and paid"
+  ],
+  "status": "confirmed",
+  "route": "none",
+  "route_reason": "ask-owner: only the organisers can say which governs.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "slide 26, 'Three ways to get visual assets', item 3",
+    "quote": "3 Asset libraries ... Packs and models that artists have already made. Kenney \u00b7 Poly Haven \u00b7 itch.io"
+   },
+   {
+    "kind": "quote",
+    "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "slide 34, 'Library assets'",
+    "quote": "Look for a coherent pack with the scale, camera, and license your game needs."
+   },
+   {
+    "kind": "quote",
+    "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "slide 70, 'Sky Roadster' (game demo)",
+    "quote": "Art: Library models + code-built scenery ... SFX: Recorded vehicle and air sounds"
+   },
+   {
+    "kind": "quote",
+    "ref": "docs/source/brief.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "'GENERATE ALL ASSETS' box",
+    "quote": "All assets must be generated for your game, including visuals and audio such as sprites, characters, environments, sound effects, and music. Do not use pre-made assets."
+   }
+  ],
+  "would_settle": "The Gauntlet organisers' ruling on libraries vs generated-only",
+  "owner_question": "The brief says 'Do not use pre-made assets' and 'All assets must be generated', but the lecture (slides 26, 34, 70) teaches asset libraries (Kenney, Poly Haven, Freesound) and shows a demo using library models and recorded SFX. Are CC0 library packs, recorded sounds, and Mixamo animations allowed in the submission, or must every asset be AI-generated or built in code?",
+  "title": "Brief says generate everything; the organiser's lecture endorses libraries",
+  "statement": "C-029 bans pre-made assets, yet the lecture (C-095, C-137, C-139, C-142, C-146, C-153, C-157) teaches asset libraries and shows library-model demos; which source governs is unstated.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "On a plain reading they conflict: slide 26 defines libraries as assets 'that artists have already made', which is what 'pre-made' means; slide 70 shows an organiser-endorsed demo using library models and recorded SFX; the brief says all assets must be generated and bans pre-made ones. Nothing in the lecture text (grep for brief/allowed/rule/pre-made) reconciles them, so which governs is unstated. Ambiguity that could save the lecture: 'generated for your game' might be read to include curated/adapted libraries, but the brief's own next sentence rules out pre-made assets. Safe default until answered: generated and code-made only (the lecture's routes 1 and 2)."
+ },
+ {
+  "id": "F-053",
+  "claim_ids": [
+   "C-069",
+   "C-213"
+  ],
+  "lens": "market-reality",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "price/free tier unsourced"
+  ],
+  "status": "suspect",
+  "route": "none",
+  "route_reason": "ask-owner: the floor is the owner's call.",
+  "evidence": [],
+  "would_settle": "The owner's stated minimum viable race",
+  "owner_question": "What is the minimum that must work for this to count as a game: two players join and finish one race?",
+  "title": "The one capability that must work is never named",
+  "statement": "C-069 and C-213: 'reliable enough to complete a race' and the correctness floor (a second player can join and finish) carry no number or conditions."
+ },
+ {
+  "id": "F-054",
+  "claim_ids": [
+   "C-075",
+   "C-093",
+   "C-101"
+  ],
+  "lens": "company-context",
+  "trap_id": "company-context.assumed-data-rights",
+  "trap_status": "unverified",
+  "cues_matched": [
+   "class game commercial?",
+   "no owner or licence stated",
+   "public repo acceptable"
+  ],
+  "status": "suspect",
+  "route": "none",
+  "route_reason": "ask-owner: ownership terms are the organiser's.",
+  "evidence": [],
+  "would_settle": "Gauntlet's Game Week participation terms",
+  "owner_question": "Who owns the games and assets, and under what licence must the repo be public?",
+  "title": "Who owns the game and assets is unstated",
+  "statement": "C-075, C-093 and C-101: the brief is silent on ownership and the organiser may claim or require public release."
+ },
+ {
+  "id": "F-055",
+  "claim_ids": [
+   "C-077",
+   "C-085",
+   "C-124",
+   "C-209"
+  ],
+  "lens": "agent-orchestration",
+  "trap_id": "agent-orchestration.irreversible-action-without-gate",
+  "trap_status": "verified",
+  "cues_matched": [
+   "arbitrary Python",
+   "deploys to labs.gauntletai.com",
+   "omission",
+   "public repository"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Review of hooks/branch protection and a secret scan decides it.",
+  "evidence": [],
+  "would_settle": "Repo settings plus a secret-scan of the first commits",
+  "title": "Agent commits or publishes with no approval gate",
+  "statement": "C-077 (public repo), C-085 and C-124/C-209 mean a coding agent can push keys, prompts or assets to a public repo irreversibly."
+ },
+ {
+  "id": "F-056",
+  "claim_ids": [
+   "C-086",
+   "C-087",
+   "C-105",
+   "C-145",
+   "C-201"
+  ],
+  "lens": "supply-chain",
+  "trap_id": "supply-chain.unverified-package-name",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Blender MCP",
+   "Claude of Duty",
+   "jsfxr",
+   "library or hand-written, unspecified",
+   "networking layer unspecified",
+   "no dependency vetting statement"
+  ],
+  "status": "confirmed",
+  "route": "check",
+  "route_reason": "Registry metadata checks decide it per package.",
+  "evidence": [
+   {
+    "kind": "check",
+    "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+    "locator": "dist-tags.latest + time"
+   },
+   {
+    "id": "Q-colyseus-lic",
+    "kind": "quote",
+    "ref": "https://github.com/colyseus/colyseus",
+    "quote": "License: MIT. No per-process room limit stated; \"Go from 10 to 10,000+ CCU by scaling vertically or horizontally with Redis and load balancers.\"",
+    "locator": "repo README; GitHub releases section empty in fetch",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Registry lookup (existence, publisher, age, downloads) for each chosen package",
+  "title": "Netcode or relay package chosen without vetting",
+  "statement": "C-086, C-087, C-105, C-145 and C-201: libraries are unchosen, so an agent will pick and install one without checking the name exists and is the right one.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Candidate packages are real and maintained: colyseus 0.18.10 (MIT, 2026-10-22), ws 8.22.1 (MIT, 2026-10-31), partyserver 0.5.10 (ISC, 2026-08-03). peerjs 1.5.5 is stale (2025-06-07, MIT). Vetting is still absent from the brief; pin names exactly (typosquat risk). Downloads and publisher age beyond maintainers not checked."
+ },
+ {
+  "id": "F-057",
+  "claim_ids": [
+   "C-088",
+   "C-203"
+  ],
+  "lens": "supply-chain",
+  "trap_id": "supply-chain.autonomous-agent-install",
+  "trap_status": "verified",
+  "cues_matched": [
+   "generation tools unspecified",
+   "no agent install policy"
+  ],
+  "status": "confirmed",
+  "route": "check",
+  "route_reason": "A stated approval rule plus allowlist settles it.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Security and Trust & Safety > Tool Safety",
+    "quote": "Tools represent arbitrary code execution and must be treated with appropriate caution. In particular, descriptions of tool behavior such as annotations should be considered untrusted, unless obtained from a trusted server."
+   },
+   {
+    "kind": "quote",
+    "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Tool Safety",
+    "quote": "Hosts must obtain explicit user consent before invoking any tool"
+   }
+  ],
+  "would_settle": "Written install policy / allowlist",
+  "title": "Agent may install generator CLIs or MCP servers unvetted",
+  "statement": "C-088 and C-203: generation tools may arrive as CLIs, npm or MCP servers installed by the coding agent with no approval rule.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Spec says hosts must obtain explicit user consent before invoking any tool and tools represent arbitrary code execution. An agent that installs MCP servers/CLIs itself and then calls them without per-install or per-call approval conflicts with that principle (as the spec states it; note the 'Key Principles' are for implementors, so the spec does not itself forbid a user opting out of prompts). Brief has no allowlist."
+ },
+ {
+  "id": "F-058",
+  "claim_ids": [
+   "C-088",
+   "C-125",
+   "C-205"
+  ],
+  "lens": "agent-security",
+  "trap_id": "agent-security.untrusted-tool-servers",
+  "trap_status": "verified",
+  "cues_matched": [
+   "generation tools unspecified",
+   "omission",
+   "third-party skills repo"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Decidable per server: publisher, pinned version, tool list.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Security and Trust & Safety > Tool Safety",
+    "quote": "Tools represent arbitrary code execution and must be treated with appropriate caution. In particular, descriptions of tool behavior such as annotations should be considered untrusted, unless obtained from a trusted server."
+   },
+   {
+    "kind": "quote",
+    "ref": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Tool > warning",
+    "quote": "clients MUST consider tool annotations to be untrusted unless they come from trusted servers."
+   }
+  ],
+  "would_settle": "Source repo and pinned version of each MCP server used",
+  "title": "Community MCP tool servers trusted by description",
+  "statement": "C-088, C-125 and C-205: generation tooling may be community MCP servers whose descriptions the agent trusts.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "MCP spec: tool descriptions/annotations are untrusted unless from a trusted server, and tools are arbitrary code execution. A community server's tool descriptions therefore cannot be the trust basis; trust must come from publisher, pinned version and review. Blender MCP is the concrete case (F-065)."
+ },
+ {
+  "id": "F-059",
+  "claim_ids": [
+   "C-088",
+   "C-210"
+  ],
+  "lens": "agent-orchestration",
+  "trap_id": "agent-orchestration.standing-broad-credentials",
+  "trap_status": "verified",
+  "cues_matched": [
+   "generation providers",
+   "omission"
+  ],
+  "status": "plausible",
+  "route": "check",
+  "route_reason": "Inspect key scope and spend limit at the provider.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "Key Principles 2 Data Privacy",
+    "quote": "User data should be protected with appropriate access controls"
+   }
+  ],
+  "would_settle": "Per-provider key scope and spend cap screenshots or API settings for each generator.",
+  "title": "Paid provider keys held by build agents with no scope or cap",
+  "statement": "C-088 and C-210: generator keys and credits sit with agents with no scope, lifetime or spend cap.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "The MCP spec has no statement on provider-key scope or spend caps; the finding is about the brief's omission and is settled only by inspecting actual key settings. Nothing fetched from a provider in this run."
+ },
+ {
+  "id": "F-060",
+  "claim_ids": [
+   "C-103",
+   "C-104",
+   "C-106",
+   "C-108",
+   "C-109",
+   "C-110",
+   "C-127",
+   "C-128",
+   "C-143"
+  ],
+  "lens": "market-reality",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "price/free tier unsourced"
+  ],
+  "status": "plausible",
+  "route": "grounded-research",
+  "route_reason": "Pricing pages are decidable facts; fetch now.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://elevenlabs.io/pricing",
+    "quote": "Starter adds 'Commercial License' (Starter $1 first month then $6/mo, 30k credits; Free $0, 10k credits; 'Music commercial use' on Starter)",
+    "locator": "plan cards (WebFetch summary, paraphrased around short quotes)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "CC BY 4.0 license (commercial use with attribution).",
+    "locator": "Free plan; also '100 monthly credits', downloads limited to '10 Meshy 6 Lite' models/month",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.meshy.ai/pricing",
+    "quote": "Private license for all assets. | Pro $20/mo, 1,000 monthly credits (up to 100 assets), unlimited downloads",
+    "locator": "Pro plan card",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://suno.com/pricing",
+    "quote": "Free $0, 50 credits per day, 'No commercial rights', 'No monthly song downloads'; Pro $8/mo, 2,500 credits, 'Commercial use rights', 20 downloads/mo; Premier $24/mo, 60 downloads",
+    "locator": "plan table",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://skybox.blockadelabs.com/plans",
+    "quote": "essential 100 credits/month '4K exports'; standard 300 credits; business 500 credits, '16K export options', 'Commercial licensing' (listed only under business); no free plan listed; two price sets shown ($20/$48/$112 and $24/$60/$140)",
+    "locator": "plans page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Quote the plan tables verbatim from each vendor's current pricing page (the fetched evidence was paraphrased).",
+  "title": "Vendor prices and plan limits are unverified",
+  "statement": "C-108-110, C-127/C-128, C-134-139, C-145/C-146 and C-149 quote ElevenLabs, Suno, Meshy, PixelLab, Retro Diffusion and AutoSprite prices from unsourced reads or aggregators; the asset budget rests on them.",
+  "grounded_by": "G1-generator-terms",
+  "note": "Downgraded from confirmed by orchestrator: evidence q3/q7 were summaries, not quotes. Primary prices fetched: ElevenLabs Free 10k credits, Starter $1 first month then $6 (30k credits; SFX 200 credits each, Eleven Music 900 credits/min); Meshy Free 100 credits, Pro $20 (1,000 credits); Suno Free 50/day, Pro $8, Premier $24; Skybox has no free plan on its plans page and shows two conflicting price sets. PixelLab, OpenAI free limits, Stable Audio not verified; Stable Audio aggregators conflict (Free commercial or not), so brief figures from aggregators there must be treated as unverified."
+ },
+ {
+  "id": "F-061",
+  "claim_ids": [
+   "C-118"
+  ],
+  "lens": "market-reality",
+  "trap_id": "market-reality.latency-over-correctness-floor",
+  "trap_status": "unverified",
+  "cues_matched": [
+   "cold start vs correctness floor"
+  ],
+  "status": "confirmed",
+  "route": "experiment",
+  "route_reason": "A cold-start measurement plus the plan's sleep behaviour decide it.",
+  "evidence": [
+   {
+    "id": "Q-render-free",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+    "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-render-ws",
+    "kind": "quote",
+    "ref": "https://render.com/docs/free",
+    "quote": "existing WebSocket messages count as activity that prevents spin-down; new WebSocket connections wake a spun-down service (paraphrase by fetch tool, not verbatim)",
+    "locator": "free-instances page, traffic section",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Measured cold-start time on the chosen plan; Render's current free-tier page",
+  "title": "Free host sleeps when the first judge joins",
+  "statement": "C-118 (Render free: 15 min idle sleep, ~1 min cold start): on Friday the server may be asleep at the first join, defeating C-064/C-069.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Same page evidence as F-042; mitigation is an external keep-warm ping before judging or a paid always-on instance (price not fetched: render.com/pricing returned no plan rows)."
+ },
+ {
+  "id": "F-062",
+  "claim_ids": [
+   "C-120"
+  ],
+  "lens": "market-reality",
+  "trap_id": "market-reality.unbounded-free-tier",
+  "trap_status": "unverified",
+  "cues_matched": [
+   "free tier with metered cap"
+  ],
+  "status": "dismissed",
+  "route": "check",
+  "route_reason": "Arithmetic plus the current quota page.",
+  "evidence": [
+   {
+    "id": "Q-cf-do",
+    "kind": "quote",
+    "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+    "locator": "DO pricing page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "Q-cf-workers",
+    "kind": "quote",
+    "ref": "https://developers.cloudflare.com/workers/platform/limits/",
+    "quote": "\"Accounts on the Workers Free plan have a daily request limit of 100,000 requests, resetting at midnight UTC.\" / CPU time per HTTP request 10 ms",
+    "locator": "Workers limits page",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "check",
+    "ref": "python3 inline calc",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+    "locator": "calc"
+   }
+  ],
+  "would_settle": "Calc with the current Cloudflare limits and the chosen tick rate",
+  "title": "Free-tier request cap vs racing tick rate",
+  "statement": "C-120: Durable Objects free 100k requests/day with 20:1 billing could be exhausted by one class-sized judging session.",
+  "grounded_by": "G2-hosting-netcode",
+  "dismissal_reason": "Same arithmetic as F-045: 100k req/day x 20 = ~2M incoming messages/day; one class-sized session at racing tick rate uses hours of one room's budget at 20 Hz, not the whole quota in minutes. Not dismissed for a 30 Hz x 20-player lobby (0.93 h)."
+ },
+ {
+  "id": "F-063",
+  "claim_ids": [
+   "C-123",
+   "C-202"
+  ],
+  "lens": "supply-chain",
+  "trap_id": "supply-chain.unpinned-dependencies",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Colyseus or ws",
+   "no pinning policy"
+  ],
+  "status": "plausible",
+  "route": "check",
+  "route_reason": "Lockfile and audit output decide it.",
+  "evidence": [
+   {
+    "kind": "check",
+    "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+    "locator": "dist-tags.latest + time"
+   }
+  ],
+  "would_settle": "Committed package-lock.json and npm audit output once the server exists.",
+  "title": "Server dependencies run publicly with no pin or audit",
+  "statement": "C-123 and C-202: the multiplayer server runs against public player input with no lockfile or audit rule.",
+  "grounded_by": "G2-hosting-netcode",
+  "note": "Registry shows versions move fast (ws 8.22.1 four days ago), so unpinned installs drift. Lockfile/audit is a project-state check on a repo that does not yet exist."
+ },
+ {
+  "id": "F-064",
+  "claim_ids": [
+   "C-124",
+   "C-125",
+   "C-126",
+   "C-163"
+  ],
+  "lens": "supply-chain",
+  "trap_id": "supply-chain.unverified-provenance",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Blender MCP",
+   "Unity/Godot/Aseprite MCPs only if picked",
+   "about 33k stars",
+   "gamedev-skills repo",
+   "no licence/component inventory"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "One decidable fact: repo, maintainer, last commit, release.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://github.com/ahujasid/blender-mcp",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "github.com/ahujasid/mcp-for-blender -> redirects (API 301) to repositories/944414751; page header, fetched today",
+    "quote": "MIT license; 33.3k stars (API stargazers_count 33317); latest commit 2e4b0bc2 at 2026-11-04T13:04:02Z, pushed_at 2026-11-04T13:04:08Z"
+   },
+   {
+    "kind": "check",
+    "ref": "https://api.github.com/repositories/944414751/commits?per_page=1",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "curl -sL; commits[0].commit.committer.date",
+    "quote": "2e4b0bc2 2026-11-04T13:04:02Z"
+   }
+  ],
+  "would_settle": "blender-mcp repository, releases and commit history",
+  "title": "Blender MCP trusted on star count",
+  "statement": "C-124-126 and C-163 cite about 33k stars as trust for a third-party repo installed via uvx/pip; last commit unverified (C-130).",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "The lecture link github.com/ahujasid/mcp-for-blender now serves the same repo as ahujasid/blender-mcp (the README is titled MCP for Blender; the repo has been renamed, and the old name resolves). Repo is MIT, actively maintained (commit hours before this run), 33.3k stars. Stars are popularity not vetting; the README also advertises a paid 'Premium' tier and a hosted generation proxy. No pinned version or component inventory exists in the brief; version pin is the remedy. Provenance is real, trust claim still unearned by star count alone."
+ },
+ {
+  "id": "F-065",
+  "claim_ids": [
+   "C-124",
+   "C-141",
+   "C-145"
+  ],
+  "lens": "agent-security",
+  "trap_id": "agent-security.local-server-command-execution",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Aseprite CLI + Lua",
+   "Blender MCP lets the agent run Blender",
+   "arbitrary Python over an unauthenticated socket"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "The addon's listening address and auth is a decidable fact.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README line ~405 Note",
+    "quote": "the addon's socket server has no authentication or encryption, so anyone who can reach that port can run Python inside Blender. Keep it on `localhost` unless you are on a trusted network"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README line ~850 Warning",
+    "quote": "The `execute_blender_code` tool allows running arbitrary Python code in Blender, which can be powerful but potentially dangerous. Use with caution in production environments. **ALWAYS save your work before using it.**"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README Safe mode",
+    "quote": "By default, the AI can run any Python code in Blender. Set `BLENDER_MCP_SAFE_MODE=1` to check every script before it runs and block risky code"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/addon.py",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "addon.py _blendermcp_bind_address",
+    "quote": "Non-loopback binding requires Allow Remote Connections in add-on preferences"
+   }
+  ],
+  "would_settle": "blender-mcp addon source: bind address, authentication",
+  "title": "Blender MCP runs arbitrary Python over an unauthenticated socket",
+  "statement": "C-124, C-141 and C-145: the lecture's Blender MCP executes any Python it receives with the user's privileges; any local process or web page that reaches the socket can run code.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "Default bind is localhost (port 9876), remote bind needs an explicit preference, but there is no authentication: any local process (or browser-origin TCP attempt that can speak the protocol) reaching 127.0.0.1:9876 gets Python execution as the user. Safe mode exists but is off by default. No SECURITY.md in the repo (raw URL returned 404). Remedy: enable BLENDER_MCP_SAFE_MODE=1, keep localhost, run Blender in a throwaway user/VM, human approval per execute call."
+ },
+ {
+  "id": "F-066",
+  "claim_ids": [
+   "C-126",
+   "C-138",
+   "C-206",
+   "C-207"
+  ],
+  "lens": "agent-security",
+  "trap_id": "agent-security.untrusted-content-drives-tools",
+  "trap_status": "verified",
+  "cues_matched": [
+   "critic inspects exported frames",
+   "import Poly Haven/Sketchfab assets",
+   "omission"
+  ],
+  "status": "confirmed",
+  "route": "grounded-research",
+  "route_reason": "Decidable from the MCP's tool list and import behaviour.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README tools table",
+    "quote": "`search_assets` / `import_asset` | Poly Haven HDRIs, textures and models, Sketchfab models, Poly Pizza low-poly models"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README tools table",
+    "quote": "`execute_blender_code` | Run Python in your live Blender"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+    "tier": "primary",
+    "date": "2026-11-04",
+    "locator": "README feature table",
+    "quote": "Poly Haven assets, Sketchfab models, Poly Pizza low-poly models, and AI-generated 3D models via Meshy, Tripo, Hyper3D Rodin and Hunyuan3D"
+   }
+  ],
+  "would_settle": "blender-mcp import tools and what they fetch",
+  "title": "Imported library models enter a code-executing session",
+  "statement": "C-126, C-138, C-206 and C-207: importing Poly Haven/Sketchfab content through Blender MCP feeds third-party files into a session that can run Python, and C-126 itself says the import breaks the no-premade rule.",
+  "grounded_by": "G3-physics-agent-security",
+  "note": "The same MCP exposes third-party model import (Poly Haven, Sketchfab, Poly Pizza) and arbitrary Python in one session, so imported files are untrusted content in a code-executing session; these imports are also pre-made assets (see F-052/F-014). I did not inspect what import_asset fetches or validates in the addon source; the README lists tools but not their sanitization."
+ },
+ {
+  "id": "F-067",
+  "claim_ids": [
+   "C-132",
+   "C-138"
+  ],
+  "lens": "rubric-inversion",
+  "trap_id": "rubric-inversion.llm-judge-self-grading",
+  "trap_status": "verified",
+  "cues_matched": [
+   "independent critique",
+   "separate critic agent"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Only agreement with human ratings on held-out assets shows it.",
+  "evidence": [],
+  "would_settle": "Critic vs human rating agreement on a labelled asset set",
+  "title": "The 'separate critic' is the same model family",
+  "statement": "C-132 and C-138 (Creator -> separate critic -> fixes): a same-family critic is not independent, so its approval proves less than it appears."
+ },
+ {
+  "id": "F-068",
+  "claim_ids": [
+   "C-132",
+   "C-138"
+  ],
+  "lens": "ml-evaluation",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "critic judgement",
+   "independent critique of exported frames"
+  ],
+  "status": "suspect",
+  "route": "experiment",
+  "route_reason": "Rater agreement is measured.",
+  "evidence": [],
+  "would_settle": "Critic vs human agreement on a labelled asset set",
+  "title": "The asset critic is not validated against humans",
+  "statement": "C-132 and C-138 rely on a critic to approve visuals; no held-out human labels or agreement measure back it."
+ },
+ {
+  "id": "F-069",
+  "claim_ids": [
+   "C-132",
+   "C-138",
+   "C-208"
+  ],
+  "lens": "agent-orchestration",
+  "trap_id": "agent-orchestration.unbounded-agent-loop",
+  "trap_status": "verified",
+  "cues_matched": [
+   "Revise (fix biggest issue, review again)",
+   "creator -> critic -> fixes",
+   "omission"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Presence of an explicit cap in the workflow config.",
+  "evidence": [],
+  "would_settle": "Loop config: iteration, cost and wall-clock limits",
+  "title": "Create-critic-fix loop with no cap",
+  "statement": "C-132, C-138 and C-208: the asset loop has no iteration, cost or time cap in a one-week build."
+ },
+ {
+  "id": "F-070",
+  "claim_ids": [
+   "C-204"
+  ],
+  "lens": "agent-security",
+  "trap_id": "agent-security.confused-deputy",
+  "trap_status": "verified",
+  "cues_matched": [
+   "omission"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "Inspect the agent config.",
+  "evidence": [],
+  "would_settle": "Agent/tool credential map",
+  "title": "Which identity and keys the agents run with is unstated",
+  "statement": "C-204: nothing says which API keys (generators, hosting) agents use or how the human's authority is bounded."
+ },
+ {
+  "id": "F-071",
+  "claim_ids": [
+   "C-211"
+  ],
+  "lens": "agent-orchestration",
+  "trap_id": "agent-orchestration.no-action-audit-trail",
+  "trap_status": "verified",
+  "cues_matched": [
+   "omission"
+  ],
+  "status": "suspect",
+  "route": "check",
+  "route_reason": "A generation log exists or does not.",
+  "evidence": [],
+  "would_settle": "A per-asset generation log (tool, prompt, date)",
+  "title": "No record of which tool made each asset",
+  "statement": "C-211: no tool-call log means no evidence for C-028 'all assets must be generated'."
+ }
+]

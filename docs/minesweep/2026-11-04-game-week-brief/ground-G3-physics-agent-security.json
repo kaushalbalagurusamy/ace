@@ -1,0 +1,389 @@
+{
+ "outcomes": [
+  {
+   "finding_id": "F-036",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://tc39.es/ecma262/",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "6.1.6.1 The Number Type",
+     "quote": "The Number type has exactly 18,437,736,874,454,810,627 (that is, 264 - 253 + 3) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://tc39.es/ecma262/",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "21.3.2.33 Math.sqrt ( x )",
+     "quote": "Return 𝔽(the square root of ℝ(n))."
+    },
+    {
+     "kind": "quote",
+     "ref": "https://tc39.es/ecma262/",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "21.3.2.31 Math.sin ( x )",
+     "quote": "Return an implementation-approximated Number value representing the sine of ℝ(n)."
+    },
+    {
+     "kind": "quote",
+     "ref": "https://tc39.es/ecma262/",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Conformance: kinds of deferral",
+     "quote": "An implementation-approximated facility is one that defers its definition to an external source while recommending an ideal behaviour. While conforming implementations are free to choose any behaviour within the constraints put forth by this specification, they are encouraged to strive to approximate the ideal. Some mathematical operations, such as Math.exp, are implementation-approximated."
+    },
+    {
+     "kind": "experiment",
+     "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+     "date": "2026-11-04",
+     "locator": "node run",
+     "quote": "perturb 1e-12 -> 5.9e-8 after 1e5 steps; order change -> 9.65e-10"
+    }
+   ],
+   "measured": {
+    "script": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+    "runtime": "node v24.21.0",
+    "model": "massless ship, 3 analytic-orbit sources (masses 1,0.5,0.3), G=1, velocity-Verlet dt=0.001, float64, single run each",
+    "results": {
+     "1e3": {
+      "order_diff": 0.0,
+      "perturb_1e-12": 9.74e-13
+     },
+     "1e4": {
+      "order_diff": 1.734e-13,
+      "perturb_1e-12": 1.172e-11
+     },
+     "1e5": {
+      "order_diff": 9.654e-10,
+      "perturb_1e-12": 5.906e-08
+     }
+    },
+    "note": "order_diff = |position(sum order a+b+c) - position(c+b+a)|, same engine, same machine. A first run with only 2 sources gave order_diff exactly 0 at all N because a+b==b+a in IEEE 754; order dependence needs >=3 terms. Perturbation grows ~12x per decade of steps (1e-12 -> 5.9e-8 after 1e5 steps, ~5.9e4x amplification). Not measured: cross-engine Math.sin/cos differences (only V8 available here); no timeout wrapper (macOS has none); run took <1 s."
+   },
+   "note": "Spec requires bit-exact IEEE binary64 for + - * / and correctly-rounded sqrt (sqrt is defined as the square root of the real value, rounded to a Number), so these agree across engines. Math.sin/cos/exp/pow-class functions are 'implementation-approximated': engines may differ in last bits. A shared n-body step using them cannot be assumed bit-identical across browsers; chaotic/sensitive dynamics then amplify the difference (about 6e4x over 1e5 steps here). Mitigation space: avoid transcendental calls in the sim loop (use only + - * / sqrt, own sin/cos polynomials), fixed step, server-authoritative state with periodic resync. Math.pow/atan2 text not separately quoted; they sit in the same approximated family per spec text for sin (not verified verbatim here). Cross-browser run not performed."
+  },
+  {
+   "finding_id": "F-039",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://tc39.es/ecma262/",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "6.1.6.1 The Number Type",
+     "quote": "The Number type has exactly 18,437,736,874,454,810,627 (that is, 264 - 253 + 3) values, representing the double-precision floating point IEEE 754-2019 binary64 values as specified in the IEEE Standard for Binary Floating-Point Arithmetic"
+    },
+    {
+     "kind": "experiment",
+     "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+     "date": "2026-11-04",
+     "locator": "node run, 3 sources",
+     "quote": "order_diff 0 at 1e3, 1.73e-13 at 1e4, 9.65e-10 at 1e5 steps"
+    }
+   ],
+   "measured": {
+    "script": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+    "runtime": "node v24.21.0",
+    "model": "massless ship, 3 analytic-orbit sources (masses 1,0.5,0.3), G=1, velocity-Verlet dt=0.001, float64, single run each",
+    "results": {
+     "1e3": {
+      "order_diff": 0.0,
+      "perturb_1e-12": 9.74e-13
+     },
+     "1e4": {
+      "order_diff": 1.734e-13,
+      "perturb_1e-12": 1.172e-11
+     },
+     "1e5": {
+      "order_diff": 9.654e-10,
+      "perturb_1e-12": 5.906e-08
+     }
+    },
+    "note": "order_diff = |position(sum order a+b+c) - position(c+b+a)|, same engine, same machine. A first run with only 2 sources gave order_diff exactly 0 at all N because a+b==b+a in IEEE 754; order dependence needs >=3 terms. Perturbation grows ~12x per decade of steps (1e-12 -> 5.9e-8 after 1e5 steps, ~5.9e4x amplification). Not measured: cross-engine Math.sin/cos differences (only V8 available here); no timeout wrapper (macOS has none); run took <1 s."
+   },
+   "note": "Float addition is not associative; reordering three gravity terms changed ship position by 9.65e-10 after 1e5 steps on one machine. With only two terms the difference is exactly 0 (commutative), so the hazard needs 3+ bodies. Requirement: fixed summation order (by body index) in every client and server."
+  },
+  {
+   "finding_id": "F-037",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://arxiv.org/html/2506.17867",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "arXiv 2506.17867 (Liu & Salomao), section 1",
+     "quote": "Consider two primaries moving along circular orbits about their center of mass. A massless satellite moves in the same plane under Newtonian attraction."
+    },
+    {
+     "kind": "quote",
+     "ref": "https://arxiv.org/html/2506.17867",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "section 4",
+     "quote": "Hamilton's equations of E_mu are equivalent to q'' = -mu (q-m(t))/|q-m(t)|^3 - (1-mu)(q-e(t))/|q-e(t)|^3"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://tlakoba.w3.uvm.edu/math337/for_final_topics/SSM_1990_Yoshida.pdf",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Yoshida, Phys. Lett. A 150 (1990), Introduction",
+     "quote": "the discrete mapping obtained describes the exact time evolution of a slightly perturbed Hamiltonian system and thus possesses the perturbed Hamiltonian as a conserved quantity. This guarantees that there is no secular change in the error of the total energy"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://tlakoba.w3.uvm.edu/math337/for_final_topics/SSM_1990_Yoshida.pdf",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "same",
+     "quote": "If the integrator is not symplectic, the error of the total energy grows secularly in general."
+    },
+    {
+     "kind": "experiment",
+     "ref": "/private/tmp/claude-501/-Users-kaushal/0a2c1e26-0f94-48f5-8ab8-e74094b6f0eb/scratchpad/nbody.js",
+     "date": "2026-11-04",
+     "locator": "node run",
+     "quote": "ship position difference vs 1e-12 perturbation: 5.9e-8 at 1e5 steps"
+    }
+   ],
+   "note": "Kepler two-body motion is analytic: position at any time t comes from a closed-form solve of Kepler's equation, so any client can evaluate state at any t without stepping (random access, no drift, cheap, identical inputs give the same output up to the solver's tolerance). In the restricted problem the primaries can still be put on analytic Kepler orbits (the quoted model prescribes m(t), e(t)), but the ship's trajectory has no closed form and must be stepped; error then accumulates (phase error grows, symplectic bound applies to energy only, and only for constant step as Yoshida states; the Lee-Duncan-Levison abstract notes that naively varying the step destroys the property). Race consequences: ship state is a function of the whole input history, so all clients need fixed dt and identical inputs/ordering or an authoritative server; track checkpoints/ranking cannot be computed in closed form for the ship; if bodies are N>2 mutually interacting, even the bodies are not analytic. Body count, dt and error budget are still unspecified in the brief (C-194); here dt=0.001 with 3 sources gave 1e-12 -> 6e-8 in 1e5 steps."
+  },
+  {
+   "finding_id": "F-027",
+   "outcome": "plausible",
+   "evidence": [],
+   "note": "Not run. Experiment: for each track, (1) define the course as ordered checkpoints and a thrust cap; (2) run a bot/solver (e.g. random-shooting or CMA-ES over a thrust schedule, or a greedy-plus-search controller) with the shared fixed-step sim for many seeded trials; record completion rate and best time; a track is winnable if completion rate > 0 under the cap with a margin, and ranked fairly if two runs' progress metric is monotone along the reference solution. (3) Define progress as accumulated checkpoint index plus distance-to-next-checkpoint rather than orbital angle, and test that it never decreases for a known-good lap and handles retrograde/angle wrap (compare against angle-based progress on recorded runs). Also check no checkpoint requires a dv above the cap. Report completion rate, time spread, and rank inversions.",
+   "would_settle": "Automated solver run per track under thrust limits plus rank-inversion count between candidate progress metrics."
+  },
+  {
+   "finding_id": "F-064",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://github.com/ahujasid/blender-mcp",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "github.com/ahujasid/mcp-for-blender -> redirects (API 301) to repositories/944414751; page header, fetched today",
+     "quote": "MIT license; 33.3k stars (API stargazers_count 33317); latest commit 2e4b0bc2 at 2026-11-04T13:04:02Z, pushed_at 2026-11-04T13:04:08Z"
+    },
+    {
+     "kind": "check",
+     "ref": "https://api.github.com/repositories/944414751/commits?per_page=1",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "curl -sL; commits[0].commit.committer.date",
+     "quote": "2e4b0bc2 2026-11-04T13:04:02Z"
+    }
+   ],
+   "note": "The lecture link github.com/ahujasid/mcp-for-blender now serves the same repo as ahujasid/blender-mcp (the README is titled MCP for Blender; the repo has been renamed, and the old name resolves). Repo is MIT, actively maintained (commit hours before this run), 33.3k stars. Stars are popularity not vetting; the README also advertises a paid 'Premium' tier and a hosted generation proxy. No pinned version or component inventory exists in the brief; version pin is the remedy. Provenance is real, trust claim still unearned by star count alone."
+  },
+  {
+   "finding_id": "F-065",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README line ~405 Note",
+     "quote": "the addon's socket server has no authentication or encryption, so anyone who can reach that port can run Python inside Blender. Keep it on `localhost` unless you are on a trusted network"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README line ~850 Warning",
+     "quote": "The `execute_blender_code` tool allows running arbitrary Python code in Blender, which can be powerful but potentially dangerous. Use with caution in production environments. **ALWAYS save your work before using it.**"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README Safe mode",
+     "quote": "By default, the AI can run any Python code in Blender. Set `BLENDER_MCP_SAFE_MODE=1` to check every script before it runs and block risky code"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/addon.py",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "addon.py _blendermcp_bind_address",
+     "quote": "Non-loopback binding requires Allow Remote Connections in add-on preferences"
+    }
+   ],
+   "note": "Default bind is localhost (port 9876), remote bind needs an explicit preference, but there is no authentication: any local process (or browser-origin TCP attempt that can speak the protocol) reaching 127.0.0.1:9876 gets Python execution as the user. Safe mode exists but is off by default. No SECURITY.md in the repo (raw URL returned 404). Remedy: enable BLENDER_MCP_SAFE_MODE=1, keep localhost, run Blender in a throwaway user/VM, human approval per execute call.",
+   "measured": null
+  },
+  {
+   "finding_id": "F-066",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README tools table",
+     "quote": "`search_assets` / `import_asset` | Poly Haven HDRIs, textures and models, Sketchfab models, Poly Pizza low-poly models"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README tools table",
+     "quote": "`execute_blender_code` | Run Python in your live Blender"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://raw.githubusercontent.com/ahujasid/blender-mcp/main/README.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "README feature table",
+     "quote": "Poly Haven assets, Sketchfab models, Poly Pizza low-poly models, and AI-generated 3D models via Meshy, Tripo, Hyper3D Rodin and Hunyuan3D"
+    }
+   ],
+   "note": "The same MCP exposes third-party model import (Poly Haven, Sketchfab, Poly Pizza) and arbitrary Python in one session, so imported files are untrusted content in a code-executing session; these imports are also pre-made assets (see F-052/F-014). I did not inspect what import_asset fetches or validates in the addon source; the README lists tools but not their sanitization."
+  },
+  {
+   "finding_id": "F-058",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Security and Trust & Safety > Tool Safety",
+     "quote": "Tools represent arbitrary code execution and must be treated with appropriate caution. In particular, descriptions of tool behavior such as annotations should be considered untrusted, unless obtained from a trusted server."
+    },
+    {
+     "kind": "quote",
+     "ref": "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Tool > warning",
+     "quote": "clients MUST consider tool annotations to be untrusted unless they come from trusted servers."
+    }
+   ],
+   "note": "MCP spec: tool descriptions/annotations are untrusted unless from a trusted server, and tools are arbitrary code execution. A community server's tool descriptions therefore cannot be the trust basis; trust must come from publisher, pinned version and review. Blender MCP is the concrete case (F-065)."
+  },
+  {
+   "finding_id": "F-057",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Security and Trust & Safety > Tool Safety",
+     "quote": "Tools represent arbitrary code execution and must be treated with appropriate caution. In particular, descriptions of tool behavior such as annotations should be considered untrusted, unless obtained from a trusted server."
+    },
+    {
+     "kind": "quote",
+     "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Tool Safety",
+     "quote": "Hosts must obtain explicit user consent before invoking any tool"
+    }
+   ],
+   "note": "Spec says hosts must obtain explicit user consent before invoking any tool and tools represent arbitrary code execution. An agent that installs MCP servers/CLIs itself and then calls them without per-install or per-call approval conflicts with that principle (as the spec states it; note the 'Key Principles' are for implementors, so the spec does not itself forbid a user opting out of prompts). Brief has no allowlist."
+  },
+  {
+   "finding_id": "F-059",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://modelcontextprotocol.io/specification/2025-06-18/index.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "Key Principles 2 Data Privacy",
+     "quote": "User data should be protected with appropriate access controls"
+    }
+   ],
+   "note": "The MCP spec has no statement on provider-key scope or spend caps; the finding is about the brief's omission and is settled only by inspecting actual key settings. Nothing fetched from a provider in this run.",
+   "would_settle": "Per-provider key scope and spend cap screenshots or API settings for each generator."
+  },
+  {
+   "finding_id": "F-052",
+   "outcome": "confirmed",
+   "disposition": "ask-owner",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "slide 26, 'Three ways to get visual assets', item 3",
+     "quote": "3 Asset libraries ... Packs and models that artists have already made. Kenney · Poly Haven · itch.io"
+    },
+    {
+     "kind": "quote",
+     "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "slide 34, 'Library assets'",
+     "quote": "Look for a coherent pack with the scale, camera, and license your game needs."
+    },
+    {
+     "kind": "quote",
+     "ref": "docs/source/lecture-2026-11-02-game-assets.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "slide 70, 'Sky Roadster' (game demo)",
+     "quote": "Art: Library models + code-built scenery ... SFX: Recorded vehicle and air sounds"
+    },
+    {
+     "kind": "quote",
+     "ref": "docs/source/brief.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "'GENERATE ALL ASSETS' box",
+     "quote": "All assets must be generated for your game, including visuals and audio such as sprites, characters, environments, sound effects, and music. Do not use pre-made assets."
+    }
+   ],
+   "note": "On a plain reading they conflict: slide 26 defines libraries as assets 'that artists have already made', which is what 'pre-made' means; slide 70 shows an organiser-endorsed demo using library models and recorded SFX; the brief says all assets must be generated and bans pre-made ones. Nothing in the lecture text (grep for brief/allowed/rule/pre-made) reconciles them, so which governs is unstated. Ambiguity that could save the lecture: 'generated for your game' might be read to include curated/adapted libraries, but the brief's own next sentence rules out pre-made assets. Safe default until answered: generated and code-made only (the lecture's routes 1 and 2).",
+   "owner_question": "The brief says 'Do not use pre-made assets' and 'All assets must be generated', but the lecture (slides 26, 34, 70) teaches asset libraries (Kenney, Poly Haven, Freesound) and shows a demo using library models and recorded SFX. Are CC0 library packs, recorded sounds, and Mixamo animations allowed in the submission, or must every asset be AI-generated or built in code?"
+  },
+  {
+   "finding_id": "F-014",
+   "outcome": "plausible",
+   "disposition": "ask-owner",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "docs/source/brief.md",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "locator": "'GENERATE ALL ASSETS' box",
+     "quote": "Do not use pre-made assets."
+    }
+   ],
+   "note": "The rule question is the same as F-052 (settled as a conflict). Per-library licences (Kenney and Poly Haven CC0 per the lecture slides 'CC0') were not fetched from the library pages in this run, so the licence half stays unverified.",
+   "owner_question": "Same as F-052: are CC0 library packs (Kenney, Poly Haven) acceptable under 'do not use pre-made assets'?",
+   "would_settle": "Organiser answer, then each library's own licence page."
+  }
+ ],
+ "could_not_verify": [
+  "Cross-browser (Chrome/Safari/Firefox) bit-level differences in Math.sin/cos/pow: only Node (V8) available, no other engine run.",
+  "Math.pow and Math.atan2 spec clauses not quoted verbatim (sin, sqrt, exp-note were).",
+  "What blender-mcp import_asset fetches/validates (addon source not audited).",
+  "Per-library licence pages (Kenney, Poly Haven, Mixamo) not fetched.",
+  "Provider key scope/spend caps (F-059).",
+  "Scholarpedia fetch failed (expired certificate); no NASA/JPL definition page was fetched, restricted three-body definition taken from arXiv 2506.17867.",
+  "Hairer-Lubich-Wanner book not fetched; symplectic energy behaviour quoted from Yoshida 1990 PDF (local pdftotext of fetched file)."
+ ]
+}

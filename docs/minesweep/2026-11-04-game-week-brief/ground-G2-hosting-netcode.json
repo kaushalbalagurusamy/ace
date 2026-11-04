@@ -1,0 +1,607 @@
+{
+ "outcomes": [
+  {
+   "finding_id": "F-041",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "id": "Q-vc-hobby",
+     "kind": "quote",
+     "ref": "https://vercel.com/docs/plans/hobby",
+     "quote": "the Hobby plan restricts users to non-commercial, personal use only. / Vercel Function maximum duration | 300s (5 minutes)",
+     "locator": "Hobby plan page, last_updated 2026-09-14",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-vc-ws",
+     "kind": "quote",
+     "ref": "https://vercel.com/docs/functions/websockets",
+     "quote": "> WebSockets are available on all plans ... Vercel Functions can serve WebSocket connections ... A single WebSocket connection is pinned to one Vercel Function instance. ... WebSocket connections close when a Vercel Function reaches its maximum duration. ... Store durable state, presence, counters, rooms, and pub/sub coordination in an external data store instead of relying on in-memory variables.",
+     "locator": "WebSockets doc, last_updated 2026-08-10",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-pk-shut",
+     "kind": "quote",
+     "ref": "https://docs.partykit.io/guides/migrate-to-partyserver/",
+     "quote": "The hosted PartyKit platform is shutting down. Deploys stop on 16 October and the platform shuts down on 23 October 2026. / 23 October 2026: `npx partykit deploy` to your own Cloudflare account stops working. Workers already in your account keep running.",
+     "locator": "migration guide intro + timeline (also docs.partykit.io home banner)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-cf-do",
+     "kind": "quote",
+     "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+     "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+     "locator": "DO pricing page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-render-free",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+     "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Mixed. Vercel Hobby: non-commercial and 300 s cap CONFIRMED; but C-117 'holds no sockets' is REFUTED for today: WebSockets are supported on all plans, though a connection closes at max duration (300 s on Hobby, so races under 5 min only, with reconnect) and rooms must live in an external store, not memory. Hosted PartyKit shutdown CONFIRMED. DO free limits confirmed. Net: every named option has a hard constraint, but Vercel is not 'no sockets'. Correct C-117."
+  },
+  {
+   "finding_id": "F-042",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "id": "Q-render-free",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+     "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-render-ws",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "existing WebSocket messages count as activity that prevents spin-down; new WebSocket connections wake a spun-down service (paraphrase by fetch tool, not verbatim)",
+     "locator": "free-instances page, traffic section",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Render free web service sleeps after 15 min without inbound traffic and takes about one minute to spin up; in-memory rooms are lost on sleep. Open WebSockets count as traffic, so a live session keeps it awake, but the first judge after idle hits a ~1 min loading page. Cold-start duration is the vendor's figure, not measured here.",
+   "would_settle": "Measured cold start on the deployed service plus a keep-warm ping plan (experiment; not run, no deploys allowed)."
+  },
+  {
+   "finding_id": "F-061",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "id": "Q-render-free",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+     "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-render-ws",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "existing WebSocket messages count as activity that prevents spin-down; new WebSocket connections wake a spun-down service (paraphrase by fetch tool, not verbatim)",
+     "locator": "free-instances page, traffic section",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Same page evidence as F-042; mitigation is an external keep-warm ping before judging or a paid always-on instance (price not fetched: render.com/pricing returned no plan rows)."
+  },
+  {
+   "finding_id": "F-034",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "id": "Q-render-free",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+     "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-vc-ws",
+     "kind": "quote",
+     "ref": "https://vercel.com/docs/functions/websockets",
+     "quote": "> WebSockets are available on all plans ... Vercel Functions can serve WebSocket connections ... A single WebSocket connection is pinned to one Vercel Function instance. ... WebSocket connections close when a Vercel Function reaches its maximum duration. ... Store durable state, presence, counters, rooms, and pub/sub coordination in an external data store instead of relying on in-memory variables.",
+     "locator": "WebSockets doc, last_updated 2026-08-10",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-colyseus-dep",
+     "kind": "quote",
+     "ref": "https://docs.colyseus.io/deployment",
+     "quote": "deploys \"no different than deploying a regular Node.js application\"; \"IMPORTANT: DO NOT use 'cluster' mode.\"; gives no limits on rooms or connections per process; Render/Railway not mentioned; memory not covered",
+     "locator": "deployment doc",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-rail-nows",
+     "kind": "quote",
+     "ref": "https://docs.railway.com/reference/pricing/plans",
+     "quote": "The document does not mention WebSockets. (docs.railway.com/reference/websockets returned 404)",
+     "locator": "plans page; websockets URL 404",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Render: 15 min idle spin-down (WebSocket messages count as activity); Vercel: connection closes at 300 s max duration on Hobby; Colyseus doc sets proxy_read_timeout 86400s only for self-run Nginx. No connection-count or WebSocket idle-timeout limit found on Render or Railway pages (Railway websockets URL 404).",
+   "would_settle": "Render and Railway proxy idle-timeout and max-connection docs (not located), or a client heartbeat design that sends a ping inside any host idle window."
+  },
+  {
+   "finding_id": "F-043",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "id": "Q-render-nomem",
+     "kind": "quote",
+     "ref": "https://render.com/docs/free",
+     "quote": "Memory/CPU limits: The page doesn't specify any.",
+     "locator": "free page; render.com/pricing returned no plan rows",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-rail-plan",
+     "kind": "quote",
+     "ref": "https://docs.railway.com/reference/pricing/plans",
+     "quote": "\"$1 of free credit per month.\" / \"Users who create a new Trial account receive a free one-time grant of $5.\" / Free: half a gigabyte of RAM and one vCPU; Trial: 1 GB of RAM and 2 vCPUs / if balance hits zero Railway will \"stop all of your workloads\"",
+     "locator": "plans reference",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Render free page states no memory/CPU limit; the '512 MB' in C-118 was not confirmed from a primary page. Railway Free is 0.5 GB RAM / 1 vCPU, Trial 1 GB / 2 vCPU. OOM-restart behaviour not documented in fetched pages.",
+   "would_settle": "Render instance-types page (free RAM) and its restart-on-OOM text."
+  },
+  {
+   "finding_id": "F-044",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "id": "Q-rail-plan",
+     "kind": "quote",
+     "ref": "https://docs.railway.com/reference/pricing/plans",
+     "quote": "\"$1 of free credit per month.\" / \"Users who create a new Trial account receive a free one-time grant of $5.\" / Free: half a gigabyte of RAM and one vCPU; Trial: 1 GB of RAM and 2 vCPUs / if balance hits zero Railway will \"stop all of your workloads\"",
+     "locator": "plans reference",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-cf-do",
+     "kind": "quote",
+     "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+     "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+     "locator": "DO pricing page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-vc-hobby",
+     "kind": "quote",
+     "ref": "https://vercel.com/docs/plans/hobby",
+     "quote": "the Hobby plan restricts users to non-commercial, personal use only. / Vercel Function maximum duration | 300s (5 minutes)",
+     "locator": "Hobby plan page, last_updated 2026-09-14",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "python3 inline calc",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+     "locator": "calc"
+    }
+   ],
+   "note": "Free tiers are hard-capped, not billed: Railway trial is a one-time $5 and workloads stop at zero balance; Cloudflare free caps 100k req/day; Vercel Hobby pauses ~30 days on overage. So the exposure is outage, not surprise cost, on free plans; no spend ceiling exists in the brief for any paid fallback. Owner question stands: maximum spend this week.",
+   "would_settle": "Owner's budget figure."
+  },
+  {
+   "finding_id": "F-045",
+   "outcome": "dismissed",
+   "evidence": [
+    {
+     "id": "Q-cf-do",
+     "kind": "quote",
+     "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+     "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+     "locator": "DO pricing page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "python3 inline calc",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+     "locator": "calc"
+    }
+   ],
+   "dismissal_reason": "Claim says 100k requests with 20:1 billing is about 5k messages/day. The page gives 100,000 requests/day and bills incoming WebSocket messages at 20:1, which (reading it as 20 messages = 1 request) is about 2,000,000 incoming messages/day, not 5k. Calc: one 8-player room at 20 Hz uses ~3.5 h of quota, so one class session fits; sustained multi-room all-day load does not. Direction of the ratio is not spelled out in the fetched quote, so treat the arithmetic as inferred.",
+   "note": "Residual risk is real but smaller than claimed: also cap tick rate and send client input only on change. Outgoing messages are not counted in the quoted line.",
+   "would_settle": "Cloudflare pricing example text that states '20 messages = 1 request'."
+  },
+  {
+   "finding_id": "F-062",
+   "outcome": "dismissed",
+   "evidence": [
+    {
+     "id": "Q-cf-do",
+     "kind": "quote",
+     "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+     "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+     "locator": "DO pricing page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-cf-workers",
+     "kind": "quote",
+     "ref": "https://developers.cloudflare.com/workers/platform/limits/",
+     "quote": "\"Accounts on the Workers Free plan have a daily request limit of 100,000 requests, resetting at midnight UTC.\" / CPU time per HTTP request 10 ms",
+     "locator": "Workers limits page",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "python3 inline calc",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "100000 req/day x 20 incoming msgs per billed request = 2,000,000 incoming msgs/day; at 20 Hz x 8 players sending = 160 msg/s -> 12,500 s = 3.47 h of one room; 10Hz x 8 -> 6.94 h; 30Hz x 20 players -> 0.93 h. Assumes the 20:1 ratio means 20 messages = 1 request (page quote does not spell direction).",
+     "locator": "calc"
+    }
+   ],
+   "dismissal_reason": "Same arithmetic as F-045: 100k req/day x 20 = ~2M incoming messages/day; one class-sized session at racing tick rate uses hours of one room's budget at 20 Hz, not the whole quota in minutes. Not dismissed for a 30 Hz x 20-player lobby (0.93 h)."
+  },
+  {
+   "finding_id": "F-046",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "id": "Q-peerjs",
+     "kind": "quote",
+     "ref": "https://peerjs.com/",
+     "quote": "\"Use our free cloud server or host your own PeerServer.\" (site gives no broker limits, no TURN/STUN/NAT statement; peerjs.com/docs also silent)",
+     "locator": "home + docs pages",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+     "locator": "dist-tags.latest + time"
+    }
+   ],
+   "note": "PeerJS free cloud broker exists but no limits, STUN/TURN defaults or NAT statement on peerjs.com; last release 1.5.5 on 2025-06-07. Cannot be settled without network tests. A host tab closing ends the race by design.",
+   "would_settle": "Connection test from 3 network types with and without a TURN server; PeerJS GitHub README for default ICE servers."
+  },
+  {
+   "finding_id": "F-048",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "id": "Q-colyseus-dep",
+     "kind": "quote",
+     "ref": "https://docs.colyseus.io/deployment",
+     "quote": "deploys \"no different than deploying a regular Node.js application\"; \"IMPORTANT: DO NOT use 'cluster' mode.\"; gives no limits on rooms or connections per process; Render/Railway not mentioned; memory not covered",
+     "locator": "deployment doc",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "id": "Q-colyseus-lic",
+     "kind": "quote",
+     "ref": "https://github.com/colyseus/colyseus",
+     "quote": "License: MIT. No per-process room limit stated; \"Go from 10 to 10,000+ CCU by scaling vertically or horizontally with Redis and load balancers.\"",
+     "locator": "repo README; GitHub releases section empty in fetch",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Colyseus docs state no rooms-per-process or connection limit and say not to use PM2 cluster mode; scaling multi-process needs Redis presence/driver. No documented number for a single small instance; do not invent one.",
+   "would_settle": "Own load test of one room-per-class, or Colyseus benchmark page."
+  },
+  {
+   "finding_id": "F-056",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "check",
+     "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+     "locator": "dist-tags.latest + time"
+    },
+    {
+     "id": "Q-colyseus-lic",
+     "kind": "quote",
+     "ref": "https://github.com/colyseus/colyseus",
+     "quote": "License: MIT. No per-process room limit stated; \"Go from 10 to 10,000+ CCU by scaling vertically or horizontally with Redis and load balancers.\"",
+     "locator": "repo README; GitHub releases section empty in fetch",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Candidate packages are real and maintained: colyseus 0.18.10 (MIT, 2026-10-22), ws 8.22.1 (MIT, 2026-10-31), partyserver 0.5.10 (ISC, 2026-08-03). peerjs 1.5.5 is stale (2025-06-07, MIT). Vetting is still absent from the brief; pin names exactly (typosquat risk). Downloads and publisher age beyond maintainers not checked."
+  },
+  {
+   "finding_id": "F-063",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "check",
+     "ref": "curl https://registry.npmjs.org/<pkg> (read-only metadata)",
+     "tier": "primary",
+     "date": "2026-11-04",
+     "quote": "colyseus 0.18.10 published 2026-10-22 MIT, created 2015, maintainer endel; partyserver 0.5.10 published 2026-08-03 ISC, created 2024-06; peerjs 1.5.5 published 2025-06-07 MIT (about 17 months before today); ws 8.22.1 published 2026-10-31 MIT, maintainer lpinca",
+     "locator": "dist-tags.latest + time"
+    }
+   ],
+   "note": "Registry shows versions move fast (ws 8.22.1 four days ago), so unpinned installs drift. Lockfile/audit is a project-state check on a repo that does not yet exist.",
+   "would_settle": "Committed package-lock.json and npm audit output once the server exists."
+  }
+ ],
+ "host_table": [
+  {
+   "host": "Render free web service",
+   "free_limits": "750 free instance hours/month per workspace; no persistent disk for web services; page says not for production; RAM/CPU not stated on page",
+   "sleeps": "Yes: 15 min without inbound traffic; ~1 min spin-up",
+   "websockets": "Supported; WS messages count as activity, new WS connection wakes service",
+   "quote_ids": [
+    "Q-render-free",
+    "Q-render-ws",
+    "Q-render-nomem"
+   ],
+   "single_instance_class_size": "Docs state no capacity number"
+  },
+  {
+   "host": "Railway Free/Trial",
+   "free_limits": "Free $1/month credit, 0.5 GB RAM, 1 vCPU; Trial one-time $5, 1 GB, 2 vCPU; workloads stop at zero balance",
+   "sleeps": "Not stated on page (credit exhaustion stops workloads)",
+   "websockets": "Not mentioned on plans page; websockets doc URL 404",
+   "quote_ids": [
+    "Q-rail-plan",
+    "Q-rail-nows"
+   ],
+   "single_instance_class_size": "Docs state no capacity number"
+  },
+  {
+   "host": "Cloudflare Workers + Durable Objects (free)",
+   "free_limits": "100,000 requests/day, 13,000 GB-s/day, SQLite-backed DOs only; Workers CPU 10 ms/request",
+   "sleeps": "Idle DOs hibernate (not billed for duration)",
+   "websockets": "Yes with Hibernation API; incoming WS billed 20:1",
+   "quote_ids": [
+    "Q-cf-do",
+    "Q-cf-hib",
+    "Q-cf-workers"
+   ],
+   "single_instance_class_size": "Docs: 'thousands of clients per instance', no cap stated"
+  },
+  {
+   "host": "Vercel Hobby",
+   "free_limits": "Non-commercial personal use only; function max duration 300 s; Hobby pauses ~30 days on overage",
+   "sleeps": "Serverless; no sleep concept, but connections close at 300 s",
+   "websockets": "Supported on all plans (pinned to one instance; state must be external)",
+   "quote_ids": [
+    "Q-vc-hobby",
+    "Q-vc-ws"
+   ],
+   "single_instance_class_size": "Docs: Fluid compute lets one instance serve multiple WS connections; no number; rooms need external store"
+  },
+  {
+   "host": "PartyKit hosted",
+   "free_limits": "Shut down 23 Oct 2026",
+   "sleeps": "n/a",
+   "websockets": "n/a",
+   "quote_ids": [
+    "Q-pk-shut"
+   ],
+   "single_instance_class_size": "n/a"
+  },
+  {
+   "host": "PartyServer (self-deployed on Cloudflare)",
+   "free_limits": "Runs on your own Cloudflare account; Workers free includes SQLite DOs",
+   "sleeps": "DO hibernation",
+   "websockets": "Yes",
+   "quote_ids": [
+    "Q-ps-req",
+    "Q-cf-do"
+   ],
+   "single_instance_class_size": "See Cloudflare DO"
+  },
+  {
+   "host": "Colyseus (library, MIT)",
+   "free_limits": "Library; deployment is ordinary Node; no per-process room limit documented",
+   "sleeps": "Depends on host",
+   "websockets": "Yes",
+   "quote_ids": [
+    "Q-colyseus-lic",
+    "Q-colyseus-dep"
+   ],
+   "single_instance_class_size": "Docs state no number"
+  },
+  {
+   "host": "PeerJS (library + free cloud broker)",
+   "free_limits": "No broker limits published on peerjs.com",
+   "sleeps": "n/a",
+   "websockets": "WebRTC data channels via broker signalling",
+   "quote_ids": [
+    "Q-peerjs"
+   ],
+   "single_instance_class_size": "Peer-to-peer; host tab must stay open"
+  }
+ ],
+ "quotes": [
+  {
+   "id": "Q-render-free",
+   "kind": "quote",
+   "ref": "https://render.com/docs/free",
+   "quote": "Render spins down a Free web service that goes \"15 minutes without receiving any inbound traffic.\" / Spin-up \"takes about one minute\" / \"750 Free instance hours\" / \"Do not use them for production applications.\"",
+   "locator": "free-instances page, fetched via WebFetch summariser (quotes as returned)",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-render-ws",
+   "kind": "quote",
+   "ref": "https://render.com/docs/free",
+   "quote": "existing WebSocket messages count as activity that prevents spin-down; new WebSocket connections wake a spun-down service (paraphrase by fetch tool, not verbatim)",
+   "locator": "free-instances page, traffic section",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-render-nomem",
+   "kind": "quote",
+   "ref": "https://render.com/docs/free",
+   "quote": "Memory/CPU limits: The page doesn't specify any.",
+   "locator": "free page; render.com/pricing returned no plan rows",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-rail-plan",
+   "kind": "quote",
+   "ref": "https://docs.railway.com/reference/pricing/plans",
+   "quote": "\"$1 of free credit per month.\" / \"Users who create a new Trial account receive a free one-time grant of $5.\" / Free: half a gigabyte of RAM and one vCPU; Trial: 1 GB of RAM and 2 vCPUs / if balance hits zero Railway will \"stop all of your workloads\"",
+   "locator": "plans reference",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-rail-nows",
+   "kind": "quote",
+   "ref": "https://docs.railway.com/reference/pricing/plans",
+   "quote": "The document does not mention WebSockets. (docs.railway.com/reference/websockets returned 404)",
+   "locator": "plans page; websockets URL 404",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-cf-do",
+   "kind": "quote",
+   "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+   "quote": "Free: Requests \"100,000 / day\", Duration \"13,000 GB-s / day\"; \"For compute requests billing-only, a 20:1 ratio is applied to incoming WebSocket messages\"; \"Only Durable Objects with SQLite storage backend are available.\"",
+   "locator": "DO pricing page",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-cf-hib",
+   "kind": "quote",
+   "ref": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+   "quote": "\"Durable Objects that are idle and eligible for hibernation are not billed for duration\"",
+   "locator": "DO pricing page",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-cf-workers",
+   "kind": "quote",
+   "ref": "https://developers.cloudflare.com/workers/platform/limits/",
+   "quote": "\"Accounts on the Workers Free plan have a daily request limit of 100,000 requests, resetting at midnight UTC.\" / CPU time per HTTP request 10 ms",
+   "locator": "Workers limits page",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-vc-ws",
+   "kind": "quote",
+   "ref": "https://vercel.com/docs/functions/websockets",
+   "quote": "> WebSockets are available on all plans ... Vercel Functions can serve WebSocket connections ... A single WebSocket connection is pinned to one Vercel Function instance. ... WebSocket connections close when a Vercel Function reaches its maximum duration. ... Store durable state, presence, counters, rooms, and pub/sub coordination in an external data store instead of relying on in-memory variables.",
+   "locator": "WebSockets doc, last_updated 2026-08-10",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-vc-hobby",
+   "kind": "quote",
+   "ref": "https://vercel.com/docs/plans/hobby",
+   "quote": "the Hobby plan restricts users to non-commercial, personal use only. / Vercel Function maximum duration | 300s (5 minutes)",
+   "locator": "Hobby plan page, last_updated 2026-09-14",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-pk-shut",
+   "kind": "quote",
+   "ref": "https://docs.partykit.io/guides/migrate-to-partyserver/",
+   "quote": "The hosted PartyKit platform is shutting down. Deploys stop on 16 October and the platform shuts down on 23 October 2026. / 23 October 2026: `npx partykit deploy` to your own Cloudflare account stops working. Workers already in your account keep running.",
+   "locator": "migration guide intro + timeline (also docs.partykit.io home banner)",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-ps-req",
+   "kind": "quote",
+   "ref": "https://docs.partykit.io/guides/migrate-to-partyserver/",
+   "quote": "PartyServer runs as \"a plain Cloudflare Worker with Durable Objects in your own Cloudflare account\" ... pay Cloudflare directly. The Workers free plan includes SQLite-backed Durable Objects.",
+   "locator": "migration guide",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-colyseus-lic",
+   "kind": "quote",
+   "ref": "https://github.com/colyseus/colyseus",
+   "quote": "License: MIT. No per-process room limit stated; \"Go from 10 to 10,000+ CCU by scaling vertically or horizontally with Redis and load balancers.\"",
+   "locator": "repo README; GitHub releases section empty in fetch",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-colyseus-dep",
+   "kind": "quote",
+   "ref": "https://docs.colyseus.io/deployment",
+   "quote": "deploys \"no different than deploying a regular Node.js application\"; \"IMPORTANT: DO NOT use 'cluster' mode.\"; gives no limits on rooms or connections per process; Render/Railway not mentioned; memory not covered",
+   "locator": "deployment doc",
+   "tier": "primary",
+   "date": "2026-11-04"
+  },
+  {
+   "id": "Q-peerjs",
+   "kind": "quote",
+   "ref": "https://peerjs.com/",
+   "quote": "\"Use our free cloud server or host your own PeerServer.\" (site gives no broker limits, no TURN/STUN/NAT statement; peerjs.com/docs also silent)",
+   "locator": "home + docs pages",
+   "tier": "primary",
+   "date": "2026-11-04"
+  }
+ ],
+ "could_not_verify": [
+  "Render free RAM figure (512 MB claim) and OOM-restart text: render.com/pricing returned no plan rows; free page silent",
+  "Railway WebSocket and idle-timeout docs: docs.railway.com/reference/websockets 404",
+  "Cloudflare statement that 20:1 means 20 messages = 1 request (direction inferred); DO per-instance connection cap",
+  "GitHub releases pages for colyseus/partykit repos empty via fetch; versions taken from npm registry instead",
+  "PeerJS default STUN/TURN and public broker limits not stated on peerjs.com or /docs",
+  "Cold start never measured (no deploys allowed)",
+  "Fly.io not checked (not needed)",
+  "Second-hand: Vercel limits page was too long; used the Hobby plan page for 300 s instead"
+ ]
+}
