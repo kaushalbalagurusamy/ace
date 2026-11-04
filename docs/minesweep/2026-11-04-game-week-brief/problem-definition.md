@@ -1,6 +1,6 @@
-# Problem definition: Final Frontier (Game Week) - pass 1
+# Problem definition: Final Frontier (Game Week) - passes 1 and 2
 
-**Status: pass 1, uncalibrated.** The lenses used have not passed a committed evaluation. Of 71 findings, 30 were grounded and reframed here (6 confirmed, 24 plausible); 38 are still `suspect` and ungrounded (listed in `reframed.json` open_leads); 3 were dismissed. Treat everything below as a working definition, not a cleared one. No finding rated critical or high; this reflects a free class project and unproven readings, not a clean bill.
+**Status: two passes, uncalibrated.** The lenses used have not passed a committed evaluation. Of 71 findings, 39 were grounded and rated (6 confirmed, 30 plausible; 24 low, 12 medium; none high or critical), 3 were dismissed, and 32 are still `suspect` and ungrounded. Treat everything below as a working definition, not a cleared one. No finding rated critical or high; this reflects a free class project and unproven readings, not a clean bill.
 
 ## 1. The brief's legitimate objective
 Within one week (due Thursday 2026-11-05 midnight, timezone unstated), ship a complete, polished, browser-playable game that peers judge on Friday morning. For Option 3 (Multiplayer Racing): two or more people race from a shared link, two or more distinct tracks, full race flow with results and replay, position feedback, one mechanic beyond steering, multiplayer reliable enough to finish a race. All visuals and audio are generated for the game; no pre-made assets.
@@ -21,7 +21,8 @@ Build a small, finished, server-authoritative multiplayer space racer in the bro
 Ask-owner:
 1. **F-052/F-014:** May CC0 library packs or recorded SFX be used? Options: (a) no, generated or code-made only (default); (b) yes if CC0 and credited; (c) organisers rule in writing.
 2. **F-016/F-002:** Does a Game Week entry count as commercial use under generator terms (winners announced Friday, organiser branding, public hosting at labs.gauntletai.com, public repo)? Options: (a) no; (b) yes or unsure, so use commercial-rights tiers only; (c) organisers confirm. Until answered we use tiers or methods that make the answer irrelevant. This turns critical if the answer is "commercial" and free-tier audio ships.
-3. **F-044:** Maximum spend for hosting and generation this week? Options: zero; a stated amount; unbounded.
+3. **F-007:** Which devices and input methods will judges use on Friday? Options: (a) laptop keyboard only; (b) laptop plus touch/phone; (c) unknown, so support keyboard and touch.
+4. **F-044:** Maximum spend for hosting and generation this week? Options: zero; a stated amount; unbounded.
 
 Plausible, unproven (would_settle in reframed.json): F-004, F-011, F-019 (disclosure, name, EU scope); F-027 (track winnability, solver run); F-034, F-043, F-046, F-048 (host limits, memory, NAT; need measurement); F-036, F-039 (cross-browser determinism; avoided by design, never measured); F-059, F-060, F-063 (keys, prices, lockfile).
 
@@ -45,5 +46,5 @@ Plausible, unproven (would_settle in reframed.json): F-004, F-011, F-019 (disclo
 | research-README item 5 | PeerJS fallback | rejected (F-046, F-056) |
 | research-README item 6 | Blender MCP and its import path | conditioned (F-065, F-064, F-066, F-057) |
 
-## 6. What this pass did not do
-38 findings (accessibility, privacy, repo secrets, netcode authority and failure modes, capacity, asset-critic validity, rubric and schedule) were not grounded and are unrated. The next pass should pick them up from open_leads, starting with the netcode/authority group and F-010, F-022 and F-050, which are cheap to settle. Re-sweep this definition when any of them lands.
+## 6. What these passes did not do
+Pass 2 grounded accessibility (F-001, F-005, F-007), repo secrets (F-010), host load-testing rules (F-020) and decoded-audio memory (F-040; downgraded by the skeptic to implementation advice). 32 findings (privacy, netcode authority and failure modes, capacity, asset-critic validity, rubric and schedule) were not grounded and are unrated. The next pass should pick them up from open_leads, starting with the netcode/authority group and F-022 and F-050, which are cheap to settle. Re-sweep this definition when any of them lands.

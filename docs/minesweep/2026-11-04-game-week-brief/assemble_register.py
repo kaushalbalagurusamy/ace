@@ -49,7 +49,7 @@ def main(findings_path, *reframed_paths):
                              "answers": [{k: a[k] for k in ("q", "a", "why") if k in a} for a in r["severity"]["answers"]]}
             f["underlying_problem"] = r["underlying_problem"]
             f["disposition"] = r["disposition"]
-            f["spec_section"] = SPEC[r["spec_section"]]
+            f["spec_section"] = SPEC.get(r["spec_section"], r["spec_section"])  # pass-2 already uses schema values
             if r.get("owner_question"):
                 f["owner_question"] = r["owner_question"]
             if x["status"] == "plausible" and not f.get("would_settle"):
