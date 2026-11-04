@@ -1,0 +1,355 @@
+{
+ "findings": [
+  {
+   "id": "F-001",
+   "title": "Visual pass/fail with no contrast, text or mute baseline",
+   "status": "plausible",
+   "skeptic_verdict": "plausible",
+   "basis": "The brief judges by looks and names no contrast, text-instruction or mute baseline; WCAG 1.4.3 (4.5:1) is a reference only, no legal duty for a class project.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "WCAG is a guideline here, not a legal duty; nothing is breached."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No one is harmed by a missing baseline in a class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "The game still runs; legibility is a quality matter."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "Not shown for this finding."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "Not shown for this finding."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Judges are peers rating looks; a missing contrast baseline is a gap, not a rejectable flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Cheap-to-fix legibility and polish gap."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Make the game legible on a judge's screen and sound-off setup, with an explicit self-chosen baseline.",
+   "disposition": "comply-safely",
+   "spec_section": "product-scope",
+   "build_consequence": "Adopt a self-set baseline: 4.5:1 text contrast, instructions as on-screen text, a mute toggle, and a sound-off playthrough check before Friday.",
+   "would_settle": "Owner-adopted or default baseline plus a contrast check of the final UI"
+  },
+  {
+   "id": "F-005",
+   "title": "Audio and colour carry game information with no second channel",
+   "status": "plausible",
+   "skeptic_verdict": "plausible",
+   "basis": "Position, hazards and pickups may be signalled by colour or audio alone; WCAG 1.4.1/1.4.2 apply only by analogy and are not a duty here.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "WCAG is a guideline here, not a legal duty."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No harm; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "Judges on muted laptops or with colour-vision differences lose some cues but the game still works."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "Not shown for this finding."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "Not shown for this finding."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Design weakness, but not one a reviewer would reject a class project for."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Missing second channel for cues is a polish/usability gap."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Give every gameplay-critical cue a second channel so the game works muted and without relying on hue.",
+   "disposition": "comply-safely",
+   "spec_section": "product-scope",
+   "build_consequence": "Pair each sound cue with a visual cue, use shape/icon plus colour for hazards and boosts, provide a mute control, and do not autoplay audio before a user gesture.",
+   "would_settle": "Playthrough with sound off and with a greyscale filter"
+  },
+  {
+   "id": "F-007",
+   "title": "Input method and device support unspecified for judges",
+   "status": "plausible",
+   "skeptic_verdict": "plausible",
+   "basis": "The brief says any browser on unknown devices but never states keyboard, touch or gamepad support; WCAG 2.1.1 applicability to steering is unclear and is a guideline only.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law or licence is at stake; WCAG is not a duty here."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No harm."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "A failure on a judge's device is possible but not shown; devices are unknown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No security issue."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No financial or legal exposure."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "A multiplayer game with unspecified input methods and no mouse-free lobby is an unstated requirement a reviewer would flag."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "State which input methods the judging setup must support and make the lobby and steering work on them.",
+   "disposition": "ask-owner",
+   "spec_section": "product-scope",
+   "build_consequence": "Support keyboard steering and a keyboard-operable lobby by default; add touch only if the owner confirms judges use phones.",
+   "owner_question": "Which devices and input methods will judges use on Friday? Options: (a) laptop keyboard only; (b) laptop plus touch/phone; (c) unknown, so support keyboard and touch.",
+   "would_settle": "Owner states the judges' devices and input methods"
+  },
+  {
+   "id": "F-010",
+   "title": "API keys or prompts could be committed to the public repo",
+   "status": "plausible",
+   "skeptic_verdict": "plausible",
+   "basis": "The repo is public and AI agents do much of the build, so generator credentials could be committed; GitLab push protection is Ultimate-tier and may be unavailable on the instance. Remedy is rotation, not history rewrite.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "The brief does not require committing secrets."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No harm to third parties."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under implied conditions."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "A leaked generator key is not a key-recovery, RCE or privilege-escalation hole."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "Class-project keys are typically free-tier or capped; no substantial unbounded exposure shown."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "A public repo built with agents and no secret hygiene or scanning is a process flaw a reviewer would reject."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Keep credentials and unreleased prompts out of a public repo and be able to detect and recover if one leaks.",
+   "disposition": "comply-safely",
+   "spec_section": "crypto-agent-security",
+   "build_consequence": "Keep keys in env files that are gitignored, commit an .env.example only, add a pre-commit secret scan, tell agents never to write keys to files, and rotate any key that is ever committed.",
+   "would_settle": "Admin answer on instance secret-detection features; a clean scan of the first push"
+  },
+  {
+   "id": "F-020",
+   "title": "Load-testing the free hosts is not authorised",
+   "status": "plausible",
+   "skeptic_verdict": "plausible",
+   "basis": "Vercel allows load tests only on Enterprise with notice; Render prohibits DoS testing; Cloudflare permits benchmarking. A breach could get the account suspended just before judging, but it bites only if someone load-tests.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "The brief does not require load testing, so following it breaks no host terms."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No harm."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "A suspension just before judging would be damaging, but only if a load test is run; it is avoidable and not implied by the brief."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No security hole."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No spend or contract exposure on free tiers."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "An omitted scoping note, not a design flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Operational care point: choose a test method that does not breach host policy."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Validate multiplayer capacity without breaching the chosen host's load-testing policy.",
+   "disposition": "comply-safely",
+   "spec_section": "capacity-physics",
+   "build_consequence": "Load-test only locally or against a self-run instance; on the host use a small multi-client smoke test, and read the host's terms before any heavier test.",
+   "would_settle": "Read Cloudflare Service-Specific Terms and the Render/Vercel policy for the chosen host"
+  },
+  {
+   "id": "F-040",
+   "title": "Decoded audio held as PCM in RAM (narrowed to implementation advice)",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "Narrowed claim: decodeAudioData yields memory-resident float32 PCM meant for clips under about 45 s; a long music track is better streamed through an audio element. Applies only to C-105; autoplay unlock is unevidenced and dropped.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Nothing breached."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No harm."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "One long track is about 64 MB, fine on a judge's laptop; no documented limit was found."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No security issue."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No exposure."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a brief flaw; the skeptic found it is implementation advice."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Minor memory-efficiency point with an easy alternative."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Keep audio memory modest by decoding only short effects and streaming or looping long music.",
+   "disposition": "comply-safely",
+   "spec_section": "capacity-physics",
+   "build_consequence": "Decode only short SFX with Web Audio; play music through an audio element (MediaElementAudioSourceNode) or a short mono loop.",
+   "would_settle": "Computed decoded size of the final audio set"
+  }
+ ],
+ "quarantine": [],
+ "open_leads": []
+}
