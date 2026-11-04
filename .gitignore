@@ -1,2 +1,3 @@
 .claude/subagent-ledger.jsonl
 .claude/state-snapshot.json
+.claude/run-registry.tsv
