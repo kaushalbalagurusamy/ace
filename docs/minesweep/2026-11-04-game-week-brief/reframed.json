@@ -1,0 +1,2104 @@
+{
+ "findings": [
+  {
+   "id": "F-002",
+   "title": "Generator terms for output use, tier and data sent are unread",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "The brief names no generator; ElevenLabs Free is limited to non-commercial use, Suno Free to personal non-commercial use, Meshy Free gives output under CC BY 4.0. Whether a peer-judged class game with a public repo breaches those is undetermined; retention/training terms are unchecked.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Whether a peer-judged class game is 'commercial' is undetermined, so no plain breach."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "The brief makes generated assets the central focus yet names no generator, tier or terms check; a reviewer would reject that omission."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Choose generators and tiers whose terms permit a public, judged, repo-hosted class game, and record the terms read for each.",
+   "disposition": "ask-owner",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Pick generator tiers that grant output use for a public demo (paid month where Free is non-commercial/no-download) and log each tool's terms and date in the provenance file.",
+   "owner_question": "Is a Game Week entry (peer-judged, winners announced Friday, hosted at labs.gauntletai.com, public repo) a commercial use? Options: (a) no, personal/educational, free tiers acceptable; (b) yes or unsure, so use only tiers with commercial rights; (c) ask the organisers.",
+   "would_settle": "Each chosen generator's current terms page (output ownership, commercial, download, retention, training)"
+  },
+  {
+   "id": "F-003",
+   "title": "Ownership, copyrightability and provenance of all-generated assets",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "Per the US Copyright Office Part 2 report, prompt-only AI output is not copyrightable, so the team may hold no exclusive rights in raw generated assets while keeping rights in code, design and human edits; stakes for a class project are low.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Copyright non-ownership of raw outputs breaks nothing; it only limits what rights we can claim."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Stakes for a class project are low and the skeptic downgraded it; not a design flaw a reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Weak provenance and an unclaimable asset right is a minor documentation gap, not a flaw that fails the class game."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "State what rights are claimed: code, design and human edits yes; raw prompt-only generated assets no exclusivity.",
+   "disposition": "comply-safely",
+   "spec_section": "asset-provenance",
+   "build_consequence": "Keep a per-asset provenance log, claim no exclusive rights in raw outputs, and license the repo code only (assets 'as generated, no exclusivity claimed').",
+   "would_settle": "US Copyright Office AI guidance, the chosen providers' ownership clauses, and a per-asset provenance log"
+  },
+  {
+   "id": "F-004",
+   "title": "No notice to players that assets are AI-generated",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-006, C-028, C-075 and C-148 ship wholly AI-generated art and audio to the public with no disclosure or synthetic-audio labelling.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No applicable law is shown to be broken; Art. 50 applicability to a game's art is unproven and artistic works are treated lightly."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a correctness flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "A missing credit line is cheap polish, not a flaw."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Tell players, honestly and cheaply, that the game's art and audio are AI-generated.",
+   "disposition": "comply-safely",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Add an 'assets generated with AI (tools listed)' line to the credits screen and README; no further compliance work.",
+   "would_settle": "Official EUR-Lex text of Reg. 2024/1689 Art. 50 and its application date, plus the organiser's rules on AI disclosure."
+  },
+  {
+   "id": "F-011",
+   "title": "Name 'Final Frontier' may collide with existing games or marks",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-079 and C-094: the title is unchecked against existing games, trademarks or organiser branding.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "A registered mark exists for Class 009 games but infringement needs confusion in commerce; not plain for a class demo."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "A naming choice, not a design flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Renaming is a trivial cost; the clash is a working-title risk only."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Use a title that does not collide with an existing game mark.",
+   "disposition": "reframe",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Treat 'Final Frontier' as a codename and ship under a distinct title chosen before the public repo and URL are named.",
+   "would_settle": "USPTO TSDR record for 50030136 and EUIPO search."
+  },
+  {
+   "id": "F-012",
+   "title": "Attribution and licence duties for libraries and CC BY output",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "If Meshy Free output ships, CC BY 4.0 attribution to Meshy is owed; ElevenLabs and Suno impose no attribution but Suno forbids stripping watermark/metadata (per finding, not re-checked). Library licence duties were not checked.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Breach arises only if Meshy Free output ships without credit; the brief does not require that."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Mechanical duty, no design flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Attribution is a small bookkeeping duty once tools are known."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Honour attribution and no-strip-watermark duties of whichever tools actually ship.",
+   "disposition": "comply-safely",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Ship a CREDITS file naming each tool and licence (CC BY 4.0 for Meshy Free if used; keep Suno metadata/watermark) and check each library LICENSE at install."
+  },
+  {
+   "id": "F-014",
+   "title": "Library-asset route contradicts the brief's ban and carries per-asset licences",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-095, C-126, C-137, C-139, C-142, C-146, C-149 and C-150 offer Kenney, Poly Haven, Mixamo, Freesound and OpenGameArt whose licences vary (CC0, CC BY, non-commercial) and which C-029 says not to use; C-153/C-157 demos normalise it.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Following the ban plainly breaks nothing; CC0 packs are licence-clean, the conflict is an assignment rule, not law."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "Lecture and brief give opposite instructions on the same rule that decides pass/fail; the spec cannot satisfy both."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Resolve a contradictory instruction on pre-made assets before anything is built.",
+   "disposition": "reframe",
+   "spec_section": "asset-provenance",
+   "build_consequence": "Follow the stricter brief wording: no library packs, no Blender-MCP library imports; assets are AI-generated or code-made, with a provenance log, pending any organiser ruling (see F-052).",
+   "would_settle": "Organiser answer, then each library's own licence page."
+  },
+  {
+   "id": "F-015",
+   "title": "Free or guest tiers named that bar commercial use or downloads",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "Suno Free (no downloads, no commercial rights) and ElevenLabs Free (non-commercial only) are restricted; Meshy Free only limits downloads (10/month per finding) and requires credit. Other named tiers are unverified.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Suno Free and ElevenLabs Free limits only bite if the work counts as commercial (open, F-016)."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Free-tier limits are a tool-selection constraint with cheap workarounds."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Use tiers whose terms and download limits fit the assets we must ship.",
+   "disposition": "comply-safely",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Do not rely on Suno Free (no downloads) or ElevenLabs Free for shipped audio; buy one cheap month or use code-synthesised audio; Meshy Free only with credit and within its 10 downloads."
+  },
+  {
+   "id": "F-016",
+   "title": "Non-commercial free-tier output used in a public competition game",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-096-100 say free-tier outputs are non-commercial, and C-101 admits nobody has checked whether a competition game counts as commercial; C-163/C-164 (licence list, commercial status) are unstated.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Whether Game Week counts as commercial is unknown, so no plain breach is established."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Rated low on the proven part; if the owner answers 'commercial' this becomes a plain ToS breach for free-tier audio."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Decide whether the entry is commercial use so tier choice is made on a fact.",
+   "disposition": "ask-owner",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Until answered, ship only assets from tiers with commercial rights or code-made assets, so the answer does not matter.",
+   "owner_question": "Does Game Week's judging and winner announcement, organiser branding or public hosting that makes the entry commercial under generator terms? Options: (a) no, personal/educational; (b) yes or unsure; (c) organisers to confirm in writing.",
+   "would_settle": "Owner fact: whether Game Week offers prizes or organiser branding; vendor definition of commercial (ElevenLabs terms define it? not extracted) or written vendor/organiser answer."
+  },
+  {
+   "id": "F-019",
+   "title": "EU risk classification and AI disclosure never stated",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-165 is an omission: a public web game with AI-generated assets reachable from the EU has no stated risk class or notice.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Applicability of EU AI Act Art. 50 to a class game's art is unproven."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "EU classification is a documentation question at most."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Record that the game is not an EU-regulated high-risk system and that AI-generated content is disclosed.",
+   "disposition": "comply-safely",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Disclose AI-generated assets in credits (same line as F-004); note 'likely minimal risk, unverified'; do no classification work.",
+   "would_settle": "EUR-Lex Art. 50 and Art. 2 scope; owner answer on EU availability."
+  },
+  {
+   "id": "F-027",
+   "title": "Tracks may not be winnable; progress on an orbit is hard to rank",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-065 and C-092 need two distinct, solvable orbital tracks, while C-067 needs ranking on a non-monotone orbital path (angle wraps, retrograde); C-193 mentions bot or solvability checks.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law or licence is involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "The brief asks for position/progress feedback and a ranking, and orbit progress has no defined metric; a reviewer would reject an undefined ranking."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Define what 'ahead' means on an orbital course and prove each track is winnable under thrust limits.",
+   "disposition": "reframe",
+   "spec_section": "gameplay/track-design",
+   "build_consequence": "Rank by ordered checkpoint gates (not orbital angle), and run an automated solver on each track to prove it is completable before it ships.",
+   "would_settle": "Automated solver run per track under thrust limits plus rank-inversion count between candidate progress metrics."
+  },
+  {
+   "id": "F-034",
+   "title": "Socket and idle-timeout limits on the free host",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-073 and C-086 imply one socket per player per room; limits and idle timeouts on the free host are unstated.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Host limits are not a legal question."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "Unproven: proxy timeouts were not located."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Idle-timeout limits are handled by a heartbeat; minor."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Keep long-lived sockets alive within the free host's idle and connection limits.",
+   "disposition": "comply-safely",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Send a client heartbeat well inside the shortest known idle window and read the host's current proxy docs before choosing.",
+   "would_settle": "Render and Railway proxy idle-timeout and max-connection docs (not located), or a client heartbeat design that sends a ping inside any host idle window."
+  },
+  {
+   "id": "F-036",
+   "title": "N-body state agreement across browsers and devices",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "ECMAScript does not guarantee bit-identical Math.sin/cos across engines, so a lockstep client-side n-body sim using them cannot be assumed to agree; in one V8 scenario a 1e-12 perturbation grew to 5.9e-8 over 1e5 steps. Cross-browser divergence itself is unmeasured; server-authoritative state avoids it.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "Divergence is unmeasured across browsers and only matters if lockstep is chosen."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "Lockstep client-side n-body with Math.sin/cos cannot be assumed to agree across browsers; authority must be chosen, not assumed."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Pick an authority model that does not depend on bit-identical floating point across engines.",
+   "disposition": "reframe",
+   "spec_section": "physics/determinism",
+   "build_consequence": "Run the n-body step on the server (authoritative); clients only interpolate snapshots. No cross-browser lockstep and no reliance on engine trig.",
+   "would_settle": "Determinism test on Chrome, Safari, Firefox with fixed-step integrator and resync interval"
+  },
+  {
+   "id": "F-037",
+   "title": "Kepler orbits vs restricted n-body model mismatch and accuracy budget",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "Kepler gives closed-form state only for two-body orbits; a massless ship in a restricted n-body field must be numerically stepped, with error accumulating; body count, dt and error budget are unspecified. No proof that the two models conflict in the proposal.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "The proposal names two physics models without body count, step size or error budget; a reviewer would reject that spec gap."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Choose one simulated model and state its body count, fixed step and error budget.",
+   "disposition": "reframe",
+   "spec_section": "physics/determinism",
+   "build_consequence": "Simulate restricted n-body with a fixed-step symplectic integrator and a stated body count; use Kepler closed forms only to seed orbits and draw guide lines.",
+   "would_settle": "Reference on two-body vs restricted n-body and a stated body count and error budget"
+  },
+  {
+   "id": "F-039",
+   "title": "Summing gravity terms in different orders gives different bits",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "Reordering three gravity terms changed ship position by ~1e-9 after 1e5 steps in one V8 run; matters only if different clients/server sum in different orders, avoided by a fixed body-index order in shared code.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Summation order is avoidable with a fixed-index convention."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Make every state-producing computation use one fixed order.",
+   "disposition": "comply-safely",
+   "spec_section": "physics/determinism",
+   "build_consequence": "Sum gravity terms in fixed body-index order in the single shared step function; add a hash test.",
+   "would_settle": "Same-seed simulation hashed on Chrome, Safari and Firefox"
+  },
+  {
+   "id": "F-041",
+   "title": "Named hosting options each carry a hard constraint",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "Free Vercel Hobby limits WebSocket connections to the 300 s function maximum with external state; hosted PartyKit shut down 23 Oct 2026; Render free sleeps after 15 min; Cloudflare DO free has daily request caps. C-117 'holds no sockets' is outdated.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Vercel Hobby is non-commercial/personal only, which a class project likely fits (ties to F-016)."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "Choosing among the named hosts without their constraints would fail the brief's multiplayer reliability line; hosted PartyKit is already shut down."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Pick a host whose WebSocket, sleep and quota limits fit a short judged session.",
+   "disposition": "reframe",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Do not use hosted PartyKit; do not assume Vercel cannot hold sockets (300 s cap); choose Render or Cloudflare with a documented keep-warm and reconnect plan."
+  },
+  {
+   "id": "F-042",
+   "title": "Host sleep and cold start on judging morning",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "If rooms run on Render Free, the first join after 15 idle minutes waits roughly a minute, and in-memory rooms are lost on spin-down. Open WebSocket traffic keeps it awake.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "Degraded, not failed: spin-up is about a minute and open sockets keep it awake."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "Judges join Friday morning after an idle night; a Render-free cold start and lost in-memory rooms undercut 'easy to get into a match'."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Make the first join on judging morning fast and not dependent on a sleeping instance.",
+   "disposition": "comply-safely",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Pre-warm the server (open socket or scheduled ping) before judging, keep rooms re-creatable, and show a 'waking server' state."
+  },
+  {
+   "id": "F-043",
+   "title": "Small free instance can be OOM-killed or restarted",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-118 (Render free: sleeps, ~512 MB) and C-191 (memory budget unstated) mean the process can restart and drop all rooms mid-judging.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "Free-instance memory is unknown; unproven."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Instance sizing is operational tuning."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Keep the server inside a small free instance's memory.",
+   "disposition": "comply-safely",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Cap rooms and players per process, measure RSS in a local load run, and make the server restart-safe.",
+   "would_settle": "Render instance-types page (free RAM) and its restart-on-OOM text."
+  },
+  {
+   "id": "F-044",
+   "title": "Free-tier quotas and no cost ceiling",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "The brief states no spend limit; named free tiers hard-cap rather than bill, so the risk is mid-judging outage, and a Cloudflare DO message-budget estimate depends on assumed tick rate and player count.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "Free tiers named hard-cap rather than bill, so unbounded spend is not shown."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Quota exhaustion mid-judging is an availability risk, not a spend risk."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "State a spend ceiling and a quota plan so the game does not die in the judging window.",
+   "disposition": "ask-owner",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Design for free-tier quotas with hard caps (no billing surprise) and budget a fixed spend only if the owner sets one.",
+   "owner_question": "What is the maximum spend for hosting and generation this week? Options: (a) zero, free tiers only; (b) up to a stated amount (e.g. $20); (c) whatever the build needs.",
+   "would_settle": "Owner's budget figure."
+  },
+  {
+   "id": "F-046",
+   "title": "WebRTC/PeerJS NAT traversal may fail on judge networks",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-122 calls PeerJS a no-server fallback with NAT reliability unverified; campus or corporate networks may block peers, and a closed host tab ends the race.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "NAT failure is unmeasured and PeerJS is only a README fallback."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "A P2P fallback not yet chosen; failure is avoided by using a server."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Do not make joining depend on peer-to-peer NAT traversal on unknown judge networks.",
+   "disposition": "reframe",
+   "spec_section": "netcode/authority",
+   "build_consequence": "Use WebSocket to a server as the only transport; no PeerJS/WebRTC unless TURN is provisioned and tested.",
+   "would_settle": "Connection test from 3 network types with and without a TURN server; PeerJS GitHub README for default ICE servers."
+  },
+  {
+   "id": "F-048",
+   "title": "Unbounded rooms per process",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-123 (Colyseus or a small ws server) leaves rooms-per-process policy unspecified.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Room caps are a one-line guard."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Bound resource use per process.",
+   "disposition": "comply-safely",
+   "spec_section": "hosting/ops",
+   "build_consequence": "Enforce a max-rooms and max-players cap in the server and refuse joins cleanly beyond it.",
+   "would_settle": "Own load test of one room-per-class, or Colyseus benchmark page."
+  },
+  {
+   "id": "F-052",
+   "title": "Brief says generate everything; the organiser's lecture endorses libraries",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "The written brief bans pre-made assets while the organiser's lecture teaches asset libraries and demos library models/recorded SFX; the brief's wording is the safer reading, and whether CC0 packs or recordings are tolerated needs an organiser answer.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "CC0 library licences are fine; the conflict is an assignment rule, not law or terms."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "The organiser's lecture and written brief conflict on a rule that is part of the pass/fail judgment, and the spec cannot satisfy both."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Establish what 'generated' and 'pre-made' mean for this assignment before assets are produced.",
+   "disposition": "ask-owner",
+   "spec_section": "asset-provenance",
+   "build_consequence": "Default to the brief's strict reading: AI-generated or code-made only, no Kenney/Poly Haven/Freesound, and log provenance; ask organisers if a pack is wanted.",
+   "owner_question": "May CC0 library packs (Kenney, Poly Haven, Freesound) or recorded SFX be used, given the brief says 'Do not use pre-made assets' but the lecture teaches them? Options: (a) no, generated or code-made only (our default); (b) yes, if licensed CC0 and credited; (c) organisers to rule in writing."
+  },
+  {
+   "id": "F-056",
+   "title": "Netcode or relay package chosen without vetting",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "colyseus, ws and partyserver exist and are maintained with MIT/ISC licences (per finding); peerjs is stale (2025-06); the brief has no package-vetting rule. No unsafe package was identified.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "All named packages are MIT/ISC and maintained (peerjs aside)."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Package vetting is routine hygiene; none were found unsafe."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Vet netcode dependencies before they enter a public repo.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Choose maintained packages (ws or colyseus), commit a lockfile, check registry age/publisher at install, skip peerjs.",
+   "would_settle": "Registry lookup (existence, publisher, age, downloads) for each chosen package"
+  },
+  {
+   "id": "F-057",
+   "title": "Agent may install generator CLIs or MCP servers unvetted",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "The MCP spec says tools are arbitrary code execution and hosts must get explicit user consent before invoking any tool; the brief sets no rule on agent-installed generator CLIs/servers. Actual unvetted installation is hypothetical.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No unsafe package identified; supply-chain compromise is hypothetical."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "Autonomous agents building the game with no install or tool-consent policy is a gap a reviewer would reject; actual unvetted installs are hypothetical."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Set a written policy for what agents may install or run.",
+   "disposition": "reframe",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Allowlist installs (npm packages reviewed and pinned, generator via official API/CLI only), require human approval for new MCP servers or global installs.",
+   "would_settle": "Written install policy / allowlist"
+  },
+  {
+   "id": "F-058",
+   "title": "Community MCP tool servers trusted by description",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "Per the MCP spec, tool descriptions/annotations from untrusted servers are untrusted; no evidence shows the project relies on them.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Untrusted tool descriptions are a hygiene point; no reliance is shown."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Treat tool descriptions from non-first-party servers as untrusted input.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Read, pin and approve any MCP server's tool list before use; never auto-approve tools.",
+   "would_settle": "Source repo and pinned version of each MCP server used"
+  },
+  {
+   "id": "F-059",
+   "title": "Paid provider keys held by build agents with no scope or cap",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-088 and C-210: generator keys and credits sit with agents with no scope, lifetime or spend cap.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "Loss is bounded by the prepaid account and unproven."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Key scoping is hygiene; spend is bounded by the account."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Give build agents the least credential and spend authority needed.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Use scoped, capped provider keys kept in env files outside the repo (gitignored); agents get no keys they do not need.",
+   "would_settle": "Per-provider key scope and spend cap screenshots or API settings for each generator."
+  },
+  {
+   "id": "F-060",
+   "title": "Vendor prices and plan limits are unverified",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-108-110, C-127/C-128, C-134-139, C-145/C-146 and C-149 quote ElevenLabs, Suno, Meshy, PixelLab, Retro Diffusion and AutoSprite prices from unsourced reads or aggregators; the asset budget rests on them.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Prices were paraphrased; refetching is cheap."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Base tool and tier decisions on verbatim current plan tables.",
+   "disposition": "comply-safely",
+   "spec_section": "licensing/credits",
+   "build_consequence": "Re-read each vendor's pricing and terms page on the day of purchase and cite verbatim in the provenance file.",
+   "would_settle": "Quote the plan tables verbatim from each vendor's current pricing page (the fetched evidence was paraphrased)."
+  },
+  {
+   "id": "F-063",
+   "title": "Server dependencies run publicly with no pin or audit",
+   "status": "plausible",
+   "skeptic_verdict": null,
+   "basis": "C-123 and C-202: the multiplayer server runs against public player input with no lockfile or audit rule.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Lockfile and audit are minutes of work."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Pin and audit server dependencies in a public repo.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Commit package-lock.json, run npm audit in CI, keep dependencies few.",
+   "would_settle": "Committed package-lock.json and npm audit output once the server exists."
+  },
+  {
+   "id": "F-064",
+   "title": "Blender MCP trusted on star count",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "The ahujasid blender-mcp repo (now mcp-for-blender) is genuine, MIT and active; star count is not vetting, and no version pin or review is stated; last commit was hours before 2026-11-04.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "No law involved."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Star count is not vetting but the repo is genuine and MIT."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "If an MCP tool is used, vet it by source, not popularity.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Pin blender-mcp to a reviewed commit/release if used at all; see F-065.",
+   "would_settle": "blender-mcp repository, releases and commit history"
+  },
+  {
+   "id": "F-065",
+   "title": "Blender MCP runs arbitrary Python over an unauthenticated socket",
+   "status": "confirmed",
+   "skeptic_verdict": "upheld",
+   "basis": "Blender MCP's add-on socket has no authentication and executes arbitrary Python as the user; defaults to localhost and safe mode is opt-in. Exposure exists only if the tool is installed.",
+   "severity": {
+    "tier": "medium",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Running an open-source tool locally breaks no law."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "Default bind is localhost and the tool is not installed; not a severe hole by default."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": true,
+      "why": "An add-on socket with no auth that runs arbitrary Python as the user is a design a security reviewer would reject unless confined; default is localhost so exposure is conditional."
+     }
+    ]
+   },
+   "tier": "medium",
+   "underlying_problem": "Use Blender through a path that cannot execute attacker-chosen Python.",
+   "disposition": "reframe",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Prefer reviewed headless bpy scripts; if the MCP is used: BLENDER_MCP_SAFE_MODE=1, localhost only, pinned commit, no import tools, closed when idle."
+  },
+  {
+   "id": "F-066",
+   "title": "Imported library models enter a code-executing session",
+   "status": "plausible",
+   "skeptic_verdict": "downgraded",
+   "basis": "The Blender MCP exposes Poly Haven/Sketchfab/Poly Pizza import and arbitrary-Python execution in the same session; whether imports create an actual injection or code-execution path is unexamined.",
+   "severity": {
+    "tier": "low",
+    "answers": [
+     {
+      "id": "law-licence-terms-ethics",
+      "q": "Would following the brief as written plainly break a law, a licence, third-party terms of service, or professional ethics?",
+      "a": false,
+      "why": "Library imports would breach the no-premade rule rather than any law."
+     },
+     {
+      "id": "harm-safety",
+      "q": "Would following the brief as written harm users or third parties, or compromise physical safety?",
+      "a": false,
+      "why": "No user or third party is harmed; a free class game."
+     },
+     {
+      "id": "production-failure",
+      "q": "Would the deliverable fail under the production conditions the brief itself implies (load, faults, adversaries, scale)?",
+      "a": false,
+      "why": "No failure under the conditions the brief implies is shown."
+     },
+     {
+      "id": "severe-security",
+      "q": "Would it open a severe security hole (key recovery, remote code execution, supply-chain compromise, privilege escalation, data exfiltration)?",
+      "a": false,
+      "why": "No severe security hole is shown."
+     },
+     {
+      "id": "material-exposure",
+      "q": "Would it create substantial financial or legal exposure short of a plain breach (unit economics that cannot work, unbounded spend, contractual risk)?",
+      "a": false,
+      "why": "No unbounded spend or contractual exposure for a free class project."
+     },
+     {
+      "id": "principal-reject",
+      "q": "Is it a correctness, measurement, statistical or design flaw that a principal-level reviewer would reject?",
+      "a": false,
+      "why": "Not a design flaw a principal reviewer would reject."
+     },
+     {
+      "id": "friction",
+      "q": "Is it operational friction, weaker maintainability, or minor inefficiency?",
+      "a": true,
+      "why": "Whether imports create an injection path is unexamined."
+     }
+    ]
+   },
+   "tier": "low",
+   "underlying_problem": "Keep untrusted asset content out of a code-executing session.",
+   "disposition": "comply-safely",
+   "spec_section": "agent-tooling/security",
+   "build_consequence": "Disable import_asset/search_assets in any Blender session; assets are generated or authored in-repo.",
+   "would_settle": "blender-mcp import tools and what they fetch"
+  }
+ ],
+ "quarantine": [
+  {
+   "locator": "docs/source/lecture-2026-11-02-game-assets.md slide 26 (L267), slide 34 (L347-353)",
+   "text": "Three ways to get visual assets: (3) Asset libraries, packs and models artists have already made (Kenney, Poly Haven, itch.io); Library assets (Kenney Tiny Dungeon, Poly Haven, Quaternius).",
+   "finding_ids": [
+    "F-052",
+    "F-014"
+   ],
+   "reason": "Contradicts brief L55 'Do not use pre-made assets'; the strict reading is the only one that cannot fail the assignment.",
+   "replacement": "Invariant: every shipped asset is AI-generated or code-made and has a provenance-log row; no library pack is used unless the organisers rule otherwise in writing."
+  },
+  {
+   "locator": "docs/source/lecture-2026-11-02-game-assets.md slide 70 (L892-898)",
+   "text": "Sky Roadster demo: Art 'Library models + code-built scenery'; SFX 'Recorded vehicle and air sounds'.",
+   "finding_ids": [
+    "F-052",
+    "F-014"
+   ],
+   "reason": "The demo shows library models and recorded SFX, which the brief bans; it is an example, not an allowance.",
+   "replacement": "Do not copy the demo's asset route; code-built scenery and synthesised/generated audio only."
+  },
+  {
+   "locator": "docs/source/research-README.md item 5 (C-117)",
+   "text": "Vercel Hobby is non-commercial, 300 s function cap and no shared state across instances; host the static client there at most.",
+   "finding_ids": [
+    "F-041"
+   ],
+   "reason": "Current Vercel docs say WebSockets are available on all plans (functions can serve WS, 300 s cap), so 'holds no sockets' is outdated; non-commercial and 300 s parts stand.",
+   "replacement": "Vercel is fine for the static client; if used for sockets, reconnect before the 300 s cap and keep room state outside the function."
+  },
+  {
+   "locator": "docs/source/research-README.md item 5 (C-121)",
+   "text": "Hosted PartyKit shut down on 23 Oct 2026; successor is PartyServer on your own Cloudflare.",
+   "finding_ids": [
+    "F-041",
+    "F-056"
+   ],
+   "reason": "The shutdown is upheld, not refuted, so the fact is kept; any lead that treats hosted PartyKit as a hosting option is rejected.",
+   "replacement": "Hosted PartyKit is excluded; PartyServer on our own Cloudflare account or a ws/Colyseus Node server are the candidates."
+  },
+  {
+   "locator": "docs/source/research-README.md item 5 (C-118)",
+   "text": "Better: Colyseus or a small ws Node server on Render free (750 h/mo, 15 min idle sleep, about 1 min cold start).",
+   "finding_ids": [
+    "F-042",
+    "F-043",
+    "F-034"
+   ],
+   "reason": "Recommended as 'better' without the judging-morning cold-start, lost in-memory rooms or memory limits.",
+   "replacement": "Render free only with a pre-warm before judging, room caps, a heartbeat and restart-safe rooms."
+  },
+  {
+   "locator": "docs/source/research-README.md item 5 (C-122)",
+   "text": "PeerJS is a no-server fallback; NAT reliability unverified.",
+   "finding_ids": [
+    "F-046",
+    "F-056"
+   ],
+   "reason": "Peer-to-peer may fail on judge networks and peerjs is stale (2025-06); no TURN plan.",
+   "replacement": "Server-relayed WebSocket is the only transport; no P2P without a tested TURN."
+  },
+  {
+   "locator": "docs/source/research-README.md item 6 (C-124, C-126)",
+   "text": "Blender MCP: MIT, about 33k stars; can import Poly Haven/Sketchfab assets.",
+   "finding_ids": [
+    "F-065",
+    "F-064",
+    "F-066",
+    "F-057"
+   ],
+   "reason": "Unauthenticated socket that runs arbitrary Python; star count is not vetting; import path breaches the no-premade rule.",
+   "replacement": "Headless reviewed bpy scripts preferred; MCP only with safe mode, localhost, pinned commit and import tools off."
+  },
+  {
+   "locator": "proposal.md L3 (C-080, C-081)",
+   "text": "Final Frontier ... with Kepler and restricted n-body physics.",
+   "finding_ids": [
+    "F-037",
+    "F-036",
+    "F-039"
+   ],
+   "reason": "Two physics models named with no body count, step or error budget; Kepler is closed-form only for two bodies.",
+   "replacement": "One simulated model: server-authoritative restricted n-body, fixed step, stated body count and error budget; Kepler only seeds/draws orbits."
+  },
+  {
+   "locator": "proposal.md L3 (C-079, C-094)",
+   "text": "Final Frontier (name).",
+   "finding_ids": [
+    "F-011"
+   ],
+   "reason": "May collide with a pending US application for FINAL FRONTIER (class 9 game software, filed 2026-08-04; seen via an aggregator, not checked against the USPTO) and existing Steam titles.",
+   "replacement": "Use as a codename only; ship under a distinct title."
+  }
+ ],
+ "open_leads": [
+  {
+   "theme": "player-facing/accessibility",
+   "id": "F-001",
+   "title": "Visual pass/fail with no contrast, text or mute baseline",
+   "route": "retrieval",
+   "would_settle": "WCAG 2.2 contrast, text-alternative and audio-control criteria"
+  },
+  {
+   "theme": "player-facing/accessibility",
+   "id": "F-005",
+   "title": "Audio and colour carry game information with no second channel",
+   "route": "retrieval",
+   "would_settle": "WCAG 2.2 success criteria text (use of colour, captions) plus a decision on target level"
+  },
+  {
+   "theme": "player-facing/accessibility",
+   "id": "F-007",
+   "title": "Input method and device support unspecified for judges",
+   "route": "retrieval",
+   "would_settle": "WCAG 2.1.1/2.5 criteria text and the organisers' statement of judge devices"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-006",
+   "title": "A copyleft library bundled into the browser build",
+   "route": "check",
+   "would_settle": "SPDX licence of each chosen dependency (package.json/lockfile) once picked"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-008",
+   "title": "Player names, IPs and rooms stored with no retention rule",
+   "route": "grounded-research",
+   "would_settle": "Chosen host's data-processing/logging terms and a stated retention for names and results"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-009",
+   "title": "Public rooms, player names and unknown-age audience",
+   "route": "deep-research",
+   "would_settle": "Platform rules for name moderation, COPPA/age expectations for a public web game"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-017",
+   "title": "Relay or hosting provider processes player IPs with no agreement",
+   "route": "grounded-research",
+   "would_settle": "Chosen relay/host DPA or privacy policy and where connection data is processed"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-018",
+   "title": "Plan limits could tempt multi-account asset generation",
+   "route": "retrieval",
+   "would_settle": "The generator's terms clause on multiple accounts/credit abuse"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-020",
+   "title": "Load-testing the free hosts is not authorised",
+   "route": "retrieval",
+   "would_settle": "Host acceptable-use policy on load testing"
+  },
+  {
+   "theme": "legal/privacy/terms",
+   "id": "F-054",
+   "title": "Who owns the game and assets is unstated",
+   "route": "none",
+   "would_settle": "Gauntlet's Game Week participation terms"
+  },
+  {
+   "theme": "security/repo/ops",
+   "id": "F-010",
+   "title": "API keys or prompts could be committed to the public repo",
+   "route": "check",
+   "would_settle": "gitleaks-style scan of repo history and an enabled pre-commit/push-protection setting"
+  },
+  {
+   "theme": "security/repo/ops",
+   "id": "F-055",
+   "title": "Agent commits or publishes with no approval gate",
+   "route": "check",
+   "would_settle": "Repo settings plus a secret-scan of the first commits"
+  },
+  {
+   "theme": "security/repo/ops",
+   "id": "F-070",
+   "title": "Which identity and keys the agents run with is unstated",
+   "route": "check",
+   "would_settle": "Agent/tool credential map"
+  },
+  {
+   "theme": "agent tooling and asset QA",
+   "id": "F-069",
+   "title": "Create-critic-fix loop with no cap",
+   "route": "check",
+   "would_settle": "Loop config: iteration, cost and wall-clock limits"
+  },
+  {
+   "theme": "agent tooling and asset QA",
+   "id": "F-071",
+   "title": "No record of which tool made each asset",
+   "route": "check",
+   "would_settle": "A per-asset generation log (tool, prompt, date)"
+  },
+  {
+   "theme": "agent tooling and asset QA",
+   "id": "F-067",
+   "title": "The 'separate critic' is the same model family",
+   "route": "experiment",
+   "would_settle": "Critic vs human rating agreement on a labelled asset set"
+  },
+  {
+   "theme": "agent tooling and asset QA",
+   "id": "F-068",
+   "title": "The asset critic is not validated against humans",
+   "route": "experiment",
+   "would_settle": "Critic vs human agreement on a labelled asset set"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-013",
+   "title": "Who is authoritative and trusted: server, host peer or relay",
+   "route": "check",
+   "would_settle": "An ADR naming the authority, message ordering and trust model"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-023",
+   "title": "Control feel under orbital lag and network delay",
+   "route": "experiment",
+   "would_settle": "Playtest with 100-150 ms RTT and novice players"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-025",
+   "title": "Netcode parameters unspecified: loss, RTT, tick rate, reliability",
+   "route": "experiment",
+   "would_settle": "Chosen tick rate tested under 50-150 ms RTT and 2% loss"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-028",
+   "title": "Synchronised race start over lossy links",
+   "route": "experiment",
+   "would_settle": "Start-time skew measured across clients with realistic RTT"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-029",
+   "title": "Winner decided by client clocks",
+   "route": "check",
+   "would_settle": "Spec stating server tick or sequence number assigns finish order"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-030",
+   "title": "Ties and float equality in ranking",
+   "route": "check",
+   "would_settle": "A tiebreak rule and test cases with equal progress/time"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-031",
+   "title": "Contested pickups or hits resolved by each client",
+   "route": "check",
+   "would_settle": "Spec naming the single adjudicator and sequence for contested events"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-032",
+   "title": "Race completion despite disconnect or host loss",
+   "route": "experiment",
+   "would_settle": "Fault-injection run: drop one racer, drop the host, observe race outcome"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-033",
+   "title": "WebSocket/TCP stalls a live racing state stream",
+   "route": "experiment",
+   "would_settle": "Race-state latency under 2-5% packet loss for WebSocket vs WebRTC datachannel"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-038",
+   "title": "No snapshot rate or interpolation buffer",
+   "route": "experiment",
+   "would_settle": "Visual smoothness test under injected jitter with chosen buffer"
+  },
+  {
+   "theme": "netcode/authority/consistency",
+   "id": "F-047",
+   "title": "Reconnect, host loss and restart behaviour undefined",
+   "route": "experiment",
+   "would_settle": "Fault-injection run on the chosen server"
+  },
+  {
+   "theme": "capacity/performance",
+   "id": "F-021",
+   "title": "Generated asset format, size and loop specs are unspecified",
+   "route": "check",
+   "would_settle": "Total build size and load time measured against a stated budget"
+  },
+  {
+   "theme": "capacity/performance",
+   "id": "F-024",
+   "title": "'Easy to get into a match' with no time-to-race number",
+   "route": "experiment",
+   "would_settle": "Measured p95 time-to-race with N concurrent judges on the chosen host"
+  },
+  {
+   "theme": "capacity/performance",
+   "id": "F-026",
+   "title": "Judging-morning concurrency and server capacity",
+   "route": "experiment",
+   "would_settle": "Load test: N concurrent rooms and sockets on the chosen host"
+  },
+  {
+   "theme": "capacity/performance",
+   "id": "F-035",
+   "title": "Device floor, frame rate and memory on judge laptops",
+   "route": "experiment",
+   "would_settle": "Frame-time and memory capture on an integrated-GPU laptop and a phone"
+  },
+  {
+   "theme": "capacity/performance",
+   "id": "F-040",
+   "title": "Decoded audio held as PCM in RAM",
+   "route": "check",
+   "would_settle": "Computed decoded size of the final audio set"
+  },
+  {
+   "theme": "schedule/rubric/business",
+   "id": "F-022",
+   "title": "Deadline 'Thursday @ Midnight' has no timezone",
+   "route": "none",
+   "would_settle": "The Gauntlet organisers' stated timezone and late policy"
+  },
+  {
+   "theme": "schedule/rubric/business",
+   "id": "F-049",
+   "title": "A peer-judged 'beautiful, unique, polished' rubric rewards first impressions",
+   "route": "deep-research",
+   "would_settle": "Past Game Week judging criteria and examples; the organisers' actual rubric"
+  },
+  {
+   "theme": "schedule/rubric/business",
+   "id": "F-050",
+   "title": "Deadline timezone and late rule unstated",
+   "route": "none",
+   "would_settle": "The Gauntlet organisers' schedule page"
+  },
+  {
+   "theme": "schedule/rubric/business",
+   "id": "F-051",
+   "title": "Success is defined by the evaluating peers' impression",
+   "route": "none",
+   "would_settle": "The owner's statement of the game's real audience"
+  },
+  {
+   "theme": "schedule/rubric/business",
+   "id": "F-053",
+   "title": "The one capability that must work is never named",
+   "route": "none",
+   "would_settle": "The owner's stated minimum viable race"
+  }
+ ]
+}

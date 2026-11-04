@@ -1,0 +1,379 @@
+[
+ {
+  "id": "F-001",
+  "claim_ids": [
+   "C-005",
+   "C-012",
+   "C-013",
+   "C-017",
+   "C-020",
+   "C-023",
+   "C-151"
+  ],
+  "lens": "accessibility",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "audio",
+   "instructions",
+   "visual pass/fail, no contrast"
+  ],
+  "status": "plausible",
+  "route": "retrieval",
+  "route_reason": "WCAG success-criteria text defines the baseline; choosing a level is an owner decision.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "The visual presentation of text and images of text has a contrast ratio of at least 4.5:1, except for the following:",
+    "locator": "SC 1.4.3 #contrast-minimum",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "note",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Owner adopts a named baseline (e.g. WCAG 2.2 AA text contrast) or states none.",
+  "title": "Visual pass/fail with no contrast, text or mute baseline",
+  "statement": "C-005, C-012, C-013, C-020 judge by looks, and C-017/C-023 (instructions) and C-151 (sound check) never require readable contrast, text instructions, mute or captions.",
+  "grounded_by": "G4-pass2",
+  "note": "WCAG 1.4.3 gives a concrete text-contrast baseline (4.5:1) that the brief's pass/fail visual bar lacks. That the brief is silent comes from claims.json, not this fetch. WCAG is a reference baseline only."
+ },
+ {
+  "id": "F-005",
+  "claim_ids": [
+   "C-021",
+   "C-026",
+   "C-028",
+   "C-030",
+   "C-066",
+   "C-067",
+   "C-068",
+   "C-092",
+   "C-168",
+   "C-169",
+   "C-170"
+  ],
+  "lens": "accessibility",
+  "trap_id": "accessibility.information-by-single-sense",
+  "trap_status": "verified",
+  "cues_matched": [
+   "animation",
+   "audio cues",
+   "hazards, boosts",
+   "omission",
+   "position by colour",
+   "position under orbital physics",
+   "results",
+   "sound levels"
+  ],
+  "status": "plausible",
+  "route": "retrieval",
+  "route_reason": "WCAG 1.4.1/1.2 text settles what is required; whether the judges need it is a scope choice.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "Color is not used as the only visual means of conveying information, indicating an action,",
+    "locator": "SC 1.4.1 #use-of-color",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "If any audio on a web page plays automatically for more than 3 seconds,",
+    "locator": "SC 1.4.2 #audio-control",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "note",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Owner decides whether any accessibility standard applies; if WCAG AA is adopted, 1.4.1 covers hazard/position cues.",
+  "title": "Audio and colour carry game information with no second channel",
+  "statement": "C-028 mandates generated audio and C-067/C-068 need position and pickup feedback; nothing requires a visual twin for sound cues, a mute control, or non-colour cues, and C-168-170 (accessibility standard, single-sense) are unstated.",
+  "grounded_by": "G4-pass2",
+  "note": "WCAG 1.4.1 says colour must not be the only means of conveying information; 1.4.2 covers auto-playing audio. Applies by analogy to position/hazards signalled by colour or audio alone; WCAG does not specifically govern browser games."
+ },
+ {
+  "id": "F-007",
+  "claim_ids": [
+   "C-024",
+   "C-025",
+   "C-042",
+   "C-064",
+   "C-074",
+   "C-090"
+  ],
+  "lens": "accessibility",
+  "trap_id": "accessibility.not-keyboard-or-pointer-operable",
+  "trap_status": "verified",
+  "cues_matched": [
+   "browser, unknown devices",
+   "controls",
+   "join flow"
+  ],
+  "status": "plausible",
+  "route": "retrieval",
+  "route_reason": "WCAG 2.1.1 text plus a decision on supported input set.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "All functionality of the content is operable through a keyboard interface",
+    "locator": "SC 2.1.1 #keyboard",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/xaur/",
+    "quote": "The remapping of keys used to control movement or interaction in virtual environments is not currently required by WCAG.",
+    "locator": "XAUR sec 3.6",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/xaur/",
+    "quote": "There are also currently very useful accessibility guidelines available that are specific to gaming.",
+    "locator": "XAUR sec 3.1",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "note",
+    "ref": "https://www.w3.org/TR/WCAG22/",
+    "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Owner lists supported input methods (keyboard/touch/gamepad) in the brief.",
+  "owner_question": "Which devices and input methods will judges use on Friday (laptop keyboard, touch, phone)?",
+  "title": "Input method and device support unspecified for judges",
+  "statement": "C-024/C-074 say the game must run in any browser for judges on unknown devices, but C-042/C-064/C-090 never say whether keyboard, touch or gamepad steering must work or how a lobby is operated without a mouse.",
+  "grounded_by": "G4-pass2",
+  "note": "WCAG 2.1.1 requires keyboard operability, but its path-dependent-movement exception may cover steering, so applicability to a racing game is unclear. W3C XAUR says WCAG does not require key remapping and points to external game-specific guidelines (not fetched)."
+ },
+ {
+  "id": "F-010",
+  "claim_ids": [
+   "C-077"
+  ],
+  "lens": "security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "secrets in public repo"
+  ],
+  "status": "plausible",
+  "route": "check",
+  "route_reason": "Secret scan and pre-commit hook.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://docs.gitlab.com/user/application_security/secret_detection/",
+    "quote": "You should always revoke and replace exposed secrets as soon as possible.",
+    "locator": "GitLab secret detection overview, response section",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://docs.gitlab.com/user/application_security/secret_detection/secret_push_protection/",
+    "quote": "To use this feature, you must enable it per project.",
+    "locator": "GitLab push protection page; page lists Tier: Ultimate and does not mention public projects",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning",
+    "quote": "Secret scanning runs automatically for free.",
+    "locator": "GitHub about-secret-scanning, public repositories",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning",
+    "quote": "When you receive an alert, rotate the affected credential immediately to prevent unauthorized access.",
+    "locator": "GitHub about-secret-scanning, alerts",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "note",
+    "ref": "https://labs.gauntletai.com",
+    "quote": "curl -sI returned HTTP/2 302, server: Elestio, on 2026-11-04. Consistent with the known redirect to /users/sign_in on GitLab, but I did not inspect Location or version, and cannot confirm which security features are enabled.",
+    "tier": "secondary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Ask the instance admin which GitLab tier/secret-detection features labs.gauntletai.com has.",
+  "title": "API keys or prompts could be committed to the public repo",
+  "statement": "C-077 says the repo is public and C-078 empty; generator credentials or prompts committed during the deadline push would leak.",
+  "grounded_by": "G4-pass2",
+  "note": "Both vendors say revoke/rotate exposed secrets. GitLab push protection is Ultimate tier and per-project, so likely unavailable on a class instance. Public-project behaviour not stated on fetched GitLab pages. Rotation, not history rewrite, is the remedy (my inference, not quoted)."
+ },
+ {
+  "id": "F-020",
+  "claim_ids": [
+   "C-174"
+  ],
+  "lens": "security-ethics",
+  "trap_id": null,
+  "trap_status": "novel",
+  "cues_matched": [
+   "load testing",
+   "omission"
+  ],
+  "status": "plausible",
+  "route": "retrieval",
+  "route_reason": "Host acceptable-use text decides.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://render.com/docs/penetration-testing",
+    "quote": "Engaging in any form of Denial of Service (DoS) testing against Render infrastructure including customer environments",
+    "locator": "Render penetration-testing policy; sentence continues 'is expressly prohibited'",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://vercel.com/kb/guide/what-s-vercel-s-policy-regarding-load-testing-deployments",
+    "quote": "Load testing is only permitted on Enterprise plans.",
+    "locator": "Vercel KB load-testing policy",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://vercel.com/kb/guide/what-s-vercel-s-policy-regarding-load-testing-deployments",
+    "quote": "If no prior warning is given before conducting a load test, you are likely to be in breach of the fair usage policy.",
+    "locator": "Vercel KB load-testing policy",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.cloudflare.com/terms/",
+    "quote": "You are permitted to perform benchmark tests of our Services.",
+    "locator": "Cloudflare Self-Serve Subscription Agreement s2.2.2 (relayed by fetch tool, not independently read)",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "note",
+    "ref": "https://developers.cloudflare.com/workers/platform/limits/",
+    "quote": "No load/stress-testing statement found on the Workers limits page or Cloudflare terms page; linked Service-Specific Terms not read. No dedicated Render load-test page found, only the DoS clause.",
+    "tier": "primary",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Read Cloudflare Service-Specific Terms/AUP; ask Render support about low-volume load tests.",
+  "title": "Load-testing the free hosts is not authorised",
+  "statement": "C-174 is an omission: stress or abuse tests of free-tier hosting are not scoped, and may breach their terms.",
+  "grounded_by": "G4-pass2",
+  "note": "Vercel: Enterprise-only plus notice. Render: DoS testing prohibited (security-testing page; whether modest load tests count is unstated). Cloudflare: none found, only a benchmarking permission and an undue-burden clause."
+ },
+ {
+  "id": "F-040",
+  "claim_ids": [
+   "C-105",
+   "C-108",
+   "C-110",
+   "C-134"
+  ],
+  "lens": "media-pipelines",
+  "trap_id": "media-pipelines.decoded-frames-exceed-memory",
+  "trap_status": "verified",
+  "cues_matched": [
+   "jsfxr / Web Audio",
+   "pixel art sprite sheets, animated sheets"
+  ],
+  "status": "plausible",
+  "route": "check",
+  "route_reason": "Arithmetic from clip length x sample rate x channels gives the size.",
+  "evidence": [
+   {
+    "kind": "quote",
+    "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+    "quote": "The buffer contains the audio signal waveform encoded as a series of amplitudes in the following format: non-interleaved IEEE754 32-bit linear PCM",
+    "locator": "MDN AudioBuffer description",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+    "quote": "Objects of these types are designed to hold small audio snippets, typically less than 45 s.",
+    "locator": "MDN AudioBuffer description",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData",
+    "quote": "The single argument to this callback is an AudioBuffer representing the decodedData (the decoded PCM audio data).",
+    "locator": "MDN decodeAudioData, successCallback",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/webaudio-1.1/",
+    "quote": "represents a memory-resident audio asset.",
+    "locator": "Web Audio API 1.1 sec 1.4",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "quote",
+    "ref": "https://www.w3.org/TR/webaudio-1.1/",
+    "quote": "usually somewhat less than a minute.",
+    "locator": "Web Audio API 1.1 sec 1.4",
+    "tier": "primary",
+    "date": "2026-11-04"
+   },
+   {
+    "kind": "check",
+    "ref": "orchestrator arithmetic",
+    "quote": "3 min stereo 44.1 kHz = 31.8 MB as 16-bit PCM, 63.5 MB as 32-bit float; 5 tracks about 318 MB (supplied by orchestrator, not recomputed here; spec format is 32-bit float so 63.5 MB each applies)",
+    "locator": "orchestrator",
+    "date": "2026-11-04"
+   }
+  ],
+  "would_settle": "Computed decoded size of the final audio set",
+  "title": "Decoded audio held as PCM in RAM",
+  "statement": "C-105/C-108/C-110/C-134 (code-made audio, jsfxr, sprite sheets): many SFX plus music decode to large float32 buffers, and autoplay unlock is unaddressed.",
+  "grounded_by": "G4-pass2",
+  "note": "Spec and MDN say decoded audio is memory-resident float PCM meant for short clips, so decoding multi-minute tracks is off-design. No browser memory limit is documented in MDN decodeAudioData or the W3C spec text read.",
+  "skeptic": {
+   "verdict": "downgraded",
+   "reason": "MDN quotes re-fetched 2026-11-04 and are accurate (float32 PCM; 'designed to hold small audio snippets, typically less than 45 s'; MDN adds 'For longer sounds, objects implementing the MediaElementAudioSourceNode are more suitable', which is the easy alternative: stream via an <audio> element). But the quotes are design guidance, not a limit or a hazard. Nothing in the brief requires multi-minute decoded tracks; the brief only says generate sound effects and music (brief.md:54-55). Claim C-105 only says jsfxr/Web Audio are free code-made audio; C-108/C-110/C-134 are about sprite tools and have no bearing on audio memory. The 'autoplay unlock is unaddressed' part has no evidence in the finding at all. Memory arithmetic (not recomputed): one 3-min stereo float track is about 64 MB, fine on a judge's laptop; only many long tracks (about 318 MB for 5) would matter. A short looped track, mono, or streamed element avoids it. No documented browser memory limit was found.",
+   "supported_claim": "Implementation advice, not a brief trap: decodeAudioData yields memory-resident float32 PCM that MDN says is meant for clips under about 45 s; for a long music track, prefer an <audio> element via MediaElementAudioSourceNode (or a short loop). Applies only to C-105. Autoplay unlock is unevidenced and should be dropped or sourced separately.",
+   "checked": [
+    "curl MDN AudioBuffer page: float32 PCM quote and <45 s quote present; also MediaElementAudioSourceNode recommendation for longer sounds",
+    "claims.json C-105/C-108/C-110/C-134 texts: only C-105 concerns audio, none concern memory or duration",
+    "brief.md audio lines: no requirement for long decoded tracks",
+    "W3C 1.1 quotes and decodeAudioData quote taken from input, not re-fetched",
+    "orchestrator arithmetic taken as supplied, not recomputed"
+   ]
+  },
+  "supported_claim": "Implementation advice, not a brief trap: decodeAudioData yields memory-resident float32 PCM that MDN says is meant for clips under about 45 s; for a long music track, prefer an <audio> element via MediaElementAudioSourceNode (or a short loop). Applies only to C-105. Autoplay unlock is unevidenced and should be dropped or sourced separately."
+ }
+]

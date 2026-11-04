@@ -1,0 +1,66 @@
+{
+ "confirmed_findings": [
+  {
+   "id": "F-040",
+   "title": "Decoded audio held as PCM in RAM",
+   "statement": "C-105/C-108/C-110/C-134 (code-made audio, jsfxr, sprite sheets): many SFX plus music decode to large float32 buffers, and autoplay unlock is unaddressed.",
+   "claim_ids": [
+    "C-105",
+    "C-108",
+    "C-110",
+    "C-134"
+   ],
+   "status": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+     "quote": "The buffer contains the audio signal waveform encoded as a series of amplitudes in the following format: non-interleaved IEEE754 32-bit linear PCM",
+     "locator": "MDN AudioBuffer description",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+     "quote": "Objects of these types are designed to hold small audio snippets, typically less than 45 s.",
+     "locator": "MDN AudioBuffer description",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData",
+     "quote": "The single argument to this callback is an AudioBuffer representing the decodedData (the decoded PCM audio data).",
+     "locator": "MDN decodeAudioData, successCallback",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/webaudio-1.1/",
+     "quote": "represents a memory-resident audio asset.",
+     "locator": "Web Audio API 1.1 sec 1.4",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/webaudio-1.1/",
+     "quote": "usually somewhat less than a minute.",
+     "locator": "Web Audio API 1.1 sec 1.4",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "orchestrator arithmetic",
+     "quote": "3 min stereo 44.1 kHz = 31.8 MB as 16-bit PCM, 63.5 MB as 32-bit float; 5 tracks about 318 MB (supplied by orchestrator, not recomputed here; spec format is 32-bit float so 63.5 MB each applies)",
+     "locator": "orchestrator",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Spec and MDN say decoded audio is memory-resident float PCM meant for short clips, so decoding multi-minute tracks is off-design. No browser memory limit is documented in MDN decodeAudioData or the W3C spec text read."
+  }
+ ]
+}

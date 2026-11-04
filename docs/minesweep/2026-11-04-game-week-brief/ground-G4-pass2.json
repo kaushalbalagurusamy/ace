@@ -1,0 +1,253 @@
+{
+ "outcomes": [
+  {
+   "finding_id": "F-001",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "The visual presentation of text and images of text has a contrast ratio of at least 4.5:1, except for the following:",
+     "locator": "SC 1.4.3 #contrast-minimum",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "note",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "WCAG 1.4.3 gives a concrete text-contrast baseline (4.5:1) that the brief's pass/fail visual bar lacks. That the brief is silent comes from claims.json, not this fetch. WCAG is a reference baseline only.",
+   "would_settle": "Owner adopts a named baseline (e.g. WCAG 2.2 AA text contrast) or states none."
+  },
+  {
+   "finding_id": "F-005",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "Color is not used as the only visual means of conveying information, indicating an action,",
+     "locator": "SC 1.4.1 #use-of-color",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "If any audio on a web page plays automatically for more than 3 seconds,",
+     "locator": "SC 1.4.2 #audio-control",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "note",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "WCAG 1.4.1 says colour must not be the only means of conveying information; 1.4.2 covers auto-playing audio. Applies by analogy to position/hazards signalled by colour or audio alone; WCAG does not specifically govern browser games.",
+   "would_settle": "Owner decides whether any accessibility standard applies; if WCAG AA is adopted, 1.4.1 covers hazard/position cues."
+  },
+  {
+   "finding_id": "F-007",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "All functionality of the content is operable through a keyboard interface",
+     "locator": "SC 2.1.1 #keyboard",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/xaur/",
+     "quote": "The remapping of keys used to control movement or interaction in virtual environments is not currently required by WCAG.",
+     "locator": "XAUR sec 3.6",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/xaur/",
+     "quote": "There are also currently very useful accessibility guidelines available that are specific to gaming.",
+     "locator": "XAUR sec 3.1",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "note",
+     "ref": "https://www.w3.org/TR/WCAG22/",
+     "quote": "Scope note: WCAG is cited as a guideline only. The brief names no accessibility standard and no legal duty is claimed for this class project. Fetched via a summarising tool that caps quotes at 125 chars, so quotes are fragments of the normative sentences.",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "WCAG 2.1.1 requires keyboard operability, but its path-dependent-movement exception may cover steering, so applicability to a racing game is unclear. W3C XAUR says WCAG does not require key remapping and points to external game-specific guidelines (not fetched).",
+   "would_settle": "Owner lists supported input methods (keyboard/touch/gamepad) in the brief."
+  },
+  {
+   "finding_id": "F-010",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://docs.gitlab.com/user/application_security/secret_detection/",
+     "quote": "You should always revoke and replace exposed secrets as soon as possible.",
+     "locator": "GitLab secret detection overview, response section",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://docs.gitlab.com/user/application_security/secret_detection/secret_push_protection/",
+     "quote": "To use this feature, you must enable it per project.",
+     "locator": "GitLab push protection page; page lists Tier: Ultimate and does not mention public projects",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning",
+     "quote": "Secret scanning runs automatically for free.",
+     "locator": "GitHub about-secret-scanning, public repositories",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://docs.github.com/en/code-security/secret-scanning/introduction/about-secret-scanning",
+     "quote": "When you receive an alert, rotate the affected credential immediately to prevent unauthorized access.",
+     "locator": "GitHub about-secret-scanning, alerts",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "note",
+     "ref": "https://labs.gauntletai.com",
+     "quote": "curl -sI returned HTTP/2 302, server: Elestio, on 2026-11-04. Consistent with the known redirect to /users/sign_in on GitLab, but I did not inspect Location or version, and cannot confirm which security features are enabled.",
+     "tier": "secondary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Both vendors say revoke/rotate exposed secrets. GitLab push protection is Ultimate tier and per-project, so likely unavailable on a class instance. Public-project behaviour not stated on fetched GitLab pages. Rotation, not history rewrite, is the remedy (my inference, not quoted).",
+   "would_settle": "Ask the instance admin which GitLab tier/secret-detection features labs.gauntletai.com has."
+  },
+  {
+   "finding_id": "F-020",
+   "outcome": "plausible",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://render.com/docs/penetration-testing",
+     "quote": "Engaging in any form of Denial of Service (DoS) testing against Render infrastructure including customer environments",
+     "locator": "Render penetration-testing policy; sentence continues 'is expressly prohibited'",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://vercel.com/kb/guide/what-s-vercel-s-policy-regarding-load-testing-deployments",
+     "quote": "Load testing is only permitted on Enterprise plans.",
+     "locator": "Vercel KB load-testing policy",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://vercel.com/kb/guide/what-s-vercel-s-policy-regarding-load-testing-deployments",
+     "quote": "If no prior warning is given before conducting a load test, you are likely to be in breach of the fair usage policy.",
+     "locator": "Vercel KB load-testing policy",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.cloudflare.com/terms/",
+     "quote": "You are permitted to perform benchmark tests of our Services.",
+     "locator": "Cloudflare Self-Serve Subscription Agreement s2.2.2 (relayed by fetch tool, not independently read)",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "note",
+     "ref": "https://developers.cloudflare.com/workers/platform/limits/",
+     "quote": "No load/stress-testing statement found on the Workers limits page or Cloudflare terms page; linked Service-Specific Terms not read. No dedicated Render load-test page found, only the DoS clause.",
+     "tier": "primary",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Vercel: Enterprise-only plus notice. Render: DoS testing prohibited (security-testing page; whether modest load tests count is unstated). Cloudflare: none found, only a benchmarking permission and an undue-burden clause.",
+   "would_settle": "Read Cloudflare Service-Specific Terms/AUP; ask Render support about low-volume load tests."
+  },
+  {
+   "finding_id": "F-040",
+   "outcome": "confirmed",
+   "evidence": [
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+     "quote": "The buffer contains the audio signal waveform encoded as a series of amplitudes in the following format: non-interleaved IEEE754 32-bit linear PCM",
+     "locator": "MDN AudioBuffer description",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer",
+     "quote": "Objects of these types are designed to hold small audio snippets, typically less than 45 s.",
+     "locator": "MDN AudioBuffer description",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData",
+     "quote": "The single argument to this callback is an AudioBuffer representing the decodedData (the decoded PCM audio data).",
+     "locator": "MDN decodeAudioData, successCallback",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/webaudio-1.1/",
+     "quote": "represents a memory-resident audio asset.",
+     "locator": "Web Audio API 1.1 sec 1.4",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "quote",
+     "ref": "https://www.w3.org/TR/webaudio-1.1/",
+     "quote": "usually somewhat less than a minute.",
+     "locator": "Web Audio API 1.1 sec 1.4",
+     "tier": "primary",
+     "date": "2026-11-04"
+    },
+    {
+     "kind": "check",
+     "ref": "orchestrator arithmetic",
+     "quote": "3 min stereo 44.1 kHz = 31.8 MB as 16-bit PCM, 63.5 MB as 32-bit float; 5 tracks about 318 MB (supplied by orchestrator, not recomputed here; spec format is 32-bit float so 63.5 MB each applies)",
+     "locator": "orchestrator",
+     "date": "2026-11-04"
+    }
+   ],
+   "note": "Spec and MDN say decoded audio is memory-resident float PCM meant for short clips, so decoding multi-minute tracks is off-design. No browser memory limit is documented in MDN decodeAudioData or the W3C spec text read."
+  }
+ ],
+ "could_not_verify": [
+  "Game Accessibility Guidelines site not fetched (only referenced by W3C XAUR).",
+  "WCAG 1.2.x not quoted; judged not directly relevant.",
+  "Cloudflare Service-Specific Terms/AUP and Durable Objects terms not read.",
+  "GitLab public-project behaviour for secret detection not stated; features enabled on labs.gauntletai.com unknown; Location header not inspected.",
+  "Browser memory limits for AudioBuffer: none documented in fetched sources.",
+  "WebFetch caps quotes at 125 chars, so quotes are fragments; W3C webaudio and Cloudflare terms came via the summarising tool."
+ ]
+}

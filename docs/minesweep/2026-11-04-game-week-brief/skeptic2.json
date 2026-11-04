@@ -1,0 +1,17 @@
+{
+  "verdicts": [
+    {
+      "finding_id": "F-040",
+      "verdict": "downgraded",
+      "reason": "MDN quotes re-fetched 2026-11-04 and are accurate (float32 PCM; 'designed to hold small audio snippets, typically less than 45 s'; MDN adds 'For longer sounds, objects implementing the MediaElementAudioSourceNode are more suitable', which is the easy alternative: stream via an <audio> element). But the quotes are design guidance, not a limit or a hazard. Nothing in the brief requires multi-minute decoded tracks; the brief only says generate sound effects and music (brief.md:54-55). Claim C-105 only says jsfxr/Web Audio are free code-made audio; C-108/C-110/C-134 are about sprite tools and have no bearing on audio memory. The 'autoplay unlock is unaddressed' part has no evidence in the finding at all. Memory arithmetic (not recomputed): one 3-min stereo float track is about 64 MB, fine on a judge's laptop; only many long tracks (about 318 MB for 5) would matter. A short looped track, mono, or streamed element avoids it. No documented browser memory limit was found.",
+      "supported_claim": "Implementation advice, not a brief trap: decodeAudioData yields memory-resident float32 PCM that MDN says is meant for clips under about 45 s; for a long music track, prefer an <audio> element via MediaElementAudioSourceNode (or a short loop). Applies only to C-105. Autoplay unlock is unevidenced and should be dropped or sourced separately.",
+      "checked": [
+        "curl MDN AudioBuffer page: float32 PCM quote and <45 s quote present; also MediaElementAudioSourceNode recommendation for longer sounds",
+        "claims.json C-105/C-108/C-110/C-134 texts: only C-105 concerns audio, none concern memory or duration",
+        "brief.md audio lines: no requirement for long decoded tracks",
+        "W3C 1.1 quotes and decodeAudioData quote taken from input, not re-fetched",
+        "orchestrator arithmetic taken as supplied, not recomputed"
+      ]
+    }
+  ]
+}
