@@ -51,7 +51,7 @@ main { max-width: 62rem; margin: 0 auto; padding: 1.4rem 1rem 3rem; }
 .note { max-width: 70ch; color: var(--muted); font-size: .93rem; }
 .panelhead { margin-bottom: .6rem; }
 
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.2rem, 1fr)); gap: .6rem; margin: 1rem 0 .6rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.2rem, 1fr)); gap: .6rem; margin: 1rem 0 .6rem; }
 .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: .65rem .8rem; }
 .stat b { display: block; font: 700 1.6rem/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
 .stat span { color: var(--muted); font-size: .84rem; }

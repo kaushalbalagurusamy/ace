@@ -4,7 +4,7 @@
     if (tabs.indexOf(name) < 0) name = "minesweep";
     tabs.forEach(function (t) {
       var on = t === name;
-      document.getElementById(t).hidden = !on;
+      document.getElementById("panel-" + t).hidden = !on;
       document.getElementById("t-" + t).setAttribute("aria-selected", on ? "true" : "false");
     });
   }

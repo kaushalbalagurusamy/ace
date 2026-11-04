@@ -101,7 +101,7 @@ ask_html = "".join(f'<li><span class="fid">{e(f["id"])}</span> {e(f["owner_quest
 pd = (RUN / "problem-definition.md").read_text().split("## 2. Reframed problem for Final Frontier")[1].split("## 3.")[0].strip()
 problem = e(pd)
 
-tab1 = f'''<section id="minesweep" class="tabpanel" role="tabpanel" aria-labelledby="t-minesweep" hidden>
+tab1 = f'''<section id="panel-minesweep" class="tabpanel" role="tabpanel" aria-labelledby="t-minesweep" hidden>
   <header class="panelhead">
     <h2>Minesweeping</h2>
     <p class="lede">Before building, the brief, your Final Frontier proposal and the supporting notes were treated as claims and swept for traps: licences, provider terms, multiplayer physics, hosting, the judging rubric and agent tooling. This is pass {reg["convergence"]["passes"]} of up to 4, <b>uncalibrated</b>: none of the {len(reg["run"]["lenses"])} lenses has passed its own evaluation, so every finding is a lead, not a verdict.</p>
@@ -176,9 +176,9 @@ page = f'''<!DOCTYPE html>
   <p class="eyebrow">Gauntlet Game Week · Option 3, multiplayer racing · due Thursday 5 November, midnight</p>
   <h1>Final Frontier: what the research says so far</h1>
   <nav class="tabs" role="tablist" aria-label="Sections">
-    <button id="t-minesweep" role="tab" data-tab="minesweep" aria-controls="minesweep">Minesweeping</button>
-    <button id="t-lecture" role="tab" data-tab="lecture" aria-controls="lecture">Lecture guidance</button>
-    <button id="t-seeds" role="tab" data-tab="seeds" aria-controls="seeds">Research seeds</button>
+    <button id="t-minesweep" role="tab" data-tab="minesweep" aria-controls="panel-minesweep">Minesweeping</button>
+    <button id="t-lecture" role="tab" data-tab="lecture" aria-controls="panel-lecture">Lecture guidance</button>
+    <button id="t-seeds" role="tab" data-tab="seeds" aria-controls="panel-seeds">Research seeds</button>
   </nav>
 </header>
 <main>
