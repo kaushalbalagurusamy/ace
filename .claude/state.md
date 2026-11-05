@@ -24,7 +24,7 @@ Upstream branch w8-game-week-brief tip unchanged (bb9772a); brief, research READ
 1. Owner answers: F-052 library packs allowed? F-016/F-002 is the entry "commercial"? F-044 spend ceiling; F-007 judge devices; F-022/F-050 deadline timezone.
 2. Pass 3: 32 ungrounded findings (netcode authority/failure modes F-013, F-023-F-033, F-035, F-038, F-047; rubric F-049, F-051, F-053; asset critic F-067-F-069; privacy F-008, F-009, F-017; capacity F-026). Then re-sweep problem-definition.md.
 3. Then stage 1 research seeded from the lecture, stage 2 experiments (cross-browser determinism, host cold start, art bake-off), stage 3 ADRs (engine, authority model, host). Build docs/requirements-ledger.md from docs/source/brief.md line by line (not yet built: the run's termination condition).
-4. Not authorised yet: sf install install; adding a remote (labs.gauntletai.com namespace unverified); any development.
+4. Remote: origin = ssh://git@labs.gauntletai.com:22022/kaushalbalagurusamy/gauntlet-game-week.git (pushed 2026-11-05). Not authorised yet: sf install install; any development.
 
 ## Disclosures
 - Commit 94303ee message says "31 findings"; the count was 33. Not amended.
