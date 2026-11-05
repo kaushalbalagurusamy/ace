@@ -13,9 +13,9 @@ send({ t: 'createLobby' }); await sleep(200); send({ t: 'startSolo' });
 let start; while (!(start = got.find(m => m.t === 'raceStart'))) await sleep(200);
 const YD = 1.0936133;
 let hole = start.hole, ball = { x: start.players[0].ball.x, z: start.players[0].ball.z }, shots = 0, holesDone = 0, seen = 0, surface = start.players[0].ball.surface;
-const log = [];
+const log = []; let tries = 0, lastPenalty = false; const OFFSETS = [0, -12, 12, -25, 25, -40, 40, -60, 60];
 const dist = () => Math.hypot(hole.pin.x - ball.x, hole.pin.z - ball.z);
-const aim = () => ((Math.atan2(hole.pin.x - ball.x, hole.pin.z - ball.z) * 180 / Math.PI) + 360) % 360;
+const aim = () => ((Math.atan2(hole.pin.x - ball.x, hole.pin.z - ball.z) * 180 / Math.PI) + (lastPenalty ? OFFSETS[tries % OFFSETS.length] : 0) + 360) % 360; // after a water/OOB penalty try other lines
 // Club and length choice from the sim itself: the longest full swing that does not overshoot, else the 62 degree wedge
 // at the length whose total (carry + roll) matches the distance.
 const clubOf = k => BAG.find(c => c.key === k);
@@ -38,7 +38,7 @@ while (!finished() && shots < 14 * HOLES) {
     msg = { t: 'shot', clubKey: pick.club, aimDeg: aim(), length: pick.L, zMs: 0, xMs: 60 * sc, cMs: 150 * sc }; }
   const r = await next(msg); shots++;
   if (!r || r.t === 'error') { if (process.env.VERBOSE) log.push(`  error: ${r?.message}`); if (r?.message?.includes('still moving')) { await sleep(1500); continue; } log.push(`hole ${hole.index + 1} shot ${shots}: ${r ? r.t + ':' + (r.message ?? r.code) : 'no response'}`); break; }
-  ball = { x: r.ball.x, z: r.ball.z }; surface = r.ball.surface;
+  ball = { x: r.ball.x, z: r.ball.z }; surface = r.ball.surface; lastPenalty = !!r.penalty; tries = r.penalty ? tries + 1 : 0;
   if (process.env.VERBOSE) log.push(`  ${msg.t} ${msg.clubKey ?? ''}${msg.length && msg.clubKey ? '@' + msg.length.toFixed(2) : ''} aim ${msg.aimDeg.toFixed(1)} -> ${(dist() * YD).toFixed(1)} yd left, ${r.ball.surface}${r.penalty ? ', PENALTY' : ''}`);
   if (r.ball.holedOut) {
     holesDone++; log.push(`hole ${hole.index + 1} par ${hole.par}: holed out, total strokes ${r.ball.strokes}`);
