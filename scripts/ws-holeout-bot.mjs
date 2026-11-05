@@ -12,7 +12,7 @@ send({ t: 'hello', sessionId: 'bot-' + Date.now(), name: 'HoleBot' }); await sle
 send({ t: 'createLobby' }); await sleep(200); send({ t: 'startSolo' });
 let start; while (!(start = got.find(m => m.t === 'raceStart'))) await sleep(200);
 const YD = 1.0936133;
-let hole = start.hole, ball = { x: start.players[0].ball.x, z: start.players[0].ball.z }, shots = 0, holesDone = 0, seen = 0;
+let hole = start.hole, ball = { x: start.players[0].ball.x, z: start.players[0].ball.z }, shots = 0, holesDone = 0, seen = 0, surface = start.players[0].ball.surface;
 const log = [];
 const dist = () => Math.hypot(hole.pin.x - ball.x, hole.pin.z - ball.z);
 const aim = () => ((Math.atan2(hole.pin.x - ball.x, hole.pin.z - ball.z) * 180 / Math.PI) + 360) % 360;
@@ -32,13 +32,13 @@ const next = async (msg) => { const n = got.length; send(msg); let r;
   for (let i = 0; i < 60 && !(r = got.slice(n).find(m => m.t === 'shotResult' || m.t === 'error')); i++) await sleep(100); return r; };
 const finished = () => got.some(m => m.t === 'raceEnd');
 while (!finished() && shots < 14 * HOLES) {
-  const d = dist(), yd = d * YD, onGreen = d <= hole.greenRadius; let msg;
+  const d = dist(), yd = d * YD, onGreen = surface === 'green'; let msg;
   if (onGreen) { const v0 = Math.sqrt(2 * 0.5486 * d + 1.1); msg = { t: 'putt', aimDeg: aim(), length: Math.min(1, Math.max(0.05, v0 / 15)) }; }
   else { const pick = choose(yd), sc = durationScale(pick.L);
     msg = { t: 'shot', clubKey: pick.club, aimDeg: aim(), length: pick.L, zMs: 0, xMs: 60 * sc, cMs: 150 * sc }; }
   const r = await next(msg); shots++;
   if (!r || r.t === 'error') { if (process.env.VERBOSE) log.push(`  error: ${r?.message}`); if (r?.message?.includes('still moving')) { await sleep(1500); continue; } log.push(`hole ${hole.index + 1} shot ${shots}: ${r ? r.t + ':' + (r.message ?? r.code) : 'no response'}`); break; }
-  ball = { x: r.ball.x, z: r.ball.z };
+  ball = { x: r.ball.x, z: r.ball.z }; surface = r.ball.surface;
   if (process.env.VERBOSE) log.push(`  ${msg.t} ${msg.clubKey ?? ''}${msg.length && msg.clubKey ? '@' + msg.length.toFixed(2) : ''} aim ${msg.aimDeg.toFixed(1)} -> ${(dist() * YD).toFixed(1)} yd left, ${r.ball.surface}${r.penalty ? ', PENALTY' : ''}`);
   if (r.ball.holedOut) {
     holesDone++; log.push(`hole ${hole.index + 1} par ${hole.par}: holed out, total strokes ${r.ball.strokes}`);
@@ -46,7 +46,7 @@ while (!finished() && shots < 14 * HOLES) {
     const t0 = Date.now(); let nh; while (!(nh = got.find((m, i) => m.t === 'nextHole' && i >= seen)) && Date.now() - t0 < 30000) await sleep(100);
     if (!nh) { log.push('no nextHole after hole-out'); break; }
     seen = got.indexOf(nh) + 1; log.push(`  nextHole after ${((Date.now() - t0) / 1000).toFixed(1)} s wait: hole ${nh.hole.index + 1}, strokes carried ${nh.ball.strokes}`);
-    hole = nh.hole; ball = { x: nh.ball.x, z: nh.ball.z }; continue;
+    hole = nh.hole; ball = { x: nh.ball.x, z: nh.ball.z }; surface = nh.ball.surface; continue;
   }
   await sleep(Math.min(20000, r.samples.at(-1).t * 1000 + 300));
 }
