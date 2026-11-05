@@ -11,11 +11,11 @@
 ## Race flow
 
 1. A 5 s countdown starts, then "Go". Every player spawns on hole 1's tee at the same moment.
-2. [OPEN Q1] Players play simultaneously at their own pace. There is no turn order and no waiting for others.
+2. [GIVEN] Players share the course and play simultaneously at their own pace. There is no turn order. Everyone sees everyone's balls and tracers. Sabotage mechanics come in a later version.
 3. On holing out, a 2 s hole card shows (hole, strokes, split time), then the player is moved to the next tee automatically. The clock keeps running through this.
 4. [GIVEN] A player finishes when they hole out on hole 18.
 5. [ASSUMED] A player who has finished can spectate the others from a free camera or follow the leader.
-6. [ASSUMED] The race ends when every player has finished, or 3 minutes after the first finisher, or 30 minutes after Go, whichever comes first.
+6. [GIVEN] Each room has a **20-minute limit** from Go. Once the first player finishes, the others have **1 minute**. When it runs out, or at 20 minutes, every unfinished player's progress is **frozen** for the final results.
 
 ## Timing
 
@@ -24,14 +24,20 @@
   - The server takes the swing's receive time and adds the simulated flight-and-roll time, so the finish moment comes from the simulation, not from when a message arrives.
 - **Score** = total strokes, including penalty strokes.
 
-## Penalties and anti-stuck [OPEN Q5]
+## Penalties [GIVEN: standard Rules of Golf, each with a time cost]
 
-| Situation | Rule [ASSUMED] |
-|---|---|
-| Out of bounds | +1 stroke; ball dropped on the nearest fairway point to where it crossed the line |
-| Water | +1 stroke; dropped on the nearest dry fairway or first cut behind the entry point |
-| Stuck or unplayable (hold R for 2 s) | +2 strokes; dropped on the nearest fairway point no closer to the hole |
-| 10 strokes on a hole | Hole picked up and scored as 10; player moved to the next tee |
+The relief options follow the Rules of Golf as I recall them [UNVERIFIED rule numbers]. The time cost is how the game turns each penalty into lost race time [ASSUMED values].
+
+| Situation | Rule of Golf | In-game handling | Time cost |
+|---|---|---|---|
+| Out of bounds | Stroke and distance: +1, replay from the previous spot | Ball reappears at the previous spot. The golfer is moved there | 2 s drop wait (the walk back is skipped) |
+| Penalty area (water at Pebble Beach: the ocean on 4 to 10 and 17 to 18) | +1. Back-on-the-line relief, or stroke and distance. Lateral relief for red areas | The server picks the legal drop nearest the hole from back-on-the-line or lateral (2 club-lengths) | 2 s drop wait |
+| Unplayable (hold R for 1 s) | +1. Stroke and distance, back-on-the-line, or lateral 2 club-lengths | Same choice as above | 2 s drop wait |
+| Lost ball | Not possible: the ball is always tracked | None | None |
+| Free relief (cart path, ground under repair) | No penalty, nearest point of relief | Automatic | 1 s |
+
+- [ASSUMED] During a drop wait the golfer can't move or swing, and a "Dropping… 2 s" timer shows.
+- [ASSUMED] There is no stroke cap. The 20-minute and 1-minute limits bound the race instead.
 
 ## Ranking with the 1-second rule [GIVEN rule, ASSUMED grouping]
 
@@ -45,7 +51,8 @@ while finishers remain:
     rank the group by strokes (lower first), then by time
     if two players in a group have equal strokes, they share the place (dead heat)
     remove the group
-then rank non-finishers below finishers: most holes completed, then fewest strokes
+then rank non-finishers (progress frozen at the limit) below finishers:
+    most holes completed, then shortest distance from ball to hole, then fewest strokes
 ```
 
 **Worked example:**
@@ -76,5 +83,5 @@ then rank non-finishers below finishers: most holes completed, then fewest strok
 
 - **AC-R1:** Unit tests cover the ranking function, including the example above, a dead heat, a chain of three players 0.8 s apart and DNF ordering.
 - **AC-R2:** With 200 ms of simulated latency on one client, its finish time differs from a 0 ms run of the same inputs by less than 0.25 s.
-- **AC-R3:** No hole can last longer than 10 strokes. R-reset always ends with the ball on a legal lie.
+- **AC-R3:** Every penalty applies the right stroke count and drop wait. Unplayable relief always ends with the ball on a legal lie. Progress freezes exactly 60 s after the first finish, or at 20:00.
 - **AC-R4:** "Play again" starts a new race with all players returning, without anyone reloading the page.

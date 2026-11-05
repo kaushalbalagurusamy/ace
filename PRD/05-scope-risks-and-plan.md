@@ -1,53 +1,52 @@
 # 05: Scope, risks and build order
 
-## Can this all ship tonight?
+## Scope [GIVEN]
 
-Not all of it. At writing time there were about 13 hours to midnight CST. No code exists yet, and every visual and sound must be generated.
-
-The full spec needs several large pieces:
-- a 3D rigged golfer with a swing animated from a reference clip
-- calibrated TrackMan-grade physics
-- an 18-hole course generator with a solver
-- a multiplayer server
-- all generated art and audio
-
-Each is a day's work on its own. The brief explicitly prefers *a smaller, finished game to a larger, unfinished one*. Players and judges will feel the polish of the core loop (walk, Z-X-C swing, watch the flight, putt out) far more than the physics fidelity.
-
-## Cut line [ASSUMED, your call]
-
-| Priority | Item |
-|---|---|
-| **Must, tonight** | Waiting room and 3×4 lobbies (01). All 14 clubs with the HUD. WASD and the Z-X-C swing with timing scoring. Putting. Server-simulated flight, bounce and roll using the placeholder constants in 03. 18 procedural holes from 3 or 4 templates. Race clock, the 1 s ranking rule, results and play again. A code-built low-poly golfer with keyframed swing poses. Generated audio for swing, impact, cup, UI and one music loop. Hosted, with a link that works on judging morning. |
-| **Should** | Sourced TrackMan numbers in place of the placeholders (03 §8). The completability solver (03 §7). Spectate after finishing. Green slope overlay. Hole cards and fun stats. Reconnect mid-race. |
-| **Could** | Pose timing fitted from the reference clip. Five club-head shapes. All 5 hole templates. Time-trial solo mode. Brand names in the HUD. |
-| **Won't, v1** | Wind, weather, accounts, persistence across server restarts, touch or phone controls, more than 4 per lobby. |
+- Everything in 01 to 04 and 06 ships tonight, by midnight CST on 2026-11-05.
+- **Track A (main thread):** the MVP is built first with greyscale polygons, to prove that the swing, physics, race rules and multiplayer work.
+- **Track B (subagents):** asset generation runs in parallel. Generated assets replace the greyscale stand-ins by ID (06 §5).
 
 ## Build order
 
-1. **Decisions:** answer Q1 to Q10 (README) and write the engine/authority/host ADR. Three.js client, Node `ws` server, server-authoritative shots.
-2. **Shared sim:** a ball-flight, bounce and roll module (TypeScript) run by the server. Its unit tests come first: AC-P3, AC-P4 and the ranking tests from AC-R1.
-3. **Server:** waiting room, lobbies, race clock, shot handling and ranking.
-4. **Client:** terrain from one hole template, the movement and aim camera, the HUD.
-5. **Swing:** the swing state machine and timing scoring (02 §3), with the placeholder golfer.
-6. **Content:** more hole templates, the golfer model and poses, audio.
-7. **Deploy:** host it, warm it up and run a 4-player playtest. Fix the worst feel issue only.
-8. **If time remains:** sourced physics numbers, then the solver.
+### Track A
+1. **Scaffold:** a Vite + TypeScript client on `three@0.186.1`, a Node `ws` server, and a shared `sim/` package that only the server runs. Record the ADR: engine, server authority, host.
+2. **Sim first, with tests:**
+   - ball flight, bounce and roll (03)
+   - swing timing scoring (02 §3)
+   - penalties (04)
+   - the ranking function (04)
+   - Tests to pass first: AC-P3, AC-P4, AC-S3, AC-S5, AC-R1.
+3. **Server:** waiting room, lobbies with 3×4 caps, race clock with the 20 min and 1 min limits, shot handling, freezing progress, results.
+4. **Client:**
+   - greyscale Pebble Beach terrain (06 §3)
+   - WASD and mouse aim
+   - the club HUD
+   - swing mode and putting
+   - the post-shot TrackMan card
+   - shared tracers
+   - the mini map and rangefinder
+5. **Golfer:** pose extraction from the reference clip (02 §6), on the code rig.
+6. **Integration:** swap in the generated assets (06), then audio.
+7. **Deploy:** host it, warm it up and run a 4-player playtest from the public link. Fix feel issues.
+
+### Track B
+Starts at once, following 06 §4.
 
 ## Top risks
 
 | Risk | Effect | Mitigation |
 |---|---|---|
-| Swing feel is off: windows too tight or the camera unclear | The core loop isn't fun | Timing constants as live-tunable config. Playtest by step 5. Tolerant windows to start |
-| Golfer animation looks rough | Fails the "polished, cohesive" bar | Stylised low-poly figure that looks intentional. One art style for everything |
-| Placeholder physics gives odd distances | Experts notice | Clamp results to the Tour-scaled carry table. Source the numbers when time allows |
-| 18 holes take too long to play | Races drag on | Run speed and hole lengths are config. Aim for a 10 to 15 minute race (brief) |
-| Free host sleeps or cold-starts at judging (F-042, F-043) | Judges can't join | Paid tier or keep-alive within the spend ceiling (F-044). Warm it up 15 minutes before judging |
-| Judges on phones (F-007) | They can't play | Show a "Keyboard required" screen on touch devices. Ask the organisers |
-| The reference clip or brand names (Q7, Q9) | Rights or "pre-made" challenge | The clip is used only to measure timing. Generic HUD labels. Provenance log and CREDITS file |
-| Keyboard rollover: holding Z+X+C | Some keyboards drop keys | Z, X and C sit on one row, which usually survives rollover. Test on the judging laptops |
+| Swing feel: windows too tight or the camera unclear | The core loop isn't fun | Timing constants as live-tunable config. Playtest as soon as step 4 works |
+| Pose extraction from a single front-view clip is noisy, because depth is ambiguous | The animation looks wrong | Smooth the curves. Clamp them to joint limits. Fall back to hand-keyed poses timed from the clip |
+| Placeholder physics gives odd distances | Experts notice (Callaway demo) | Source the TrackMan numbers (03 §8) before the demo |
+| Pebble Beach rights (06 §2) | The sponsor or the course owner objects | Settle Q12 before anything is published |
+| Free host sleeps or cold-starts at judging (F-042, F-043) | Judges can't join | Keep-alive or a paid tier within the spend ceiling (F-044). Warm it up 15 minutes before judging |
+| Judges on phones (F-007) | They can't play | Show a "Keyboard required" screen on touch devices |
+| Keyboard rollover: holding Z+X+C | Some keyboards drop keys | Test on the judging laptops |
+| Generated assets arrive late or don't match | Visual mismatch | Greyscale stand-ins always work. Swap by ID. One style brief for every generator (06 §4) |
 
 ## Tests that gate a release
 
 - The ranking function (AC-R1), the Stimp roll check (AC-P3), deterministic flight (AC-P4) and lobby capacity enforced by the server (AC-L1, AC-L2).
 - A 2-browser race from the hosted link, start to results to play again (AC-L3, AC-R4).
-- A scripted perfect swing gives a straight maximum carry (AC-S3).
+- A scripted perfect swing gives a straight maximum carry (AC-S3). Progress freezes at the limits (AC-R3).

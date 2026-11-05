@@ -17,6 +17,7 @@ Up to four players race through 18 holes of golf in a browser. Players join from
 | [03-physics-and-course.md](03-physics-and-course.md) | Ball flight, launch, lies, bounce and roll, greens, cup, course layout |
 | [04-race-rules-and-results.md](04-race-rules-and-results.md) | Race flow, timing, penalties, ranking with the 1-second rule, results |
 | [05-scope-risks-and-plan.md](05-scope-risks-and-plan.md) | What fits by tonight, risks, build order, tests |
+| [06-assets-and-pebble-beach.md](06-assets-and-pebble-beach.md) | Asset list, generation platforms for 3D and audio, the Pebble Beach map |
 
 ## How to read the tags
 
@@ -25,22 +26,28 @@ Up to four players race through 18 holes of golf in a browser. Players join from
 - **[UNVERIFIED]**: a fact from memory that needs a source check before it drives numbers.
 - **[OPEN]**: needs your answer. The default I'd use is shown.
 
-## Review these first
+## Decisions (owner answers, 2026-11-05)
 
-These are the gaps where my default changes the game most.
-
-| # | Question | Default if you don't answer |
+| # | Question | Decision [GIVEN] |
 |---|---|---|
-| Q1 | Do players share one course and see each other's golfers and balls? | Yes. Everyone plays the same 18 holes at their own pace. You see others only when on the same hole, with no collisions. A live leaderboard shows everyone. |
-| Q2 | How do players aim? WASD is disabled in swing mode. | The mouse turns the camera. Near the ball, the aim line follows the camera, and Space locks it. |
-| Q3 | How does putting work? Z-X-C doesn't fit a putting stroke. | Hold Z to draw the putter back (a meter fills), release to strike. Distance follows the draw length. X and C do nothing. |
-| Q4 | When does the race end for players who haven't finished? | 3 minutes after the first finisher, or 30 minutes after Go. Unfinished players are ranked by holes completed, then strokes. |
-| Q5 | What happens with out of bounds, water and a stuck ball? | +1 stroke and an automatic drop. A hole is picked up at 10 strokes. Holding R for 2 seconds drops you on the fairway for +2. |
-| Q6 | How does 130 mph scale across the bag? | 130 mph is driver club speed. Other clubs scale by Tour-average speed ratios (see 03). |
-| Q7 | What are "MCS (Wax Nation)" and the "Dunaway front SyberVision" clip? | I can't identify either from memory. Please send links. Until then the swing is animated in code from kinematic-sequence timing. A video would only be used to measure timing, never shipped (see 02 §6). |
-| Q8 | Can one player start alone, for practice or for judges? | Yes, as a "time trial" lobby that doesn't count as a race. |
-| Q9 | Should the HUD show brand names (Elyte, Apex, Opus, Odyssey Tri-Hot)? | The HUD shows generic labels (Driver, 3W, 18° UT, 4i...). Brand names stay in the bag data. |
-| Q10 | Does all of this ship tonight? | No. See 05 for the cut line I recommend. |
+| Q1 | Shared course? | Yes. All players share the course and see each other's balls and tracers. Ways to sabotage each other come in a later version. |
+| Q1b | Mini map | Required. It shows players, balls and the hole layout. Expanded, it becomes a rangefinder for planning the shot and choosing a club (02 §7). |
+| Q2 | Aiming | The mouse sets the aim, and **no aim line is drawn**. Planning a shot on the rangefinder doesn't guarantee the golfer is facing that way. After each shot, transient TrackMan-style stats show: carry, total, offline. |
+| Q3 | Putting | A simple Z pendulum: hold to draw back, release to strike. |
+| Q4 | Race end | Each room has a 20-minute limit. Once the first player finishes, the rest have 1 minute. After that their progress is frozen for the final results. |
+| Q5 | Penalties | Standard Rules of Golf, with each penalty also costing time in game, such as a 2-second wait for a drop (04). |
+| Q6 | Speed across the bag | Tour-average speed ratios, with the driver at 130 mph. |
+| Q7 | Swing reference | Use https://www.youtube.com/watch?v=zJpTTF4wr7s to extract the 3D golfer animation. |
+| Q8 | Solo | A single-player time trial, with score stats. |
+| Q9 | Club names | Generic HUD labels. The Callaway and Odyssey model names are for generating the club assets, because Callaway is the sponsor (06). |
+| Q10 | Scope | Everything ships tonight. Build the MVP first with greyscale polygons to prove the physics. Asset generation runs in parallel through subagents. |
+| Q11 | First map | Pebble Beach Golf Links (06). |
+
+**Still open:**
+- **Q12:** Pebble Beach naming rights for the public build. Default: an unnamed "Monterey coastal links" (06 §2).
+- **Keys:** a Meshy Pro key and an OpenAI image key.
+- **F-044:** the spend ceiling.
+- **F-007:** judge devices.
 
 ## What carries over from the space-game research
 
@@ -48,5 +55,5 @@ These are the gaps where my default changes the game most.
 - **Generator terms:** use tiers whose terms fit a public, judged game. ElevenLabs Starter is already active (F-002, F-016).
 - **Netcode and hosting:** WebSocket to one authoritative server, no peer-to-peer, and a warm-up before judging (F-041, F-042, F-034, F-043).
 - **Keys:** keys stay in an untracked `.env`, never in git.
-- **Engine:** my earlier recommendation of 2D Phaser is withdrawn. Golf ball flight needs 3D, so the plan is Three.js, which still needs an ADR.
+- **Engine (decided 2026-11-05):** Three.js r186 (`three@0.186.1`, the version the vendored skills pin) on the client, and a Node `ws` server that owns the shot simulation. This replaces my earlier 2D Phaser recommendation. The project skills in `.claude/skills/` (see PROVENANCE.md there) cover Three.js scene setup, materials, glTF loading, camera, input, game feel, physics tuning, procedural generation, UI, audio and asset creation.
 - **Dropped:** the n-body physics findings (F-036, F-037, F-039) no longer apply.

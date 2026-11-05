@@ -32,7 +32,7 @@
 | In race | No | Results |
 | Results | No | Open (Play again) or closed (everyone leaves) |
 
-8. [GIVEN by the brief] A race needs at least 2 players. [OPEN Q8] By default, a lone host can start a time trial that doesn't count as a race.
+8. [GIVEN by the brief] A race needs at least 2 players. [GIVEN] A lone host can start a single-player time trial, which shows the same time and score stats as a race.
 9. [ASSUMED] The host's Start button is enabled when at least 2 players are present and all are ready. The host can also force a start once at least 2 players have been present for 60 seconds.
 10. [ASSUMED] If the host leaves, the player who has been in the lobby longest becomes host.
 11. [ASSUMED] An empty lobby closes at once and frees its slot. An Open lobby with no start for 10 minutes closes, and its players return to the waiting room.

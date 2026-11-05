@@ -24,7 +24,7 @@
 - **Driver:** 130 mph club speed with a +5° AoA.
 - **3W off the tee:** +2° AoA.
 - **All other clubs:** struck down, with PGA Tour-average delivery.
-- [OPEN Q6] Each club's speed is 130 mph × (that club's Tour-average speed ÷ Tour-average driver speed).
+- [GIVEN Q6] Each club's speed is 130 mph × (that club's Tour-average speed ÷ Tour-average driver speed).
 
 The table below is **[UNVERIFIED] TrackMan PGA Tour averages, recalled from memory**. It must be checked against TrackMan's published table before use. The scaled column is club speed × 130/113.
 
@@ -89,9 +89,12 @@ The table below is **[UNVERIFIED] TrackMan PGA Tour averages, recalled from memo
 - A faster ball lips out with a deflection.
 - There are no gimmes. Every hole must be holed.
 
-## 7. Course [ASSUMED throughout]
+## 7. Course
 
-- **Holes:** 18 holes, par 72: 4 par 3s, 10 par 4s and 4 par 5s. Hole order and pars are fixed, and the layouts are procedural from a per-lobby seed.
+- [GIVEN] **First map:** Pebble Beach Golf Links, laid out from real course data. Layout, data sources and legal notes are in 06.
+- [ASSUMED] **Pebble Beach and the solver:** Pebble Beach uses its real yardages. The completability solver below still runs on it.
+- [ASSUMED] **Later maps:** the procedural generator described below is for maps after Pebble Beach and doesn't block the MVP.
+- [ASSUMED] **Procedural holes:** 18 holes, par 72: 4 par 3s, 10 par 4s and 4 par 5s. Hole order and pars are fixed, and the layouts are procedural from a per-lobby seed.
 - **Lengths** are scaled for 130 mph:
   - par 3: 160 to 250 yd
   - par 4: 380 to 500 yd

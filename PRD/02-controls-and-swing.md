@@ -26,7 +26,7 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 3. [ASSUMED] Run speed is 9 m/s, so a 300-yard walk takes about 30 seconds. This speed is the main lever on race length (see 05).
 4. [ASSUMED] Players can't walk into water or past out-of-bounds stakes. Trees block movement. Golfers pass through each other.
 5. [GIVEN] Space within 2.5 m of the ball [ASSUMED distance] enters swing mode. A prompt shows "Space: address ball" when in range.
-6. [OPEN Q2] **Aiming:** within range, a dotted aim line runs from the ball along the camera's facing direction. A marker shows the active club's full carry on that line. Pressing Space locks the aim.
+6. [GIVEN] **Aiming:** the mouse sets the aim direction, the way the camera faces. **No aim line or landing marker is drawn.** Pressing Space locks the aim. A shot planned on the rangefinder (§7) isn't guaranteed to match where the golfer faces. Lining up is part of the skill.
 
 ## 3. Swing mode
 
@@ -73,10 +73,15 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 
 - [ASSUMED] The camera follows the ball, then returns to the golfer.
 - [ASSUMED] Movement unlocks once the ball comes to rest. The player can start walking while the ball is still rolling.
+- [GIVEN] **Shot card:** after each shot, TrackMan-style stats show briefly: **carry, total and offline** (yards left or right of the aim line).
+  - [ASSUMED] The card also shows club speed, ball speed, launch, spin and the swing timing grade for Z, X and C.
+  - [ASSUMED] It fades after 4 s.
+- [GIVEN] Every ball's tracer is visible to every player.
+  - [ASSUMED] Each tracer stays until that player's next shot.
 
-## 5. Putting [OPEN Q3]
+## 5. Putting [GIVEN: simple Z pendulum]
 
-- [ASSUMED] With the putter equipped, Space within range enters putt mode. There is no automatic backswing.
+- With the putter equipped, Space within range enters putt mode. There is no automatic backswing.
 - Holding Z draws the putter back and a meter fills over 1.5 s for maximum length. Releasing Z strikes the ball.
 - Ball speed is proportional to the draw. Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
 - X and C do nothing.
@@ -84,13 +89,26 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 
 ## 6. Golfer animation
 
-- [GIVEN] The swing should match Dunaway's front-view SyberVision swing: find the clip, slow it down and break the motion into 3D components.
-- [OPEN Q7] I haven't located this clip, and I don't know what "MCS (Wax Nation)" refers to. Please send links.
-- **Shipping rule** (register F-014, F-052) [ASSUMED]: the brief bans pre-made assets, so the clip may only be used to measure poses and timing. Nothing from it ships.
-  - The golfer is a code-built, low-poly rigged figure.
-  - Key poses (address, takeaway, top, transition, slot, impact, finish) are authored as joint angles, and the measured timings drive the interpolation between them.
-- **Likeness** [ASSUMED]: the shipped golfer must not be a likeness of the person in the clip.
-- **Club models** [ASSUMED]: 5 head shapes (driver, fairway wood, hybrid, iron, wedge) plus one putter, built from parameters (loft, shaft length) in code.
+- [GIVEN] **Reference clip:** https://www.youtube.com/watch?v=zJpTTF4wr7s, the source for extracting the 3D golfer animation.
+- [ASSUMED] **Extraction method:**
+  1. Download the clip locally, for reference only.
+  2. Step through it frame by frame, slowed down.
+  3. Run 3D pose estimation (for example MediaPipe Pose landmarks) on the frames to get joint angles and the phase timings: address, takeaway, top, Z/X/C onsets, impact, finish.
+  4. Retarget those onto our own rig as keyframes.
+- [ASSUMED] **What ships:** only the extracted joint-angle curves, on our own model. The video and its frames are never shipped (brief: no pre-made assets), and the golfer isn't a likeness of the person in it.
+- [GIVEN] **MVP visuals:** greyscale polygons. The golfer is a code-built low-poly rigged figure, and the generated golfer replaces it later (06).
+- [ASSUMED] **Club models:** for the MVP, 5 head shapes (driver, fairway wood, hybrid, iron, wedge) plus one putter, built from parameters in code. They're replaced by the generated Callaway-styled models (06).
+
+## 7. Mini map and rangefinder [GIVEN]
+
+- **Mini map:** always visible in a corner, oriented to the hole. It shows:
+  - the hole layout (tee, fairway, rough, bunkers, water, green, pin)
+  - every player's golfer and ball, in their player colours
+- **Rangefinder:** expanding the mini map (key M, [ASSUMED]) turns it into a full-screen top-down rangefinder.
+  - Hovering any point shows the distance from your ball and the distance from that point to the pin, in yards.
+  - It also shows the elevation change, plus a club suggestion ("plays like" 7i) based on full-swing carries [ASSUMED].
+  - [ASSUMED] Clicking sets a temporary target marker that shows on the mini map only, not in the 3D world, so the aim stays the golfer's job (§2.6).
+  - [ASSUMED] While expanded, movement still works but swing mode can't start.
 
 ## Acceptance criteria
 
