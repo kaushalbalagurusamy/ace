@@ -1,5 +1,6 @@
 // Deploy entry: one process serves the built client (dist/), /healthz and the ws endpoint on PORT.
 import http from 'node:http';
+import crypto from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
@@ -42,6 +43,7 @@ interface RPlayer { name: string; ball: BallState; nextAtMs: number; finishS?: n
 interface Race { lobbyId: string; hole: Hole; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean }
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
+const tokens = new Map<string, string>(); // sessionId -> secret resume token (never broadcast)
 const touched = new Map<string, number>(); // lobbyId -> last activity (ms), for expiry
 
 // A lobby must never stay stuck and block the 3-lobby cap: stale ones are reset or closed.
@@ -72,7 +74,7 @@ function parse(raw: string): ClientMsg | null {
   try { m = JSON.parse(raw); } catch { return null; }
   if (!m || typeof m !== 'object' || typeof m.t !== 'string') return null;
   switch (m.t) {
-    case 'hello': return typeof m.sessionId === 'string' && m.sessionId.length >= 1 && m.sessionId.length <= 64 && typeof m.name === 'string' && m.name.length <= 64 ? m : null;
+    case 'hello': return (m.token === undefined || typeof m.token === 'string') && typeof m.sessionId === 'string' && m.sessionId.length >= 1 && m.sessionId.length <= 64 && typeof m.name === 'string' && m.name.length <= 64 ? m : null;
     case 'createLobby': case 'leaveLobby': case 'start': case 'startSolo': return m;
     case 'joinLobby': return typeof m.lobbyId === 'string' ? m : null;
     case 'ready': return typeof m.ready === 'boolean' ? m : null;
@@ -179,9 +181,15 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
   }
 }
 
+function sameToken(a: string | undefined, b: string | undefined): boolean {
+  if (!a || !b) return false;
+  const x = Buffer.from(a), y = Buffer.from(b);
+  return x.length === y.length && crypto.timingSafeEqual(x, y);
+}
+
 function drop(sid: string) {
   const before = mgr.lobbyOf(sid);
-  socks.delete(sid);
+  socks.delete(sid); tokens.delete(sid);
   mgr.disconnect(sid);
   if (before) {
     const after = mgr.list().find(l => l.id === before.id);
@@ -204,17 +212,22 @@ wss.on('connection', ws => {
         if (m.t !== 'hello') return; // ignore until hello
         // The same session reconnecting (reload, retry before the old socket's close arrived) takes over.
         const old = socks.get(m.sessionId);
-        if (old && old !== ws) { drop(m.sessionId); old.terminate(); }
+        // Only the holder of the secret token may take a session over; the sessionId alone is public.
+        if (old && old !== ws) {
+          if (!sameToken(m.token, tokens.get(m.sessionId))) return err(ws, 'ALREADY_CONNECTED');
+          drop(m.sessionId); old.terminate();
+        }
         const res = mgr.connect(m.sessionId, m.name);
         if (!res.ok) return err(ws, res.error);
         sid = res.value.sessionId; myName = res.value.name;
         socks.set(sid, ws);
-        send(ws, { t: 'welcome', sessionId: sid, name: res.value.name });
+        tokens.set(sid, crypto.randomUUID());
+        send(ws, { t: 'welcome', sessionId: sid, name: res.value.name, token: tokens.get(sid)! });
         send(ws, { t: 'lobbies', lobbies: mgr.list() });
         return;
       }
       // A repeated hello on the same socket (double submit) is harmless: re-confirm instead of erroring.
-      if (m.t === 'hello') { send(ws, { t: 'welcome', sessionId: sid, name: myName }); return; }
+      if (m.t === 'hello') { send(ws, { t: 'welcome', sessionId: sid, name: myName, token: tokens.get(sid)! }); return; }
       onMessage(ws, sid, m);
     } catch (e) { console.error(e); err(ws, 'BAD_MESSAGE', 'internal error'); }
   });

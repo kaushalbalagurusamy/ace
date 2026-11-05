@@ -3,7 +3,8 @@ import type { ErrorCode, LobbyView } from '../server/lobby-types';
 import type { TrajectoryPoint } from '../sim/types';
 
 export type ClientMsg =
-  | { t: 'hello'; sessionId: string; name: string }
+  /** token = the secret from the last `welcome`; required to take over an existing session (reload/reconnect). */
+  | { t: 'hello'; sessionId: string; name: string; token?: string }
   | { t: 'createLobby' }
   | { t: 'joinLobby'; lobbyId: string }
   | { t: 'leaveLobby' }
@@ -20,7 +21,7 @@ export interface HoleInfo { index: number; par: number; pin: { x: number; z: num
 export interface PlayerRace { id: string; name: string; hole: number; ball: BallState; finishedAtS?: number }
 
 export type ServerMsg =
-  | { t: 'welcome'; sessionId: string; name: string }
+  | { t: 'welcome'; sessionId: string; name: string; /** secret, sent only to this socket, never broadcast */ token: string }
   | { t: 'error'; code: ErrorCode | 'BAD_MESSAGE' | 'NOT_YOUR_TURN' | 'NOT_IN_RACE'; message: string }
   | { t: 'lobbies'; lobbies: LobbyView[] }
   | { t: 'lobby'; lobby: LobbyView | null }

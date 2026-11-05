@@ -9,6 +9,7 @@ const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-p
 
 let sessionId = sessionStorage.getItem('ace.sid') ?? crypto.randomUUID();
 sessionStorage.setItem('ace.sid', sessionId);
+let token = sessionStorage.getItem('ace.tok') ?? undefined;
 let name = localStorage.getItem('ace.name') ?? '';
 let welcomed = false, lobbies: LobbyView[] = [], lobby: LobbyView | null = null, error = '', count: number | null = null;
 let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
@@ -27,7 +28,7 @@ const ui = new UI((a, d, form) => {
   if (a === 'name') {
     const v = form.querySelector<HTMLInputElement>('#nm')!.value.trim();
     if (!validName(v)) return ui.showName(v, 'Name must be 2 to 16 characters.');
-    name = v; localStorage.setItem('ace.name', v); net.send({ t: 'hello', sessionId, name });
+    name = v; localStorage.setItem('ace.name', v); net.send({ t: 'hello', sessionId, name, token });
   } else if (a === 'create') net.send({ t: 'createLobby' });
   else if (a === 'join') net.send({ t: 'joinLobby', lobbyId: d.id! });
   else if (a === 'leave') net.send({ t: 'leaveLobby' });
@@ -41,7 +42,7 @@ ui.setClub(0);
 
 const net = new Net(onMsg, () => {
   if (touchOnly) return;
-  if (validName(name)) net.send({ t: 'hello', sessionId, name }); else { phase = 'name'; ui.showName(name); }
+  if (validName(name)) net.send({ t: 'hello', sessionId, name, token }); else { phase = 'name'; ui.showName(name); }
 }, () => {
   welcomed = false; lobby = null; hole = null; swing = null; phase = 'down'; ui.showDown('Server restarted or disconnected.');
 });
@@ -49,7 +50,7 @@ if (touchOnly) ui.showTouch();
 
 function onMsg(m: ServerMsg) {
   switch (m.t) {
-    case 'welcome': welcomed = true; sessionId = m.sessionId; sessionStorage.setItem('ace.sid', sessionId); if (phase !== 'race' && phase !== 'results') { phase = 'menu'; menu(); } break;
+    case 'welcome': welcomed = true; sessionId = m.sessionId; token = m.token; sessionStorage.setItem('ace.tok', m.token); sessionStorage.setItem('ace.sid', sessionId); if (phase !== 'race' && phase !== 'results') { phase = 'menu'; menu(); } break;
     case 'error':
       if (m.code === 'NOT_IN_LOBBY') break;
       if (!welcomed && (m.code === 'NAME_INVALID' || m.code === 'NAME_TAKEN' || m.code === 'ALREADY_CONNECTED')) { phase = 'name'; ui.showName(name, errText(m)); break; }
