@@ -46,10 +46,17 @@ const countdowns = new Map<string, NodeJS.Timeout>();
 const tokens = new Map<string, string>(); // sessionId -> secret resume token (never broadcast)
 const touched = new Map<string, number>(); // lobbyId -> last activity (ms), for expiry
 
+// No timer callback may throw out of the event loop: one bad lobby must not take every lobby down.
+const safe = <A extends unknown[]>(f: (...a: A) => void) => (...a: A) => { try { f(...a); } catch (e) { console.error('timer error', e); } };
+process.on('uncaughtException', e => console.error('uncaughtException', e));
+process.on('unhandledRejection', e => console.error('unhandledRejection', e));
+
 // A lobby must never stay stuck and block the 3-lobby cap: stale ones are reset or closed.
 const STARTING_MAX_MS = 30_000, OPEN_IDLE_MS = 10 * 60_000, RACE_STUCK_MS = RACE_LIMIT_MS + 60_000;
-setInterval(() => {
+setInterval(safe(() => {
   const now = Date.now();
+  const live = new Set(mgr.list().map(l => l.id));
+  for (const id of touched.keys()) if (!live.has(id)) touched.delete(id); // closed lobbies must not leak entries
   for (const l of mgr.list()) {
     const idle = now - (touched.get(l.id) ?? now);
     touched.set(l.id, touched.get(l.id) ?? now);
@@ -59,13 +66,13 @@ setInterval(() => {
     else continue;
     broadcastLobbies();
   }
-}, 15_000).unref();
+}), 15_000).unref();
 
 const send = (ws: WebSocket | undefined, m: ServerMsg) => { if (ws?.readyState === 1) ws.send(JSON.stringify(m)); };
 const err = (ws: WebSocket, code: Extract<ServerMsg, { t: 'error' }>['code'], message: string = code) => send(ws, { t: 'error', code, message });
 const toLobby = (l: LobbyView | undefined, m: ServerMsg) => l?.players.forEach(p => send(socks.get(p.sessionId), m));
 const broadcastLobbies = () => { const m: ServerMsg = { t: 'lobbies', lobbies: mgr.list() }; socks.forEach(w => send(w, m)); };
-const lobbyChanged = (l: LobbyView | undefined) => { if (l) touched.set(l.id, Date.now()); broadcastLobbies(); toLobby(l, { t: 'lobby', lobby: l ?? null }); };
+const lobbyChanged = (l: LobbyView | undefined, activity = true) => { if (l && activity) touched.set(l.id, Date.now()); broadcastLobbies(); toLobby(l, { t: 'lobby', lobby: l ?? null }); };
 
 const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
 const optNum = (v: unknown) => v === undefined || num(v);
@@ -93,7 +100,7 @@ function startCountdown(lobbyId: string) {
     clearInterval(iv); countdowns.delete(lobbyId);
     beginRace(l);
   };
-  const iv = setInterval(tick, 1000);
+  const iv = setInterval(safe(tick), 1000);
   countdowns.set(lobbyId, iv);
   tick();
 }
@@ -105,7 +112,7 @@ function beginRace(l: LobbyView) {
     players.set(p.sessionId, { name: p.name, nextAtMs: goAtMs, ball: { x: h.info.tee.x, z: h.info.tee.z, strokes: 0, holedOut: false, surface: h.surfaceAt(h.info.tee.x, h.info.tee.z) } });
   }
   const race: Race = { lobbyId: l.id, hole: h, goAtMs, players, timers: [], firstFinish: false };
-  race.timers.push(setTimeout(() => endRace(race), RACE_LIMIT_MS));
+  race.timers.push(setTimeout(safe(() => endRace(race)), RACE_LIMIT_MS));
   races.set(l.id, race);
   mgr.setState(l.id, 'in_race');
   touched.set(l.id, Date.now());
@@ -146,7 +153,7 @@ function applyPlay(ws: WebSocket, sid: string, r: Race, me: RPlayer, out: Played
   me.finishS = (nowMs - r.goAtMs) / 1000 + flightS;
   toLobby(lobby, { t: 'holedOut', playerId: sid, strokes: out.ball.strokes, splitS: me.finishS });
   if ([...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id))) endRace(r);
-  else if (!r.firstFinish) { r.firstFinish = true; r.timers.push(setTimeout(() => endRace(r), AFTER_FIRST_MS)); }
+  else if (!r.firstFinish) { r.firstFinish = true; r.timers.push(setTimeout(safe(() => endRace(r)), AFTER_FIRST_MS)); }
 }
 
 function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
@@ -156,7 +163,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
     case 'createLobby': case 'joinLobby': case 'ready': case 'start': case 'startSolo': {
       const res = m.t === 'createLobby' ? mgr.createLobby(sid) : m.t === 'joinLobby' ? mgr.joinLobby(sid, m.lobbyId) : m.t === 'ready' ? mgr.setReady(sid, m.ready) : m.t === 'start' ? mgr.start(sid) : mgr.startSolo(sid);
       if (fail(res)) return;
-      lobbyChanged(mgr.lobbyOf(sid));
+      lobbyChanged(mgr.lobbyOf(sid), m.t !== 'ready'); // toggling ready is not activity: it must not keep an idle lobby alive
       if (m.t === 'start' || m.t === 'startSolo') startCountdown(mgr.lobbyOf(sid)!.id);
       return;
     }
@@ -203,7 +210,13 @@ const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 4096 });
 wss.on('connection', ws => {
   let sid: string | undefined, myName = '';
   ws.on('error', () => {});
+  // A socket that never says hello would otherwise hold a connection (and a waiting-room slot) forever.
+  const helloTimer = setTimeout(() => { if (!sid) ws.terminate(); }, 10_000);
+  ws.on('close', () => clearTimeout(helloTimer));
+  let windowStart = Date.now(), inWindow = 0; // per-socket rate limit: 40 messages per second
   ws.on('message', (data, isBinary) => {
+    if (Date.now() - windowStart > 1000) { windowStart = Date.now(); inWindow = 0; }
+    if (++inWindow > 40) { ws.terminate(); return; }
     try {
       if (isBinary) return err(ws, 'BAD_MESSAGE', 'text only');
       const m = parse(data.toString());
