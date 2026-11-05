@@ -30,7 +30,7 @@ def make_classifier(coastal, centroids, green_ref, pin_px, green_r_px):
     names = ['t', 'r', 'c', 'f', 'f']
     def classify(c, x=None, y=None):
         r, g, b = c; mn = min(r, g, b)
-        if mn >= 196 and b >= r - 3: return 'w' if coastal else 'o'
+        if mn >= 196 and b >= r - 3: return 'w' if (coastal and b >= r + 6) else 'o'   # blue-tinted wash is ocean; blank white is outside the drawn course
         if r >= 190 and g >= 190 and b <= r - 10 and b <= g - 6: return 's'
         sat = max(r, g, b) - mn
         if sat <= 22 and 135 <= r <= 225: return 'p'
@@ -99,15 +99,14 @@ def trace(n, tmp):
         z = z0 + (iz + 0.5) * CELL; row = []
         for ix in range(nx):
             x = -X_HALF + (ix + 0.5) * CELL; votes = Counter()
-            for ox, oz in ((0, 0), (-.5, -.5), (.5, -.5), (-.5, .5), (.5, .5)):
-                zz = z + oz * CELL * 0.8; xx = x + ox * CELL * 0.8
+            for ox in (-.33, 0, .33):
+              for oz in (-.33, 0, .33):
+                zz = z + oz * CELL; xx = x + ox * CELL
                 ppx = tx + (zz * ux + xx * rx) / scale; ppy = ty + (zz * uy + xx * ry) / scale
                 ix2, iy2 = int(ppx), int(ppy)
-                if 0 <= ix2 < w and 0 <= iy2 < h: votes[classify(px[iy2][ix2], ix2, iy2)] += 1
-                else:   # beyond the graphic: ocean continues if the nearest edge pixel is water, otherwise out of bounds
-                    ex = min(w - 1, max(0, ix2)); ey = min(h - 1, max(0, iy2))
-                    votes['w' if coastal and classify(px[ey][ex]) == 'w' else 'o'] += 1
-            row.append(votes.most_common(1)[0][0])
+                votes[classify(px[iy2][ix2], ix2, iy2) if (0 <= ix2 < w and 0 <= iy2 < h) else 'o'] += 1     # beyond the graphic: outside
+            # thin features survive a 2 m cell: sand and path win with 2 of 9 samples, rock shore with 3 (the rest by majority)
+            row.append('s' if votes['s'] >= 2 else 'p' if votes['p'] >= 2 else 'k' if votes['k'] >= 3 else votes.most_common(1)[0][0])
         rows.append(row)
     # tee box and pin always playable
     def put(x, z, rad, c):
