@@ -21,12 +21,21 @@ const ERR: Record<string, string> = {
 };
 export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ?? m.message;
 
+const HELP = `<details class="help" open><summary>How to play</summary><ul>
+<li><b>Move</b> WASD, <b>look and aim</b> mouse (no aim line: line up by eye; the mini map and its rangefinder help you pick a club)</li>
+<li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter</li>
+<li><b>Swing length</b> mouse wheel or [ and ] pick 25, 50, 75 or 100 percent before you swing: short swings for short shots</li>
+<li><b>Swing</b> stand by your ball, press Space, then press and hold Z, X, C in order as the backswing tops out (hips, shoulders, release). Good timing = straight and long</li>
+<li><b>Putt</b> P, Space, hold Z to draw back, release to strike</li>
+<li><b>Shot card</b> after every shot: carry, total, offline and how well you timed each key</li>
+<li>First to hole out wins; fewer strokes only decides finishes within 1 second</li></ul></details>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 export interface Row { id: string; name: string; hole: number; strokes: number; done: boolean }
 
 const CSS = `
 #ui{position:fixed;inset:0;z-index:1;pointer-events:none;font:14px system-ui;color:#eee}
 .scr{position:absolute;inset:0;background:#1c1c1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:auto}
+.help{max-width:560px;font-size:13px;opacity:.9}.help ul{margin:4px 0 0;padding-left:18px;text-align:left}.help summary{cursor:pointer}
 .scr h1{font-size:56px;margin:0;letter-spacing:6px}
 .scr button,.scr input{font:inherit;padding:8px 14px;background:#444;color:#eee;border:1px solid #777;border-radius:3px}
 .scr button:disabled{opacity:.4}.scr button:not(:disabled){cursor:pointer}
@@ -86,7 +95,7 @@ export class UI {
         <div><button data-act="ready" data-v="${me?.ready ? '' : '1'}">${me?.ready ? 'Not ready' : 'Ready'}</button>
         ${host ? `<button data-act="start" ${allReady ? '' : 'disabled'}>Start</button>` : ''}
         ${host && l.players.length === 1 ? `<button data-act="solo">Solo time trial</button>` : ''}
-        <button data-act="leave">Leave lobby</button></div>`);
+        <button data-act="leave">Leave lobby</button></div>${HELP}`);
       return;
     }
     const full = m.lobbies.length >= 3;
@@ -94,7 +103,7 @@ export class UI {
       const can = l.state === 'open' && l.players.length < 4;
       return `<div class="row"><span>${esc(l.name)} (${l.players.length}/4, ${l.state})</span><button data-act="join" data-id="${esc(l.id)}" ${can ? '' : 'disabled'}>Join</button></div>`;
     }).join('') || 'No lobbies yet.'}</div>${err}
-      <button data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button>`);
+      <button data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button>${HELP}`);
   }
   showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[]) {
     this.screen(`<h1>Results</h1><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
