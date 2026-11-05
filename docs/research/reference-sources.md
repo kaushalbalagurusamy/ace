@@ -64,3 +64,10 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 - **Pipeline:** OpenAI image edit with this reference produces a front/side/back A-pose turnaround in STYLE.md's look. Then Meshy multi-image-to-3D, auto-rig, and the swing keyframes from refs/swing.
 - **Fidelity:** a fresh critic compares renders against this image (face and hair silhouette, beard, skin tone, eyes) before the golfer ships.
 - Reference only: the image itself never ships.
+
+## Golf cart: Genesis Box Buggy, `refs/cart/` (owner, 2026-11-05: Genesis is a sponsor)
+
+- **Source:** The Independent, "Genesis may put Box Buggy electric golf cart into production" (Steve Fowler, 2026-08-21). https://www.independent.co.uk/cars/electric-vehicles/genesis-box-buggy-electric-golf-cart-b3037105.html. Image URLs are in `refs/cart/sources.json`.
+- **Files:** `genesis-1.jpg` (rear three-quarter), `genesis-3.jpg` (front three-quarter, Genesis wing logo in the background), `genesis-4.jpg` (interior: plaid seats and a tan dash). `genesis-2` was a duplicate and is removed.
+- **Signature features:** a four-seat glass-canopy box body in dark blue, a horizontal light bar with chrome strips at the rear, chunky knobby wheels with exposed suspension, a tan and plaid interior, and the Genesis winged badge.
+- **Use:** Meshy image-to-3D for the player's cart, then the fidelity critic, as for every model. Reference only; the photos never ship.
