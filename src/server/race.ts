@@ -38,11 +38,32 @@ function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number,
   return { pts, x: end.p.x, z: end.p.z, t: end.t, holed };
 }
 
+const CLUB_LEN_M = 1.2; // a driver-ish club length; relief is within two of them
+
+/** Rules of Golf relief from a penalty area: from where the ball last crossed onto non-water ground (the entry point), the nearest-the-hole
+ *  playable spot that is no nearer the hole, either within two club-lengths (lateral) or back on the line from the pin through the entry point. */
+export function waterRelief(h: Hole, samples: { p: { x: number; z: number } }[]): { x: number; z: number } | null {
+  let e = samples[0]?.p; if (!e) return null;
+  for (let i = samples.length - 1; i >= 0; i--) { const q = samples[i]!.p; if (h.penaltyAt(q.x, q.z) !== 'water') { e = q; break; } }
+  const pin = h.info.pin, d = (x: number, z: number) => Math.hypot(x - pin.x, z - pin.z), dE = d(e.x, e.z);
+  let best: { x: number; z: number } | null = null, bestD = Infinity;
+  const consider = (x: number, z: number) => { if (h.penaltyAt(x, z) || d(x, z) < dE - 1e-6) return; const dd = d(x, z); if (dd < bestD) { bestD = dd; best = { x, z }; } };
+  for (let dx = -2 * CLUB_LEN_M; dx <= 2 * CLUB_LEN_M + 1e-9; dx += 0.3) for (let dz = -2 * CLUB_LEN_M; dz <= 2 * CLUB_LEN_M + 1e-9; dz += 0.3) if (Math.hypot(dx, dz) <= 2 * CLUB_LEN_M) consider(e.x + dx, e.z + dz);
+  const L = dE || 1, ux = (e.x - pin.x) / L, uz = (e.z - pin.z) / L;
+  for (let t = 0; t <= 120; t += 0.5) if (!h.penaltyAt(e.x + ux * t, e.z + uz * t)) { consider(e.x + ux * t, e.z + uz * t); break; }   // back on the line: first playable point
+  return best;
+}
+
 function settle(h: Hole, prev: BallState, x: number, z: number, holed: boolean, base: Omit<Played, 'ball' | 'penalty' | 'dropWaitS' | 'totalM'>): Played {
   const totalM = Math.hypot(x - prev.x, z - prev.z);
+  if (h.penaltyAt(x, z) === 'water') {
+    const drop = waterRelief(h, base.samples) ?? { x: prev.x, z: prev.z };   // no legal point found: stroke and distance
+    const ball = { x: drop.x, z: drop.z, strokes: prev.strokes + 2, holedOut: false, surface: h.surfaceAt(drop.x, drop.z) };
+    return { ...base, totalM, ball, penalty: 'Water hazard: +1 stroke, dropped within two club-lengths no nearer the hole', dropWaitS: DROP_WAIT_S };
+  }
   if (h.outOfBounds(x, z)) {
     const ball = { x: prev.x, z: prev.z, strokes: prev.strokes + 2, holedOut: false, surface: h.surfaceAt(prev.x, prev.z) };
-    return { ...base, totalM, ball, penalty: `${h.penaltyAt(x, z) === 'water' ? 'Water' : 'Out of bounds'}: +1 stroke, replay from previous spot`, dropWaitS: DROP_WAIT_S };
+    return { ...base, totalM, ball, penalty: 'Out of bounds: +1 stroke, replay from previous spot', dropWaitS: DROP_WAIT_S };
   }
   const ball = { x, z, strokes: prev.strokes + 1, holedOut: holed, surface: h.surfaceAt(x, z) };
   return { ...base, totalM, ball, dropWaitS: 0 };

@@ -123,3 +123,46 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(bk.ballSpeedMs / fw.ballSpeedMs).toBeCloseTo(0.75, 6);
   });
 });
+
+describe('penalty area relief (PRD/04: +1 and the legal drop nearest the hole, plus the 2 s wait)', () => {
+  const h18 = hole(17);                                         // ocean on the left of hole 18
+  const CLUB_LEN = 1.2, perfect7 = { zMs: 0, xMs: 60, cMs: 150 };
+  /** Finds an aim from the tee that ends in water by scanning, so the test does not assume any layout. */
+  function waterShot() {
+    for (let aim = -170; aim <= 170; aim += 5) {
+      const r = playShot(h18, ball18(0, 0), { clubKey: '7', aimDeg: (aim + 360) % 360, ...perfect7 });
+      if (!('error' in r) && r.penalty?.startsWith('Water')) return { r, aim };
+    }
+    throw new Error('no water shot found on hole 18');
+  }
+  const ball18 = (x: number, z: number): BallState => ({ x, z, strokes: 0, holedOut: false, surface: h18.surfaceAt(x, z) });
+  /** Where the ball last crossed onto ground that was not water, walking the replay backwards from the end. */
+  function entryPoint(samples: { p: { x: number; z: number } }[]) {
+    for (let i = samples.length - 1; i >= 0; i--) { const p = samples[i]!.p; if (h18.penaltyAt(p.x, p.z) !== 'water') return p; }
+    return samples[0]!.p;
+  }
+  it('water: +1 stroke, a 2 s drop wait and the ball dropped on a playable lie', () => {
+    const { r } = waterShot();
+    expect(r.ball.strokes).toBe(2);                              // the stroke and the penalty stroke
+    expect(r.dropWaitS).toBe(2);
+    expect(h18.penaltyAt(r.ball.x, r.ball.z)).toBeNull();
+    expect(r.ball.holedOut).toBe(false);
+  });
+  it('the drop is legal: within two club-lengths of the entry point, or back on the line from the pin through it; never nearer the hole', () => {
+    const { r } = waterShot(), e = entryPoint(r.samples), pin = h18.info.pin;
+    const dEntry = Math.hypot(r.ball.x - e.x, r.ball.z - e.z), nearer = Math.hypot(r.ball.x - pin.x, r.ball.z - pin.z) < Math.hypot(e.x - pin.x, e.z - pin.z) - 1e-6;
+    // back on the line: collinear with pin -> entry point and farther from the pin
+    const ux = e.x - pin.x, uz = e.z - pin.z, L = Math.hypot(ux, uz) || 1, vx = r.ball.x - pin.x, vz = r.ball.z - pin.z;
+    const cross = Math.abs(ux * vz - uz * vx) / L, onLine = cross < 0.5 && Math.hypot(vx, vz) >= L - 1e-6;
+    expect(nearer, 'not nearer the hole than where it entered').toBe(false);
+    expect(dEntry <= 2 * CLUB_LEN + 0.5 || onLine, `drop ${dEntry.toFixed(1)} m from entry`).toBe(true);
+  });
+  it('relief is not just a replay from the previous spot: the ball is dropped near the hazard edge', () => {
+    const { r } = waterShot(), e = entryPoint(r.samples);
+    expect(Math.hypot(r.ball.x - e.x, r.ball.z - e.z)).toBeLessThan(Math.max(8, 0.9 * Math.hypot(e.x, e.z)));   // closer to the entry point than the tee unless the entry is the tee
+  });
+  it('out of bounds stays stroke and distance: replay from the previous spot, +1, 2 s', () => {
+    const r = ok(playShot(hole(0), ball(0, 0), { clubKey: '1', aimDeg: 90, ...perfect }));
+    expect(r.penalty).toMatch(/Out of bounds/); expect([r.ball.x, r.ball.z]).toEqual([0, 0]); expect(r.ball.strokes).toBe(2); expect(r.dropWaitS).toBe(2);
+  });
+});
