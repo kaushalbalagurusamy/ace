@@ -6,6 +6,7 @@ import { extname, join, normalize } from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { LobbyManager } from './lobbies';
 import { playPutt, playShot, type Played } from './race';
+import { parseClientMsg } from './parse';
 import { HOLE_COUNT, hole, teeBall, type Hole } from './course';
 import { rankPlayers } from '../sim';
 import type { BallState, ClientMsg, PlayerRace, ServerMsg } from '../shared/protocol';
@@ -77,22 +78,6 @@ const toLobby = (l: LobbyView | undefined, m: ServerMsg) => l?.players.forEach(p
 const broadcastLobbies = () => { const m: ServerMsg = { t: 'lobbies', lobbies: mgr.list() }; socks.forEach(w => send(w, m)); };
 const lobbyChanged = (l: LobbyView | undefined, activity = true) => { if (l && activity) touched.set(l.id, Date.now()); broadcastLobbies(); toLobby(l, { t: 'lobby', lobby: l ?? null }); };
 
-const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
-const optNum = (v: unknown) => v === undefined || num(v);
-function parse(raw: string): ClientMsg | null {
-  let m: any;
-  try { m = JSON.parse(raw); } catch { return null; }
-  if (!m || typeof m !== 'object' || typeof m.t !== 'string') return null;
-  switch (m.t) {
-    case 'hello': return (m.token === undefined || typeof m.token === 'string') && typeof m.sessionId === 'string' && m.sessionId.length >= 1 && m.sessionId.length <= 64 && typeof m.name === 'string' && m.name.length <= 64 ? m : null;
-    case 'createLobby': case 'leaveLobby': case 'start': case 'startSolo': return m;
-    case 'joinLobby': return typeof m.lobbyId === 'string' ? m : null;
-    case 'ready': return typeof m.ready === 'boolean' ? m : null;
-    case 'shot': return typeof m.clubKey === 'string' && num(m.aimDeg) && optNum(m.zMs) && optNum(m.xMs) && optNum(m.cMs) && optNum(m.length) ? m : null;
-    case 'putt': return num(m.aimDeg) && num(m.length) ? m : null;
-    default: return null;
-  }
-}
 
 function startCountdown(lobbyId: string) {
   let left = COUNTDOWN_S;
@@ -239,7 +224,7 @@ wss.on('connection', ws => {
     if (++inWindow > 40) { ws.terminate(); return; }
     try {
       if (isBinary) return err(ws, 'BAD_MESSAGE', 'text only');
-      const m = parse(data.toString());
+      const m = parseClientMsg(data.toString());
       if (!m) return err(ws, 'BAD_MESSAGE', 'malformed message');
       if (!sid) {
         if (m.t !== 'hello') return; // ignore until hello
