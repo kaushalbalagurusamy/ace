@@ -5,7 +5,8 @@ import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { LobbyManager } from './lobbies';
-import { hole, playPutt, playShot, type Hole, type Played } from './race';
+import { playPutt, playShot, type Played } from './race';
+import { HOLE_COUNT, hole, teeBall, type Hole } from './course';
 import { rankPlayers } from '../sim';
 import type { BallState, ClientMsg, PlayerRace, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from './lobby-types';
@@ -37,10 +38,12 @@ const server = http.createServer((req, res) => {
 // ---- ws layer ----
 const mgr = new LobbyManager();
 const socks = new Map<string, WebSocket>(); // sessionId -> socket
+const HOLES: readonly Hole[] = Array.from({ length: HOLE_COUNT }, (_, i) => hole(i));
+const HOLE_CARD_S = 2; // PRD/04: 2 s hole card, then the player is moved to the next tee; the clock keeps running
 const COUNTDOWN_S = 5, RACE_LIMIT_MS = 20 * 60_000, AFTER_FIRST_MS = 60_000;
 
-interface RPlayer { name: string; ball: BallState; nextAtMs: number; finishS?: number }
-interface Race { lobbyId: string; hole: Hole; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean }
+interface RPlayer { name: string; hole: number; holesDone: number; ball: BallState; nextAtMs: number; finishS?: number }
+interface Race { lobbyId: string; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean }
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
 const tokens = new Map<string, string>(); // sessionId -> secret resume token (never broadcast)
@@ -106,34 +109,35 @@ function startCountdown(lobbyId: string) {
 }
 
 function beginRace(l: LobbyView) {
-  const h = hole(0), goAtMs = Date.now();
+  const h = HOLES[0]!, goAtMs = Date.now();
   const players = new Map<string, RPlayer>();
   for (const p of l.players) {
-    players.set(p.sessionId, { name: p.name, nextAtMs: goAtMs, ball: { x: h.info.tee.x, z: h.info.tee.z, strokes: 0, holedOut: false, surface: h.surfaceAt(h.info.tee.x, h.info.tee.z) } });
+    players.set(p.sessionId, { name: p.name, hole: 0, holesDone: 0, nextAtMs: goAtMs, ball: teeBall(h, 0) });
   }
-  const race: Race = { lobbyId: l.id, hole: h, goAtMs, players, timers: [], firstFinish: false };
+  const race: Race = { lobbyId: l.id, goAtMs, players, timers: [], firstFinish: false };
   race.timers.push(setTimeout(safe(() => endRace(race)), RACE_LIMIT_MS));
   races.set(l.id, race);
   mgr.setState(l.id, 'in_race');
   touched.set(l.id, Date.now());
   broadcastLobbies();
-  const list: PlayerRace[] = [...players].map(([id, p]) => ({ id, name: p.name, hole: 0, ball: { ...p.ball } }));
+  const list: PlayerRace[] = [...players].map(([id, p]) => ({ id, name: p.name, hole: p.hole, ball: { ...p.ball } }));
   toLobby(l, { t: 'raceStart', hole: h.info, players: list, goAtMs });
 }
 
 const present = (r: Race, sid: string) => mgr.lobbyOf(sid)?.id === r.lobbyId;
+const allDone = (r: Race) => [...r.players].every(([id, p]) => p.finishS !== undefined || !present(r, id));
 
 function endRace(r: Race) {
   if (races.get(r.lobbyId) !== r) return;
   races.delete(r.lobbyId);
   r.timers.forEach(clearTimeout);
-  const pin = r.hole.info.pin;
   const arr = [...r.players].map(([id, p]) => ({ id, p }));
-  const places = rankPlayers(arr.map(({ id, p }) => ({
-    id, finishTime: p.finishS, strokes: p.ball.strokes, holesCompleted: p.ball.holedOut ? 1 : 0,
-    distanceToHole: p.ball.holedOut ? undefined : Math.hypot(p.ball.x - pin.x, p.ball.z - pin.z),
-  })));
-  const results = places.map(pl => { const p = r.players.get(pl.id)!; return { id: pl.id, name: p.name, place: pl.place, timeS: p.finishS, strokes: p.ball.strokes, holes: p.ball.holedOut ? 1 : 0 }; });
+  const places = rankPlayers(arr.map(({ id, p }) => {
+    const pin = HOLES[p.hole]!.info.pin;
+    return { id, finishTime: p.finishS, strokes: p.ball.strokes, holesCompleted: p.holesDone,
+      distanceToHole: p.finishS === undefined ? Math.hypot(p.ball.x - pin.x, p.ball.z - pin.z) : undefined };
+  }));
+  const results = places.map(pl => { const p = r.players.get(pl.id)!; return { id: pl.id, name: p.name, place: pl.place, timeS: p.finishS, strokes: p.ball.strokes, holes: p.holesDone }; });
   const m: ServerMsg = { t: 'raceEnd', results };
   r.players.forEach((_, sid) => { if (present(r, sid)) send(socks.get(sid), m); });
   // Back to open (ready flags cleared) so the same players can play again and the slot is never stuck.
@@ -148,12 +152,28 @@ function applyPlay(ws: WebSocket, sid: string, r: Race, me: RPlayer, out: Played
   me.nextAtMs = nowMs + (out.flightS + out.dropWaitS) * 1000;
   const { flightS, dropWaitS, ...wire } = out;
   const lobby = mgr.lobbyOf(sid);
-  toLobby(lobby, { t: 'shotResult', playerId: sid, ...wire });
+  toLobby(lobby, { t: 'shotResult', playerId: sid, hole: me.hole, ...wire });
   if (!out.ball.holedOut) return;
-  me.finishS = (nowMs - r.goAtMs) / 1000 + flightS;
-  toLobby(lobby, { t: 'holedOut', playerId: sid, strokes: out.ball.strokes, splitS: me.finishS });
-  if ([...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id))) endRace(r);
+  const splitS = (nowMs - r.goAtMs) / 1000 + flightS, last = me.hole === HOLE_COUNT - 1;
+  me.holesDone++;
+  toLobby(lobby, { t: 'holedOut', playerId: sid, hole: me.hole, strokes: out.ball.strokes, splitS, finished: last });
+  if (!last) {
+    me.nextAtMs = nowMs + (flightS + HOLE_CARD_S) * 1000;
+    r.timers.push(setTimeout(safe(() => advance(r, sid, me)), (flightS + HOLE_CARD_S) * 1000));
+    return;
+  }
+  me.finishS = splitS;
+  if (allDone(r)) endRace(r);
   else if (!r.firstFinish) { r.firstFinish = true; r.timers.push(setTimeout(safe(() => endRace(r)), AFTER_FIRST_MS)); }
+}
+
+/** Moves a player who holed out to the next tee (the race clock never stopped). */
+function advance(r: Race, sid: string, me: RPlayer) {
+  if (races.get(r.lobbyId) !== r || !present(r, sid) || me.hole >= HOLE_COUNT - 1) return;
+  me.hole++;
+  me.ball = teeBall(HOLES[me.hole]!, me.ball.strokes);
+  me.nextAtMs = Date.now();
+  toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: HOLES[me.hole]!.info, ball: { ...me.ball } });
 }
 
 function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
@@ -181,7 +201,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       const now = Date.now();
       if (me.ball.holedOut) return err(ws, 'NOT_YOUR_TURN', 'already holed out');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
-      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(r.hole, me.ball, m) : playPutt(r.hole, me.ball, m.aimDeg, m.drawMs), now);
+      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, m) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.drawMs), now);
       return;
     }
     default: return err(ws, 'BAD_MESSAGE', 'unexpected hello');
@@ -202,7 +222,7 @@ function drop(sid: string) {
     const after = mgr.list().find(l => l.id === before.id);
     lobbyChanged(after);
     const r = races.get(before.id);
-    if (r && (!after || [...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id)))) endRace(r);
+    if (r && (!after || allDone(r))) endRace(r);
   } else broadcastLobbies();
 }
 

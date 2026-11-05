@@ -27,6 +27,8 @@ export type ServerMsg =
   | { t: 'lobby'; lobby: LobbyView | null }
   | { t: 'countdown'; seconds: number }
   | { t: 'raceStart'; hole: HoleInfo; players: PlayerRace[]; goAtMs: number }
-  | { t: 'shotResult'; playerId: string; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; grade: { z: number; x: number; c: number }; ball: BallState; penalty?: string }
-  | { t: 'holedOut'; playerId: string; strokes: number; splitS: number }
+  | { t: 'shotResult'; playerId: string; hole: number; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; grade: { z: number; x: number; c: number }; ball: BallState; penalty?: string }
+  | { t: 'holedOut'; playerId: string; hole: number; strokes: number; splitS: number; /** true after hole 18 */ finished: boolean }
+  /** Sent to the whole lobby 2 s after a hole-out: that player is now on the tee of `hole`. Strokes in `ball` are cumulative. */
+  | { t: 'nextHole'; playerId: string; hole: HoleInfo; ball: BallState }
   | { t: 'raceEnd'; results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };
