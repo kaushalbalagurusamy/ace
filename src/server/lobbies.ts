@@ -19,9 +19,10 @@ export class LobbyManager {
 
   connect(sessionId: string, name: string): Result<{ sessionId: string; name: string }> {
     if (this.players.has(sessionId)) return fail('ALREADY_CONNECTED');
-    const n = name.trim();
-    if (n.length < 2 || n.length > 16) return fail('NAME_INVALID');
-    const key = n.toLowerCase();
+    const n = typeof name === 'string' ? name.normalize('NFKC').trim() : '';
+    // letters, digits, space, _ and - only: no control, format, zero-width or bidi characters
+    if (n.length < 2 || n.length > 16 || !/^[\p{L}\p{N} _-]+$/u.test(n)) return fail('NAME_INVALID');
+    const key = n.toLowerCase(); // shortcut: no confusable (homoglyph) skeleton, add if impersonation matters
     for (const p of this.players.values()) if (p.name.toLowerCase() === key) return fail('NAME_TAKEN');
     this.players.set(sessionId, { name: n, ready: false });
     return { ok: true, value: { sessionId, name: n } };
@@ -80,8 +81,8 @@ export class LobbyManager {
     const c = this.ctx(sessionId);
     if (!c.ok) return c;
     if (c.lobby.host !== sessionId) return fail('NOT_HOST');
-    const n = name.trim();
-    if (n.length < 1 || n.length > 24) return fail('NAME_INVALID');
+    const n = typeof name === 'string' ? name.normalize('NFKC').trim() : '';
+    if (n.length < 1 || n.length > 24 || !/^[\p{L}\p{N} _'.!-]+$/u.test(n)) return fail('NAME_INVALID');
     c.lobby.name = n;
     return { ok: true, value: this.view(c.lobby) };
   }

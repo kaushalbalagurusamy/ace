@@ -35,6 +35,24 @@ describe('names', () => {
   });
 });
 
+describe('name hygiene', () => {
+  it('rejects control, zero-width, bidi characters and non-strings; NFKC makes fullwidth equal to ASCII', () => {
+    const m = new LobbyManager();
+    expect(err(m.connect('a', 'bo\u200Bb'))).toBe('NAME_INVALID');
+    expect(err(m.connect('a', 'bo\u202Eb'))).toBe('NAME_INVALID');
+    expect(err(m.connect('a', 'bo\nb'))).toBe('NAME_INVALID');
+    expect(err(m.connect('a', 42 as unknown as string))).toBe('NAME_INVALID');
+    expect(m.connect('a', 'Bob').ok).toBe(true);
+    expect(err(m.connect('b', '\uFF22\uFF4F\uFF42'))).toBe('NAME_TAKEN'); // fullwidth "Bob"
+  });
+  it('lobby rename rejects zero-width characters', () => {
+    const { m, ids } = setup(1);
+    m.createLobby(ids[0]!);
+    expect(err(m.renameLobby(ids[0]!, 'a\u200Bb'))).toBe('NAME_INVALID');
+    expect(m.renameLobby(ids[0]!, "Ann's lobby").ok).toBe(true);
+  });
+});
+
 describe('AC-L1 lobby limit', () => {
   it('a 4th lobby is rejected by the server', () => {
     const { m, ids } = setup(4);
