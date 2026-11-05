@@ -1,6 +1,6 @@
 # ADR-0001: Engine, server authority and host
 
-Status: accepted 2026-11-05 (owner decisions in `PRD/README.md`; host default applied because the owner answered "defaults").
+Status: accepted 2026-11-05 (owner decisions in `PRD/README.md`; host amended to Railway, see item 5).
 
 ## Decision
 
@@ -8,7 +8,7 @@ Status: accepted 2026-11-05 (owner decisions in `PRD/README.md`; host default ap
 2. **Server:** one Node process with `ws`, authoritative for every shot. Clients send raw swing key timings; the server re-scores them, simulates the flight at a fixed 240 Hz step and sends back the whole trajectory (60 Hz samples). Clients only replay. No peer-to-peer.
 3. **Shared code:** `src/sim/` is pure TypeScript with no DOM and no I/O. Only the server runs it for results. The client may import its types and constants, never call it to decide an outcome.
 4. **Tests:** Vitest. Test command: `npm test`.
-5. **Host (default, no ADR-level evidence yet):** a single always-on WebSocket host with the static client served by the same Node process. Free-tier hosts that sleep (Render free, F-042/F-043) are rejected for judging time. Provider is chosen at deploy time within a $0 extra spend ceiling (F-044 default); if no free always-on host works, that is a recorded blocker for the owner, not a silent downgrade.
+5. **Host (amended 2026-11-05 by supervisor/owner):** Railway. It supports WebSockets, stays always-on and gives a stable `*.up.railway.app` URL that can be submitted by the midnight deadline and polished in place until 08:00 Fri. One Node process serves the built client and the `ws` endpoint on `PORT`, with a `/healthz` route. Deploy is a Dockerfile. The owner runs `railway login`; no agent deploys before that. Render free (sleeps, F-042/F-043) stays rejected. Spend on Railway is unmeasured; F-044 ceiling still applies.
 
 ## Limits of the evidence
 
