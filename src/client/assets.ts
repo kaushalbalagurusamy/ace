@@ -6,7 +6,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
-interface Row { id: string; target_height_m?: number; height_m?: number }
+interface Row { id: string; target_height_m?: number; height_m?: number; qa?: { verdict?: string } }
 let manifest: Promise<Row[]> | null = null;
 const rows = () => (manifest ??= fetch('/assets/manifest.json').then(async r => (r.ok ? ((await r.json()) as Row[]) : [] as Row[])).catch(() => [] as Row[]));
 
@@ -25,8 +25,10 @@ export async function loadModel(id: string): Promise<THREE.Object3D | null> {
   if (!models.has(id)) {
     models.set(id, (async () => {
       try {
-        const [g, all] = await Promise.all([gltf().loadAsync(`/assets/models/${id}.glb`), rows()]);
-        const row = all.find(r => r.id === id), height = row?.target_height_m ?? row?.height_m ?? 1;
+        const row = (await rows()).find(r => r.id === id), height = row?.target_height_m ?? row?.height_m ?? 1;
+        if (row?.qa?.verdict !== 'PASS') return null; // owner rule: a 3D model ships only after its fidelity check passed; until then the code-built stand-in stays
+        const g = await gltf().loadAsync(`/assets/models/${id}.glb`);
+
         const root = new THREE.Group(); root.add(g.scene);
         const box = new THREE.Box3().setFromObject(g.scene), size = box.getSize(new THREE.Vector3());
         const k = size.y > 0 ? height / size.y : 1; g.scene.scale.multiplyScalar(k);
