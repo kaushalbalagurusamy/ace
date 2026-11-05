@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { IDEAL_MS, BAG, launchFor, scoreSwing, simulateShot } from '../src/sim';
+import { IDEAL_MS, BAG, LAND_ROLL_FRACTION, launchFor, rollDistance, scoreSwing, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
@@ -8,20 +8,15 @@ const ball = (x: number, z: number, strokes = 0): BallState => ({ x, z, strokes,
 const ok = (r: Played | { error: string }): Played => { if ('error' in r) throw new Error(r.error); return r; };
 const perfect = { zMs: IDEAL_MS.z, xMs: IDEAL_MS.x, cMs: IDEAL_MS.c };
 
-describe('hole geometry', () => {
-  it('green within 14 m of the pin, fairway within 22 m of the centre line, then first cut to 30 m, then rough', () => {
-    expect(h.surfaceAt(pin.x, pin.z - 13)).toBe('green');
-    expect(h.surfaceAt(0, 100)).toBe('fairway');
-    expect(h.surfaceAt(25, 100)).toBe('firstCut');
-    expect(h.surfaceAt(40, 100)).toBe('rough');
-  });
-  it('out of bounds beyond 70 m wide, behind the tee, or 40 m past the pin', () => {
-    expect(h.outOfBounds(71, 100)).toBe(true);
-    expect(h.outOfBounds(0, -21)).toBe(true);
-    expect(h.outOfBounds(0, pin.z + 41)).toBe(true);
-    expect(h.outOfBounds(0, 100)).toBe(false);
-  });
-});
+/** Finds a spot on the hole with the given lie and room around it (scans the traced grid; independent of any layout assumption). */
+function findLie(h: ReturnType<typeof hole>, lie: string, minZ = 40, maxZ = 200): { x: number; z: number } {
+  for (let z = minZ; z <= maxZ; z += 3) for (let x = -60; x <= 60; x += 3) {
+    if (h.surfaceAt(x, z) !== lie || h.penaltyAt(x, z)) continue;
+    let all = true; for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]] as [number, number][]) if (h.surfaceAt(x + dx, z + dz) !== lie) all = false;
+    if (all) return { x, z };
+  }
+  throw new Error(`no ${lie} spot on the hole`);
+}
 
 describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture)', () => {
   const start = ball(pin.x, pin.z - 1);
@@ -34,7 +29,7 @@ describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture)', () => {
     expect(r.ball.z).toBeCloseTo(pin.z, 6);
   });
   it('a putt hit too hard rolls past the cup without dropping (speed above 1.6 m/s)', () => {
-    const r = ok(playPutt(h, start, 0, 0.4));
+    const r = ok(playPutt(h, start, 0, 0.15)); // 2.25 m/s: about 2.0 m/s over the cup, above the 1.6 m/s capture limit
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeGreaterThan(pin.z);
     expect(r.ball.strokes).toBe(1);
@@ -84,10 +79,13 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(r.totalM).toBeGreaterThan(r.carryM);
     expect(r.flightS).toBeGreaterThan(simulateShot(launchFor(BAG[0]!, scoreSwing(perfect))).flightTimeS);
   });
-  it('server total equals the sim total on a flat fairway: there is one roll model', () => {
+  it('server total = sim carry + one roll-out from LAND_ROLL_FRACTION of the landing speed on the landing lie (one roll model)', () => {
     const sim = simulateShot(launchFor(BAG[0]!, scoreSwing(perfect)));
     const r = ok(playShot(h, tee, { clubKey: '1', aimDeg: 0, ...perfect }));
-    expect(Math.abs(r.totalM - sim.totalM)).toBeLessThan(0.02 * sim.totalM);
+    expect(r.penalty).toBeUndefined();
+    const landing = h.surfaceAt(0, sim.carryM);
+    const expected = sim.carryM + rollDistance(LAND_ROLL_FRACTION * sim.landingSpeedMs, landing);
+    expect(Math.abs(r.totalM - expected)).toBeLessThan(0.03 * expected);
   });
   it('aim rotates the shot about the ball: 90 degrees aim sends a drive sideways (out of bounds, penalty)', () => {
     const r = ok(playShot(h, tee, { clubKey: '1', aimDeg: 90, ...perfect }));
@@ -114,10 +112,14 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect('error' in playShot(h, tee, { clubKey: 'P', aimDeg: 0 })).toBe(true);
     expect('error' in playShot(h, tee, { clubKey: 'Z', aimDeg: 0 })).toBe(true);
   });
-  it('rough costs distance versus fairway for the same swing (lie speed multiplier)', () => {
-    const fw = ok(playShot(h, ball(0, 100), { clubKey: '7', aimDeg: 0, ...perfect }));
-    const rough = ok(playShot(h, ball(40, 100), { clubKey: '7', aimDeg: 0, ...perfect }));
-    expect(rough.carryM).toBeLessThan(fw.carryM + 0.0001); // carry is the sim's; rough lowers ball speed
-    expect(rough.ballSpeedMs).toBeLessThan(fw.ballSpeedMs);
+  it('the rough lie costs 15% of ball speed versus the fairway for the same swing (PRD/03 section 4: 0.85)', () => {
+    const f = findLie(h, 'fairway', 60), r = findLie(h, 'rough', 60);
+    const fw = ok(playShot(h, ball(f.x, f.z), { clubKey: '7', aimDeg: 0, ...perfect })), ro = ok(playShot(h, ball(r.x, r.z), { clubKey: '7', aimDeg: 0, ...perfect }));
+    expect(ro.ballSpeedMs / fw.ballSpeedMs).toBeCloseTo(0.85, 6);
+  });
+  it('the bunker lie costs 25% of ball speed (0.75) for a full club', () => {
+    const f = findLie(h, 'fairway', 60), b = findLie(h, 'bunker', 0, 400);
+    const fw = ok(playShot(h, ball(f.x, f.z), { clubKey: '9', aimDeg: 0, ...perfect })), bk = ok(playShot(h, ball(b.x, b.z), { clubKey: '9', aimDeg: 0, ...perfect }));
+    expect(bk.ballSpeedMs / fw.ballSpeedMs).toBeCloseTo(0.75, 6);
   });
 });

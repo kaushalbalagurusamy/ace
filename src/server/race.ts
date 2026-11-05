@@ -42,7 +42,7 @@ function settle(h: Hole, prev: BallState, x: number, z: number, holed: boolean, 
   const totalM = Math.hypot(x - prev.x, z - prev.z);
   if (h.outOfBounds(x, z)) {
     const ball = { x: prev.x, z: prev.z, strokes: prev.strokes + 2, holedOut: false, surface: h.surfaceAt(prev.x, prev.z) };
-    return { ...base, totalM, ball, penalty: 'Out of bounds: +1 stroke, replay from previous spot', dropWaitS: DROP_WAIT_S };
+    return { ...base, totalM, ball, penalty: `${h.penaltyAt(x, z) === 'water' ? 'Water' : 'Out of bounds'}: +1 stroke, replay from previous spot`, dropWaitS: DROP_WAIT_S };
   }
   const ball = { x, z, strokes: prev.strokes + 1, holedOut: holed, surface: h.surfaceAt(x, z) };
   return { ...base, totalM, ball, dropWaitS: 0 };

@@ -1,8 +1,9 @@
 // The Pebble Beach Golf Links card (docs/research/reference-sources.md: SFGATE 2000 U.S. Open card, hole 2 played as a par 5).
-// SIMPLIFICATION: every hole has a straight centre line at its true length. Doglegs and the coastline from the hole
-// graphics are not modelled yet (docs/slices/course-18/spec.md).
+// Layouts are traced from the SFGATE hole graphics (scripts/trace_holes.py -> src/shared/course-grid.ts): the tee is the
+// origin, the pin is on +z at the card yardage, and one lie grid per hole drives the server's physics and the client's visuals.
 import type { Surface } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
+import { GRIDS, type HoleGrid } from '../shared/course-grid';
 
 export const CARD: readonly { par: number; yards: number }[] = [
   [4, 381], [5, 502], [4, 390], [4, 331], [3, 188], [5, 524], [3, 106], [4, 418], [4, 466],
@@ -10,23 +11,46 @@ export const CARD: readonly { par: number; yards: number }[] = [
 ].map(([par, yards]) => ({ par: par!, yards: yards! }));
 export const HOLE_COUNT = CARD.length;
 
-const M_PER_YD = 0.9144, FIRST_CUT_HALF = 30, OOB_HALF = 70;
+const M_PER_YD = 0.9144;
 
-export interface Hole { info: HoleInfo; surfaceAt(x: number, z: number): Surface; outOfBounds(x: number, z: number): boolean }
+export type Penalty = 'water' | 'oob';
+export interface Hole {
+  info: HoleInfo;
+  /** the lie under (x, z); hazards that are penalties report 'rough' here, use penaltyAt for those */
+  surfaceAt(x: number, z: number): Surface;
+  /** water or out of bounds (beyond the traced map counts as out of bounds); null when the spot is playable */
+  penaltyAt(x: number, z: number): Penalty | null;
+  outOfBounds(x: number, z: number): boolean;
+}
+
+/** Decodes one grid's run-length rows into a flat array of class characters (cached per hole). */
+function decode(g: HoleGrid): Uint8Array {
+  const a = new Uint8Array(g.nx * g.nz).fill(111); // 'o'
+  g.rows.forEach((row, iz) => { let ix = 0; for (const m of row.matchAll(/([a-z])(\d*)/g)) { const n = m[2] ? Number(m[2]) : 1; a.fill(m[1]!.charCodeAt(0), iz * g.nx + ix, iz * g.nx + ix + n); ix += n; } });
+  return a;
+}
+const LIE: Record<string, Surface> = { g: 'green', f: 'fairway', p: 'fairway', c: 'firstCut', r: 'rough', t: 'rough', k: 'rough', s: 'bunker', w: 'rough', o: 'rough' };
+const cache: (Uint8Array | undefined)[] = [];
 
 export function hole(index: number): Hole {
   if (!Number.isInteger(index) || index < 0 || index >= HOLE_COUNT) throw new RangeError(`no such hole: ${index}`);
   const { par, yards } = CARD[index]!;
-  const lengthM = yards * M_PER_YD;
-  const info: HoleInfo = { index, par, pin: { x: 0, z: lengthM }, tee: { x: 0, z: 0 }, greenRadius: 14, fairwayHalfWidth: 22, lengthM };
+  const lengthM = yards * M_PER_YD, g = GRIDS[index]!, cells = (cache[index] ??= decode(g));
+  const cls = (x: number, z: number): number => {
+    const ix = Math.floor((x - g.x0) / g.cell), iz = Math.floor((z - g.z0) / g.cell);
+    return ix < 0 || iz < 0 || ix >= g.nx || iz >= g.nz ? 111 : cells[iz * g.nx + ix]!;
+  };
+  // green radius from the traced green's area around the pin
+  let greenCells = 0;
+  for (let dz = -40; dz <= 40; dz += g.cell) for (let dx = -40; dx <= 40; dx += g.cell) if (Math.hypot(dx, dz) <= 40 && cls(dx, lengthM + dz) === 103) greenCells++;
+  const greenRadius = Math.sqrt((greenCells * g.cell * g.cell) / Math.PI);
+  const info: HoleInfo = { index, par, pin: { x: 0, z: lengthM }, tee: { x: 0, z: 0 }, greenRadius, fairwayHalfWidth: 20, lengthM };
+  const penaltyAt = (x: number, z: number): Penalty | null => { const c = cls(x, z); return c === 119 ? 'water' : c === 111 ? 'oob' : null; };
   return {
     info,
-    surfaceAt(x, z) {
-      if (Math.hypot(x - info.pin.x, z - info.pin.z) <= info.greenRadius) return 'green';
-      const ax = Math.abs(x);
-      return ax <= info.fairwayHalfWidth ? 'fairway' : ax <= FIRST_CUT_HALF ? 'firstCut' : 'rough';
-    },
-    outOfBounds: (x, z) => Math.abs(x) > OOB_HALF || z < -20 || z > info.pin.z + 40,
+    surfaceAt: (x, z) => LIE[String.fromCharCode(cls(x, z))] ?? 'rough',
+    penaltyAt,
+    outOfBounds: (x, z) => penaltyAt(x, z) !== null,
   };
 }
 
