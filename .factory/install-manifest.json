@@ -1,0 +1,128 @@
+{
+  "agent_models": {
+    "audit": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "design": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "implement": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "orchestrator": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "qa": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "research": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "review": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    },
+    "test": {
+      "pinned": "sonnet",
+      "proposed": "sonnet"
+    }
+  },
+  "allowed_models": [
+    "sonnet"
+  ],
+  "backups": [],
+  "env_pin": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CLAUDE_CODE_SUBAGENT_MODEL_FORCE": "1"
+  },
+  "factory": {
+    "commit": "01c18ae1d2f40f56b9c1a60243b9b10ca2b1ca4d",
+    "root": "/Users/kaushal/Projects/software-factory",
+    "version": "0.1.0"
+  },
+  "items": [
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".factory/profile.yaml",
+      "sha256": "e579fdae271b69a9424043d7c87b491d00272a31aed780a905f5e896589c6537",
+      "tracked": false
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/audit.md",
+      "sha256": "4eaaf052f48e2906f5738009261ac5b0977d6ce5f73e641ca4d2e1b6c27d7628",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/design.md",
+      "sha256": "2c4ce4aa428d443548745453abcebb2ca691d2a38dbbd6345089e64b3758e4dc",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/implement.md",
+      "sha256": "ac09ece0aee7454e00bb7b92911e1380416867459b6fe488f67b6bf28236656b",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/orchestrator.md",
+      "sha256": "a765ba78e9c6bd42d377d1ee18fb16add5d434817ec623f340e0c31a134c7f63",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/qa.md",
+      "sha256": "1ff6cf017c03254be1bd423a54c3a8330b653cffdf018cd40d79b6f88821758b",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/research.md",
+      "sha256": "120f2c9b9eba875f07ec42612ddee45202581428a44fe931471b6f8b68af44f9",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/review.md",
+      "sha256": "e77492c1608383733670ed4279957fad53aa58c78b0c2ea2142fdeb62156eba5",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/agents/test.md",
+      "sha256": "272595049e455956a6a4e908c6972b177885620a17145314a9b8646f3dad8756",
+      "tracked": true
+    },
+    {
+      "backup": null,
+      "origin": "created",
+      "path": ".claude/settings.json",
+      "sha256": "93cd8f358a2921888828c73622e9911f31ecce13de46c7b5af4d431894f0991f",
+      "tracked": true
+    }
+  ],
+  "model_pin": "sonnet",
+  "options": {
+    "agents": true,
+    "hooks": true
+  },
+  "python": "/Users/kaushal/Projects/software-factory/.venv/bin/python",
+  "schema": 1
+}

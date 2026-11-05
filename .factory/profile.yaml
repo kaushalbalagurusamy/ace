@@ -1,0 +1,19 @@
+# Written by `python -m factory.install` because the project had no profile. Edit freely; the
+# installer never modifies an existing profile. Defaults: generic protected paths, the
+# orchestrator as the main-session role, and the standard stage graph (the `graph` key is omitted,
+# so the factory's default graph applies).
+schema_version: 1
+project: {name: project-ca22e043}
+main_session_role: orchestrator
+paths:
+  eval: ["evals/**"]
+  held_out: ["tests/held_out/**"]
+  frozen_tests: ["tests/frozen/**"]
+  baseline_update: ["evals/baselines/**"]
+# Releasing a human stop is a one-way door: the orchestrator is asked, every other role is denied
+# (a declaration `--by human:<ref>` alone would let an agent type it).
+one_way_door_patterns:
+  - 'factory\.cli\s+hitl'
+  - '\bsf\s+hitl\b.*\b(release|supersede)'
+  - 'factory\.hitl'
+  - '\.factory/stops'

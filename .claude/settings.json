@@ -1,0 +1,83 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks path_guard"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks secrets_guard"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks blindness_guard"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks bash_guard"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks stop_gate"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks subagent_stop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks ledger_audit"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=/Users/kaushal/Projects/software-factory /Users/kaushal/Projects/software-factory/.venv/bin/python -m factory.hooks session_start"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "sonnet",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CLAUDE_CODE_SUBAGENT_MODEL_FORCE": "1"
+  }
+}
