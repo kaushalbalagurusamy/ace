@@ -7,7 +7,12 @@ import { Net } from './net';
 import { BAG, PUTTER, UI, YD, errText } from './ui';
 import { World } from './scene';
 
-const SPEED = 9, RANGE = 2.5;
+import { RANGE, WALK_SPEED, SPRINT_SPEED, canAddress, golferSpot, distance } from './rules';
+import { DEFAULT_MULT, label as lookLabel, loadMult, lookDelta, requestLock, saveMult, stepMult } from './sensitivity';
+import { rfView } from './terrain';
+import { BAG as SIMBAG, IDEAL_MS, durationScale, launchFor, scoreSwing, simulateShot } from '../sim';
+let lookMult = loadMult() ?? DEFAULT_MULT;
+let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
 
 let sessionId = sessionStorage.getItem('ace.sid') ?? crypto.randomUUID();
@@ -80,13 +85,16 @@ function onMsg(m: ServerMsg) {
       const me = world.ents.get(selfId);
       pos = me ? { x: me.ball.x + 1, z: me.ball.z - 0.5 } : { ...m.hole.tee };
       yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z);
-      holeStartStrokes = 0; startAmbience(m.hole.index);
+      holeStartStrokes = 0; startAmbience(m.hole.index); world.selfId = selfId;
       phase = 'race'; ui.screen(null); board(); break;
     }
     case 'shotResult': {
       world.shot(m); if (m.playerId === selfId) { ui.card(m); swing = null; }
       shotSounds(m);
-      if (m.penalty) ui.toast(`${world.ents.get(m.playerId)?.name ?? ''}: ${m.penalty}`);
+      if (m.penalty && m.playerId === selfId) {
+        ui.banner(m.penalty);                                                  // the ball is NOT where the tracer ends: say so loudly
+        setTimeout(() => { pos = golferSpot(m.ball); }, (m.samples.at(-1)?.t ?? 0) * 1000 + 300);   // PRD/04: the golfer is moved to the drop
+      } else if (m.penalty) ui.toast(`${world.ents.get(m.playerId)?.name ?? ''}: ${m.penalty}`);
       board(); break;
     }
     case 'holedOut': {
@@ -133,10 +141,10 @@ const board = () => ui.board([...world.ents.values()].map(e => ({ id: e.id, name
 
 // ---- input ----
 const canvas = world.renderer.domElement;
-canvas.addEventListener('click', () => { if (phase === 'race') canvas.requestPointerLock?.(); });
+canvas.addEventListener('click', () => { if (phase === 'race') void requestLock(canvas); });
 addEventListener('mousemove', e => {
   if (phase !== 'race' || swing || (document.pointerLockElement !== canvas && !(e.buttons & 1))) return;
-  yaw += e.movementX * 0.003; pitch = Math.min(1.2, Math.max(0.05, pitch + e.movementY * 0.003));
+  yaw += lookDelta(e.movementX, lookMult); pitch = Math.min(1.2, Math.max(0.05, pitch + lookDelta(e.movementY, lookMult)));
 });
 const own = () => world.ents.get(selfId);
 const started = () => Date.now() >= goAt && !endAt;
@@ -149,12 +157,14 @@ addEventListener('keydown', e => {
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === 'KeyN') { audio.toggleMute(); return; }
+  if (e.code === 'Comma' || e.code === 'Period') { lookMult = stepMult(lookMult, e.code === 'Period' ? 1 : -1); saveMult(lookMult); ui.toast(lookLabel(lookMult)); return; }
+  if (e.code === 'KeyM' && !swing) { rfOpen = !rfOpen; rfHover = null; ui.rf().style.display = rfOpen ? 'block' : 'none'; ui.rfTip(null); if (rfOpen) document.exitPointerLock(); return; }
   const ci = BAG.findIndex(b => b.code === e.code);
   if (ci >= 0 && !swing) { club = ci; ui.setClub(ci); return; } // locked once the stance starts
   if (swing) { if (swing.sentAt === undefined) act(swing.fsm.key(e.code, true, e.timeStamp)); return; }
   if (e.code === 'Space' && started()) {
     const me = own();
-    if (!me || me.ball.holedOut || me.anim || ownDist() > RANGE) return;
+    if (rfOpen || !me || !canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut })) return;
     const putt = club === PUTTER, aim = aimDeg(yaw); // first press: take the stance and lock the aim
     swing = { fsm: new SwingFSM({ putt, aimDeg: aim, clubKey: BAG[club]!.key }), putt, aim };
     act(swing.fsm.key(e.code, true, e.timeStamp)); // the machine models the first press too
@@ -179,8 +189,8 @@ function frame(now: number) {
   const me = own(), go = started();
   if (!swing && go) {
     const f = Number(keys.has('KeyW')) - Number(keys.has('KeyS')), r = Number(keys.has('KeyD')) - Number(keys.has('KeyA'));
-    const n = Math.hypot(f, r) || 1;
-    pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * SPEED * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * SPEED * dt;
+    const n = Math.hypot(f, r) || 1, speed = keys.has('ShiftLeft') || keys.has('ShiftRight') ? SPRINT_SPEED : WALK_SPEED;
+    pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * speed * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * speed * dt;
   }
   if (swing) {
     if (swing.sentAt !== undefined) { if (!stuckSince) stuckSince = now; if (now - stuckSince > 3000) { swing = null; stuckSince = 0; } }
@@ -195,7 +205,10 @@ function frame(now: number) {
     }
   } else { stuckSince = 0; ui.meterShow(null); }
   if (!swing) ui.meterShow(null);
-  ui.prompt(!swing && go && me && !me.ball.holedOut && !me.anim && ownDist() <= RANGE ? 'Space: take your stance' : '');
+  const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut });
+  ui.prompt(swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`);
+  ui.ballMarker(me && !me.ball.holedOut ? world.ballScreen() : null, me ? Math.hypot(me.ball.x - pos.x, me.ball.z - pos.z) * YD : 0);
+  if (rfOpen && me && hole) ui.drawRangefinder(hole, me.ball, pos, rfTarget, rfHover);
   const cd = goAt - Date.now();
   ui.countdown(cd > 0 ? String(Math.ceil(cd / 1000)) : cd > -800 ? 'GO' : '');
   if (me) {
@@ -206,10 +219,32 @@ function frame(now: number) {
   }
   world.tick(now);
   ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => [
-    { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true },
+    { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true, own: e.id === selfId },
     { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade },
   ]));
   const cam = me?.anim ? me.ballMesh.position : null; // camera follows the ball while it flies
   world.render(cam ? -cam.x : pos.x, cam ? cam.z : pos.z, swing ? swing.aim * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : 1.5);
 }
 requestAnimationFrame(frame);
+
+// ---- rangefinder (PRD/02 section 7): M toggles; hover shows distances and a club suggestion; click sets a target shown on the maps only ----
+const rfCanvas = ui.rfCanvas();
+const perfectAt = (L: number) => { const d = durationScale(L); return scoreSwing({ zMs: IDEAL_MS.z, xMs: IDEAL_MS.x * d, cMs: IDEAL_MS.c * d }, L); };
+const clubs = SIMBAG.filter(c => c.key !== 'P');
+const carryYd = (c: (typeof SIMBAG)[number], L = 1) => simulateShot(launchFor(c, perfectAt(L), L)).carryM * YD;
+let fullCarries: { label: string; yd: number }[] | null = null;
+/** "Plays like" suggestion from the sim's perfect-swing carries; below the wedge's full carry it names the wedge and a swing length. */
+function playsLike(yd: number): string {
+  fullCarries ??= clubs.map(c => ({ label: c.label, yd: carryYd(c) }));
+  const wedge = clubs.find(c => c.key === 'O')!, wedgeFull = fullCarries.find(f => f.label === wedge.label)!.yd;
+  if (yd < wedgeFull) { let lo = 0.05, hi = 1; for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (carryYd(wedge, mid) < yd) lo = mid; else hi = mid; } return `${wedge.label} at ${Math.round(((lo + hi) / 2) * 100)}%`; }
+  return fullCarries.reduce((a, b) => (Math.abs(b.yd - yd) < Math.abs(a.yd - yd) ? b : a)).label;
+}
+const rfWorld = (e: MouseEvent) => { const r = rfCanvas.getBoundingClientRect(); return { p: rfView(hole!.index, rfCanvas.width, rfCanvas.height).toWorld(((e.clientX - r.left) / r.width) * rfCanvas.width, ((e.clientY - r.top) / r.height) * rfCanvas.height), cx: e.clientX - r.left, cy: e.clientY - r.top }; };
+rfCanvas.addEventListener('mousemove', e => {
+  const me = own(); if (!rfOpen || !hole || !me) return;
+  const { p, cx, cy } = rfWorld(e); rfHover = p;
+  const fromBall = Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, toPin = Math.hypot(p.x - hole.pin.x, p.z - hole.pin.z) * YD;
+  ui.rfTip(`From your ball: ${Math.round(fromBall)} yd\nTo the pin: ${Math.round(toPin)} yd\nElevation: flat\nPlays like: ${playsLike(fromBall)}`, cx, cy);
+});
+rfCanvas.addEventListener('click', e => { if (rfOpen && hole) rfTarget = rfWorld(e).p; });

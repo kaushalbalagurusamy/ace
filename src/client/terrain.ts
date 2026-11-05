@@ -11,6 +11,12 @@ const COL: Record<string, [number, number, number]> = {
 };
 /** Outside the traced map on an ocean hole is open sea (still out of bounds for the rules). */
 const COL_OPEN_SEA: [number, number, number] = [48, 112, 170];
+const COL_OOB: [number, number, number] = [26, 58, 36], COL_OOB_STRIPE: [number, number, number] = [36, 76, 48];
+/** A playable cell next to an out-of-bounds cell: drawn as the white boundary line so out of bounds is unmistakable. */
+function edgeOfOob(cells: Uint8Array, g: (typeof GRIDS)[number], cx: number, cz: number): boolean {
+  for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) { const x = cx + dx, z = cz + dz; if (x < 0 || z < 0 || x >= g.nx || z >= g.nz || cells[z * g.nx + x] === 111) return true; }
+  return false;
+}
 const cache = new Map<string, HTMLCanvasElement>();
 const grids = new Map<number, Uint8Array>();
 const seaMasks = new Map<number, Uint8Array>();
@@ -38,7 +44,10 @@ export function gridCanvas(hole: number, px: number, mirrorX: boolean, flipZ: bo
   for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) {
     const ix = Math.min(g.nx - 1, Math.floor(x / px)), iz = Math.min(g.nz - 1, Math.floor(y / px));
     const cx = mirrorX ? g.nx - 1 - ix : ix, cz = flipZ ? g.nz - 1 - iz : iz;
-    const ch = String.fromCharCode(cells[cz * g.nx + cx]!), col = (ch === 'o' && g.coastal && sea[cz * g.nx + cx] ? COL_OPEN_SEA : COL[ch]) ?? COL.o!;
+    const ch = String.fromCharCode(cells[cz * g.nx + cx]!), isSea = ch === 'o' && g.coastal && sea[cz * g.nx + cx];
+    let col = (isSea ? COL_OPEN_SEA : ch === 'o' ? COL_OOB : COL[ch]) ?? COL.o!;
+    if (ch === 'o' && !isSea && px > 1 && (((x >> 2) + (y >> 2)) & 1)) col = COL_OOB_STRIPE;                  // hatched: not playable
+    else if (ch !== 'o' && ch !== 'w' && edgeOfOob(cells, g, cx, cz)) col = [236, 236, 228];                  // white boundary line (OOB stakes)
     const n = px > 1 ? 1 + (((x * 73856093) ^ (y * 19349663)) % 17) / 170 - 0.05 : 1; // faint grain so large areas do not look flat
     const i = (y * c.width + x) * 4; img.data[i] = col[0] * n; img.data[i + 1] = col[1] * n; img.data[i + 2] = col[2] * n; img.data[i + 3] = 255;
   }
@@ -77,4 +86,13 @@ export function propSpots(hole: number): PropSpot[] {
     else if (c === 'k' && r < 0.12 && rocks.length < 30) rocks.push({ kind: 'rock', x: px, z: pz, scale: 0.7 + rnd() * 0.8, rotY: rnd() * 6.28 });
   }
   return [...trees, ...rocks];
+}
+
+/** Rangefinder view: fits the hole's grid into a W x H canvas, tee at the bottom, pin at the top, sim +x to the right. */
+export function rfView(hole: number, W: number, H: number) {
+  const g = GRIDS[hole]!, gw = g.nx * g.cell, gh = g.nz * g.cell, s = Math.min(W / gw, H / gh) * 0.98, cx = g.x0 + gw / 2, cz = g.z0 + gh / 2;
+  const toScreen = (x: number, z: number): [number, number] => [W / 2 + (x - cx) * s, H / 2 - (z - cz) * s];
+  const toWorld = (sx: number, sy: number): { x: number; z: number } => ({ x: cx + (sx - W / 2) / s, z: cz - (sy - H / 2) / s });
+  const [x0, y0] = toScreen(g.x0, g.z0 + gh);
+  return { s, toScreen, toWorld, x0, y0, w: gw * s, h: gh * s };
 }

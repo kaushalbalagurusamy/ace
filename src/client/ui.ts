@@ -1,5 +1,5 @@
 import { GRIDS } from '../shared/course-grid';
-import { gridCanvas } from './terrain';
+import { gridCanvas, rfView } from './terrain';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 
@@ -50,6 +50,11 @@ const CSS = `
 #meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
 #toast{left:50%;top:70px;transform:translateX(-50%);display:none}
+#banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
+#arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
+#keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
+#rf{position:absolute;inset:6% 12%;display:none;background:rgba(12,20,16,.94);border:2px solid #678;pointer-events:auto;padding:0}#rf canvas{width:100%;height:100%;display:block;cursor:crosshair}
+#rftip{position:absolute;pointer-events:none;background:rgba(0,0,0,.85);padding:6px 10px;border-radius:3px;display:none;white-space:pre;line-height:1.4}
 table{border-collapse:collapse;min-width:360px}td,th{padding:3px 10px;text-align:left}
 `;
 
@@ -67,7 +72,8 @@ export class UI {
       <div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div style="background:#444"><div id="fill"></div></div></div>
-      <div class="hud" id="cd"></div><div class="hud" id="toast"></div>`;
+      <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
+      <div class="hud" id="keys">Space swing · Shift sprint · M rangefinder · N mute · , . look speed</div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.root.append(this.scr, this.hud);
     this.mini = this.hud.querySelector('canvas')!;
     this.scr.addEventListener('click', e => {
@@ -120,6 +126,30 @@ export class UI {
   board(rows: Row[], self: string) {
     this.$('lb').innerHTML = rows.map(r => `<div style="${r.id === self ? 'font-weight:bold' : ''}">${esc(r.name)} &nbsp; H${r.hole + 1} &nbsp; ${r.strokes}${r.done ? ' &check;' : ''}</div>`).join('');
   }
+  private bannerT = 0;
+  /** A big, long-lasting message for events the player must not miss (penalties). */
+  banner(t: string, ms = 5000) { const e = this.$('banner'); e.style.display = 'block'; e.textContent = t; clearTimeout(this.bannerT); this.bannerT = window.setTimeout(() => (e.style.display = 'none'), ms); }
+  /** Edge arrow toward the local ball with its distance when the ball is off screen; hidden when the beacon is in view. */
+  ballMarker(m: { x: number; y: number; onScreen: boolean; dir: number } | null, yards: number) {
+    const e = this.$('arrow'); if (!m || m.onScreen) { e.style.display = 'none'; return; }
+    const cx = innerWidth / 2, cy = innerHeight / 2, r = Math.min(cx, cy) - 70, x = cx + Math.cos(m.dir) * r * (innerWidth / innerHeight > 1 ? 1.5 : 1), y = cy + Math.sin(m.dir) * r;
+    e.style.display = 'block'; e.style.left = `${Math.min(innerWidth - 100, Math.max(10, x - 45))}px`; e.style.top = `${Math.min(innerHeight - 70, Math.max(10, y - 20))}px`;
+    (e.firstElementChild as HTMLElement).style.transform = `rotate(${m.dir + Math.PI / 2}rad)`; (e.lastElementChild as HTMLElement).textContent = `ball ${Math.round(yards)} yd`;
+  }
+  /** Expanded mini map: terrain, markers, the target and the line from the ball to the hovered point (PRD/02 section 7). */
+  drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null) {
+    const c = this.rfCanvas(); if (c.width !== c.clientWidth || c.height !== c.clientHeight) { c.width = c.clientWidth; c.height = c.clientHeight; }
+    const ctx = c.getContext('2d')!, v = rfView(h.index, c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(h.index, 2, false, true), v.x0, v.y0, v.w, v.h);
+    const dot = (p: { x: number; z: number }, col: string, r: number) => { const [x, y] = v.toScreen(p.x, p.z); ctx.fillStyle = col; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); return [x, y] as const; };
+    dot(h.tee, '#222', 5); dot(h.pin, '#ffe14d', 6); dot(golfer, '#fff', 5);
+    const [bx, by] = dot(ball, '#fff', 6); ctx.strokeStyle = '#ffe14d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(bx, by, 10, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
+    if (target) { const [x, y] = v.toScreen(target.x, target.z); ctx.strokeStyle = '#ff8a3d'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - 8, y - 8); ctx.lineTo(x + 8, y + 8); ctx.moveTo(x + 8, y - 8); ctx.lineTo(x - 8, y + 8); ctx.stroke(); ctx.lineWidth = 1; }
+    if (hover) { const [x, y] = v.toScreen(hover.x, hover.z); ctx.strokeStyle = '#fff'; ctx.setLineDash([6, 5]); ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(x, y); ctx.stroke(); ctx.setLineDash([]); }
+  }
+  rf = () => this.hud.querySelector<HTMLElement>('#rf')!;
+  rfCanvas = () => this.hud.querySelector<HTMLCanvasElement>('#rf canvas')!;
+  rfTip = (t: string | null, x = 0, y = 0) => { const e = this.hud.querySelector<HTMLElement>('#rftip')!; e.style.display = t ? 'block' : 'none'; if (t) { e.textContent = t; e.style.left = `${x + 14}px`; e.style.top = `${y + 14}px`; } };
   prompt(t: string) { const e = this.$('prompt'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   meterShow(frac: number | null, label = '') {
     const e = this.$('meter'); e.style.display = frac === null ? 'none' : 'block';
@@ -135,7 +165,7 @@ export class UI {
     e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */
-  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean }[]) {
+  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean }[]) {
     const c = this.mini.getContext('2d')!, W = this.mini.width, H = this.mini.height;
     const dx = h.pin.x - h.tee.x, dz = h.pin.z - h.tee.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L;
     const s = (H - 30) / (L + 20);
@@ -149,7 +179,7 @@ export class UI {
     c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
     const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);
     const [tx, tz] = P(h.tee.x, h.tee.z); c.fillStyle = '#222'; c.fillRect(tx - 4, tz - 2, 8, 4);
-    for (const d of dots) { const [x, y] = P(d.x, d.z); c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
+    for (const d of dots) { const [x, y] = P(d.x, d.z); if (d.own && d.ball) { c.strokeStyle = '#ffe14d'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 6, 0, 7); c.stroke(); c.lineWidth = 1; } c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
   }
 }
 export type { BallState };

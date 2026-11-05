@@ -22,11 +22,18 @@ export class World {
   myHole = 0;
   private course = new THREE.Group();
   private props = new THREE.Group();
+  /** id of the local player: their ball gets a yellow beacon and a screen marker */
+  selfId = '';
+  private beacon = (() => {
+    const g = new THREE.Group(), m = new THREE.MeshBasicMaterial({ color: '#ffe14d', transparent: true, opacity: 0.75, depthTest: false });
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 14, 8).translate(0, 7, 0), m), tip = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.4, 10).rotateX(Math.PI).translate(0, 15, 0), m);
+    beam.renderOrder = tip.renderOrder = 20; g.add(beam, tip); g.visible = false; return g;
+  })();
   private propToken = 0;
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = new THREE.Fog('#cfe6f4', 220, 900);
-    this.scene.add(new THREE.HemisphereLight('#ffffff', '#6b7b6b', 1.9), this.course, this.props);
+    this.scene.add(new THREE.HemisphereLight('#ffffff', '#6b7b6b', 1.9), this.course, this.props, this.beacon);
     const sun = new THREE.DirectionalLight('#ffffff', 1.5); sun.position.set(50, 100, 30); this.scene.add(sun);
     const resize = () => { this.renderer.setSize(innerWidth, innerHeight); this.cam.aspect = innerWidth / innerHeight; this.cam.updateProjectionMatrix(); };
     addEventListener('resize', resize); resize();
@@ -118,7 +125,17 @@ export class World {
     e.anim = { pts: vs, ts: m.samples.map(s => s.t), t0: performance.now(), final: m.ball };
     e.ball = { ...e.ball, strokes: m.ball.strokes };
   }
+  /** Screen position (px) of the local ball for the edge arrow: onScreen is false when it is off screen or behind the camera. */
+  ballScreen(): { x: number; y: number; onScreen: boolean; dir: number } | null {
+    const e = this.ents.get(this.selfId); if (!e || e.ball.holedOut && !e.anim) return null;
+    const v = e.ballMesh.position.clone().setY(2).project(this.cam), behind = v.z > 1;
+    const x = (v.x * 0.5 + 0.5) * innerWidth, y = (-v.y * 0.5 + 0.5) * innerHeight, onScreen = !behind && x > 20 && x < innerWidth - 20 && y > 20 && y < innerHeight - 20;
+    return { x, y, onScreen, dir: Math.atan2((behind ? -1 : 1) * (y - innerHeight / 2), (behind ? -1 : 1) * (x - innerWidth / 2)) };
+  }
   tick(now: number) {
+    const own = this.ents.get(this.selfId);
+    this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole;
+    if (own) this.beacon.position.set(own.ballMesh.position.x, 0, own.ballMesh.position.z);
     for (const e of this.ents.values()) {
       const a = e.anim; if (!a) continue;
       const t = (now - a.t0) / 1000;

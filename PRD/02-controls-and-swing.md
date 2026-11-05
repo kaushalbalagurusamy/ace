@@ -23,10 +23,12 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 
 1. [GIVEN] WASD moves the golfer.
 2. [ASSUMED] Movement is relative to the camera. The mouse orbits a third-person camera.
-3. [ASSUMED] Run speed is 9 m/s, so a 300-yard walk takes about 30 seconds. This speed is the main lever on race length (see 05).
+3. [GIVEN, owner playtest 2026-11-05] Walking speed is **13 m/s**, and holding **Shift** sprints at **18 m/s** (config in `src/client/rules.ts`; 9 m/s felt slow). A 300-yard walk takes about 20 seconds. This speed is the main lever on race length (see 05).
 4. [ASSUMED] Players can't walk into water or past out-of-bounds stakes. Trees block movement. Golfers pass through each other.
 5. [GIVEN] The first Space press within 2.5 m of the ball [ASSUMED distance] takes the **stance**: swing mode starts, the aim locks and WASD is disabled. A prompt shows "Space: take your stance" when in range.
-6. [GIVEN] **Aiming:** the mouse sets the aim direction, the way the camera faces. **No aim line or landing marker is drawn.** Pressing Space locks the aim. A shot planned on the rangefinder (§7) isn't guaranteed to match where the golfer faces. Lining up is part of the skill.
+6. [GIVEN, owner playtest] **Look speed:** the owner prefers the feel of a macOS three-finger drag, so the default look sensitivity is 2.5 times the original 0.003 rad per pixel, adjustable live with `,` and `.` in 10% steps (toast "Look 2.5×", saved in localStorage), and pointer lock asks for unadjusted movement first so a mouse and a trackpad scale the same (`src/client/sensitivity.ts`).
+7. [GIVEN, owner playtest] **Your ball is never lost:** a yellow beacon stands over your ball, an edge arrow with the distance in yards shows when it is off screen, and a "Walk to your ball" hint shows until you are in range. After a penalty (water relief or out of bounds) a large banner says what happened and the golfer is moved to where the ball now is. Out of bounds is drawn with a white boundary line and a hatched area beyond it, starting about 12 m beyond the traced land.
+8. [GIVEN] **Aiming:** the mouse sets the aim direction, the way the camera faces. **No aim line or landing marker is drawn.** Pressing Space locks the aim. A shot planned on the rangefinder (§7) isn't guaranteed to match where the golfer faces. Lining up is part of the skill.
 
 ## 3. Swing mode
 
@@ -98,12 +100,12 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 - [GIVEN] **MVP visuals:** greyscale polygons. The golfer is a code-built low-poly rigged figure, and the generated golfer replaces it later (06).
 - [ASSUMED] **Club models:** for the MVP, 5 head shapes (driver, fairway wood, hybrid, iron, wedge) plus one putter, built from parameters in code. They're replaced by the generated Callaway-styled models (06).
 
-## 7. Mini map and rangefinder [GIVEN]
+## 7. Mini map and rangefinder [GIVEN; built 2026-11-05]
 
 - **Mini map:** always visible in a corner, oriented to the hole. It shows:
   - the hole layout (tee, fairway, rough, bunkers, water, green, pin)
   - every player's golfer and ball, in their player colours
-- **Rangefinder:** expanding the mini map (key M, [ASSUMED]) turns it into a full-screen top-down rangefinder.
+- **Rangefinder:** `M` toggles the expanded mini map (the HUD shows "M: rangefinder"), a large top-down view of the traced hole with the tee, pin, your ball and golfer.
   - Hovering any point shows the distance from your ball and the distance from that point to the pin, in yards.
   - It also shows the elevation change, plus a club suggestion ("plays like" 7i) based on full-swing carries [ASSUMED].
   - [ASSUMED] Clicking sets a temporary target marker that shows on the mini map only, not in the 3D world, so the aim stays the golfer's job (§2.6).
