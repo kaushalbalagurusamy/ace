@@ -42,6 +42,8 @@ export interface LobbyView {
 //   start(sessionId: string): Result<LobbyView>;
 //   /** Host only, exactly 1 player in the lobby: single-player time trial. state -> 'starting'. */
 //   startSolo(sessionId: string): Result<LobbyView>;
+//   /** Server-driven transition (countdown -> in_race, race end -> open). 'open' clears every ready flag. False if the lobby is unknown. */
+//   setState(lobbyId: string, state: LobbyState): boolean;
 //   list(): LobbyView[]; // creation order; returns copies, never live internal state
 //   lobbyOf(sessionId: string): LobbyView | undefined;
 // }

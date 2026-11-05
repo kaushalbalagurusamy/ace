@@ -109,6 +109,14 @@ export class LobbyManager {
     return { ok: true, value: this.view(c.lobby) };
   }
 
+  setState(lobbyId: string, state: LobbyState): boolean {
+    const lobby = this.lobbies.get(lobbyId);
+    if (!lobby) return false;
+    lobby.state = state;
+    if (state === 'open') for (const m of lobby.members) this.players.get(m)!.ready = false;
+    return true;
+  }
+
   list(): LobbyView[] {
     return [...this.lobbies.values()].map((l) => this.view(l));
   }

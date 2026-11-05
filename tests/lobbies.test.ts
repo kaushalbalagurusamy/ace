@@ -171,3 +171,23 @@ describe('start rules', () => {
     expect(m.list()).toEqual([]);
   });
 });
+
+describe('state transitions (stuck-lobby fix)', () => {
+  it('setState moves a lobby through in_race back to open and clears ready flags', () => {
+    const { m, ids } = setup(2);
+    const lobby = val<{ id: string }>(m.createLobby(ids[0]!));
+    m.joinLobby(ids[1]!, lobby.id);
+    m.setReady(ids[0]!, true); m.setReady(ids[1]!, true); m.start(ids[0]!);
+    expect(m.setState(lobby.id, 'in_race')).toBe(true);
+    expect(m.list()[0]!.state).toBe('in_race');
+    expect(m.setState(lobby.id, 'open')).toBe(true);
+    expect(m.list()[0]!.state).toBe('open');
+    expect(m.list()[0]!.players.every(p => !p.ready)).toBe(true);
+    // play again is possible: ready up and start again
+    m.setReady(ids[0]!, true); m.setReady(ids[1]!, true);
+    expect(m.start(ids[0]!).ok).toBe(true);
+  });
+  it('setState on an unknown lobby is false', () => {
+    expect(new LobbyManager().setState('nope', 'open')).toBe(false);
+  });
+});
