@@ -319,7 +319,24 @@
     "shipped_bytes": 71836,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 2,
+        "b": 3,
+        "c": 3,
+        "d": 3,
+        "e": 3
+      },
+      "mean": 2.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Stilt trunk with two sparse foliage tiers; mid-trunk clumps are jagged shard planes like confetti; not twisted; reads as a scraggly pine.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/tree-cypress-b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "tree-cypress-a",
@@ -341,7 +358,24 @@
     "shipped_bytes": 105024,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 2,
+        "b": 2,
+        "c": 4,
+        "d": 4,
+        "e": 3
+      },
+      "mean": 3.0,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Reads as a tall pole-like trunk with a small cloud crown, like a pine or palm, not a wind-sculpted Monterey cypress; spiky pale root shards; texture slightly smeared.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/tree-cypress-a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "rock-a",
@@ -363,7 +397,24 @@
     "shipped_bytes": 152276,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 2,
+        "c": 3,
+        "d": 4,
+        "e": 3
+      },
+      "mean": 3.0,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "About 8 separate rocks, not three; flat and low; noisy photoreal mottled texture, green-tinted grey off #8A8F8C; no lichen.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/rock-a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "tree-pine-a",
@@ -385,7 +436,24 @@
     "shipped_bytes": 66568,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 4,
+        "b": 4,
+        "c": 3,
+        "d": 4,
+        "e": 4
+      },
+      "mean": 3.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Best of the set: umbrella crown on a tall straight trunk with root flare; foliage a bluish-teal brighter than #3D5A3A; clumps are blobby spheres, single dome not layered.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/tree-pine-a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "rock-b",
@@ -407,7 +475,24 @@
     "shipped_bytes": 71312,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 3,
+        "c": 2,
+        "d": 3,
+        "e": 3
+      },
+      "mean": 2.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Single tall narrow egg/pillar with drawn-on cracks, not a wide layered outcrop; strongly blue slate colour; base not visible.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/rock-b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "rock-c",
@@ -429,7 +514,24 @@
     "shipped_bytes": 65804,
     "post_process": "gltf-transform optimize: draco + webp textures <=1024; raw original kept local (assets/models/raw, gitignored)",
     "normalisation_note": "Meshy output is about 1.9 units, centred at the origin: the loader must scale to target_height_m and put the base at y=0",
-    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)"
+    "budget_note": "triangle budget in assets/STYLE.md is approximate in Meshy (up to 4% over)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 2,
+        "c": 3,
+        "d": 3,
+        "e": 3
+      },
+      "mean": 2.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Renders badly cropped; boxy slab-like with crease seams, not smooth sea-worn; very pale flat grey; no lichen.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/rock-c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "golfer-sheet",
@@ -504,7 +606,24 @@
     "triangles": 12308,
     "shipped_bytes": 289580,
     "post_process": "gltf-transform optimize: meshopt + webp textures <=1024; raw kept local",
-    "note": "Meshy walking/running clips were returned but NOT used (brief: no premade animations). Joint curves come from our own pose extraction (PRD/02 \u00a76). Armature root is scaled 0.01: loader must normalise."
+    "note": "Meshy walking/running clips were returned but NOT used (brief: no premade animations). Joint curves come from our own pose extraction (PRD/02 \u00a76). Armature root is scaled 0.01: loader must normalise.",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 4,
+        "b": 3,
+        "c": 4,
+        "d": 4,
+        "e": 4
+      },
+      "mean": 3.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Cap reads as a skullcap with no visible peak from the front; stern flat-shaded face, no readable eyes; faint scratch streaks on shirt, grey smudging on trousers; smooth-shaded not faceted; feet cropped in the renders.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/golfer/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   },
   {
     "id": "tex-fairway",
@@ -621,5 +740,318 @@
     "source_png": "assets/images/tex-green.png",
     "shipped_bytes": 94711,
     "post_process": "downscaled to 1024 px, JPEG q82 (sips); original PNG kept local; seamlessness judged by eye on one sample only"
+  },
+  {
+    "id": "club-ut",
+    "file": "assets/models/club-ut.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-ut-1.jpg",
+      "refs/callaway/club-ut-2.jpg",
+      "refs/callaway/club-ut-3.jpg",
+      "refs/callaway/club-ut-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Apex Utility Iron (#2 UDI, stamped 18 deg; the photos show a 22 deg head)",
+    "loft_label": "18 deg",
+    "task_id": "01a1ad15-4503-7262-b948-acc5c2b68735",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-ut.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 4,
+        "b": 4,
+        "c": 3,
+        "d": 3,
+        "e": 4
+      },
+      "mean": 3.6,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Silhouette, hollow-body cap with two screws, black insert, APEX, Callaway and UT stamps read correctly as an iron-style UDI. Chrome is flat near-white, plastic looking; visible facets; hosel too long and thin; head a bit small; mirrored or garbled top-edge text.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-ut/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-iron",
+    "file": "assets/models/club-iron.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-iron-1.jpg",
+      "refs/callaway/club-iron-2.jpg",
+      "refs/callaway/club-iron-3.jpg",
+      "refs/callaway/club-iron-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway X Forged Iron (2025)",
+    "loft_label": "4i-PW",
+    "task_id": "01a1ad15-44e7-7080-b72b-cc9b8caa05ff",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-iron.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 4,
+        "b": 4,
+        "c": 3,
+        "d": 3,
+        "e": 4
+      },
+      "mean": 3.6,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Cavity-back forged iron silhouette, Callaway script and V, X FORGED legible; shallow cavity; flat white-grey no chrome gradient; baked facets on hosel and head; sole view slab-like; hosel slightly long.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-iron/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-wedge-50",
+    "file": "assets/models/club-wedge-50.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-wedge-opus-sp-1.jpg",
+      "refs/callaway/club-wedge-opus-sp-2.jpg",
+      "refs/callaway/club-wedge-opus-sp-3.jpg",
+      "refs/callaway/club-wedge-opus-sp-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Opus SP Chrome Wedge (2025)",
+    "loft_label": "50 deg",
+    "task_id": "01a1ad18-0c92-76c9-b2bc-f7ed9dac27bc",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-wedge-50.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 4,
+        "c": 2,
+        "d": 3,
+        "e": 2
+      },
+      "mean": 2.8,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Plausible teardrop head and markings; flat white with visible facets, no chrome read; odd rectangular cut-out in the hosel; bulbous sole; indistinguishable from the other wedges without markings.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-wedge-50/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-wedge-54",
+    "file": "assets/models/club-wedge-54.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-wedge-opus-sp-plus-1.jpg",
+      "refs/callaway/club-wedge-opus-sp-plus-2.jpg",
+      "refs/callaway/club-wedge-opus-sp-plus-3.jpg",
+      "refs/callaway/club-wedge-opus-sp-plus-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Opus SP+ Chrome Wedge (2026 page)",
+    "loft_label": "54 deg",
+    "task_id": "01a1ad18-0d9f-7221-82a9-d25ebf9c7c0f",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-wedge-54.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 2,
+        "b": 3,
+        "c": 2,
+        "d": 2,
+        "e": 3
+      },
+      "mean": 2.4,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Detached paper-thin fin floats across the face; face partly hollow in side view; smooth egg head with thick sole; dark-grey SP+ band is a useful differentiator.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-wedge-54/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-wedge-62",
+    "file": "assets/models/club-wedge-62.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-wedge-full-toe-sp-1.jpg",
+      "refs/callaway/club-wedge-full-toe-sp-2.jpg",
+      "refs/callaway/club-wedge-full-toe-sp-3.jpg",
+      "refs/callaway/club-wedge-full-toe-sp-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Full Toe SP Wedge (2026 page)",
+    "loft_label": "62 deg",
+    "task_id": "01a1ad18-ab73-7689-b52d-bc3364e6f907",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-wedge-62.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 4,
+        "c": 2,
+        "d": 3,
+        "e": 3
+      },
+      "mean": 3.0,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Rounded high toe and FULL TOE SP text, groove lines, V logo good; black rectangular patches on the top/toe edge and hosel; stray glyph panel on the sole; faceted white; bulbous sole.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-wedge-62/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-putter",
+    "file": "assets/models/club-putter.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-putter-1.jpg",
+      "refs/callaway/club-putter-2.jpg",
+      "refs/callaway/club-putter-3.jpg",
+      "refs/callaway/club-putter-4.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Odyssey Square 2 Square TRI-HOT Black Seven CS Putter",
+    "loft_label": "putter",
+    "task_id": "01a1ad19-556b-76fe-bb46-c41db5d4f9ee",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-putter.glb (local only)",
+    "balance_before": 970,
+    "balance_after": 730,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 3,
+        "b": 2,
+        "c": 3,
+        "d": 3,
+        "e": 2
+      },
+      "mean": 2.6,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Black mallet with two forward wings and centre shaft present; no white face insert visible, a dark plate with a screw-like medallion instead; alignment dashes partial; scratch-like specular streaks; thin kinked shaft; head cropped in renders.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-putter/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-driver",
+    "file": "assets/models/club-driver.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-driver-1.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Elyte Triple Diamond Driver (2025)",
+    "loft_label": "8 deg",
+    "task_id": "01a1ad20-2910-7774-bcb8-6cadf2502ea8",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-driver.glb (local only)",
+    "balance_before": 730,
+    "balance_after": 670,
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "a": 2,
+        "b": 3,
+        "c": 2,
+        "d": 2,
+        "e": 3
+      },
+      "mean": 2.4,
+      "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+      "notes": "Distorted tilted sliver in the front view; faceted low-poly blob in side view; stray rectangular peg and blade hangs off the sole; sole view is a hollow-looking shell; graphics recognisable (white panels, green line, E, ELYTE) but smeared; stray 'O5' for 10.5. Threequarter view is the best.",
+      "date": "2026-11-05",
+      "renders": "assets/qa/club-driver/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "club-3w",
+    "file": "assets/models/club-3w.glb",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-6",
+    "tier": "Pro",
+    "stage": "textured",
+    "seed_photos": [
+      "refs/callaway/club-3w-1.jpg"
+    ],
+    "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
+    "product": "Callaway Elyte Triple Diamond Fairway Wood (2025)",
+    "loft_label": "15 deg",
+    "task_id": "01a1ad20-291f-7665-bece-efc673e3db61",
+    "credits_used": 30,
+    "date": "2026-11-05",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "build session (script)",
+    "raw": "assets/models/raw/club-3w.glb (local only)",
+    "balance_before": 730,
+    "balance_after": 670
   }
 ]
