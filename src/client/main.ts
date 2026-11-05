@@ -16,7 +16,7 @@ let welcomed = false, lobbies: LobbyView[] = [], lobby: LobbyView | null = null,
 let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
 
 let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
-let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.35, club = 0;
+let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.55, club = 0; // higher default camera so the golfer and ball both read at address
 const keys = new Set<string>();
 /** swing exists from the first Space press (stance, aim locked, WASD off) until the shot or putt is sent. */
 type Swing = { fsm: SwingFSM; putt: boolean; aim: number; sentAt?: number };
@@ -29,6 +29,7 @@ const act = (a: Action | null) => {
 };
 
 const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })));
+(window as unknown as { __ace?: unknown }).__ace = { world }; // debug handle for browser checks
 const validName = (n: string) => n.trim().length >= 2 && n.trim().length <= 16;
 
 const ui = new UI((a, d, form) => {

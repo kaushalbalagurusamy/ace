@@ -1,3 +1,5 @@
+import { GRIDS } from '../shared/course-grid';
+import { gridCanvas } from './terrain';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 
@@ -141,11 +143,11 @@ export class UI {
       const a = (x - h.tee.x) * ux + (z - h.tee.z) * uz, r = (x - h.tee.x) * uz - (z - h.tee.z) * ux;
       return [W / 2 + r * s, H - 10 - a * s];
     };
-    c.fillStyle = '#555'; c.fillRect(0, 0, W, H);
-    c.fillStyle = '#7a7a7a'; c.fillRect(W / 2 - (h.fairwayHalfWidth + 3) * s, H - 10 - L * s, 2 * (h.fairwayHalfWidth + 3) * s, L * s);
-    c.fillStyle = '#9a9a9a'; c.fillRect(W / 2 - h.fairwayHalfWidth * s, H - 10 - L * s, 2 * h.fairwayHalfWidth * s, L * s);
-    const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#ddd'; c.beginPath(); c.arc(px, pz, h.greenRadius * s, 0, 7); c.fill();
-    c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);
+    c.fillStyle = '#233'; c.fillRect(0, 0, W, H);
+    const g = GRIDS[h.index]!, img = gridCanvas(h.index, 1, false, true);
+    const [x0, zTop] = P(g.x0, g.z0 + g.nz * g.cell);                                // top-left of the grid image on the map
+    c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
+    const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);
     const [tx, tz] = P(h.tee.x, h.tee.z); c.fillStyle = '#222'; c.fillRect(tx - 4, tz - 2, 8, 4);
     for (const d of dots) { const [x, y] = P(d.x, d.z); c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
   }

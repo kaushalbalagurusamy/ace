@@ -14,7 +14,7 @@ import type { LobbyView } from './lobby-types';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const DIST = join(process.cwd(), 'dist');
-const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.glb': 'model/gltf-binary' };
+const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.ogg': 'audio/ogg', '.glb': 'model/gltf-binary', '.jpg': 'image/jpeg', '.wasm': 'application/wasm' };
 
 async function handle(req: http.IncomingMessage, res: http.ServerResponse) {
   const url = new URL(req.url ?? '/', 'http://x');
@@ -26,7 +26,9 @@ async function handle(req: http.IncomingMessage, res: http.ServerResponse) {
   if (!file.startsWith(DIST)) { res.writeHead(403); res.end(); return; }
   try {
     const body = await readFile(file);
-    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    // assets are static for a deploy: let browsers and the CDN cache them (never held in memory here, read from disk per request)
+    const cache = /^\/(assets|draco)\//.test(url.pathname) ? 'public, max-age=3600' : url.pathname.startsWith('/assets/') ? 'no-cache' : 'no-cache';
+    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream', 'cache-control': cache });
     res.end(body);
   } catch { res.writeHead(404); res.end('not found'); }
 }

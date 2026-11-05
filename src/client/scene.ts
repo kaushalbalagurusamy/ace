@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/protocol';
+import { isCoastal, propSpots, terrainMesh } from './terrain';
+import { loadModel, type PropSpot } from './assets';
 
-const SHADES = ['#f0f0f0', '#b8b8b8', '#808080', '#505050'];
+const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
 export interface Ent {
   id: string; name: string; shade: string; ball: BallState; hole: number; done: boolean;
   golfer: THREE.Group; ballMesh: THREE.Mesh; tracer?: THREE.Line; hid?: boolean;
@@ -18,10 +20,12 @@ export class World {
   /** hole (0-based) the local player is on: other players' balls, golfers and tracers on other holes are hidden */
   myHole = 0;
   private course = new THREE.Group();
+  private props = new THREE.Group();
+  private propToken = 0;
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    this.scene.background = new THREE.Color('#9a9a9a'); this.scene.fog = new THREE.Fog('#9a9a9a', 150, 700);
-    this.scene.add(new THREE.HemisphereLight('#ffffff', '#555555', 1.6), this.course);
+    this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = new THREE.Fog('#cfe6f4', 220, 900);
+    this.scene.add(new THREE.HemisphereLight('#ffffff', '#6b7b6b', 1.9), this.course, this.props);
     const sun = new THREE.DirectionalLight('#ffffff', 1.5); sun.position.set(50, 100, 30); this.scene.add(sun);
     const resize = () => { this.renderer.setSize(innerWidth, innerHeight); this.cam.aspect = innerWidth / innerHeight; this.cam.updateProjectionMatrix(); };
     addEventListener('resize', resize); resize();
@@ -53,18 +57,28 @@ export class World {
   /** Rebuilds the terrain for a hole without touching the players. */
   buildCourse(h: HoleInfo) {
     this.course.clear();
-    const dx = h.pin.x - h.tee.x, dz = h.pin.z - h.tee.z, L = Math.hypot(dx, dz) || 1, rot = Math.atan2(-dx, dz);
-    const mid = V((h.pin.x + h.tee.x) / 2, 0, (h.pin.z + h.tee.z) / 2), len = L + 30;
-    this.band(4000, 4000, mid.x, mid.z, 0, -0.02, '#5c5c5c');
-    this.band(2 * (h.fairwayHalfWidth + 4), len, mid.x, mid.z, rot, 0, '#6e6e6e');
-    this.band(2 * h.fairwayHalfWidth, len, mid.x, mid.z, rot, 0.01, '#8a8a8a');
+    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
+    base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
+    this.course.add(base, terrainMesh(h.index));
     const pin = V(h.pin.x, 0, h.pin.z);
-    for (const [r, c, y] of [[h.greenRadius + 2.5, '#9a9a9a', 0.02], [h.greenRadius, '#c8c8c8', 0.03]] as const) {
-      const m = new THREE.Mesh(new THREE.CircleGeometry(r, 40).rotateX(-Math.PI / 2), this.mat(c)); m.position.set(pin.x, y, pin.z); this.course.add(m);
-    }
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
-    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#222', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     this.course.add(pole, flag);
+    void this.setProps(propSpots(h.index));
+  }
+
+  /** Places generated trees and rocks (cheap clones of cached models); kinds that fail to load are skipped. */
+  async setProps(spots: PropSpot[]) {
+    const token = ++this.propToken;
+    this.props.clear();
+    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
+    let i = 0;
+    for (const s of spots.slice(0, 180)) {
+      const list = ids[s.kind], m = await loadModel(list[i++ % list.length]!);
+      if (token !== this.propToken) return;                      // a newer hole replaced this request
+      if (!m) continue;
+      m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; this.props.add(m);
+    }
   }
   private makeGolfer(shade: string, name: string) {
     const g = new THREE.Group(), box = (w: number, h: number, d: number, x: number, y: number, c = shade) => {
@@ -74,6 +88,13 @@ export class World {
     const c = document.createElement('canvas'); c.width = 256; c.height = 64; const x = c.getContext('2d')!;
     x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(0, 0, 256, 64); x.fillStyle = '#fff'; x.font = '36px system-ui'; x.textAlign = 'center'; x.fillText(name, 128, 44);
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(2, 0.5, 1); s.position.y = 2.4; g.add(s);
+    // swap the box stand-in for the generated golfer when it loads (the stand-in is the fallback); a disc in the player's colour sits under the feet
+    void loadModel('golfer').then(model => {
+      if (!model) return;
+      for (const ch of [...g.children]) if (ch !== s) g.remove(ch);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.7, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: shade })); disc.position.y = 0.03;
+      g.add(model, disc);
+    });
     return g;
   }
   setBall(e: Ent, b: BallState) { e.ball = b; e.ballMesh.position.copy(V(b.x, 0.22, b.z)); e.ballMesh.visible = !b.holedOut; }
@@ -113,7 +134,7 @@ export class World {
     }
   }
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5) {
-    const dist = y > 1.5 ? 25 : 6.5, f = [Math.sin(yaw), Math.cos(yaw)] as const;
+    const dist = y > 1.5 ? 25 : 8, f = [Math.sin(yaw), Math.cos(yaw)] as const;
     const target = V(x, y, z);
     this.cam.position.copy(V(x - f[0] * dist * Math.cos(pitch), y + dist * Math.sin(pitch), z - f[1] * dist * Math.cos(pitch)));
     this.cam.lookAt(target); this.renderer.render(this.scene, this.cam);
