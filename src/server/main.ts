@@ -42,12 +42,28 @@ interface RPlayer { name: string; ball: BallState; nextAtMs: number; finishS?: n
 interface Race { lobbyId: string; hole: Hole; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean }
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
+const touched = new Map<string, number>(); // lobbyId -> last activity (ms), for expiry
+
+// A lobby must never stay stuck and block the 3-lobby cap: stale ones are reset or closed.
+const STARTING_MAX_MS = 30_000, OPEN_IDLE_MS = 10 * 60_000, RACE_STUCK_MS = RACE_LIMIT_MS + 60_000;
+setInterval(() => {
+  const now = Date.now();
+  for (const l of mgr.list()) {
+    const idle = now - (touched.get(l.id) ?? now);
+    touched.set(l.id, touched.get(l.id) ?? now);
+    if (l.state === 'starting' && !countdowns.has(l.id) && !races.has(l.id) && idle > STARTING_MAX_MS) mgr.setState(l.id, 'open');
+    else if (l.state === 'in_race' && !races.has(l.id) && idle > STARTING_MAX_MS) mgr.setState(l.id, 'open');
+    else if ((l.state === 'open' && idle > OPEN_IDLE_MS) || idle > RACE_STUCK_MS) { for (const p of l.players) { mgr.leaveLobby(p.sessionId); send(socks.get(p.sessionId), { t: 'lobby', lobby: null }); } touched.delete(l.id); }
+    else continue;
+    broadcastLobbies();
+  }
+}, 15_000).unref();
 
 const send = (ws: WebSocket | undefined, m: ServerMsg) => { if (ws?.readyState === 1) ws.send(JSON.stringify(m)); };
 const err = (ws: WebSocket, code: Extract<ServerMsg, { t: 'error' }>['code'], message: string = code) => send(ws, { t: 'error', code, message });
 const toLobby = (l: LobbyView | undefined, m: ServerMsg) => l?.players.forEach(p => send(socks.get(p.sessionId), m));
 const broadcastLobbies = () => { const m: ServerMsg = { t: 'lobbies', lobbies: mgr.list() }; socks.forEach(w => send(w, m)); };
-const lobbyChanged = (l: LobbyView | undefined) => { broadcastLobbies(); toLobby(l, { t: 'lobby', lobby: l ?? null }); };
+const lobbyChanged = (l: LobbyView | undefined) => { if (l) touched.set(l.id, Date.now()); broadcastLobbies(); toLobby(l, { t: 'lobby', lobby: l ?? null }); };
 
 const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
 const optNum = (v: unknown) => v === undefined || num(v);
@@ -89,6 +105,9 @@ function beginRace(l: LobbyView) {
   const race: Race = { lobbyId: l.id, hole: h, goAtMs, players, timers: [], firstFinish: false };
   race.timers.push(setTimeout(() => endRace(race), RACE_LIMIT_MS));
   races.set(l.id, race);
+  mgr.setState(l.id, 'in_race');
+  touched.set(l.id, Date.now());
+  broadcastLobbies();
   const list: PlayerRace[] = [...players].map(([id, p]) => ({ id, name: p.name, hole: 0, ball: { ...p.ball } }));
   toLobby(l, { t: 'raceStart', hole: h.info, players: list, goAtMs });
 }
@@ -108,7 +127,8 @@ function endRace(r: Race) {
   const results = places.map(pl => { const p = r.players.get(pl.id)!; return { id: pl.id, name: p.name, place: pl.place, timeS: p.finishS, strokes: p.ball.strokes, holes: p.ball.holedOut ? 1 : 0 }; });
   const m: ServerMsg = { t: 'raceEnd', results };
   r.players.forEach((_, sid) => { if (present(r, sid)) send(socks.get(sid), m); });
-  // LobbyManager has no setter to move the lobby back to 'results'/'open'; its state is left alone.
+  // Back to open (ready flags cleared) so the same players can play again and the slot is never stuck.
+  if (mgr.setState(r.lobbyId, 'open')) { touched.set(r.lobbyId, Date.now()); lobbyChanged(mgr.list().find(x => x.id === r.lobbyId)); }
 }
 
 function raceOf(sid: string) { const l = mgr.lobbyOf(sid); return l && races.get(l.id); }
@@ -159,9 +179,21 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
   }
 }
 
+function drop(sid: string) {
+  const before = mgr.lobbyOf(sid);
+  socks.delete(sid);
+  mgr.disconnect(sid);
+  if (before) {
+    const after = mgr.list().find(l => l.id === before.id);
+    lobbyChanged(after);
+    const r = races.get(before.id);
+    if (r && (!after || [...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id)))) endRace(r);
+  } else broadcastLobbies();
+}
+
 const wss = new WebSocketServer({ server, path: '/ws', maxPayload: 4096 });
 wss.on('connection', ws => {
-  let sid: string | undefined;
+  let sid: string | undefined, myName = '';
   ws.on('error', () => {});
   ws.on('message', (data, isBinary) => {
     try {
@@ -170,30 +202,23 @@ wss.on('connection', ws => {
       if (!m) return err(ws, 'BAD_MESSAGE', 'malformed message');
       if (!sid) {
         if (m.t !== 'hello') return; // ignore until hello
+        // The same session reconnecting (reload, retry before the old socket's close arrived) takes over.
+        const old = socks.get(m.sessionId);
+        if (old && old !== ws) { drop(m.sessionId); old.terminate(); }
         const res = mgr.connect(m.sessionId, m.name);
         if (!res.ok) return err(ws, res.error);
-        sid = res.value.sessionId;
+        sid = res.value.sessionId; myName = res.value.name;
         socks.set(sid, ws);
         send(ws, { t: 'welcome', sessionId: sid, name: res.value.name });
         send(ws, { t: 'lobbies', lobbies: mgr.list() });
         return;
       }
-      if (m.t === 'hello') return err(ws, 'ALREADY_CONNECTED');
+      // A repeated hello on the same socket (double submit) is harmless: re-confirm instead of erroring.
+      if (m.t === 'hello') { send(ws, { t: 'welcome', sessionId: sid, name: myName }); return; }
       onMessage(ws, sid, m);
     } catch (e) { console.error(e); err(ws, 'BAD_MESSAGE', 'internal error'); }
   });
-  ws.on('close', () => {
-    if (!sid || socks.get(sid) !== ws) return;
-    const before = mgr.lobbyOf(sid);
-    socks.delete(sid);
-    mgr.disconnect(sid);
-    if (before) {
-      const after = mgr.list().find(l => l.id === before.id);
-      lobbyChanged(after);
-      const r = races.get(before.id);
-      if (r && (!after || [...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id)))) endRace(r);
-    } else broadcastLobbies();
-  });
+  ws.on('close', () => { if (sid && socks.get(sid) === ws) drop(sid); });
 });
 
 server.listen(PORT, () => console.log(`listening on ${PORT}`));
