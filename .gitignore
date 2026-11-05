@@ -6,3 +6,5 @@
 
 # Third-party reference material (seeds generation only; never shipped or committed)
 refs/
+node_modules/
+dist/
