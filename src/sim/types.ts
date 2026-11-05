@@ -59,10 +59,12 @@ export interface ShotResult {
   totalM: number;
   /** signed lateral miss from the target line in metres, + = right */ offlineM: number;
   flightTimeS: number;
+  /** horizontal speed (m/s) at first ground contact; roll-out starts from LAND_ROLL_FRACTION of it */ landingSpeedMs: number;
 }
 /** Flat fairway, no wind, ISA sea level, ball starts at origin heading along +z (target line); x is right, y up.
  *  Deterministic: same Launch => identical ShotResult (bitwise-equal numbers). */
 // contract: export function simulateShot(launch: Launch): ShotResult;
+// contract: export const LAND_ROLL_FRACTION: number; // shared by the sim and the server's surface roll
 
 export interface Club { key: string; label: string; loftDeg: number; maxClubSpeedMph: number }
 // contract: export const BAG: readonly Club[];

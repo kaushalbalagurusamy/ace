@@ -20,9 +20,6 @@ const cl = (s: number) => Math.min(0.3, 2.2 * s);
 
 // PLACEHOLDER roll: surface decel (PRD/03 §5) and fraction of post-bounce speed that becomes roll.
 const DECEL: Record<Exclude<Surface, 'green' | 'bunker'>, number> = { fringe: 1.1, fairway: 1.4, firstCut: 2.5, rough: 5.0 };
-const FAIRWAY_E = 0.45;
-const FAIRWAY_MU = 0.5;
-const ROLL_FRACTION = 0.2; // stands in for repeated bounces, which constant-decel roll alone can't model
 
 export function rollingDecel(surface: Surface, stimp = 10): number {
   if (surface === 'bunker') return Infinity;
@@ -36,6 +33,9 @@ export function rollDistance(v0: number, surface: Surface, stimp = 10): number {
 }
 
 type S = { x: number; y: number; z: number; vx: number; vy: number; vz: number };
+
+/** Share of horizontal landing speed the ball keeps to roll out (PLACEHOLDER, PRD/03 §5 bounce model not sourced). */
+export const LAND_ROLL_FRACTION = 0.3;
 
 export function simulateShot(launch: Launch): ShotResult {
   const rad = Math.PI / 180;
@@ -117,16 +117,15 @@ export function simulateShot(launch: Launch): ShotResult {
   samples.push({ t, p: { x: s.x, y: 0, z: s.z } });
 
   const carryM = Math.hypot(s.x, s.z);
-  // bounce on fairway: normal restitution, friction cuts tangential speed; then roll
+  // One roll model for sim and server: after landing the ball keeps LAND_ROLL_FRACTION of its horizontal speed and
+  // rolls out on a flat fairway (the server rolls it per real surface and checks the cup, starting from the same speed).
   const vh = Math.hypot(s.vx, s.vz);
-  const vn = Math.abs(s.vy);
-  const vt = Math.max(0.1 * vh, vh - FAIRWAY_MU * (1 + FAIRWAY_E) * vn); // floor: bounces never kill all forward speed
-  const roll = rollDistance(vt * ROLL_FRACTION, 'fairway');
+  const roll = rollDistance(vh * LAND_ROLL_FRACTION, 'fairway');
   const dirx = vh > 0 ? s.vx / vh : 0;
   const dirz = vh > 0 ? s.vz / vh : 1;
   const endX = s.x + dirx * roll;
   const endZ = s.z + dirz * roll;
-  return { samples, carryM, totalM: Math.hypot(endX, endZ), offlineM: endX, flightTimeS: t };
+  return { samples, carryM, totalM: Math.hypot(endX, endZ), offlineM: endX, flightTimeS: t, landingSpeedMs: vh };
 }
 
 // ---- Bag (PRD/02 §1). Speeds = 130 mph * tour/113 (PRD/03 §2, UNVERIFIED table); wedges/putter ASSUMED. ----
@@ -160,5 +159,6 @@ export function launchFor(c: Club, score: SwingScore, length: SwingLength = 100)
   const spinLoft = c.loftDeg - a;
   let backspinRpm = 185 * spinLoft;
   if (c.loftDeg >= 8 && c.loftDeg <= 18) backspinRpm = Math.max(2500, backspinRpm); // woods/hybrid floor
-  return { ballSpeed, launchDeg, azimuthDeg: 0, backspinRpm, spinAxisDeg: 3 * score.faceToPathDeg + 0 };
+  // Swing path (X timing) sets the start line: half the path angle (PRD/02 §3: early X pulls left, late X pushes right).
+  return { ballSpeed, launchDeg, azimuthDeg: 0.5 * score.pathDeg + 0, backspinRpm, spinAxisDeg: 3 * score.faceToPathDeg + 0 };
 }
