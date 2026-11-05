@@ -105,10 +105,10 @@ export class UI {
   // --- HUD ---
   setClub(i: number) { this.hud.querySelectorAll('.slot').forEach((e, j) => e.classList.toggle('on', i === j)); }
   info(hole: HoleInfo, yards: number, lie: string, clock: string, strokes: number) {
-    this.$('info').innerHTML = `Hole ${hole.index} &middot; Par ${hole.par} &middot; Strokes ${strokes}<br>Pin ${Math.round(yards)} yd &middot; Lie: ${esc(lie)}<br>Clock ${clock}`;
+    this.$('info').innerHTML = `Hole ${hole.index + 1} &middot; Par ${hole.par} &middot; Strokes ${strokes}<br>Pin ${Math.round(yards)} yd &middot; Lie: ${esc(lie)}<br>Clock ${clock}`;
   }
   board(rows: Row[], self: string) {
-    this.$('lb').innerHTML = rows.map(r => `<div style="${r.id === self ? 'font-weight:bold' : ''}">${esc(r.name)} &nbsp; H${r.hole} &nbsp; ${r.strokes}${r.done ? ' &check;' : ''}</div>`).join('');
+    this.$('lb').innerHTML = rows.map(r => `<div style="${r.id === self ? 'font-weight:bold' : ''}">${esc(r.name)} &nbsp; H${r.hole + 1} &nbsp; ${r.strokes}${r.done ? ' &check;' : ''}</div>`).join('');
   }
   prompt(t: string) { const e = this.$('prompt'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   meterShow(frac: number | null, label = '') {
@@ -118,11 +118,11 @@ export class UI {
   countdown(t: string) { const e = this.$('cd'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   toast(t: string) { const e = this.$('toast'); e.style.display = 'block'; e.textContent = t; clearTimeout(this.toastT); this.toastT = window.setTimeout(() => (e.style.display = 'none'), 3000); }
   card(m: Extract<ServerMsg, { t: 'shotResult' }>) {
-    const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), g = (v: number) => (v * 100).toFixed(0) + '%';
+    const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), g = (v: number) => ((1 - v) * 100).toFixed(0) + '%'; // server sends normalised error n; show accuracy
     const off = m.offlineM * YD;
     e.innerHTML = `<b>Shot</b><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
       Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Timing Z ${g(m.grade.z)} X ${g(m.grade.x)} C ${g(m.grade.c)}${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
-    e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 4000);
+    e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */
   drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean }[]) {
