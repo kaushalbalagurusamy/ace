@@ -1,5 +1,5 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, launchFor, rollingDecel, scoreSwing, simulateShot } from '../sim';
+import { BAG, isSwingLength, launchFor, rollingDecel, scoreSwing, simulateShot } from '../sim';
 import type { Surface, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
@@ -35,7 +35,7 @@ export interface Played {
   grade: { z: number; x: number; c: number }; ball: BallState; penalty?: string;
   /** seconds from strike to ball at rest */ flightS: number; /** extra lock-out after the shot (drop wait) */ dropWaitS: number;
 }
-export interface ShotReq { clubKey: string; aimDeg: number; zMs?: number; xMs?: number; cMs?: number }
+export interface ShotReq { clubKey: string; aimDeg: number; zMs?: number; xMs?: number; cMs?: number; length?: number }
 
 /** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Stops at the cup if it passes slow enough. */
 function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number, a: number, t0: number) {
@@ -69,8 +69,10 @@ function settle(h: Hole, prev: BallState, x: number, z: number, holed: boolean, 
 export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { error: string } {
   const club = BAG.find(c => c.key === req.clubKey);
   if (!club || club.key === 'P') return { error: 'unknown club (use putt for the putter)' };
-  const score = scoreSwing(req);
-  const launch = launchFor(club, score);
+  const length = req.length ?? 100;
+  if (!isSwingLength(length)) return { error: 'invalid swing length (use 25, 50, 75 or 100)' };
+  const score = scoreSwing(req, length);
+  const launch = launchFor(club, score, length);
   launch.ballSpeed *= LIE_SPEED[prev.surface as Surface] ?? 1;
   const sim = simulateShot(launch);
   const a = (req.aimDeg * Math.PI) / 180, sin = Math.sin(a), cos = Math.cos(a);

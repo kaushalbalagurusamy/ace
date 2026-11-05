@@ -78,7 +78,7 @@ function parse(raw: string): ClientMsg | null {
     case 'createLobby': case 'leaveLobby': case 'start': case 'startSolo': return m;
     case 'joinLobby': return typeof m.lobbyId === 'string' ? m : null;
     case 'ready': return typeof m.ready === 'boolean' ? m : null;
-    case 'shot': return typeof m.clubKey === 'string' && num(m.aimDeg) && optNum(m.zMs) && optNum(m.xMs) && optNum(m.cMs) ? m : null;
+    case 'shot': return typeof m.clubKey === 'string' && num(m.aimDeg) && optNum(m.zMs) && optNum(m.xMs) && optNum(m.cMs) && optNum(m.length) ? m : null;
     case 'putt': return num(m.aimDeg) && num(m.drawMs) ? m : null;
     default: return null;
   }

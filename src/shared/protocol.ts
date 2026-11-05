@@ -12,7 +12,7 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'startSolo' }
   /** Raw timings, ms relative to the top of the backswing. Server re-scores. Aim = degrees clockwise from +z (hole direction). */
-  | { t: 'shot'; clubKey: string; aimDeg: number; zMs?: number; xMs?: number; cMs?: number }
+  | { t: 'shot'; clubKey: string; aimDeg: number; /** backswing length step 25|50|75|100, default 100; the server rejects anything else */ length?: number; zMs?: number; xMs?: number; cMs?: number }
   /** Putter: drawMs = how long Z was held (0..1500). */
   | { t: 'putt'; aimDeg: number; drawMs: number };
 
