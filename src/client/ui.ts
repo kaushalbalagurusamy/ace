@@ -24,7 +24,7 @@ export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ??
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
 <li><b>Move</b> WASD, <b>look and aim</b> mouse (no aim line: line up by eye; the mini map and its rangefinder help you pick a club)</li>
 <li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter</li>
-<li><b>Swing</b> stand by your ball and press Space to take your stance (aim locks). Then <b>press and hold Space</b>: the club swings back and the meter fills. <b>Release Space at the length you want</b> (a short hold is a short shot). Then press Z, X, C in order (hips, shoulders, release) right after the release. Good timing = straight and long. Esc cancels before the release</li>
+<li><b>Swing</b> stand by your ball and press Space to take your stance (aim locks). Then <b>press and hold Space</b>: the club swings back and the meter fills. <b>Release Space at the length you want</b> (a short hold is a short shot). Then press and <b>hold</b> Z, X, C in order (hips, shoulders, release) right after the release, keeping them down until the ball is struck. Good timing = straight and long. Esc cancels before the release</li>
 <li><b>Putt</b> P, Space to take your stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
 <li><b>Shot card</b> after every shot: carry, total, offline and how well you timed each key</li>
 <li>First to hole out wins; fewer strokes only decides finishes within 1 second</li></ul></details>`;

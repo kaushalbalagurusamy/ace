@@ -4,7 +4,7 @@ import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/proto
 const SHADES = ['#f0f0f0', '#b8b8b8', '#808080', '#505050'];
 export interface Ent {
   id: string; name: string; shade: string; ball: BallState; hole: number; done: boolean;
-  golfer: THREE.Group; ballMesh: THREE.Mesh; tracer?: THREE.Line;
+  golfer: THREE.Group; ballMesh: THREE.Mesh; tracer?: THREE.Line; hid?: boolean;
   anim?: { pts: THREE.Vector3[]; ts: number[]; t0: number; final: BallState };
 }
 // Sim space is left-handed (x right, z forward); three is right-handed, so mirror x.
@@ -15,6 +15,8 @@ export class World {
   scene = new THREE.Scene();
   cam = new THREE.PerspectiveCamera(60, 1, 0.1, 2000);
   ents = new Map<string, Ent>();
+  /** hole (0-based) the local player is on: other players' balls, golfers and tracers on other holes are hidden */
+  myHole = 0;
   private course = new THREE.Group();
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -30,7 +32,27 @@ export class World {
     m.position.set(cx, y, cz); m.rotation.y = rotY; this.course.add(m); return m;
   }
   load(h: HoleInfo, players: PlayerRace[]) {
-    this.course.clear(); for (const e of this.ents.values()) this.scene.remove(e.golfer, e.ballMesh, ...(e.tracer ? [e.tracer] : [])); this.ents.clear();
+    for (const e of this.ents.values()) this.scene.remove(e.golfer, e.ballMesh, ...(e.tracer ? [e.tracer] : [])); this.ents.clear();
+    this.buildCourse(h); this.myHole = h.index;
+    const rot = Math.atan2(-(h.pin.x - h.tee.x), h.pin.z - h.tee.z);
+    players.forEach((p, i) => {
+      const shade = SHADES[i % 4]!;
+      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')) };
+      this.scene.add(e.golfer, e.ballMesh); this.ents.set(p.id, e); this.setBall(e, p.ball);
+      e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
+    });
+  }
+  /** Puts a player on the tee of a hole (after their hole-out): ball reset, tracer and replay cleared. */
+  moveTo(id: string, ball: BallState, hole: number) {
+    const e = this.ents.get(id); if (!e) return;
+    e.hole = hole; e.done = false; e.anim = undefined;
+    if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
+    this.setBall(e, ball);
+    e.golfer.position.copy(V(ball.x + 1, 0, ball.z - 0.5));
+  }
+  /** Rebuilds the terrain for a hole without touching the players. */
+  buildCourse(h: HoleInfo) {
+    this.course.clear();
     const dx = h.pin.x - h.tee.x, dz = h.pin.z - h.tee.z, L = Math.hypot(dx, dz) || 1, rot = Math.atan2(-dx, dz);
     const mid = V((h.pin.x + h.tee.x) / 2, 0, (h.pin.z + h.tee.z) / 2), len = L + 30;
     this.band(4000, 4000, mid.x, mid.z, 0, -0.02, '#5c5c5c');
@@ -43,12 +65,6 @@ export class World {
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#222', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     this.course.add(pole, flag);
-    players.forEach((p, i) => {
-      const shade = SHADES[i % 4]!;
-      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')) };
-      this.scene.add(e.golfer, e.ballMesh); this.ents.set(p.id, e); this.setBall(e, p.ball);
-      e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
-    });
   }
   private makeGolfer(shade: string, name: string) {
     const g = new THREE.Group(), box = (w: number, h: number, d: number, x: number, y: number, c = shade) => {
@@ -65,6 +81,7 @@ export class World {
 
   shot(m: Extract<ServerMsg, { t: 'shotResult' }>) {
     const e = this.ents.get(m.playerId); if (!e || m.samples.length < 2) return;
+    e.hole = m.hole;
     const prev = e.ball, first = m.samples[0]!.p, last = m.samples[m.samples.length - 1]!.p;
     let pts = m.samples.map(s => ({ x: s.p.x, y: s.p.y, z: s.p.z }));
     // Samples are documented as local-frame (origin, heading +z). If so, rotate+translate onto the world.
@@ -89,6 +106,10 @@ export class World {
       const k = Math.min(1, Math.max(0, (t - a.ts[i - 1]!) / ((a.ts[i]! - a.ts[i - 1]!) || 1)));
       e.ballMesh.position.lerpVectors(a.pts[i - 1]!, a.pts[i]!, k); e.ballMesh.visible = true;
       e.tracer!.geometry.setDrawRange(0, i + 1);
+    }
+    for (const e of this.ents.values()) { // only players on my hole are drawn
+      if (e.hole !== this.myHole) { e.hid = true; e.golfer.visible = false; e.ballMesh.visible = false; if (e.tracer) e.tracer.visible = false; }
+      else if (e.hid) { e.hid = false; e.golfer.visible = true; e.ballMesh.visible = !e.ball.holedOut || !!e.anim; if (e.tracer) e.tracer.visible = true; }
     }
   }
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5) {

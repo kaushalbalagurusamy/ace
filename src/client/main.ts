@@ -60,6 +60,7 @@ function onMsg(m: ServerMsg) {
   switch (m.t) {
     case 'welcome': welcomed = true; sessionId = m.sessionId; token = m.token; sessionStorage.setItem('ace.tok', m.token); sessionStorage.setItem('ace.sid', sessionId); if (phase !== 'race' && phase !== 'results') { phase = 'menu'; menu(); } break;
     case 'error':
+      if (swing && swing.sentAt !== undefined) swing = null; // the server refused the shot: free the input
       if (m.code === 'NOT_IN_LOBBY') break;
       if (!welcomed && (m.code === 'NAME_INVALID' || m.code === 'NAME_TAKEN' || m.code === 'ALREADY_CONNECTED')) { phase = 'name'; ui.showName(name, errText(m)); break; }
       if (phase === 'race') ui.toast(errText(m)); else { error = errText(m); menu(); }
@@ -82,7 +83,18 @@ function onMsg(m: ServerMsg) {
     }
     case 'holedOut': {
       const e = world.ents.get(m.playerId); if (e) { e.done = true; e.ball = { ...e.ball, strokes: m.strokes }; }
-      ui.toast(`${e?.name ?? 'Player'} holed out in ${m.strokes} (${ui.clock(m.splitS)})`); board(); break;
+      const me = m.playerId === selfId;
+      ui.toast(me ? (m.finished ? `Finished! ${m.strokes} strokes, ${ui.clock(m.splitS)}` : `Hole ${m.hole + 1} done: ${m.strokes} strokes so far, ${ui.clock(m.splitS)}`)
+        : m.hole === hole?.index ? `${e?.name ?? 'Player'} holed out (${m.strokes} strokes)` : '');
+      board(); break;
+    }
+    case 'nextHole': {
+      if (m.playerId === selfId) {
+        hole = m.hole; world.myHole = m.hole.index; world.buildCourse(m.hole); world.moveTo(m.playerId, m.ball, m.hole.index);
+        pos = { x: m.ball.x + 1, z: m.ball.z - 0.5 }; yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z); swing = null;
+        ui.toast(`Hole ${m.hole.index + 1}: par ${m.hole.par}, ${Math.round(m.hole.lengthM * YD)} yd`);
+      } else world.moveTo(m.playerId, m.ball, m.hole.index);
+      board(); break;
     }
     case 'raceEnd':
       endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock();
@@ -116,13 +128,18 @@ addEventListener('keydown', e => {
     if (!me || me.ball.holedOut || me.anim || ownDist() > RANGE) return;
     const putt = club === PUTTER, aim = aimDeg(yaw); // first press: take the stance and lock the aim
     swing = { fsm: new SwingFSM({ putt, aimDeg: aim, clubKey: BAG[club]!.key }), putt, aim };
+    act(swing.fsm.key(e.code, true, e.timeStamp)); // the machine models the first press too
   }
 });
 addEventListener('keyup', e => {
   keys.delete(e.code);
   if (swing && swing.sentAt === undefined) act(swing.fsm.key(e.code, false, e.timeStamp));
 });
-addEventListener('blur', () => keys.clear());
+/** A stance or backswing must never survive a lost key-up: blur, tab switch, or leaving pointer lock cancels it. */
+const abortSwing = () => { if (swing && swing.sentAt === undefined) act(swing.fsm.abort()); };
+addEventListener('blur', () => { keys.clear(); abortSwing(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) abortSwing(); });
+document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) abortSwing(); });
 
 // ---- frame loop ----
 let last = performance.now(), stuckSince = 0;
@@ -159,7 +176,7 @@ function frame(now: number) {
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.aim * Math.PI / 180 : yaw);
   }
   world.tick(now);
-  ui.drawMini(hole, [...world.ents.values()].flatMap(e => [
+  ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => [
     { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true },
     { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade },
   ]));
