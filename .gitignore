@@ -3,3 +3,6 @@
 .claude/run-registry.tsv
 .env
 .env.*
+
+# Third-party reference material (seeds generation only; never shipped or committed)
+refs/
