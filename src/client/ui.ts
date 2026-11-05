@@ -25,7 +25,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 export interface Row { id: string; name: string; hole: number; strokes: number; done: boolean }
 
 const CSS = `
-#ui{position:fixed;inset:0;pointer-events:none;font:14px system-ui;color:#eee}
+#ui{position:fixed;inset:0;z-index:1;pointer-events:none;font:14px system-ui;color:#eee}
 .scr{position:absolute;inset:0;background:#1c1c1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:auto}
 .scr h1{font-size:56px;margin:0;letter-spacing:6px}
 .scr button,.scr input{font:inherit;padding:8px 14px;background:#444;color:#eee;border:1px solid #777;border-radius:3px}
