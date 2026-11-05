@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CARD, HOLE_COUNT, hole, teeBall } from '../src/server/course';
 import { GRIDS } from '../src/shared/course-grid';
+import { decodeGrid } from '../src/shared/gridtools';
 
 /** Counts straight from the traced grid (an independent view of the data the server reads). */
 function gridStats(i: number) {
@@ -104,4 +105,22 @@ describe('C18-4 teeBall', () => {
     const b = teeBall(h, 9);
     expect(b).toEqual({ x: 0, z: 0, strokes: 9, holedOut: false, surface: h.surfaceAt(0, 0) });
   });
+});
+
+describe('forgiving margin: out of bounds starts about 12 m beyond the traced land (owner playtest: balls vanished into the forest)', () => {
+  it('cells just outside the traced land are rough, not out of bounds; cells far outside still are', () => {
+    const h = hole(0), g = GRIDS[0]!, raw = decodeGrid(g, 0), margin = decodeGrid(g);
+    let promoted = 0, changedLand = 0, far = 0;
+    for (let i = 0; i < raw.length; i++) {
+      if (raw[i] === 111 && margin[i] === 114) promoted++;                // 'o' -> 'r'
+      if (raw[i] !== 111 && raw[i] !== margin[i]) changedLand++;           // land must be untouched
+    }
+    expect(promoted).toBeGreaterThan(500); expect(changedLand).toBe(0);
+    // a point 7 m beyond the left edge of the fairway on hole 1 is playable rough; 60 m beyond is out of bounds
+    for (let x = 0; x > -140; x -= 2) { if (h.penaltyAt(x, 150)) { far = x; break; } }
+    let landEdge = 0; for (let x = 0; x > -140; x -= 2) { if (decodeGrid(g, 0)[Math.floor((150 - g.z0) / g.cell) * g.nx + Math.floor((x - g.x0) / g.cell)] === 111) { landEdge = x; break; } }
+    expect(far).toBeLessThan(landEdge - 8); expect(h.penaltyAt(landEdge - 6, 150)).toBeNull(); expect(h.surfaceAt(landEdge - 6, 150)).toBe('rough');
+    expect(h.penaltyAt(-135, 150)).toBe('oob');
+  });
+  it('the margin never turns water into land', () => { const g = GRIDS[17]!, raw = decodeGrid(g, 0), m = decodeGrid(g); for (let i = 0; i < raw.length; i++) if (raw[i] === 119) expect(m[i]).toBe(119); });
 });
