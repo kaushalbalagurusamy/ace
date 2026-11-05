@@ -10,3 +10,5 @@ node_modules/
 dist/
 logs/
 assets/models/raw/
+assets/images/
+assets/models/ops/

@@ -455,7 +455,8 @@
       "total_tokens": 1514
     },
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "build session (script)",
+    "note": "concept seed only, not shipped; local file assets/images/golfer-sheet.png"
   },
   {
     "tool": "Meshy multi-image-to-3D + auto-rig",
@@ -504,5 +505,121 @@
     "shipped_bytes": 289580,
     "post_process": "gltf-transform optimize: meshopt + webp textures <=1024; raw kept local",
     "note": "Meshy walking/running clips were returned but NOT used (brief: no premade animations). Joint curves come from our own pose extraction (PRD/02 \u00a76). Armature root is scaled 0.01: loader must normalise."
+  },
+  {
+    "id": "tex-fairway",
+    "file": "assets/textures/tex-fairway.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "low",
+    "size": "1024x1024",
+    "prompt": "Closely mown fairway grass with subtle light and dark mowing stripes, base colour #6FC26A. Stylised low-poly painterly look, soft flat colour variation, no text, no logos, no objects, top-down orthographic, perfectly seamless tileable square texture whose left/right and top/bottom edges match.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 72,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 72
+      },
+      "output_tokens": 196,
+      "output_tokens_details": {
+        "image_tokens": 196,
+        "text_tokens": 0
+      },
+      "total_tokens": 268
+    },
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)",
+    "source_png": "assets/images/tex-fairway.png",
+    "shipped_bytes": 101432,
+    "post_process": "downscaled to 1024 px, JPEG q82 (sips); original PNG kept local; seamlessness judged by eye on one sample only"
+  },
+  {
+    "id": "tex-rough",
+    "file": "assets/textures/tex-rough.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "low",
+    "size": "1024x1024",
+    "prompt": "Longer rough grass, mottled mid green #3F9B4E with darker patches. Stylised low-poly painterly look, soft flat colour variation, no text, no logos, no objects, top-down orthographic, perfectly seamless tileable square texture whose left/right and top/bottom edges match.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 69,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 69
+      },
+      "output_tokens": 196,
+      "output_tokens_details": {
+        "image_tokens": 196,
+        "text_tokens": 0
+      },
+      "total_tokens": 265
+    },
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)",
+    "source_png": "assets/images/tex-rough.png",
+    "shipped_bytes": 243418,
+    "post_process": "downscaled to 1024 px, JPEG q82 (sips); original PNG kept local; seamlessness judged by eye on one sample only"
+  },
+  {
+    "id": "tex-sand",
+    "file": "assets/textures/tex-sand.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "low",
+    "size": "1024x1024",
+    "prompt": "Bunker sand, cream #EFE6D2 with fine soft ripples. Stylised low-poly painterly look, soft flat colour variation, no text, no logos, no objects, top-down orthographic, perfectly seamless tileable square texture whose left/right and top/bottom edges match.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 65,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 65
+      },
+      "output_tokens": 196,
+      "output_tokens_details": {
+        "image_tokens": 196,
+        "text_tokens": 0
+      },
+      "total_tokens": 261
+    },
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)",
+    "source_png": "assets/images/tex-sand.png",
+    "shipped_bytes": 90160,
+    "post_process": "downscaled to 1024 px, JPEG q82 (sips); original PNG kept local; seamlessness judged by eye on one sample only"
+  },
+  {
+    "id": "tex-green",
+    "file": "assets/textures/tex-green.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "low",
+    "size": "1024x1024",
+    "prompt": "Putting green, very short smooth pale lime grass #A6D98B with very subtle mow pattern. Stylised low-poly painterly look, soft flat colour variation, no text, no logos, no objects, top-down orthographic, perfectly seamless tileable square texture whose left/right and top/bottom edges match.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 70,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 70
+      },
+      "output_tokens": 196,
+      "output_tokens_details": {
+        "image_tokens": 196,
+        "text_tokens": 0
+      },
+      "total_tokens": 266
+    },
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)",
+    "source_png": "assets/images/tex-green.png",
+    "shipped_bytes": 94711,
+    "post_process": "downscaled to 1024 px, JPEG q82 (sips); original PNG kept local; seamlessness judged by eye on one sample only"
   }
 ]
