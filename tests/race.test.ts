@@ -26,43 +26,47 @@ describe('hole geometry', () => {
 describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture)', () => {
   const start = ball(pin.x, pin.z - 1);
   it('a putt that stops at the cup drops: holedOut, one stroke', () => {
-    // v0 = sqrt(2 a d) for d = 1 m at Stimp 10 is about 1.05 m/s => draw of about 105 ms of 1500
-    const r = ok(playPutt(h, start, 0, 105));
+    // v0 = sqrt(2 a d) for d = 1 m at Stimp 10 is about 1.05 m/s => length 0.07 (the old 105 ms draw)
+    const r = ok(playPutt(h, start, 0, 0.07));
     expect(r.ball.holedOut).toBe(true);
     expect(r.ball.strokes).toBe(1);
     expect(r.ball.x).toBeCloseTo(pin.x, 6);
     expect(r.ball.z).toBeCloseTo(pin.z, 6);
   });
   it('a putt hit too hard rolls past the cup without dropping (speed above 1.6 m/s)', () => {
-    const r = ok(playPutt(h, start, 0, 600));
+    const r = ok(playPutt(h, start, 0, 0.4));
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeGreaterThan(pin.z);
     expect(r.ball.strokes).toBe(1);
   });
-  it('a short putt stops short of the cup', () => {
-    const r = ok(playPutt(h, start, 0, 40));
+  it('the shortest putt (length 0.05, 0.75 m/s) stops about half a metre out, short of the cup', () => {
+    const r = ok(playPutt(h, start, 0, 0.05));
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeLessThan(pin.z);
     expect(r.ball.z).toBeGreaterThan(start.z);
   });
   it('a putt aimed 10 degrees off the line misses', () => {
-    expect(ok(playPutt(h, start, 10, 105)).ball.holedOut).toBe(false);
+    expect(ok(playPutt(h, start, 10, 0.07)).ball.holedOut).toBe(false);
   });
-  it('AC-P3 on the course: 1.83 m/s (draw 183 ms) from the same spot rolls 3.05 m +-5%', () => {
-    const r = ok(playPutt(h, ball(pin.x + 5, pin.z - 8), 0, 183)); // 9.4 m from the pin: on the green, aimed away from the cup
+  it('AC-P3 on the course: 1.83 m/s (length 0.122) from the same spot rolls 3.05 m +-5%', () => {
+    const r = ok(playPutt(h, ball(pin.x + 5, pin.z - 8), 0, 183 / 1500)); // 9.4 m from the pin: on the green, aimed away from the cup
     expect(r.ball.z - (pin.z - 8)).toBeGreaterThan(3.05 * 0.95);
     expect(r.ball.z - (pin.z - 8)).toBeLessThan(3.05 * 1.05);
   });
-  it('the draw is clamped to 0..1500 ms', () => {
-    const a = ok(playPutt(h, start, 0, 1500)), b = ok(playPutt(h, start, 0, 99999));
-    expect(b.ball.z).toBeCloseTo(a.ball.z, 6);
-    expect(ok(playPutt(h, start, 0, -50)).ball.z).toBeCloseTo(start.z, 6);
+  it('length is clamped to 0.05..1: more than 1 equals 1, and zero or negative equals the 0.05 minimum', () => {
+    const one = ok(playPutt(h, start, 0, 1)), huge = ok(playPutt(h, start, 0, 99));
+    expect(huge.ball.z).toBeCloseTo(one.ball.z, 6);
+    const min = ok(playPutt(h, start, 0, 0.05)), zero = ok(playPutt(h, start, 0, 0)), neg = ok(playPutt(h, start, 0, -3));
+    expect(zero.ball.z).toBeCloseTo(min.ball.z, 6); expect(neg.ball.z).toBeCloseTo(min.ball.z, 6);
+  });
+  it('a non-finite length is rejected', () => {
+    for (const bad of [NaN, Infinity, -Infinity]) expect('error' in playPutt(h, start, 0, bad), String(bad)).toBe(true);
   });
   it('the putter is refused off the green', () => {
-    expect('error' in playPutt(h, ball(0, 100), 0, 500)).toBe(true);
+    expect('error' in playPutt(h, ball(0, 100), 0, 0.3)).toBe(true);
   });
   it('replay samples start at the ball, are time-ordered and end where the ball stops', () => {
-    const r = ok(playPutt(h, start, 0, 300));
+    const r = ok(playPutt(h, start, 0, 0.2));
     expect(r.samples[0]!.p).toEqual({ x: start.x, y: 0, z: start.z });
     for (let i = 1; i < r.samples.length; i++) expect(r.samples[i]!.t).toBeGreaterThanOrEqual(r.samples[i - 1]!.t);
     const end = r.samples.at(-1)!.p;
@@ -97,14 +101,18 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(r.ball.holedOut).toBe(false);
   });
   it('same inputs give identical results (server owns the simulation)', () => {
-    const a = playShot(h, tee, { clubKey: '7', aimDeg: 3, zMs: 5, xMs: 70, cMs: 140, length: 75 });
-    const b = playShot(h, tee, { clubKey: '7', aimDeg: 3, zMs: 5, xMs: 70, cMs: 140, length: 75 });
+    const a = playShot(h, tee, { clubKey: '7', aimDeg: 3, zMs: 5, xMs: 70, cMs: 140, length: 0.75 });
+    const b = playShot(h, tee, { clubKey: '7', aimDeg: 3, zMs: 5, xMs: 70, cMs: 140, length: 0.75 });
     expect(a).toEqual(b);
   });
-  it('rejects the putter as a full-swing club, unknown clubs and invalid lengths', () => {
+  it('lengths: out-of-range values clamp, non-finite values are rejected', () => {
+    const sw = (length: number) => playShot(h, tee, { clubKey: '1', aimDeg: 0, ...perfect, length });
+    expect(sw(9)).toEqual(sw(1)); expect(sw(-2)).toEqual(sw(0.05));
+    for (const bad of [NaN, Infinity]) expect('error' in sw(bad), String(bad)).toBe(true);
+  });
+  it('rejects the putter as a full-swing club and unknown clubs', () => {
     expect('error' in playShot(h, tee, { clubKey: 'P', aimDeg: 0 })).toBe(true);
     expect('error' in playShot(h, tee, { clubKey: 'Z', aimDeg: 0 })).toBe(true);
-    expect('error' in playShot(h, tee, { clubKey: '1', aimDeg: 0, length: 60 })).toBe(true);
   });
   it('rough costs distance versus fairway for the same swing (lie speed multiplier)', () => {
     const fw = ok(playShot(h, ball(0, 100), { clubKey: '7', aimDeg: 0, ...perfect }));

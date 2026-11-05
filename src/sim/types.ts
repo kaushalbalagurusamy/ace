@@ -71,13 +71,16 @@ export interface Club { key: string; label: string; loftDeg: number; maxClubSpee
 /** Launch for a given club and swing score on a flat fairway-equivalent strike (aimed straight at azimuth 0). */
 // contract: export function launchFor(club: Club, score: SwingScore): Launch;
 
-// ---- Swing length (docs/slices/partial-swing/spec.md) ----
-export type SwingLength = 25 | 50 | 75 | 100;
-// contract: export const SWING_LENGTHS: readonly SwingLength[];            // [25, 50, 75, 100]
-// contract: export function isSwingLength(n: unknown): n is SwingLength;
-/** Downswing duration scale (<= 1): ideal X/C offsets and the 120 ms error window are multiplied by it. 100 -> 1. */
-// contract: export function durationScale(length: SwingLength): number;
-/** Club-speed multiplier by length; 100 -> 1. Tunable config. */
-// contract: export function lengthSpeedFactor(length: SwingLength): number;
-// contract (extended): scoreSwing(input: SwingInput, length?: SwingLength): SwingScore   // default 100, throws RangeError on an invalid length
-// contract (extended): launchFor(club: Club, score: SwingScore, length?: SwingLength): Launch // default 100, throws RangeError on an invalid length
+// ---- Swing length: continuous, set by holding Space (docs/slices/space-hold-swing/spec.md) ----
+// contract: export const MIN_LENGTH = 0.05, MAX_LENGTH = 1, FULL_TURN_MS = 750;
+// contract: export function isValidLength(n: unknown): n is number;      // any finite number (clamping is separate)
+// contract: export function clampLength(n: number): number;               // clamp to [MIN, MAX]; RangeError if not finite
+// contract: export function lengthFromHold(heldMs: number): number;       // clampLength(heldMs / FULL_TURN_MS); RangeError if not finite
+/** Downswing duration scale: piecewise-linear through (0.05,0.48) (0.25,0.6) (0.5,0.75) (0.75,0.9) (1,1). RangeError outside [0.05,1]. */
+// contract: export function durationScale(length: number): number;
+/** Club-speed multiplier: piecewise-linear through (0.05,0.18) (0.25,0.5) (0.5,0.68) (0.75,0.86) (1,1). RangeError outside [0.05,1]. */
+// contract: export function lengthSpeedFactor(length: number): number;
+/** Putt ball speed (m/s) = 15 x length (the old drawMs/1500 x 15 curve). RangeError outside [0.05,1]. */
+// contract: export function puttSpeedMs(length: number): number;
+// contract (extended): scoreSwing(input: SwingInput, length?: number): SwingScore   // default 1; Z/X/C are ms relative to the Space release
+// contract (extended): launchFor(club: Club, score: SwingScore, length?: number): Launch // default 1
