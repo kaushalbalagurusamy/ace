@@ -1,0 +1,100 @@
+{
+  "run": "ws-holeout-bot 18 holes on the traced Pebble Beach grids (local server)",
+  "date": "2026-11-05",
+  "summary": "PASS: 18 holes, 67 strokes (par 72), race time 540.9 s, place 1, 4 penalties",
+  "holes": [
+    {
+      "hole": 1,
+      "par": 4,
+      "cumulative_strokes": 3
+    },
+    {
+      "hole": 2,
+      "par": 5,
+      "cumulative_strokes": 6
+    },
+    {
+      "hole": 3,
+      "par": 4,
+      "cumulative_strokes": 9
+    },
+    {
+      "hole": 4,
+      "par": 4,
+      "cumulative_strokes": 12
+    },
+    {
+      "hole": 5,
+      "par": 3,
+      "cumulative_strokes": 14
+    },
+    {
+      "hole": 6,
+      "par": 5,
+      "cumulative_strokes": 18
+    },
+    {
+      "hole": 7,
+      "par": 3,
+      "cumulative_strokes": 20
+    },
+    {
+      "hole": 8,
+      "par": 4,
+      "cumulative_strokes": 25
+    },
+    {
+      "hole": 9,
+      "par": 4,
+      "cumulative_strokes": 29
+    },
+    {
+      "hole": 10,
+      "par": 4,
+      "cumulative_strokes": 33
+    },
+    {
+      "hole": 11,
+      "par": 4,
+      "cumulative_strokes": 36
+    },
+    {
+      "hole": 12,
+      "par": 3,
+      "cumulative_strokes": 39
+    },
+    {
+      "hole": 13,
+      "par": 4,
+      "cumulative_strokes": 42
+    },
+    {
+      "hole": 14,
+      "par": 5,
+      "cumulative_strokes": 48
+    },
+    {
+      "hole": 15,
+      "par": 4,
+      "cumulative_strokes": 52
+    },
+    {
+      "hole": 16,
+      "par": 4,
+      "cumulative_strokes": 55
+    },
+    {
+      "hole": 17,
+      "par": 3,
+      "cumulative_strokes": 59
+    },
+    {
+      "hole": 18,
+      "par": 5,
+      "cumulative_strokes": 67
+    }
+  ],
+  "penalties": 4,
+  "race_time_s": 540.94,
+  "check": "C18-5"
+}
