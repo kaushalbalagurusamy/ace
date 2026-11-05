@@ -40,12 +40,12 @@ describe('flight', () => {
     expect(r.samples.at(-1)!.p.y).toBeLessThanOrEqual(0.05);
     expect(r.samples.every(s => Number.isFinite(s.p.x + s.p.y + s.p.z))).toBe(true);
   });
-  it('a straight shot has ~zero offline; carry is positive and below the vacuum range', () => {
+  it('a straight shot has ~zero offline; carry is positive and below 2x the vacuum range (Magnus lift beats vacuum, drag cuts it)', () => {
     const r = simulateShot(base);
     expect(Math.abs(r.offlineM)).toBeLessThan(0.01 * r.carryM);
     const v = base.ballSpeed, a = base.launchDeg * Math.PI / 180;
     expect(r.carryM).toBeGreaterThan(0);
-    expect(r.carryM).toBeLessThan(v * v * Math.sin(2 * a) / 9.81);
+    expect(r.carryM).toBeLessThan(2 * v * v * Math.sin(2 * a) / 9.81);
     expect(r.totalM).toBeGreaterThanOrEqual(r.carryM);
   });
   it('AC-P2: positive spin-axis tilt curves right, more tilt curves more, negative curves left', () => {
