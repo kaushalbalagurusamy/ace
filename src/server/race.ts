@@ -1,5 +1,5 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, isSwingLength, launchFor, rollingDecel, scoreSwing, simulateShot } from '../sim';
+import { BAG, LAND_ROLL_FRACTION, isSwingLength, launchFor, rollingDecel, scoreSwing, simulateShot } from '../sim';
 import type { Surface, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
@@ -9,7 +9,6 @@ const CUP_RADIUS_M = 0.054;
 const HOLE_SPEED_MS = 1.6;
 const MAX_PUTT_MS = 15;
 const MAX_DRAW_MS = 1500;
-const LAND_ROLL_FRACTION = 0.3;
 const DROP_WAIT_S = 2;
 const LIE_SPEED: Record<Surface, number> = { fairway: 1, firstCut: 0.97, rough: 0.85, bunker: 0.75, fringe: 0.9, green: 0.9 };
 const DT = 1 / 60;
@@ -81,10 +80,9 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   const n = samples.length, last = samples[n - 1]!, before = samples[n - 2] ?? samples[0]!;
   let x = last.p.x, z = last.p.z, holed = false, flightS = last.t;
   if (!h.outOfBounds(x, z)) {
-    const dt = last.t - before.t || DT;
     const hx = last.p.x - before.p.x, hz = last.p.z - before.p.z, hd = Math.hypot(hx, hz);
     if (hd > 0) {
-      const r = roll(h, x, z, hx / hd, hz / hd, (LAND_ROLL_FRACTION * hd) / dt, rollingDecel(h.surfaceAt(x, z)), last.t);
+      const r = roll(h, x, z, hx / hd, hz / hd, LAND_ROLL_FRACTION * sim.landingSpeedMs, rollingDecel(h.surfaceAt(x, z)), last.t);
       samples.push(...r.pts); ({ x, z, t: flightS, holed } = r);
     }
   }
