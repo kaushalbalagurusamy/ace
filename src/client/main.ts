@@ -1,11 +1,11 @@
-import { SWING_LENGTHS, durationScale } from '../sim/length'; // constants only: the server decides every outcome
+import { SwingFSM, type Action } from './swingfsm';
 import type { HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 import { Net } from './net';
 import { BAG, PUTTER, UI, YD, errText } from './ui';
 import { World } from './scene';
 
-const SPEED = 9, RANGE = 2.5, IMPACT_MS = 300, PUTT_MAX = 1500;
+const SPEED = 9, RANGE = 2.5;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
 
 let sessionId = sessionStorage.getItem('ace.sid') ?? crypto.randomUUID();
@@ -18,12 +18,15 @@ let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
 let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
 let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.35, club = 0;
 const keys = new Set<string>();
-type Swing = { putt: boolean; t0: number; top: number; topMs: number; impactMs: number; length: number; aim: number; club: string; z?: number; x?: number; c?: number; held: Set<string>; sentAt?: number };
+/** swing exists from the first Space press (stance, aim locked, WASD off) until the shot or putt is sent. */
+type Swing = { fsm: SwingFSM; putt: boolean; aim: number; sentAt?: number };
 let swing: Swing | null = null;
-let lenIdx = SWING_LENGTHS.length - 1; // default 100%
-const stepLength = (d: number) => { if (swing) return; lenIdx = Math.min(SWING_LENGTHS.length - 1, Math.max(0, lenIdx + d)); ui.setLength(SWING_LENGTHS[lenIdx]!); };
-let lastWheel = 0;
-addEventListener('wheel', e => { if (phase !== 'race' || e.timeStamp - lastWheel < 120) return; lastWheel = e.timeStamp; stepLength(e.deltaY < 0 ? 1 : -1); }, { passive: true });
+/** Applies a state-machine action: cancel, or send the shot/putt (the server decides every outcome). */
+const act = (a: Action | null) => {
+  if (!a || !swing) return;
+  if (a.type === 'cancel') { swing = null; return; }
+  net.send(a.msg); swing.sentAt = performance.now();
+};
 
 const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })));
 const validName = (n: string) => n.trim().length >= 2 && n.trim().length <= 16;
@@ -42,7 +45,6 @@ const ui = new UI((a, d, form) => {
   else if (a === 'solo') net.send({ t: 'startSolo' });
   else if (a === 'back') { net.send({ t: 'leaveLobby' }); lobby = null; phase = 'menu'; menu(); }
 });
-ui.setLength(SWING_LENGTHS[lenIdx]!);
 const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbies, lobby, error, count }); };
 ui.setClub(0);
 
@@ -107,34 +109,18 @@ addEventListener('keydown', e => {
   if (e.repeat) return;
   keys.add(e.code);
   const ci = BAG.findIndex(b => b.code === e.code);
-  if (!swing && e.code === 'BracketLeft') { stepLength(-1); return; }
-  if (!swing && e.code === 'BracketRight') { stepLength(1); return; }
-  if (ci >= 0 && !swing) { club = ci; ui.setClub(ci); return; } // locked once swing mode starts
-  if (e.code === 'Escape' && swing && !swing.putt && e.timeStamp < swing.top && swing.sentAt === undefined) { swing = null; return; }
-  if (e.code === 'Escape' && swing?.putt && swing.sentAt === undefined) { swing = null; return; }
-  if (e.code === 'Space' && !swing && started()) {
+  if (ci >= 0 && !swing) { club = ci; ui.setClub(ci); return; } // locked once the stance starts
+  if (swing) { if (swing.sentAt === undefined) act(swing.fsm.key(e.code, true, e.timeStamp)); return; }
+  if (e.code === 'Space' && started()) {
     const me = own();
     if (!me || me.ball.holedOut || me.anim || ownDist() > RANGE) return;
-    const putt = club === PUTTER;
-    const length = SWING_LENGTHS[lenIdx]!, d = durationScale(length), topMs = 600 + 750 * (length / 100); // backswing stops at the chosen fraction
-    swing = { putt, t0: e.timeStamp, top: e.timeStamp + topMs, topMs, impactMs: IMPACT_MS * d, length, aim: aimDeg(yaw), club: BAG[club]!.key, held: new Set() };
-    return;
-  }
-  if (swing && swing.sentAt === undefined) {
-    const k = ({ KeyZ: 'z', KeyX: 'x', KeyC: 'c' } as Record<string, 'z' | 'x' | 'c' | undefined>)[e.code];
-    if (!k) return;
-    if (swing.putt) { if (k === 'z' && swing.z === undefined) { swing.z = e.timeStamp; } return; }
-    if (swing[k] === undefined) { swing[k] = e.timeStamp - swing.top; swing.held.add(k); }
+    const putt = club === PUTTER, aim = aimDeg(yaw); // first press: take the stance and lock the aim
+    swing = { fsm: new SwingFSM({ putt, aimDeg: aim, clubKey: BAG[club]!.key }), putt, aim };
   }
 });
 addEventListener('keyup', e => {
   keys.delete(e.code);
-  if (!swing || swing.sentAt !== undefined) return;
-  const k = ({ KeyZ: 'z', KeyX: 'x', KeyC: 'c' } as Record<string, 'z' | 'x' | 'c' | undefined>)[e.code];
-  if (!k) return;
-  if (swing.putt) {
-    if (k === 'z' && swing.z !== undefined) { net.send({ t: 'putt', aimDeg: swing.aim, drawMs: Math.round(Math.min(PUTT_MAX, e.timeStamp - swing.z)) }); swing.sentAt = performance.now(); }
-  } else if (swing.held.has(k)) { swing.held.delete(k); delete swing[k]; } // released before impact: omit
+  if (swing && swing.sentAt === undefined) act(swing.fsm.key(e.code, false, e.timeStamp));
 });
 addEventListener('blur', () => keys.clear());
 
@@ -152,20 +138,18 @@ function frame(now: number) {
   }
   if (swing) {
     if (swing.sentAt !== undefined) { if (!stuckSince) stuckSince = now; if (now - stuckSince > 3000) { swing = null; stuckSince = 0; } }
-    else if (swing.putt) {
-      ui.meterShow(swing.z === undefined ? 0 : Math.min(1, (now - swing.z) / PUTT_MAX), 'Hold Z to draw back, release to strike');
-      if (swing.z !== undefined && now - swing.z > PUTT_MAX + 3000) swing = null;
-    } else {
-      const el = now - swing.t0;
-      ui.meterShow(Math.min(1, el / swing.topMs), now < swing.top ? (el < 600 ? 'Address' : 'Backswing') : 'Z, X, C now');
-      if (now >= swing.top + swing.impactMs) {
-        const s = swing; net.send({ t: 'shot', clubKey: s.club, aimDeg: s.aim, length: s.length, ...(s.z !== undefined && { zMs: Math.round(s.z) }), ...(s.x !== undefined && { xMs: Math.round(s.x) }), ...(s.c !== undefined && { cMs: Math.round(s.c) }) });
-        s.sentAt = now;
+    else {
+      act(swing.fsm.tick(now));
+      const f = swing?.fsm;
+      if (f && swing) {
+        const ph = f.phase;
+        ui.meterShow(f.meter(now), ph === 'stance' ? (swing.putt ? 'Hold Space, release to strike' : 'Hold Space to swing back, release at the top')
+          : ph === 'backswing' ? (swing.putt ? 'Release Space to strike' : 'Release Space at the top, then Z X C') : 'Z, X, C now');
       }
     }
   } else { stuckSince = 0; ui.meterShow(null); }
   if (!swing) ui.meterShow(null);
-  ui.prompt(!swing && go && me && !me.ball.holedOut && !me.anim && ownDist() <= RANGE ? 'Space: address ball' : '');
+  ui.prompt(!swing && go && me && !me.ball.holedOut && !me.anim && ownDist() <= RANGE ? 'Space: take your stance' : '');
   const cd = goAt - Date.now();
   ui.countdown(cd > 0 ? String(Math.ceil(cd / 1000)) : cd > -800 ? 'GO' : '');
   if (me) {
