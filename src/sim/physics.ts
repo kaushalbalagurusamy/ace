@@ -1,4 +1,5 @@
-import type { Club, Launch, ShotResult, Surface, SwingScore, TrajectoryPoint } from './types';
+import type { Club, Launch, ShotResult, Surface, SwingLength, SwingScore, TrajectoryPoint } from './types';
+import { lengthSpeedFactor } from './length';
 
 // ALL CONSTANTS BELOW ARE PLACEHOLDER until PRD/03 §8 sources are checked.
 const RHO = 1.225; // ISA sea level, kg/m^3
@@ -150,9 +151,10 @@ export const BAG: readonly Club[] = [
 // PLACEHOLDER delivery: driver +5 AoA, 3W +2, others struck down more with loft.
 const aoa = (c: Club) => (c.key === '1' ? 5 : c.key === '2' ? 2 : c.key === '3' ? -1 : -2 - 0.06 * c.loftDeg);
 
-export function launchFor(c: Club, score: SwingScore): Launch {
+export function launchFor(c: Club, score: SwingScore, length: SwingLength = 100): Launch {
+  const lf = lengthSpeedFactor(length); // throws RangeError on an invalid length
   const smash = 1.48 - ((Math.min(c.loftDeg, 62) - 8) * 0.23) / 54; // 1.48 driver -> 1.25 at 62°
-  const ballSpeed = c.maxClubSpeedMph * MPH * score.speedFactor * smash * score.smashFactor;
+  const ballSpeed = c.maxClubSpeedMph * MPH * score.speedFactor * lf * smash * score.smashFactor;
   const a = aoa(c);
   const launchDeg = 0.6 * c.loftDeg + 1.25 * a + 1;
   const spinLoft = c.loftDeg - a;
