@@ -8,7 +8,8 @@
     "build": "node scripts/copy-assets.mjs && vite build",
     "dev:server": "tsx src/server/index.ts",
     "typecheck": "tsc --noEmit",
-    "assets": "node scripts/copy-assets.mjs"
+    "assets": "node scripts/copy-assets.mjs",
+    "dashboard": "vitest run --reporter=json --outputFile=docs/dashboard/vitest.json; python3 scripts/build_dashboard.py"
   },
   "dependencies": {
     "three": "^0.186.1",

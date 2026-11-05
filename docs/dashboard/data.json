@@ -1,0 +1,922 @@
+{
+  "generated": "2026-11-05T13:04:28-06:00",
+  "commit": {
+    "sha": "05c541429fe23b2bef7453df3226d15b7c72ae54",
+    "short": "05c5414",
+    "date": "2026-11-05T13:03:23-06:00",
+    "branch": "intake/sources-profile-minesweep",
+    "commits": 113
+  },
+  "tests": {
+    "measured": true,
+    "value": {
+      "files": [
+        {
+          "file": "tests/course.test.ts",
+          "passed": 11,
+          "failed": 0,
+          "total": 11
+        },
+        {
+          "file": "tests/lobbies.test.ts",
+          "passed": 21,
+          "failed": 0,
+          "total": 21
+        },
+        {
+          "file": "tests/parse.test.ts",
+          "passed": 8,
+          "failed": 0,
+          "total": 8
+        },
+        {
+          "file": "tests/physics-review.test.ts",
+          "passed": 8,
+          "failed": 0,
+          "total": 8
+        },
+        {
+          "file": "tests/physics.test.ts",
+          "passed": 16,
+          "failed": 0,
+          "total": 16
+        },
+        {
+          "file": "tests/race.test.ts",
+          "passed": 18,
+          "failed": 0,
+          "total": 18
+        },
+        {
+          "file": "tests/ranking.test.ts",
+          "passed": 8,
+          "failed": 0,
+          "total": 8
+        },
+        {
+          "file": "tests/swing-length.test.ts",
+          "passed": 20,
+          "failed": 0,
+          "total": 20
+        },
+        {
+          "file": "tests/swing.test.ts",
+          "passed": 8,
+          "failed": 0,
+          "total": 8
+        },
+        {
+          "file": "tests/swingfsm.test.ts",
+          "passed": 26,
+          "failed": 0,
+          "total": 26
+        }
+      ],
+      "passed": 144,
+      "failed": 0,
+      "total": 144,
+      "start_ms": 1793905456556
+    },
+    "source": "vitest --reporter=json"
+  },
+  "ledger": [
+    {
+      "id": "B-01",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Option 3 chosen (PRD/README). Identity = Ace, Pebble Beach golf race. Visual style still greyscale"
+    },
+    {
+      "id": "B-02",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Generated: `assets/audio/` (25), `assets/models/` (6 + golfer), `assets/textures/` (4). Not yet in the client"
+    },
+    {
+      "id": "B-03",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Deployed https://ace-x92s.onrender.com; owner submits portal and form (`docs/submission.md`)"
+    },
+    {
+      "id": "B-04",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Lobby to 18-hole race to results exists server-side; client does not yet handle `nextHole`"
+    },
+    {
+      "id": "B-05",
+      "status": "unserved",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Waits on wiring generated assets (backlog item 3) and one style pass; `assets/STYLE.md` exists"
+    },
+    {
+      "id": "B-06",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "14 clubs, swing timing, lengths, penalties. Holes differ only in length (see B-158)"
+    },
+    {
+      "id": "B-07",
+      "status": "satisfied",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "In-game How-to-play panel (`src/client/ui.ts` HELP) and README"
+    },
+    {
+      "id": "B-08",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Waiting room, countdown, race, results table. No introduction screen or title art"
+    },
+    {
+      "id": "B-09",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Putting, lengths, hazards exist; holes do not introduce new mechanics (water, doglegs, wind unserved)"
+    },
+    {
+      "id": "B-10",
+      "status": "unserved",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Same as B-05; audio generated but not wired"
+    },
+    {
+      "id": "B-11",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "README + in-game panel. A cold start by a non-author has not happened"
+    },
+    {
+      "id": "B-12",
+      "status": "satisfied",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "https://ace-x92s.onrender.com (`scripts/e2e-smoke.mjs`; supervisor ran the hole-out bot on prod)"
+    },
+    {
+      "id": "B-13",
+      "status": "unserved",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Default fonts/DOM HUD; no animation, no sound"
+    },
+    {
+      "id": "B-14",
+      "status": "partial",
+      "check": "eval",
+      "trust": "conditioned (F-002, F-016: provider terms to confirm)",
+      "note": "`assets/manifest.json` (32 rows, tool, model, prompt, date). Clubs, music and crowd not generated; licence text unconfirmed by owner"
+    },
+    {
+      "id": "B-15",
+      "status": "n/a",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Principle; guides scope cuts (`.claude/build-loop.md`)"
+    },
+    {
+      "id": "B-16",
+      "status": "satisfied",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Option 3 chosen (PRD/README Decisions)"
+    },
+    {
+      "id": "B-17",
+      "status": "n/a",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Option not chosen"
+    },
+    {
+      "id": "B-18",
+      "status": "n/a",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Option not chosen"
+    },
+    {
+      "id": "B-19",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Race flow exists; replay loop (play again) unverified in the client"
+    },
+    {
+      "id": "B-20",
+      "status": "satisfied",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "Lobbies; two Chromium contexts joined and raced (`scripts/e2e-smoke.mjs`)"
+    },
+    {
+      "id": "B-158",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "18 holes with different lengths and pars; **all straight with identical surfaces**. Needs per-hole layout (doglegs, hazards, water) from `refs/pebble-beach`"
+    },
+    {
+      "id": "B-21",
+      "status": "partial",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "`scripts/ws-holeout-bot.mjs` covers start to finish to results; \"play again\" untested in the client"
+    },
+    {
+      "id": "B-22",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Leaderboard (hole, strokes) and results table; no live position number or finish banner"
+    },
+    {
+      "id": "B-23",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "Timed swing, length, lies, penalties (`tests/swing*.test.ts`, `tests/race.test.ts`)"
+    },
+    {
+      "id": "B-24",
+      "status": "partial",
+      "check": "load",
+      "trust": "trusted",
+      "note": "Hardening in `src/server/main.ts`; load test (12 racers, 40 idle sockets) not yet run"
+    },
+    {
+      "id": "B-25",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "See B-158, B-05"
+    },
+    {
+      "id": "B-26",
+      "status": "n/a",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Principle for judging"
+    },
+    {
+      "id": "AC-S1",
+      "status": "partial",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "Implemented in `src/client/main.ts`; no automated check yet"
+    },
+    {
+      "id": "AC-S2",
+      "status": "partial",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "Esc rules in `tests/swingfsm.test.ts`; WASD-off is client code with no test"
+    },
+    {
+      "id": "AC-S3",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/physics.test.ts` (perfect swing straight, every club)"
+    },
+    {
+      "id": "AC-S4",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "The client never scores; `scoreSwing` is pure (`tests/swing.test.ts`)"
+    },
+    {
+      "id": "AC-S5",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/swing.test.ts`; weak: shows purity, not a real frame-rate run"
+    },
+    {
+      "id": "AC-S6",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/swing-length.test.ts` SH-4 (47 yd)"
+    },
+    {
+      "id": "AC-S7",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/swingfsm.test.ts` rollover cases (hardware ghosting is not testable)"
+    },
+    {
+      "id": "AC-S8",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/swing-length.test.ts` SH-5 and `tests/race.test.ts`"
+    },
+    {
+      "id": "AC-R1",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/ranking.test.ts`"
+    },
+    {
+      "id": "AC-R2",
+      "status": "unserved",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "Nothing simulates latency; finish time is server-simulated, which makes it likely true"
+    },
+    {
+      "id": "AC-R3",
+      "status": "partial",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "OOB +1 and 2 s wait tested (`tests/race.test.ts`); water, unplayable, lateral relief not implemented; timers untested"
+    },
+    {
+      "id": "AC-R4",
+      "status": "partial",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "Server returns the lobby to `open`; client results screen button unverified"
+    },
+    {
+      "id": "AC-P1",
+      "status": "blocked",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "Waits on sourcing TrackMan averages (PRD/03 \u00a78); placeholders today"
+    },
+    {
+      "id": "AC-P2",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/physics.test.ts` AC-P2, `tests/physics-review.test.ts`"
+    },
+    {
+      "id": "AC-P3",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/physics.test.ts`, `tests/race.test.ts`"
+    },
+    {
+      "id": "AC-P4",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/physics.test.ts`, `tests/race.test.ts` (weak: only catches randomness)"
+    },
+    {
+      "id": "AC-P5",
+      "status": "unserved",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "No solver; holes are fixed data today"
+    },
+    {
+      "id": "AC-L1",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/lobbies.test.ts`"
+    },
+    {
+      "id": "AC-L2",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "`tests/lobbies.test.ts`"
+    },
+    {
+      "id": "AC-L3",
+      "status": "partial",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Two browser contexts verified; a two-machine playtest is outstanding"
+    },
+    {
+      "id": "AC-L4",
+      "status": "partial",
+      "check": "unit",
+      "trust": "trusted",
+      "note": "Promotion unit-tested; the 2 s timing is implicit (close handler is immediate)"
+    },
+    {
+      "id": "AC-L5",
+      "status": "unserved",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "Reload drops the player; resume token restores nothing (review finding 4)"
+    },
+    {
+      "id": "AC-A1",
+      "status": "partial",
+      "check": "eval",
+      "trust": "trusted",
+      "note": "Manifest rows exist; no `CREDITS` file yet; OSM attribution not applicable (no OSM data used)"
+    },
+    {
+      "id": "AC-A2",
+      "status": "partial",
+      "check": "e2e",
+      "trust": "trusted",
+      "note": "True today because nothing is wired; must be re-tested after wiring"
+    },
+    {
+      "id": "AC-A3",
+      "status": "unserved",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Models not wired; manifest records target heights and a normalisation note"
+    },
+    {
+      "id": "AC-A4",
+      "status": "unserved",
+      "check": "manual",
+      "trust": "trusted",
+      "note": "Audio not wired; -16 / -20 LUFS normalisation done at generation"
+    },
+    {
+      "id": "PS-1..PS-5",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "SH-1..SH-6",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "SH-7",
+      "status": "satisfied",
+      "check": "e2e",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "SH-8",
+      "status": "partial",
+      "check": "e2e",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "C18-1..C18-4",
+      "status": "satisfied",
+      "check": "unit",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "C18-5",
+      "status": "partial",
+      "check": "e2e",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "C18-6",
+      "status": "unserved",
+      "check": "e2e",
+      "trust": null,
+      "note": ""
+    },
+    {
+      "id": "C18-7",
+      "status": "unserved",
+      "check": "e2e",
+      "trust": null,
+      "note": ""
+    }
+  ],
+  "ledger_counts": {
+    "partial": 25,
+    "unserved": 10,
+    "satisfied": 21,
+    "n/a": 4,
+    "blocked": 1
+  },
+  "reviews": [
+    {
+      "id": "R1",
+      "date": "2026-11-05",
+      "scope": "sim, server, client up to 8f05700 (incl. commit c8e3e38)",
+      "reviewer": "fresh read-only subagent",
+      "findings": {
+        "high": 4,
+        "medium": 4,
+        "low": 4
+      },
+      "fixed": [
+        "F2 X timing now steers the ball",
+        "F3 sim roll-out and one roll model, with tests",
+        "F6/F7 lobby squatting, timers, rate limit, hello timeout"
+      ],
+      "accepted": [
+        "F1 client-reported timings are trusted (docs/backlog.md)"
+      ],
+      "open": [
+        "F4 reload mid-race drops the player (AC-L5)",
+        "F5 wedge calibration waits on sourced physics",
+        "F10 client/server clock skew"
+      ],
+      "third_state": "c8e3e38: legitimate fix of a wrong test (Magnus lift beats vacuum range); the 2x bound was too loose, replaced by zero-spin, lift-ratio and apex bounds in tests/physics-review.test.ts"
+    },
+    {
+      "id": "R2",
+      "date": "2026-11-05",
+      "scope": "hold-Space swing and putting slice (docs/slices/space-hold-swing)",
+      "reviewer": "fresh read-only subagent",
+      "findings": {
+        "critical": 1,
+        "high": 2,
+        "medium": 4,
+        "low": 6
+      },
+      "fixed": [
+        "C1 client nextHole handler and per-hole drawing",
+        "H2 swing aborts on blur, visibility and lost pointer lock",
+        "H3 aimDeg overflow to NaN: bounded in src/server/parse.ts with tests",
+        "first Space press now modelled and tested in the state machine",
+        "tests anchored to literal offsets and speeds"
+      ],
+      "accepted": [
+        "M4 length and timings are client-reported (same exposure as before)"
+      ],
+      "open": [
+        "real-keyboard rollover (hardware) and Esc under pointer lock not verified in a real browser"
+      ],
+      "third_state": "length tests re-derived the implementation's scale: fixed with literal anchors"
+    }
+  ],
+  "results": [],
+  "events": [
+    {
+      "at": "2026-11-05T18:13:34+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:13:34+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:13:35+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:13:35+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:13:37+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:13:37+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:15:12+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": ""
+    },
+    {
+      "at": "2026-11-05T18:15:12+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "a34dd3bfd2d1346506cad038fa26de347f596ff3",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": ""
+    },
+    {
+      "at": "2026-11-05T18:39:01+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "6682e2c1d510221169608c39adbcf252e18cba18",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:39:01+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "6682e2c1d510221169608c39adbcf252e18cba18",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:39:04+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "6682e2c1d510221169608c39adbcf252e18cba18",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:39:04+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "6682e2c1d510221169608c39adbcf252e18cba18",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:03+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:03+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:06+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:06+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:08+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:08+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:09+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:09+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:11+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:11+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:13+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:13+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:14+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:14+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:15+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:15+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:16+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    },
+    {
+      "at": "2026-11-05T18:44:16+00:00",
+      "stage": "subagent-stop",
+      "slice": "-",
+      "sha": "9a34af955cc5e11e094aaa2b9d86f1ce62d25fea",
+      "verdict": "stopped",
+      "note": "",
+      "source": "hook",
+      "role": "general-purpose"
+    }
+  ],
+  "inventory": {
+    "test_files": 10,
+    "adrs": 1,
+    "slices": [
+      "course-18",
+      "partial-swing",
+      "space-hold-swing"
+    ],
+    "scripts": 16,
+    "manifest_rows": 38
+  },
+  "cost": {
+    "meshy_credits_used": {
+      "measured": true,
+      "value": 125,
+      "source": "assets/manifest.json credits_used (read from the Meshy API)"
+    },
+    "openai_images": {
+      "measured": true,
+      "value": 5,
+      "source": "assets/manifest.json; cap 40"
+    },
+    "elevenlabs_audio_files": {
+      "measured": true,
+      "value": 25,
+      "source": "assets/manifest.json; about 688 credits used (agent report)"
+    },
+    "hosting": {
+      "measured": false,
+      "reason": "Render plan upgraded by the owner; price not recorded here"
+    },
+    "model_spend_at_runtime": {
+      "measured": false,
+      "reason": "not applicable: the product calls no model while running"
+    }
+  },
+  "latency": {
+    "measured": false,
+    "reason": "not live: the load test (12 racers, 3 lobbies, 40 idle sockets, p95 shot resolution and server memory) has not been run; scripts/ws-holeout-bot.mjs measures one player only"
+  },
+  "logs": {
+    "measured": false,
+    "reason": "not live: server logs are not collected or parsed; Render logs are only available on the platform"
+  },
+  "traces": {
+    "measured": false,
+    "reason": "not applicable: the product calls no model; no Langfuse traces exist or are expected"
+  }
+}
