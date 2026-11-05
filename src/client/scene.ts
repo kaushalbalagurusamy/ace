@@ -91,10 +91,10 @@ export class World {
       e.tracer!.geometry.setDrawRange(0, i + 1);
     }
   }
-  render(x: number, z: number, yaw: number, pitch: number) {
-    const dist = 6.5, f = [Math.sin(yaw), Math.cos(yaw)] as const;
-    const target = V(x, 1.5, z);
-    this.cam.position.copy(V(x - f[0] * dist * Math.cos(pitch), 1.5 + dist * Math.sin(pitch), z - f[1] * dist * Math.cos(pitch)));
+  render(x: number, z: number, yaw: number, pitch: number, y = 1.5) {
+    const dist = y > 1.5 ? 25 : 6.5, f = [Math.sin(yaw), Math.cos(yaw)] as const;
+    const target = V(x, y, z);
+    this.cam.position.copy(V(x - f[0] * dist * Math.cos(pitch), y + dist * Math.sin(pitch), z - f[1] * dist * Math.cos(pitch)));
     this.cam.lookAt(target); this.renderer.render(this.scene, this.cam);
   }
 }

@@ -160,7 +160,8 @@ function frame(now: number) {
   const cd = goAt - Date.now();
   ui.countdown(cd > 0 ? String(Math.ceil(cd / 1000)) : cd > -800 ? 'GO' : '');
   if (me) {
-    const d = Math.hypot(hole.pin.x - me.ball.x, hole.pin.z - me.ball.z) * YD;
+    const dest = me.anim?.final ?? me.ball; // show the outcome distance as soon as the shot is resolved
+    const d = Math.hypot(hole.pin.x - dest.x, hole.pin.z - dest.z) * YD;
     ui.info(hole, d, me.ball.surface, ui.clock(go ? (Date.now() - goAt) / 1000 : 0), me.ball.strokes);
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.aim * Math.PI / 180 : yaw);
   }
@@ -169,6 +170,7 @@ function frame(now: number) {
     { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true },
     { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade },
   ]));
-  world.render(pos.x, pos.z, swing ? swing.aim * Math.PI / 180 : yaw, pitch);
+  const cam = me?.anim ? me.ballMesh.position : null; // camera follows the ball while it flies
+  world.render(cam ? -cam.x : pos.x, cam ? cam.z : pos.z, swing ? swing.aim * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : 1.5);
 }
 requestAnimationFrame(frame);
