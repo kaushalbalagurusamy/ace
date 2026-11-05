@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ace
+    runtime: docker
+    plan: free # free sleeps: switch to a paid always-on plan before judging (URL unchanged)
+    healthCheckPath: /healthz
+    autoDeploy: true
