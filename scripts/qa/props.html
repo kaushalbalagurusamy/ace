@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">
+// QA view of the code-built props: same neutral background, lighting and angles as scripts/qa/render-assets.mjs.
+import * as THREE from 'three'; import { makeProp, triangles } from '/src/client/props.ts';
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(640, 640); document.body.append(r.domElement);
+const V = { front: [0, 0, 1], threequarter: [0.7, 0.45, 0.9], top: [0, 1, 0.001] };
+window.show = (kind, i, view) => {
+  const g = makeProp(kind, i), scene = new THREE.Scene(); scene.background = new THREE.Color('#8a8a8a'); scene.add(g);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#707070', 1.6)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(3, 5, 4); const fill = new THREE.DirectionalLight('#ffffff', 0.8); fill.position.set(-4, 2, -3); scene.add(key, fill);
+  const box = new THREE.Box3().setFromObject(g), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()), d = Math.max(s.x, s.y, s.z) * 2.5;
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 1000), v = new THREE.Vector3(...V[view]).normalize(); cam.position.copy(c).addScaledVector(v, d); cam.lookAt(c); r.render(scene, cam);
+  return { size: s.toArray().map(n => +n.toFixed(2)), tris: triangles(g) };
+};
+window.ready = true;
+</script>

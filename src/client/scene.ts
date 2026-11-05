@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/protocol';
 import { isCoastal, propSpots, terrainMesh } from './terrain';
 import { loadModel, type PropSpot } from './assets';
+import { makeProp } from './props';
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
 export interface Ent {
@@ -74,9 +75,9 @@ export class World {
     const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
     let i = 0;
     for (const s of spots.slice(0, 180)) {
-      const list = ids[s.kind], m = await loadModel(list[i++ % list.length]!);
+      const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
+      i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      if (!m) continue;
       m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; this.props.add(m);
     }
   }

@@ -16,7 +16,7 @@ const loader = new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath(
 window.show = async (id, dir) => {
   const g = await loader.loadAsync('/assets/models/' + id + '.glb'), scene = new THREE.Scene(); scene.background = new THREE.Color('#8a8a8a'); scene.add(g.scene);
   scene.add(new THREE.HemisphereLight('#ffffff', '#707070', 1.6)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(3, 5, 4); const fill = new THREE.DirectionalLight('#ffffff', 0.8); fill.position.set(-4, 2, -3); scene.add(key, fill);
-  const box = new THREE.Box3().setFromObject(g.scene), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()), d = Math.max(s.x, s.y, s.z) * 1.9;
+  const box = new THREE.Box3().setFromObject(g.scene), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()), d = Math.max(s.x, s.y, s.z) * 2.5;
   const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 1000), v = new THREE.Vector3(...dir).normalize(); cam.position.copy(c).addScaledVector(v, d); cam.lookAt(c);
   r.render(scene, cam); let tris = 0; g.scene.traverse(o => { if (o.isMesh) tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; });
   return { size: s.toArray().map(n => +n.toFixed(3)), tris };
