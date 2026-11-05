@@ -52,4 +52,6 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 | club-wedge (62°) | Full Toe SP Wedge (2026 page) | club-wedge-full-toe-sp-1..4.jpg |
 | club-putter | Odyssey Square 2 Square TRI-HOT Black Seven CS Putter | club-putter-1..4.jpg |
 
+**Second approved source (owner, 2026-11-05):** Fairway Jockey (fairwayjockey.com) product photos of the same Callaway and Odyssey models. Use them for extra angles, such as a face-on or sole view, when the callawaygolf.com set lacks one. Same rules: reference only, and list them in `sources.json`.
+
 **Use:** these are the primary input for Meshy image-to-3D. The photos themselves never ship. Each generated model's manifest row names the photo files it was seeded from.
