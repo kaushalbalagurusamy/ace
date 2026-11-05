@@ -68,3 +68,14 @@ export interface Club { key: string; label: string; loftDeg: number; maxClubSpee
 // contract: export const BAG: readonly Club[];
 /** Launch for a given club and swing score on a flat fairway-equivalent strike (aimed straight at azimuth 0). */
 // contract: export function launchFor(club: Club, score: SwingScore): Launch;
+
+// ---- Swing length (docs/slices/partial-swing/spec.md) ----
+export type SwingLength = 25 | 50 | 75 | 100;
+// contract: export const SWING_LENGTHS: readonly SwingLength[];            // [25, 50, 75, 100]
+// contract: export function isSwingLength(n: unknown): n is SwingLength;
+/** Downswing duration scale (<= 1): ideal X/C offsets and the 120 ms error window are multiplied by it. 100 -> 1. */
+// contract: export function durationScale(length: SwingLength): number;
+/** Club-speed multiplier by length; 100 -> 1. Tunable config. */
+// contract: export function lengthSpeedFactor(length: SwingLength): number;
+// contract (extended): scoreSwing(input: SwingInput, length?: SwingLength): SwingScore   // default 100, throws RangeError on an invalid length
+// contract (extended): launchFor(club: Club, score: SwingScore, length?: SwingLength): Launch // default 100, throws RangeError on an invalid length
