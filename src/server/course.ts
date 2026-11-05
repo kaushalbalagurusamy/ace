@@ -3,7 +3,8 @@
 // origin, the pin is on +z at the card yardage, and one lie grid per hole drives the server's physics and the client's visuals.
 import type { Surface } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
-import { GRIDS, type HoleGrid } from '../shared/course-grid';
+import { GRIDS } from '../shared/course-grid';
+import { decodeGrid } from '../shared/gridtools';
 
 export const CARD: readonly { par: number; yards: number }[] = [
   [4, 381], [5, 502], [4, 390], [4, 331], [3, 188], [5, 524], [3, 106], [4, 418], [4, 466],
@@ -23,19 +24,13 @@ export interface Hole {
   outOfBounds(x: number, z: number): boolean;
 }
 
-/** Decodes one grid's run-length rows into a flat array of class characters (cached per hole). */
-function decode(g: HoleGrid): Uint8Array {
-  const a = new Uint8Array(g.nx * g.nz).fill(111); // 'o'
-  g.rows.forEach((row, iz) => { let ix = 0; for (const m of row.matchAll(/([a-z])(\d*)/g)) { const n = m[2] ? Number(m[2]) : 1; a.fill(m[1]!.charCodeAt(0), iz * g.nx + ix, iz * g.nx + ix + n); ix += n; } });
-  return a;
-}
 const LIE: Record<string, Surface> = { g: 'green', f: 'fairway', p: 'fairway', c: 'firstCut', r: 'rough', t: 'rough', k: 'rough', s: 'bunker', w: 'rough', o: 'rough' };
 const cache: (Uint8Array | undefined)[] = [];
 
 export function hole(index: number): Hole {
   if (!Number.isInteger(index) || index < 0 || index >= HOLE_COUNT) throw new RangeError(`no such hole: ${index}`);
   const { par, yards } = CARD[index]!;
-  const lengthM = yards * M_PER_YD, g = GRIDS[index]!, cells = (cache[index] ??= decode(g));
+  const lengthM = yards * M_PER_YD, g = GRIDS[index]!, cells = (cache[index] ??= decodeGrid(g));
   const cls = (x: number, z: number): number => {
     const ix = Math.floor((x - g.x0) / g.cell), iz = Math.floor((z - g.z0) / g.cell);
     return ix < 0 || iz < 0 || ix >= g.nx || iz >= g.nz ? 111 : cells[iz * g.nx + ix]!;
