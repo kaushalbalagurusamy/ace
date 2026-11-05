@@ -1,6 +1,6 @@
 # Slice: backswing length (partial swings)
 
-Status: spec accepted 2026-11-05 (supervisor design on behalf of the owner; owner may override). Source: supervisor message, `.claude/supervisor-inbox.md` gap note.
+Status: SUPERSEDED for input by docs/slices/space-hold-swing/spec.md (2026-11-05); the timing and speed ideas live on there. Original status: spec accepted 2026-11-05. Source: supervisor message, `.claude/supervisor-inbox.md` gap note.
 
 ## Why
 No partial swing exists, so from inside ~130 yd every club overshoots (even 62 degrees) and the server calls the shot out of bounds. Players can rarely reach a putt, so putting and hole-out cannot be played or physics-tested.

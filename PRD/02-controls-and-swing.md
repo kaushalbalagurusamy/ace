@@ -25,29 +25,29 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 2. [ASSUMED] Movement is relative to the camera. The mouse orbits a third-person camera.
 3. [ASSUMED] Run speed is 9 m/s, so a 300-yard walk takes about 30 seconds. This speed is the main lever on race length (see 05).
 4. [ASSUMED] Players can't walk into water or past out-of-bounds stakes. Trees block movement. Golfers pass through each other.
-5. [GIVEN] Space within 2.5 m of the ball [ASSUMED distance] enters swing mode. A prompt shows "Space: address ball" when in range.
+5. [GIVEN] The first Space press within 2.5 m of the ball [ASSUMED distance] takes the **stance**: swing mode starts, the aim locks and WASD is disabled. A prompt shows "Space: take your stance" when in range.
 6. [GIVEN] **Aiming:** the mouse sets the aim direction, the way the camera faces. **No aim line or landing marker is drawn.** Pressing Space locks the aim. A shot planned on the rangefinder (§7) isn't guaranteed to match where the golfer faces. Lining up is part of the skill.
 
 ## 3. Swing mode
 
-On Space, WASD is disabled [GIVEN]. The rest of the swing runs as a timed sequence:
+*Revised 2026-11-05 (owner design change, `docs/slices/space-hold-swing/spec.md`): the owner sets the backswing length by holding Space. This replaces the automatic backswing and the earlier wheel / `[` `]` step selector.*
 
-| Phase | Who drives it | Duration [ASSUMED, calibrate] |
-|---|---|---|
-| Address: golfer sets up over the ball | automatic | 0.6 s |
-| Takeaway and backswing to the top | automatic | 0.75 s |
-| Transition: Z window opens | player | window ±150 ms around the top |
-| Downswing: hips (Z), then shoulders (X), then release (C), each pressed and held | player | about 0.25 s from top to impact |
-| Impact, follow-through, ball launch | automatic | 0.8 s |
+1. **First Space press** near the ball: take the stance and lock the aim (WASD off).
+2. **Second Space press, held:** the backswing turns at a fixed tempo, a full turn in 750 ms (`FULL_TURN_MS`, config). A length meter fills on the HUD.
+3. **Release Space = the top of the swing.** Holding past a full turn pauses at the top. **Length** is the fraction reached, continuous, clamped to 0.05 to 1.0.
+4. **Z, X, C** are timed **relative to the Space release** (it replaces "the top"), each pressed and held to impact. Their ideal offsets and the 120 ms error window scale with length (a shorter swing has a shorter downswing), so good tempo gives a straight shot at any length.
+5. **Club speed** = the club's full speed x f(length), interpolated through 0.25 -> 0.5, 0.5 -> 0.68, 0.75 -> 0.86, 1 -> 1 (and 0.05 -> 0.18) [ASSUMED, tunable config]. A perfect 25% swing with the 62 degree wedge carries about 47 yd; a full swing is unchanged.
+6. **Impact, follow-through, ball launch** are automatic (0.8 s).
+
+Pressing Space, Z, X and C in any overlapping order loses no key: presses made before the release are scored as early (negative offsets). Implementation: the pure `SwingFSM` in `src/client/swingfsm.ts`.
 
 - **Model** [GIVEN]: the swing is based on MCS (Wax Nation). A full hip turn and shoulder turn go to the top. On the downswing, the hips lead and pull the shoulders, and the wrists release once the arms drop into the slot.
 - **Ideal timing:** the target offsets are parameters fitted to the reference clip once we have it [OPEN Q7]. The starting values below follow the general kinematic-sequence ordering of hips, then torso, then arms, then club [UNVERIFIED as exact numbers].
-  - Z at the top of the backswing: t = 0.
-  - X at Z + 60 ms.
-  - C at Z + 150 ms, about 100 ms before impact.
+  - At full length, relative to the Space release: Z at t = 0, X at 60 ms, C at 150 ms, about 100 ms before impact.
+  - At shorter lengths X and C offsets and the error window are multiplied by `durationScale(length)` (0.6 at 25%, 0.75 at 50%, 0.9 at 75%).
 - **Hold:** all three keys must stay held until impact. Letting go early counts as "bailing out" and is scored as if the key had never been pressed.
 - **Missed key:** if a key isn't pressed by impact, the swing still finishes. It counts as a mishit with that key's maximum error. The ball always goes somewhere and there is never a whiff [ASSUMED].
-- **Cancel:** Esc before the top cancels with no penalty [ASSUMED].
+- **Cancel:** Esc after the stance and before the Space release cancels with no penalty [ASSUMED]. After the release it does nothing.
 
 ### Scoring the timing [ASSUMED, all constants to calibrate]
 
@@ -79,12 +79,11 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 - [GIVEN] Every ball's tracer is visible to every player.
   - [ASSUMED] Each tracer stays until that player's next shot.
 
-## 5. Putting [GIVEN: simple Z pendulum]
+## 5. Putting [GIVEN: simple stroke; revised 2026-11-05 to hold Space]
 
-- With the putter equipped, Space within range enters putt mode. There is no automatic backswing.
-- Holding Z draws the putter back and a meter fills over 1.5 s for maximum length. Releasing Z strikes the ball.
-- Ball speed is proportional to the draw. Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
-- X and C do nothing.
+- With the putter equipped: first Space press takes the stance (aim locks); **hold Space** to draw the putter back (a meter fills over 750 ms for a full draw); **releasing Space strikes the ball.** Hold-Z putting is removed.
+- Ball speed = 15 m/s x length (length 0.05 to 1), the old `drawMs / 1500 x 15` curve. Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
+- Z, X and C do nothing with the putter. Esc after the stance and before the release cancels.
 - A green slope overlay (arrows on a grid) shows within 10 m of the ball [ASSUMED].
 
 ## 6. Golfer animation
@@ -113,7 +112,10 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 ## Acceptance criteria
 
 - **AC-S1:** All 14 keys select the matching club, and the HUD highlight updates within one frame.
-- **AC-S2:** In swing mode WASD has no effect. Esc before the top cancels the swing.
+- **AC-S2:** In swing mode WASD has no effect. Esc before the Space release cancels the swing.
 - **AC-S3:** A perfect sequence played by script gives E = 0 and the club's maximum carry with under 1% curvature.
 - **AC-S4:** The same press timings give the same ball result on the client and the server, because the server scores them.
 - **AC-S5:** At 30 fps and 144 fps, identical key timings give an identical E.
+- **AC-S6:** A perfect release at 25% with the 62 degree wedge carries 40 to 75 yd; a full swing is unchanged.
+- **AC-S7:** Holding Space together with Z, X and C in any overlapping order loses no key (state-machine key-event tests).
+- **AC-S8:** A putt released at length L has the speed of the old draw L x 1500 ms.
