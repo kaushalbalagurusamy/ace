@@ -456,5 +456,53 @@
     },
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
     "subagent": "build session (script)"
+  },
+  {
+    "tool": "Meshy multi-image-to-3D + auto-rig",
+    "tier": "Pro",
+    "date": "2026-11-05",
+    "subagent": "build session (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "balance_before": 1005,
+    "balance_after": 970,
+    "seed_images": [
+      "assets/images/golfer-front.png",
+      "assets/images/golfer-side.png",
+      "assets/images/golfer-back.png",
+      "assets/images/golfer-sheet.png"
+    ],
+    "seed_image_model": "gpt-image-2-2026-04-21",
+    "id": "golfer-mesh",
+    "file": "assets/models/raw/golfer-mesh.glb (local only, unrigged intermediate)",
+    "model": "meshy-6",
+    "task_id": "01a1ace4-056c-7000-9ded-a6f4a9a19c8f",
+    "credits_used": 30,
+    "prompt": "3 views of the Ace golfer concept sheet"
+  },
+  {
+    "tool": "Meshy multi-image-to-3D + auto-rig",
+    "tier": "Pro",
+    "date": "2026-11-05",
+    "subagent": "build session (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "balance_before": 1005,
+    "balance_after": 970,
+    "seed_images": [
+      "assets/images/golfer-front.png",
+      "assets/images/golfer-side.png",
+      "assets/images/golfer-back.png",
+      "assets/images/golfer-sheet.png"
+    ],
+    "seed_image_model": "gpt-image-2-2026-04-21",
+    "id": "golfer",
+    "file": "assets/models/golfer.glb",
+    "model": "meshy rigging",
+    "task_id": "01a1ace8-8cd6-7510-ad6e-a5bac69d90ac",
+    "credits_used": 5,
+    "height_m": 1.8,
+    "triangles": 12308,
+    "shipped_bytes": 289580,
+    "post_process": "gltf-transform optimize: meshopt + webp textures <=1024; raw kept local",
+    "note": "Meshy walking/running clips were returned but NOT used (brief: no premade animations). Joint curves come from our own pose extraction (PRD/02 \u00a76). Armature root is scaled 0.01: loader must normalise."
   }
 ]
