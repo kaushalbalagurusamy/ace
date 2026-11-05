@@ -6,7 +6,7 @@
   - This includes the three.js example textures, such as the water normal map shipped with the Water addon. Those are pre-made, so we generate our own.
 - [GIVEN] The MVP runs on greyscale polygons. Each asset below has a code-made stand-in with the same ID, so the game never waits on generation.
 - [GIVEN] Club models follow the Callaway and Odyssey models in the bag, because Callaway is the sponsor. The HUD keeps generic labels.
-- [ASSUMED] **Logos:** no Callaway logos or wordmarks appear unless Callaway supplies approved artwork. The shapes and colourways can follow the real clubs.
+- [GIVEN] **Callaway reference:** Callaway (the sponsor) directed us to use its product-site photos for the club models. Logos and wordmarks may appear on the generated models as they do in those photos.
 - [ASSUMED] **Provenance:** every asset gets one row in `assets/manifest.json`: id, file, tool, model or version, tier, prompt, seed, date, licence, and the subagent that made it. A `CREDITS.md` lists the tools and an "AI-generated assets" line. The format is the `create-game-assets` skill's `asset-manifest.json`.
 
 ## 2. Pebble Beach Golf Links: the first map [GIVEN]
@@ -29,13 +29,8 @@
 - **Geometry:** all course geometry is generated in code from this data, so the shipped course is a generated asset, not a copied one.
 - **Scale:** the real yardages are kept [ASSUMED]. At 130 mph many par 4s become a drive and a wedge, which suits a race.
 
-### Rights [OPEN Q12]
-Pebble Beach is a famous, trademarked course. The Pebble Beach Company licenses it to video games, and I recall it suing a replica-course builder in the 1990s (*Pebble Beach Co. v. Tour 18*) [UNVERIFIED]. Three options:
-- (a) Use the name and layout for an internal sponsor demo only.
-- (b) Ask Callaway whether they can arrange permission.
-- (c) Ship the public, judged build as "a coastal links inspired by the Monterey Peninsula" with no Pebble Beach name or marks. The layout is unchanged.
-
-My default is (c) for anything public until you decide.
+### Rights [GIVEN Q12, 2026-11-05]
+The owner's Pebble Beach contact approved using the **Pebble Beach** name in the game. Ship the course as "Pebble Beach Golf Links". The 2000 U.S. Open hole graphics are reference only (docs/research/reference-sources.md).
 
 ## 3. Generation platforms
 

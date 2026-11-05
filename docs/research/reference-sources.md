@@ -36,7 +36,20 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 - **Frame rate:** 30 fps gives about 33 ms per frame, which is coarse for the Z/X/C onsets (PRD/02 §3: target offsets of 60 and 150 ms). Interpolate across frames, and treat the timings as ±1 frame.
 - **Use:** extract the joint-angle curves and phase timings only. The video and its frames never ship.
 
-## Callaway product photos (owner: sponsor-approved, for seeding the club models)
+## Callaway product photos: `refs/callaway/` (sponsor-directed reference, 2026-11-05)
 
-- Not fetched yet. callawaygolf.com returned HTTP 429 to automated requests, so download them by hand or slowly in a browser.
-- Put them in `refs/callaway/<club-id>.jpg`, using the IDs from PRD/06 §4.
+- **What:** 4 studio photos for each product, at 1200 to 2000 px, from callawaygolf.com and odyssey.callawaygolf.com. Page and image URLs are in `refs/callaway/sources.json`.
+- **How they were fetched:** through a real headless browser. Plain HTTP clients get HTTP 429 from the site's bot protection.
+
+| Asset id (PRD/06) | Product page title | Files |
+|---|---|---|
+| club-driver | Elyte Triple Diamond Driver (2025) | club-driver-1..4.jpg |
+| club-3w | Elyte Triple Diamond Fairway Woods (2025) | club-3w-1..4.jpg |
+| club-ut | Apex Utility Woods (2026 page; the site lists no 2025 "UT", so this is the closest match to the owner's "Apex 2025 UT 18°") | club-ut-1..4.jpg |
+| club-iron | X Forged Irons (2025) | club-iron-1..4.jpg |
+| club-wedge (50°) | Opus SP Chrome Wedge (2025) | club-wedge-opus-sp-1..4.jpg |
+| club-wedge (54°) | Opus SP+ Chrome Wedge (2026 page) | club-wedge-opus-sp-plus-1..4.jpg |
+| club-wedge (62°) | Full Toe SP Wedge (2026 page) | club-wedge-full-toe-sp-1..4.jpg |
+| club-putter | Odyssey Square 2 Square TRI-HOT Black Seven CS Putter | club-putter-1..4.jpg |
+
+**Use:** these are the primary input for Meshy image-to-3D. The photos themselves never ship. Each generated model's manifest row names the photo files it was seeded from.

@@ -44,7 +44,6 @@ Up to four players race through 18 holes of golf in a browser. Players join from
 | Q11 | First map | Pebble Beach Golf Links (06). |
 
 **Still open:**
-- **Q12:** Pebble Beach naming rights for the public build. Default: an unnamed "Monterey coastal links" (06 §2).
 - **Keys:** a Meshy Pro key and an OpenAI image key.
 - **F-044:** the spend ceiling.
 - **F-007:** judge devices.
