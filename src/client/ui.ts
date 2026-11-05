@@ -33,6 +33,7 @@ const CSS = `
 .box{background:#2a2a2a;padding:10px 14px;min-width:360px;border:1px solid #555}.row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0}
 .err{color:#e88;min-height:1.2em}
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
+#len{top:62px;left:50%;transform:translateX(-50%);display:flex;gap:4px;align-items:center;padding:3px 8px;font-size:12px}#len i{width:18px;height:8px;background:#555;border-radius:2px}#len i.on{background:#e8e8e8}#len b{min-width:34px}
 #bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px}
 .slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
 #info{left:10px;bottom:10px;line-height:1.5}#lb{left:10px;top:10px}#mini{right:10px;top:10px;padding:0}
@@ -54,7 +55,7 @@ export class UI {
     document.head.insertAdjacentHTML('beforeend', `<style>${CSS}</style>`);
     this.root.id = 'ui'; this.hud.style.display = 'none';
     this.hud.innerHTML = `<div class="hud" id="bag">${BAG.map(b => `<div class="slot"><b>${b.key}</b>${b.label}</div>`).join('')}</div>
-      <div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
+      <div class="hud" id="len"><span>Swing</span>${[25, 50, 75, 100].map(v => `<i data-l="${v}"></i>`).join('')}<b id="lenv">100%</b></div><div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div style="background:#444"><div id="fill"></div></div></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div>`;
@@ -103,6 +104,8 @@ export class UI {
   clock(s: number) { s = Math.max(0, s); return `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`; }
 
   // --- HUD ---
+  /** 4-step swing length bar: steps up to and including `v` are lit. */
+  setLength(v: number) { this.hud.querySelectorAll<HTMLElement>('#len i').forEach(e => e.classList.toggle('on', Number(e.dataset.l) <= v)); this.$('lenv').textContent = `${v}%`; }
   setClub(i: number) { this.hud.querySelectorAll('.slot').forEach((e, j) => e.classList.toggle('on', i === j)); }
   info(hole: HoleInfo, yards: number, lie: string, clock: string, strokes: number) {
     this.$('info').innerHTML = `Hole ${hole.index + 1} &middot; Par ${hole.par} &middot; Strokes ${strokes}<br>Pin ${Math.round(yards)} yd &middot; Lie: ${esc(lie)}<br>Clock ${clock}`;
