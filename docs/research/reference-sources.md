@@ -55,3 +55,12 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 **Second approved source (owner, 2026-11-05):** Fairway Jockey (fairwayjockey.com) product photos of the same Callaway and Odyssey models. Use them for extra angles, such as a face-on or sole view, when the callawaygolf.com set lacks one. Same rules: reference only, and list them in `sources.json`.
 
 **Use:** these are the primary input for Meshy image-to-3D. The photos themselves never ship. Each generated model's manifest row names the photo files it was seeded from.
+
+## Golfer character reference: `refs/golfer/character-reference.png` (owner, 2026-11-05)
+
+- The owner supplied this image as **the** reference for the player character, replacing the earlier text-only concept.
+- What to carry into the model: face, short curly dark hair with faded sides, a full trimmed beard, skin tone and build, and the **glowing violet eyes** as a signature detail.
+- What not to copy: the cosmic background and the white embroidered robe. Dress the golfer in golf attire that keeps the white-with-gold-embroidery look (for example a white polo or quarter-zip with subtle gold celestial embroidery, dark trousers and golf shoes), so it reads as golf on the course.
+- **Pipeline:** OpenAI image edit with this reference produces a front/side/back A-pose turnaround in STYLE.md's look. Then Meshy multi-image-to-3D, auto-rig, and the swing keyframes from refs/swing.
+- **Fidelity:** a fresh critic compares renders against this image (face and hair silhouette, beard, skin tone, eyes) before the golfer ships.
+- Reference only: the image itself never ships.
