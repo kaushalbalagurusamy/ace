@@ -8,7 +8,7 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 |---|---|---|---|---|
 | 1 | Elyte TD 8° Driver | Driver | 8° [GIVEN] | +5° attack angle off the tee [GIVEN] |
 | 2 | Elyte TD 3W | 3W | 15° [ASSUMED] | +2° off the tee [GIVEN]. Off the ground it's struck down [ASSUMED] |
-| 3 | Apex 2025 UT 18° | 18° UT | 18° [GIVEN] | struck down, PGA delivery [GIVEN] |
+| 3 | Apex 2025 utility iron, #2 UDI 18° [GIVEN, clarified 2026-11-05] | 18° UT | 18° [GIVEN] | struck down, PGA delivery [GIVEN] |
 | 4 to 0 | 2025 X Forged 4-PW | 4i, 5i, 6i, 7i, 8i, 9i, PW | 23/26/30/34/38/42/46° [ASSUMED] | struck down, PGA delivery [GIVEN] |
 | - | Opus SP 50° | 50° | 50° [GIVEN] | struck down [GIVEN] |
 | = | Opus SP+ 54° | 54° | 54° [GIVEN] | struck down [GIVEN] |

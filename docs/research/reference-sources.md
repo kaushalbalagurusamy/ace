@@ -45,7 +45,7 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 |---|---|---|
 | club-driver | Elyte Triple Diamond Driver (2025) | club-driver-1..4.jpg |
 | club-3w | Elyte Triple Diamond Fairway Woods (2025) | club-3w-1..4.jpg |
-| club-ut | Apex Utility Woods (2026 page; the site lists no 2025 "UT", so this is the closest match to the owner's "Apex 2025 UT 18°") | club-ut-1..4.jpg |
+| club-ut | **Apex Utility Irons** (owner, 2026-11-05: the bag club is the 2025 Apex utility iron, **#2 UDI 18°**). The site has one Apex Utility Irons page (slug `irons-2026-apex-utility`, lofts 18/20/22/24°), and its photos show a 22° head, so stamp the model **18°**. It's an iron-style hollow head, not a wood | club-ut-1..4.jpg |
 | club-iron | X Forged Irons (2025) | club-iron-1..4.jpg |
 | club-wedge (50°) | Opus SP Chrome Wedge (2025) | club-wedge-opus-sp-1..4.jpg |
 | club-wedge (54°) | Opus SP+ Chrome Wedge (2026 page) | club-wedge-opus-sp-plus-1..4.jpg |
