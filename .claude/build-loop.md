@@ -9,12 +9,15 @@ unset until the named stage decides them; do not guess them.
 Gauntlet Game Week. Build a browser game from one of three genres (exploration/adventure, platformer,
 multiplayer racing) with **all assets generated** (visual and audio, no premade assets).
 
-- **Due: Thursday 2026-11-05 at midnight** (timezone not stated in the brief; treated as Pacific until the
-  owner says otherwise — see the open question in the minesweep). Playing and judging Friday morning;
-  winners around Friday lunch.
-- **Operator's leading idea (a hypothesis, not a decision):** *Final Frontier*, a multiplayer space racer
-  with Kepler orbits and restricted n-body physics, all assets generated. It maps to brief Option 3
-  (Multiplayer Racing). It becomes a decision only through stage 3 (ADR) after the sweep and research.
+- **Due:** the brief says Thursday 2026-11-05 at midnight; the owner confirmed **CST**. On 2026-11-05 the
+  owner also said the practical cutoff is **before judging, which starts after 08:00 CST Friday
+  2026-11-06**. Playing and judging Friday morning; winners around Friday lunch.
+- **Direction (owner decision, 2026-11-05):** *Final Frontier* (space racer) is **scrapped**. The game is a
+  **multiplayer browser golf race** (brief Option 3): up to 4 players per lobby race through 18 holes,
+  first to hole out on 18 wins. First map: Pebble Beach Golf Links. The spec is `PRD/` (README first);
+  owner decisions Q1–Q11 are recorded in `PRD/README.md`. Engine: Three.js `three@0.186.1` client, Node
+  `ws` authoritative server. The space-racer minesweep under `docs/minesweep/` is history; only its asset,
+  licensing, hosting and key findings carry over (listed in `PRD/README.md`).
 - **Remote:** `labs.gauntletai.com`, repo `gauntlet-game-week`, public, empty (as the operator reports).
   The namespace and push access are **unverified** (the host needs a login); no remote has been added.
 - **Ceiling the operator set:** the deadline above. The loop is not a variable: schedule pressure may
@@ -54,8 +57,8 @@ multiplayer racing) with **all assets generated** (visual and audio, no premade 
   stages.
 - **Multiplayer must work reliably enough to finish a race together**, with a clear way to join. Hosting is
   chosen on evidence, with the multiplayer failure modes (latency, disconnect, cold start, desync) named
-  in the spec. Physics that two clients must agree on (orbits, n-body) is a determinism and
-  synchronisation question, not only a rendering one.
+  in the spec. Ball physics runs only on the server and clients replay the trajectory it sends
+  (`PRD/03` §3), so cross-client determinism is avoided by design.
 - **Playable by someone else**: a cold-start run by a person who is not the author is the final check
   (stage 7/8), not the author's own session.
 - A zero must mean a measurement, never a failed lookup.
