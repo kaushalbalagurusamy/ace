@@ -192,7 +192,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       send(ws, { t: 'lobby', lobby: null });
       lobbyChanged(before && mgr.list().find(l => l.id === before.id));
       const r = before && races.get(before.id);
-      if (r && [...r.players].every(([id, p]) => p.ball.holedOut || !present(r, id))) endRace(r);
+      if (r && allDone(r)) endRace(r);
       return;
     }
     case 'shot': case 'putt': {
