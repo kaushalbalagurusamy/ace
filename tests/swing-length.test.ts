@@ -96,3 +96,21 @@ describe('SH-5 putt speed curve', () => {
     expect(puttSpeedMs(1)).toBe(15); expect(puttSpeedMs(0.05)).toBeCloseTo(0.75, 10);
   });
 });
+
+describe('review: literal anchors (not derived from the implementation)', () => {
+  it('ideal Z/X/C offsets are 0 / 60 / 150 ms at full and 0 / 36 / 90 ms at 25%, 0 / 45 / 112.5 at 50%, 0 / 54 / 135 at 75%', () => {
+    const e = (L: number, x: number, c: number) => scoreSwing({ zMs: 0, xMs: x, cMs: c }, L).E;
+    expect(e(1, 60, 150)).toBe(0); expect(e(0.25, 36, 90)).toBe(0); expect(e(0.5, 45, 112.5)).toBe(0); expect(e(0.75, 54, 135)).toBe(0);
+  });
+  it('and one millisecond late costs a known, small, literal amount: nX = 1/72 at 25%', () => {
+    const s = scoreSwing({ zMs: 0, xMs: 37, cMs: 90 }, 0.25);
+    expect(s.nX).toBeCloseTo(1 / 72, 10);                       // window is 120 ms x 0.6 = 72 ms
+    expect(s.E).toBeCloseTo(0.3 / 72, 10);
+  });
+  it('literal putt speeds: 0.07 gives 1.05 m/s, 0.5 gives 7.5 m/s, 1 gives 15 m/s', () => {
+    expect(puttSpeedMs(0.07)).toBeCloseTo(1.05, 10); expect(puttSpeedMs(0.5)).toBe(7.5); expect(puttSpeedMs(1)).toBe(15);
+  });
+  it('literal speed factor at 25% and 75% (the anchors the PRD documents)', () => {
+    expect(lengthSpeedFactor(0.25)).toBe(0.5); expect(lengthSpeedFactor(0.75)).toBe(0.86);
+  });
+});
