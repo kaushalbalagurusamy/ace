@@ -6,7 +6,7 @@
 | Item | Status | Owner of the action |
 |---|---|---|
 | GitLab repo link | `https://labs.gauntletai.com/kaushalbalagurusamy/gauntlet-game-week` (check which branch judges see; currently only `intake/sources-profile-minesweep` exists, with no `main`) | build session prepares; owner submits |
-| Deployment URL | **https://ace-x92s.onrender.com** (Render service `srv-dbmbob3m8hqs73f9pbpg`, free plan for now: upgrade to always-on before 08:00). Deploys from the GitHub mirror `github.com/kaushalbalagurusamy/ace` branch `main` (remote `github`), because Render can't pull from the self-hosted GitLab. Host: **Render** (owner, 2026-11-05). Needs `RENDER_API_KEY` in `.env` from the owner, and an always-on paid instance for judging, because the free tier sleeps | build session |
+| Deployment URL | **https://ace-x92s.onrender.com** (Render service `srv-dbmbob3m8hqs73f9pbpg`, plan **1 CPU / 2 GB always-on** (owner upgraded 2026-11-05; confirmed via API)). Deploys from the GitHub mirror `github.com/kaushalbalagurusamy/ace` branch `main` (remote `github`), because Render can't pull from the self-hosted GitLab. Host: **Render** (owner, 2026-11-05). Needs `RENDER_API_KEY` in `.env` from the owner, paid always-on plan, done | build session |
 | Twitter/X post | not drafted | build session drafts; **owner posts** |
 | Demo video | not recorded | build session records (demo-script skill); owner reviews |
 

@@ -2,6 +2,6 @@ services:
   - type: web
     name: ace
     runtime: docker
-    plan: free # free sleeps: switch to a paid always-on plan before judging (URL unchanged)
+    plan: standard # 1 CPU / 2 GB always-on, owner upgraded 2026-11-05 for judging
     healthCheckPath: /healthz
     autoDeploy: true
