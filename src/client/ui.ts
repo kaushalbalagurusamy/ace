@@ -45,7 +45,7 @@ table{border-collapse:collapse;min-width:360px}td,th{padding:3px 10px;text-align
 
 export class UI {
   root = document.getElementById('app')!;
-  private scr = document.createElement('div');
+  private scr = Object.assign(document.createElement('div'), { className: 'scr' });
   private hud = document.createElement('div');
   private mini!: HTMLCanvasElement;
   private $ = (id: string) => this.hud.querySelector<HTMLElement>('#' + id)!;
