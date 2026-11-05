@@ -3,8 +3,6 @@ import { BAG, LAND_ROLL_FRACTION, isSwingLength, launchFor, rollingDecel, scoreS
 import type { Surface, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
-const FIRST_CUT_HALF = 30;
-const OOB_HALF = 70;
 const CUP_RADIUS_M = 0.054;
 const HOLE_SPEED_MS = 1.6;
 const MAX_PUTT_MS = 15;
@@ -13,21 +11,8 @@ const DROP_WAIT_S = 2;
 const LIE_SPEED: Record<Surface, number> = { fairway: 1, firstCut: 0.97, rough: 0.85, bunker: 0.75, fringe: 0.9, green: 0.9 };
 const DT = 1 / 60;
 
-export interface Hole { info: HoleInfo; surfaceAt(x: number, z: number): Surface; outOfBounds(x: number, z: number): boolean }
-
-// shortcut: one hand-built hole; add entries here (and a per-hole surface fn) for more holes.
-export function hole(_index: number): Hole {
-  const info: HoleInfo = { index: 0, par: 4, pin: { x: 0, z: 380 }, tee: { x: 0, z: 0 }, greenRadius: 14, fairwayHalfWidth: 22, lengthM: 380 };
-  return {
-    info,
-    surfaceAt(x, z) {
-      if (Math.hypot(x - info.pin.x, z - info.pin.z) <= info.greenRadius) return 'green';
-      const ax = Math.abs(x);
-      return ax <= info.fairwayHalfWidth ? 'fairway' : ax <= FIRST_CUT_HALF ? 'firstCut' : 'rough';
-    },
-    outOfBounds: (x, z) => Math.abs(x) > OOB_HALF || z < -20 || z > info.pin.z + 40,
-  };
-}
+export { hole, type Hole } from './course';
+import type { Hole } from './course';
 
 export interface Played {
   samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number;
