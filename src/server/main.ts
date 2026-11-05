@@ -89,7 +89,7 @@ function parse(raw: string): ClientMsg | null {
     case 'joinLobby': return typeof m.lobbyId === 'string' ? m : null;
     case 'ready': return typeof m.ready === 'boolean' ? m : null;
     case 'shot': return typeof m.clubKey === 'string' && num(m.aimDeg) && optNum(m.zMs) && optNum(m.xMs) && optNum(m.cMs) && optNum(m.length) ? m : null;
-    case 'putt': return num(m.aimDeg) && num(m.drawMs) ? m : null;
+    case 'putt': return num(m.aimDeg) && num(m.length) ? m : null;
     default: return null;
   }
 }
@@ -201,7 +201,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       const now = Date.now();
       if (me.ball.holedOut) return err(ws, 'NOT_YOUR_TURN', 'already holed out');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
-      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, m) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.drawMs), now);
+      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, m) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.length), now);
       return;
     }
     default: return err(ws, 'BAD_MESSAGE', 'unexpected hello');

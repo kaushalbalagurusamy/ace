@@ -1,12 +1,10 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, LAND_ROLL_FRACTION, isSwingLength, launchFor, rollingDecel, scoreSwing, simulateShot } from '../sim';
+import { BAG, LAND_ROLL_FRACTION, clampLength, isValidLength, launchFor, puttSpeedMs, rollingDecel, scoreSwing, simulateShot } from '../sim';
 import type { Surface, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
 const CUP_RADIUS_M = 0.054;
 const HOLE_SPEED_MS = 1.6;
-const MAX_PUTT_MS = 15;
-const MAX_DRAW_MS = 1500;
 const DROP_WAIT_S = 2;
 const LIE_SPEED: Record<Surface, number> = { fairway: 1, firstCut: 0.97, rough: 0.85, bunker: 0.75, fringe: 0.9, green: 0.9 };
 const DT = 1 / 60;
@@ -53,8 +51,9 @@ function settle(h: Hole, prev: BallState, x: number, z: number, holed: boolean, 
 export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { error: string } {
   const club = BAG.find(c => c.key === req.clubKey);
   if (!club || club.key === 'P') return { error: 'unknown club (use putt for the putter)' };
-  const length = req.length ?? 100;
-  if (!isSwingLength(length)) return { error: 'invalid swing length (use 25, 50, 75 or 100)' };
+  const raw = req.length ?? 1;
+  if (!isValidLength(raw)) return { error: 'invalid swing length (must be a finite number)' };
+  const length = clampLength(raw);
   const score = scoreSwing(req, length);
   const launch = launchFor(club, score, length);
   launch.ballSpeed *= LIE_SPEED[prev.surface as Surface] ?? 1;
@@ -77,9 +76,10 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   });
 }
 
-export function playPutt(h: Hole, prev: BallState, aimDeg: number, drawMs: number): Played | { error: string } {
+export function playPutt(h: Hole, prev: BallState, aimDeg: number, length: number): Played | { error: string } {
   if (prev.surface !== 'green') return { error: 'putter only works on the green' };
-  const v0 = (Math.min(MAX_DRAW_MS, Math.max(0, drawMs)) / MAX_DRAW_MS) * MAX_PUTT_MS;
+  if (!isValidLength(length)) return { error: 'invalid putt length (must be a finite number)' };
+  const v0 = puttSpeedMs(clampLength(length));
   const a = (aimDeg * Math.PI) / 180;
   const decel = rollingDecel('green', 10);
   const r = roll(h, prev.x, prev.z, Math.sin(a), Math.cos(a), v0, decel, 0);

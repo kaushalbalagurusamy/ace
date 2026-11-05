@@ -33,8 +33,8 @@ describe('SH-2 timing scale is continuous and length 1 is the old full swing', (
   it('durationScale: anchored at the documented points, monotone, continuous, 1 at full', () => {
     const pts: [number, number][] = [[0.05, 0.48], [0.25, 0.6], [0.5, 0.75], [0.75, 0.9], [1, 1]];
     for (const [L, d] of pts) expect(durationScale(L), `L=${L}`).toBeCloseTo(d, 10);
-    let prev = 0;
-    for (let L = 0.05; L <= 1.0001; L += 0.01) { const d = durationScale(Math.min(1, L)); expect(d).toBeGreaterThanOrEqual(prev); expect(d - prev).toBeLessThan(0.01); prev = d; }
+    let prev = durationScale(0.05);
+    for (let L = 0.06; L <= 1.0001; L += 0.01) { const d = durationScale(Math.min(1, L)); expect(d).toBeGreaterThanOrEqual(prev); expect(d - prev).toBeLessThan(0.01); prev = d; }
     expect(durationScale(0.375)).toBeCloseTo(0.675, 10); // midway between 0.6 and 0.75
   });
   it('rejects lengths outside [0.05, 1] and non-finite ones', () => {
@@ -61,8 +61,8 @@ describe('SH-3 speed and carry rise smoothly with length', () => {
   it('lengthSpeedFactor: anchored, monotone, continuous, 1 at full', () => {
     const pts: [number, number][] = [[0.05, 0.18], [0.25, 0.5], [0.5, 0.68], [0.75, 0.86], [1, 1]];
     for (const [L, f] of pts) expect(lengthSpeedFactor(L), `L=${L}`).toBeCloseTo(f, 10);
-    let prev = 0;
-    for (let L = 0.05; L <= 1.0001; L += 0.01) { const f = lengthSpeedFactor(Math.min(1, L)); expect(f).toBeGreaterThan(prev); expect(f - prev).toBeLessThan(0.02); prev = f; }
+    let prev = lengthSpeedFactor(0.05);
+    for (let L = 0.06; L <= 1.0001; L += 0.01) { const f = lengthSpeedFactor(Math.min(1, L)); expect(f).toBeGreaterThan(prev); expect(f - prev).toBeLessThan(0.02); prev = f; }
   });
   it('carry strictly increases with length for every non-putter club; perfect swings stay straight', () => {
     for (const c of BAG.filter(c => c.key !== 'P')) {

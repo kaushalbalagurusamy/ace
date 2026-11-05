@@ -1,4 +1,4 @@
-import type { SwingInput, SwingLength, SwingScore } from './types';
+import type { SwingInput, SwingScore } from './types';
 import { durationScale } from './length';
 
 export const IDEAL_MS = { z: 0, x: 60, c: 150 } as const;
@@ -12,8 +12,8 @@ function key(press: number | undefined, ideal: number, window: number): { n: num
   return { n: clamp01(Math.abs(e) / window), sign: Math.sign(e) };
 }
 
-/** `length` shortens the downswing: ideal X/C offsets and the 120 ms window scale with durationScale (default 100 = unchanged). */
-export function scoreSwing(input: SwingInput, length: SwingLength = 100): SwingScore {
+/** `length` shortens the downswing: ideal X/C offsets and the 120 ms window scale with durationScale (default 1 = unchanged); timings are ms relative to the Space release. */
+export function scoreSwing(input: SwingInput, length = 1): SwingScore {
   const d = durationScale(length); // throws RangeError on an invalid length
   const z = key(input.zMs, IDEAL_MS.z, 120 * d);
   const x = key(input.xMs, IDEAL_MS.x * d, 120 * d);

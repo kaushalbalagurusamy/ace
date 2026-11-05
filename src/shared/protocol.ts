@@ -12,9 +12,9 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'startSolo' }
   /** Raw timings, ms relative to the top of the backswing. Server re-scores. Aim = degrees clockwise from +z (hole direction). */
-  | { t: 'shot'; clubKey: string; aimDeg: number; /** backswing length step 25|50|75|100, default 100; the server rejects anything else */ length?: number; zMs?: number; xMs?: number; cMs?: number }
-  /** Putter: drawMs = how long Z was held (0..1500). */
-  | { t: 'putt'; aimDeg: number; drawMs: number };
+  | { t: 'shot'; clubKey: string; aimDeg: number; /** backswing length as a fraction (held Space), default 1; the server rejects non-finite values and clamps to 0.05..1 */ length?: number; zMs?: number; xMs?: number; cMs?: number }
+  /** Putter: length = fraction of the backswing reached when Space was released (strikes the ball). Speed = 15 m/s x length. */
+  | { t: 'putt'; aimDeg: number; length: number };
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
 export interface HoleInfo { index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
