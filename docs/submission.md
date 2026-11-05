@@ -13,7 +13,7 @@
 ## 2. Google Form: "Game Week Sign Up"
 https://docs.google.com/forms/d/e/1FAIpQLSdVvgG46_P7PNFvrQdg9Vgon85uyUBiCis6G-UGTDLry59xqA/viewform. No sign-in needed. One page, all four fields required:
 1. **Your name:** Kaushal Balagurusamy
-2. **Your game title:** **Ace** (owner, 2026-11-05)
+2. **Your game title:** **Ace Race** (owner renamed it from "Ace", 2026-11-05)
 3. **Your game's deployed URL:** https://ace-x92s.onrender.com
 4. **Category:** Multiplayer racing
 
