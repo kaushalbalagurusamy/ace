@@ -12,6 +12,14 @@ Final Frontier = hypothesis only. Deadline Thu 2026-11-05 midnight, timezone unc
 ## Stage 12 inbound check (done)
 Upstream branch w8-game-week-brief tip unchanged (bb9772a); brief, research README and lecture hashes match docs/source/SHA256SUMS. No backlog file exists yet. Hygiene: disk 22 GB free, memory warn; preview server stopped.
 
+## Stack discussion with owner (2026-11-05, not yet ADRs)
+- No GPU pixel-streaming (latency, per-player GPU, cold starts). Modal only for offline asset generation, if used.
+- Engine recommendation: Three.js (3D) or Phaser (2D), shared JS sim on client + Node server. Unreal/Unity/Godot rejected for web delivery and agent workflow. Owner has not chosen 2D vs 3D; needs ADR. All engine facts from recall, unverified.
+- Keys: ElevenLabs = have it (Starter, paid, active, 0/40,000 credits, verified via /v1/user/subscription). Image key (OpenAI or Modal) still to choose. Meshy/Blockade only if 3D/skyboxes. Anthropic API cannot generate images; use Claude for code-drawn art and as critic.
+- Consistency plan: generate few hero assets, pin one model version, fixed style paragraph + reference image, unify in engine (palette, grading, bloom). LoRA on Modal only if first batch clashes.
+- ElevenLabs key lives in untracked .env (gitignored, chmod 600). NOT in git: copy it to the other machine by hand. Key was pasted in chat; owner advised to rotate.
+- ElevenLabs hosted MCP (https://api.elevenlabs.io/v1/mcp) needs OAuth, not the key. Registered at local scope on this Mac only (~/.claude.json); each machine must re-add it and log in via /mcp.
+
 ## Open / next
 1. Owner answers: F-052 library packs allowed? F-016/F-002 is the entry "commercial"? F-044 spend ceiling; F-007 judge devices; F-022/F-050 deadline timezone.
 2. Pass 3: 32 ungrounded findings (netcode authority/failure modes F-013, F-023-F-033, F-035, F-038, F-047; rubric F-049, F-051, F-053; asset critic F-067-F-069; privacy F-008, F-009, F-017; capacity F-026). Then re-sweep problem-definition.md.
