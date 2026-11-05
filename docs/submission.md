@@ -6,14 +6,14 @@
 | Item | Status | Owner of the action |
 |---|---|---|
 | GitLab repo link | `https://labs.gauntletai.com/kaushalbalagurusamy/gauntlet-game-week` (check which branch judges see; currently only `intake/sources-profile-minesweep` exists, with no `main`) | build session prepares; owner submits |
-| Deployment URL | not deployed yet | build session |
+| Deployment URL | not deployed yet. Host: **Render** (owner, 2026-11-05). Needs `RENDER_API_KEY` in `.env` from the owner, and an always-on paid instance for judging, because the free tier sleeps | build session |
 | Twitter/X post | not drafted | build session drafts; **owner posts** |
 | Demo video | not recorded | build session records (demo-script skill); owner reviews |
 
 ## 2. Google Form: "Game Week Sign Up"
 https://docs.google.com/forms/d/e/1FAIpQLSdVvgG46_P7PNFvrQdg9Vgon85uyUBiCis6G-UGTDLry59xqA/viewform. No sign-in needed. One page, all four fields required:
 1. **Your name:** Kaushal Balagurusamy
-2. **Your game title:** **OPEN: the owner chooses.** "Golf Race" is only a working title.
+2. **Your game title:** **Ace** (owner, 2026-11-05)
 3. **Your game's deployed URL:** the same stable URL as the portal.
 4. **Category:** Multiplayer racing
 
