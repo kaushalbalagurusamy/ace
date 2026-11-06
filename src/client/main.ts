@@ -118,6 +118,8 @@ function onMsg(m: ServerMsg) {
     }
     case 'shotResult': {
       world.shot(m); if (m.playerId === selfId) { ui.card(m); swing = null; }
+      // touch: the bag scrolls off a portrait phone's screen, so a ball at rest on the green picks the putter (any club cell still overrides)
+      if (m.playerId === selfId && document.body.classList.contains('touch') && m.ball.surface === 'green' && !m.ball.holedOut && club !== PUTTER) { club = PUTTER; ui.setClub(PUTTER); }
       shotSounds(m);
       if (m.penalty && m.playerId === selfId) {
         ui.banner(m.penalty);                                                  // the ball is NOT where the tracer ends: say so loudly
