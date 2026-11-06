@@ -13,6 +13,13 @@ interface Rest { q: THREE.Quaternion; p: THREE.Vector3; mq: THREE.Quaternion; mp
 const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _w = new THREE.Vector3();
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _t = new THREE.Vector3(), _u = new THREE.Vector3(), _p = new THREE.Vector3();
 
+/** Vertical drop for a hip at `hip` so a limb of length `reach` touches `target` (0 when it already can). */
+export function requiredDrop(hip: V3, target: V3, reach: number): number {
+  const dx = hip[0] - target[0], dy = hip[1] - target[1], dz = hip[2] - target[2], h2 = dx * dx + dz * dz;
+  if (dx * dx + dy * dy + dz * dz <= reach * reach || h2 >= reach * reach) return 0;
+  return dy - Math.sqrt(reach * reach - h2);
+}
+
 /** True when the model has every bone the rig drives. */
 export const hasRig = (model: THREE.Object3D) => NAMES.every(n => !!model.getObjectByName(n));
 
@@ -48,10 +55,17 @@ export class GolferRig {
     for (const n of ['Spine02', 'Spine01', 'Spine'] as const) this.rot(n, p.torso, 1 / 3);
     this.rot('Head', p.head, 1);
     this.model.updateMatrixWorld(true);
-    // legs: ankles to the stance, knees forward (following half the pelvis turn)
+    // legs: ankles to the stance, knees forward (following half the pelvis turn). The ankle targets are pinned to the ground;
+    // if a straightened leg can't reach its target the pelvis drops until it can, so the golfer never floats.
     const knee: V3 = [Math.sin(p.pelvis[1] * 0.5), 0, Math.cos(p.pelvis[1] * 0.5)];
-    this.ik('LeftUpLeg', 'LeftLeg', 'LeftFoot', this.add(R.LeftFoot.mp, p.lAnkle), knee);
-    this.ik('RightUpLeg', 'RightLeg', 'RightFoot', this.add(R.RightFoot.mp, p.rAnkle), knee);
+    const lFoot = this.add(R.LeftFoot.mp, p.lAnkle), rFoot = this.add(R.RightFoot.mp, p.rAnkle);
+    const drop = Math.max(this.legDrop('LeftUpLeg', 'LeftLeg', 'LeftFoot', lFoot), this.legDrop('RightUpLeg', 'RightLeg', 'RightFoot', rFoot));
+    if (drop > 0) {
+      hips.getWorldPosition(_v); _v.applyMatrix4(this.inv.copy(this.model.matrixWorld).invert()); _v.y -= drop;
+      hips.position.copy(hips.parent!.worldToLocal(_v.applyMatrix4(this.model.matrixWorld))); this.model.updateMatrixWorld(true);
+    }
+    this.ik('LeftUpLeg', 'LeftLeg', 'LeftFoot', lFoot, knee);
+    this.ik('RightUpLeg', 'RightLeg', 'RightFoot', rFoot, knee);
     this.foot('LeftFoot', p.lHeel); this.foot('RightFoot', p.rHeel);
     // arms
     const club = !p.free;
@@ -75,6 +89,12 @@ export class GolferRig {
   modelPos(n: Name, out = new THREE.Vector3()) { return out.setFromMatrixPosition(this.bones[n].matrixWorld).applyMatrix4(this.inv.copy(this.model.matrixWorld).invert()); }
 
   private add(a: THREE.Vector3, d: V3): V3 { return [a.x + d[0], a.y + d[1], a.z + d[2]]; }
+  /** How far (model metres) the hip joint must come down for this leg to reach its model-space ankle target with a soft knee. */
+  private legDrop(a: Name, b: Name, c: Name, target: V3): number {
+    const inv = this.inv.copy(this.model.matrixWorld).invert(), m = (n: Name) => this.bones[n].getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
+    const hip = m(a), kn = m(b), an = m(c), reach = (hip.distanceTo(kn) + kn.distanceTo(an)) * 0.985;   // keep a slight knee bend
+    return requiredDrop([hip.x, hip.y, hip.z], target, reach);
+  }
   /** Rotates a bone by a model-space euler (times k) applied in its parent's posed frame: local = rest * (Wr^-1 * D * Wr). */
   private rot(n: Name, e: V3, k: number) {
     if (!e[0] && !e[1] && !e[2]) return;
