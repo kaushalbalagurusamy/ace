@@ -1,7 +1,7 @@
 // Every `hole` parameter here is a courses.gridKey (course and hole in one number).
 // Draws the traced lie grid (the same data the server reads for physics) as terrain: a 3D ground mesh and the minimap.
 import * as THREE from 'three';
-import { gridOf, keyOf } from '../shared/courses';
+import { COURSES, COURSE_IDS, HOLES_PER_COURSE, gridOf, keyOf } from '../shared/courses';
 import type { HoleGrid } from '../shared/course-grid';
 import { decodeGrid } from '../shared/gridtools';
 import { loadTexture, type PropSpot } from './assets';
@@ -198,7 +198,9 @@ export function setTurf(m: THREE.Mesh, t: Turf | null, detail: boolean) {
 export const isCoastal = (hole: number) => gridOf(hole).coastal;
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
+export const themeOf = (hole: number) => COURSES[COURSE_IDS[Math.floor(hole / HOLES_PER_COURSE)]!].theme;
 export function propSpots(hole: number): PropSpot[] {
+  if (themeOf(hole) === 'parkland') return treeLines(hole);
   const g = gridOf(hole); let seed = (hole + 1) * 2654435761 >>> 0;
   const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   const trees: PropSpot[] = [], rocks: PropSpot[] = [];
@@ -208,6 +210,31 @@ export function propSpots(hole: number): PropSpot[] {
     else if (c === 'k' && r < 0.12 && rocks.length < 30) rocks.push({ kind: 'rock', x: px, z: pz, scale: 0.7 + rnd() * 0.8, rotY: rnd() * 6.28 });
   }
   return [...trees, ...rocks];
+}
+
+/** Parkland: dense oak and maple tree lines where the traced canopy meets open ground (the band within 5 cells, about 10 m),
+ *  on a jittered 5 m lattice, nearest the playing corridor first; the deep woods behind are the canopy colour of the terrain. */
+function treeLines(hole: number): PropSpot[] {
+  const g = gridOf(hole), cells = decoded(hole), T = 116, OOB = 111, N = g.nx * g.nz, DEPTH = 5;
+  const dist = new Uint8Array(N).fill(255); let front: number[] = [];
+  for (let i = 0; i < N; i++) if (cells[i] !== T && cells[i] !== OOB) { dist[i] = 0; front.push(i); }
+  for (let d = 1; d <= DEPTH && front.length; d++) {
+    const next: number[] = [];
+    for (const i of front) { const x = i % g.nx, z = (i - x) / g.nx;
+      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) { const nx = x + dx, nz = z + dz; if (nx < 0 || nz < 0 || nx >= g.nx || nz >= g.nz) continue; const j = nz * g.nx + nx; if (cells[j] === T && dist[j] === 255) { dist[j] = d; next.push(j); } } }
+    front = next;
+  }
+  let seed = (hole + 1) * 2654435761 >>> 0;
+  const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+  const zMax = g.z0 + g.nz * g.cell, cand: { s: PropSpot; p: number }[] = [];
+  for (let z = g.z0; z < zMax; z += 5) for (let x = g.x0; x < g.x0 + g.nx * g.cell; x += 5) {
+    const px = x + rnd() * 5, pz = z + rnd() * 5, ix = Math.floor((px - g.x0) / g.cell), iz = Math.floor((pz - g.z0) / g.cell);
+    const k = rnd(), r = rnd(), sc = 0.75 + rnd() * 0.4;
+    if (ix < 0 || iz < 0 || ix >= g.nx || iz >= g.nz) continue;
+    const d = dist[iz * g.nx + ix]!; if (d === 255 || d === 0) continue;
+    cand.push({ s: { kind: k < 0.6 ? 'oak' : 'maple', x: px, z: pz, scale: sc, rotY: r * 6.28 }, p: d * 25 + Math.abs(px) * 0.5 });
+  }
+  return cand.sort((a, b) => a.p - b.p).slice(0, 300).map(c => c.s);
 }
 
 /** Rangefinder view: fits the hole's grid into a W x H canvas, tee at the bottom, pin at the top, sim +x to the right. */

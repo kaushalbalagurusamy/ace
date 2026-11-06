@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { makeCypress, makePine, makeRock, makeProp, triangles } from '../src/client/props';
+import { makeCypress, makeDeciduous, makePine, makeRock, makeProp, triangles } from '../src/client/props';
 
 const size = (o: THREE.Object3D) => new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());
 describe('code-built props (assets/STYLE.md budgets and shapes)', () => {
@@ -32,4 +32,21 @@ describe('code-built props (assets/STYLE.md budgets and shapes)', () => {
     expect(Math.abs(cog(makeCypress(0)))).toBeGreaterThan(1.0); expect(Math.abs(cog(makePine()))).toBeLessThan(0.6);
   });
   it('makeProp covers every kind and index', () => { for (const k of ['cypress', 'pine', 'rock'] as const) for (let i = 0; i < 6; i++) expect(makeProp(k, i).children.length).toBeGreaterThan(0); });
+});
+
+describe('parkland props (Bethpage, Aronimink)', () => {
+  it('oak and maple: within the tree budget, on the ground, 10-22 m, oak wider than maple, palette colours only, at most 3 meshes', () => {
+    const allowed = new Set(['#5b4636', '#3e5b2e', '#4a6a35', '#35502a', '#56702f', '#6b7a33', '#4f6a2c']);
+    for (const k of ['oak', 'maple'] as const) for (const v of [0, 1]) {
+      const t = makeDeciduous(k, v), s = size(t), b = new THREE.Box3().setFromObject(t);
+      expect(triangles(t), `${k} ${v}`).toBeLessThanOrEqual(3000);
+      expect(b.min.y).toBeGreaterThan(-0.5); expect(b.min.y).toBeLessThan(0.5);
+      expect(s.y, `${k} ${v} height`).toBeGreaterThan(10); expect(s.y).toBeLessThan(22);
+      let meshes = 0;
+      t.traverse(c => { const m = c as THREE.Mesh; if (m.isMesh) { meshes++; expect(allowed.has('#' + (m.material as THREE.MeshLambertMaterial).color.getHexString())).toBe(true); } });
+      expect(meshes).toBeLessThanOrEqual(3);   // cheap enough for dense tree lines
+    }
+    expect(size(makeDeciduous('oak', 0)).x).toBeGreaterThan(size(makeDeciduous('maple', 0)).x);
+    for (const k of ['oak', 'maple'] as const) for (let i = 0; i < 4; i++) expect(makeProp(k, i).children.length).toBeGreaterThan(0);
+  });
 });

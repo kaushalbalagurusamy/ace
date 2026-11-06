@@ -1,10 +1,12 @@
 // Code-built low-poly props in the assets/STYLE.md palette (a "made with code" asset route): flat-shaded, seeded, no textures.
 // Triangle budgets: tree <= 3000, rock <= 2000 (checked in tests/props.test.ts).
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 const PAL = {
   cypress: ['#2F4A3A', '#3A5C46', '#284236'], pine: ['#3D5A3A', '#35502F', '#456843'], bark: '#5B4636', barkDark: '#4A382B',
   rock: ['#8A8F8C', '#7C817E', '#6F7570'], lichen: '#9AA37A',
+  oak: ['#3E5B2E', '#4A6A35', '#35502A'], maple: ['#56702F', '#6B7A33', '#4F6A2C'],
 };
 const mats = new Map<string, THREE.MeshLambertMaterial>();
 const mat = (c: string) => { let m = mats.get(c); if (!m) { m = new THREE.MeshLambertMaterial({ color: c, flatShading: true }); mats.set(c, m); } return m; };
@@ -56,6 +58,23 @@ export function makePine(): THREE.Group {
   }
   return g;
 }
+/** Parkland deciduous tree (Bethpage, Aronimink): a short thick trunk and a broad rounded crown of overlapping clumps.
+ *  oak: about 16 m, very wide and low-domed; maple: about 13 m, taller than wide. The crown clumps are merged into one mesh per
+ *  colour so a dense tree line stays cheap (3 meshes a tree). */
+export function makeDeciduous(kind: 'oak' | 'maple', variant: number): THREE.Group {
+  const rnd = prng(707 + variant * 23 + (kind === 'oak' ? 0 : 400)), g = new THREE.Group(), oak = kind === 'oak';
+  const H = oak ? 15 + variant * 2 : 12 + variant * 1.5, crownY = H * (oak ? 0.58 : 0.62), R = H * (oak ? 0.42 : 0.3);
+  g.add(trunk(H * 0.5, oak ? 0.7 : 0.45, oak ? 0.35 : 0.25, (rnd() - 0.5) * 0.08));
+  const byColour: THREE.BufferGeometry[][] = [[], []], cols = oak ? PAL.oak : PAL.maple;
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + rnd() * 0.5, d = i === 0 ? 0 : R * (0.45 + rnd() * 0.35);
+    const b = blob(R * (i === 0 ? 0.75 : 0.5 + rnd() * 0.2), 1.1, oak ? 0.72 : 0.95, 1.1, 0.45, rnd, cols[0]!);
+    b.position.set(Math.cos(a) * d, crownY + (i === 0 ? R * 0.25 : (rnd() - 0.3) * R * 0.5), Math.sin(a) * d); b.updateMatrix();
+    byColour[i % 2]!.push(b.geometry.applyMatrix4(b.matrix));
+  }
+  byColour.forEach((gs, k) => g.add(new THREE.Mesh(mergeGeometries(gs), mat(cols[k + 1]!))));
+  return g;
+}
 /** Coastal granite. variant 0: a cluster of three rounded boulders; 1: a tall angular outcrop of leaning prisms with a flat base; 2: one smooth sea-worn boulder.
  *  Lichen patches are larger and sit on the upper faces so they read at distance. */
 export function makeRock(variant: number): THREE.Group {
@@ -79,12 +98,12 @@ export function makeRock(variant: number): THREE.Group {
   }
   return g;
 }
-export type PropKind = 'cypress' | 'pine' | 'rock';
+export type PropKind = 'cypress' | 'pine' | 'rock' | 'oak' | 'maple';
 const templates = new Map<string, THREE.Group>();
 /** One cached template per variant; callers clone it (clones share geometry and materials, so 180 props stay cheap). */
 export function makeProp(kind: PropKind, i: number): THREE.Group {
-  const key = `${kind}:${kind === 'pine' ? 0 : i % (kind === 'cypress' ? 2 : 3)}`; let t = templates.get(key);
-  if (!t) { t = kind === 'cypress' ? makeCypress(i % 2) : kind === 'pine' ? makePine() : makeRock(i % 3); templates.set(key, t); }
+  const key = `${kind}:${kind === 'pine' ? 0 : i % (kind === 'rock' ? 3 : 2)}`; let t = templates.get(key);
+  if (!t) { t = kind === 'cypress' ? makeCypress(i % 2) : kind === 'pine' ? makePine() : kind === 'rock' ? makeRock(i % 3) : makeDeciduous(kind, i % 2); templates.set(key, t); }
   return t.clone();
 }
 export function triangles(o: THREE.Object3D): number { let t = 0; o.traverse(c => { const m = c as THREE.Mesh; if (m.isMesh) t += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position!.count) / 3; }); return t; }

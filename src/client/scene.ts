@@ -25,7 +25,8 @@ interface Look {
   /** a released swing playing out: started at t0 (ms), from `depth`, standing at the ball spot `at` facing `rotY` */
   rel?: { t0: number; depth: number; putt: boolean; at: THREE.Vector3; rotY: number };
 }
-const DEFAULT_CLUB = 6;   // 7-iron in other players' hands (their club choice is not sent)
+const DEFAULT_CLUB = 6;
+const MAX_PROPS = 320;   // parkland tree lines; coastal holes place at most 180 (terrain.propSpots)   // 7-iron in other players' hands (their club choice is not sent)
 const BOX_GRIP = clubMatrix([-0.36, 0.83, 0.12], [0, -0.62, 0.78], [0, 0, 1]);   // the box stand-in's right hand
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
@@ -159,9 +160,9 @@ export class World {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
     this.props.clear();
-    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
+    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'], oak: ['tree-oak-a', 'tree-oak-b'], maple: ['tree-maple-a', 'tree-maple-b'] } as const;
     let i = 0;
-    for (const s of spots.slice(0, 180)) {
+    for (const s of spots.slice(0, MAX_PROPS)) {
       const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
       i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
