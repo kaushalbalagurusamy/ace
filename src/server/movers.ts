@@ -13,7 +13,7 @@ export interface Push { target: 'cart' | 'golfer'; dx: number; dz: number; dvx: 
 const SLACK_M = 3;          // network jitter (two reports arriving together) plus a bump's displacement; granted once, through the bucket
 const BALL_JUMP_M = 4;      // the client moves the golfer to their ball after a penalty drop
 
-/** A player on the tee of `holeIndex`: on foot beside the ball, cart parked beside them. */
+/** A player on the tee of `holeIndex` (a courses.gridKey): on foot beside the ball, cart parked beside them. */
 export function atTee(holeIndex: number, slot: number, nowMs: number): MoverState {
   const g = golferSpot({ x: 0, z: 0 });
   return { x: g.x, z: g.z, yaw: 0, driving: false, cart: cartSpawn(holeIndex, slot), atMs: nowMs };

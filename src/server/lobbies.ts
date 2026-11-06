@@ -1,6 +1,7 @@
 import type { ErrorCode, LobbyState, LobbyView, Result } from './lobby-types';
+import { DEFAULT_COURSE, isCourseId, type CourseId } from '../shared/courses';
 
-interface Lobby { id: string; name: string; host: string; state: LobbyState; members: string[] }
+interface Lobby { id: string; name: string; host: string; state: LobbyState; members: string[]; course: CourseId }
 interface Player { name: string; ready: boolean; lobbyId?: string }
 
 const fail = (error: ErrorCode) => ({ ok: false, error }) as const;
@@ -34,13 +35,14 @@ export class LobbyManager {
     this.players.delete(sessionId);
   }
 
-  createLobby(sessionId: string): Result<LobbyView> {
+  createLobby(sessionId: string, course: CourseId = DEFAULT_COURSE): Result<LobbyView> {
     const p = this.players.get(sessionId);
     if (!p) return fail('NOT_CONNECTED');
+    if (!isCourseId(course)) return fail('COURSE_INVALID');
     if (p.lobbyId) return fail('ALREADY_IN_LOBBY');
     if (this.lobbies.size >= this.maxLobbies) return fail('LOBBY_LIMIT');
     const id = `L${this.nextId++}`;
-    const lobby: Lobby = { id, name: `${p.name}'s lobby`, host: sessionId, state: 'open', members: [sessionId] };
+    const lobby: Lobby = { id, name: `${p.name}'s lobby`, host: sessionId, state: 'open', members: [sessionId], course };
     this.lobbies.set(id, lobby);
     p.lobbyId = id;
     p.ready = false;
@@ -84,6 +86,16 @@ export class LobbyManager {
     const n = typeof name === 'string' ? name.normalize('NFKC').trim() : '';
     if (n.length < 1 || n.length > 24 || !/^[\p{L}\p{N} _'.!-]+$/u.test(n)) return fail('NAME_INVALID');
     c.lobby.name = n;
+    return { ok: true, value: this.view(c.lobby) };
+  }
+
+  setCourse(sessionId: string, course: CourseId): Result<LobbyView> {
+    const c = this.ctx(sessionId);
+    if (!c.ok) return c;
+    if (c.lobby.host !== sessionId) return fail('NOT_HOST');
+    if (c.lobby.state !== 'open') return fail('LOBBY_NOT_OPEN');
+    if (!isCourseId(course)) return fail('COURSE_INVALID');
+    c.lobby.course = course;
     return { ok: true, value: this.view(c.lobby) };
   }
 
@@ -151,6 +163,7 @@ export class LobbyManager {
       name: l.name,
       hostSessionId: l.host,
       state: l.state,
+      course: l.course,
       players: l.members.map((m) => {
         const p = this.players.get(m)!;
         return { sessionId: m, name: p.name, ready: p.ready };

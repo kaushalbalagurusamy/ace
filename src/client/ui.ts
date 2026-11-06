@@ -1,4 +1,4 @@
-import { GRIDS } from '../shared/course-grid';
+import { COURSES, COURSE_IDS, gridOf, keyOf, totals, type CourseId } from '../shared/courses';
 import { gridCanvas, rfView } from './terrain';
 import { edgePoint, mapArrowRotation, type Marker } from './overlay';
 import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
@@ -23,7 +23,7 @@ const ERR: Record<string, string> = {
   NOT_CONNECTED: 'Not connected to the server yet. Try again.', ALREADY_CONNECTED: 'This session is already connected in another tab.',
   ALREADY_IN_LOBBY: 'You are already in a lobby.', NOT_IN_LOBBY: 'You are not in a lobby.', LOBBY_LIMIT: 'All 3 lobbies are in use.',
   LOBBY_NOT_FOUND: 'That lobby no longer exists.', LOBBY_FULL: 'That lobby is full.', LOBBY_NOT_OPEN: 'That lobby has already started.',
-  NOT_HOST: 'Only the host can do that.', NEED_PLAYERS: 'Starting needs at least 2 players.', NOT_READY: 'Everyone must be ready first.',
+  NOT_HOST: 'Only the host can do that.', NEED_PLAYERS: 'Starting needs at least 2 players.', NOT_READY: 'Everyone must be ready first.', COURSE_INVALID: 'That course is not available.',
   BAD_MESSAGE: 'The server rejected that request.', NOT_YOUR_TURN: 'Not your turn.', NOT_IN_RACE: 'You are not in a race.',
 };
 export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ?? m.message;
@@ -42,7 +42,7 @@ const HELP_GROUPS: [string, [string, string][]][] = [
   ['Settings', [[`${k('Esc')} or ${k('⚙')}`, 'Camera sensitivity and graphics'], [k(',', '.'), 'Look speed down or up'], [k('N'), 'Mute'], [k('F3'), 'Frame rate']]],
 ];
 const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" class="htp-head"><h2 id="htp-t">How to play</h2><button class="x" aria-label="Close">&times;</button></form>
-  <p class="lede">Race your friends around Pebble Beach. First to hole out wins; strokes only decide finishes within 1 second.</p>
+  <p class="lede">Race your friends around Pebble Beach, Bethpage Black or Aronimink. First to hole out wins; strokes only decide finishes within 1 second.</p>
   <div class="htp-grid">${HELP_GROUPS.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>
   <p class="foot">The red flag marks the pin, the yellow beacon your ball; white lines are out of bounds. After every shot a card shows carry, total, offline, ball position and effort.</p></dialog>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
@@ -101,6 +101,9 @@ const CSS = `
 .kv{display:grid;grid-template-columns:124px 1fr;gap:10px;align-items:baseline;padding:4px 0;font-size:13.5px;line-height:1.4}.kv span:first-child{color:var(--mute);font-size:13px}
 kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;border-radius:6px;border:1px solid rgba(255,255,255,.25);border-bottom-width:2px;background:rgba(255,255,255,.08);font:600 12px/1.4 ui-monospace,Menlo,monospace;text-align:center;color:var(--ink)}
 #htp .foot{color:var(--mute);font-size:13px;margin:4px 0 0}
+.crs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}#home .crs button,.crs .one{border-radius:14px;padding:12px;text-align:left;line-height:1.3;display:flex;flex-direction:column;gap:3px;font-weight:400}
+#home .crs button[aria-checked=true],.crs .one{border:1px solid var(--gold);background:rgba(214,180,90,.16)}.crs b{font-size:14px;font-weight:600}.crs small{font-size:12px;color:var(--mute)}.crs.solo{grid-template-columns:1fr}
+@media (max-width:520px){.crs{grid-template-columns:1fr}}
 .scr table{border-collapse:collapse;width:100%}.scr td,.scr th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}.scr th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 @media (max-width:520px){.tag{letter-spacing:.14em}.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
@@ -168,20 +171,26 @@ export class UI {
   showTouch() { this.screen(`${this.wm(false)}<div class="glass"><h2>Keyboard required</h2><p class="sub">Open Ace on a desktop or laptop to play.</p></div>`); }
   showDown(msg: string) { this.screen(`${this.wm()}<div class="glass"><h2>Reconnecting…</h2><p class="sub">${esc(msg)}</p></div>`); }
   showName(name: string, err = '') {
-    this.screen(`${this.wm(false)}<p class="tag">A race around Pebble Beach Golf Links</p><form class="glass"><label for="nm">Your name</label>
+    this.screen(`${this.wm(false)}<p class="tag">A race around championship golf</p><form class="glass"><label for="nm">Your name</label>
       <input id="nm" value="${esc(name)}" maxlength="16" minlength="2" autocomplete="nickname" placeholder="2 to 16 characters" autofocus>
       <div class="err" role="alert">${esc(err)}</div><button class="pri wide" data-act="name" style="margin-top:16px">Enter the waiting room</button></form>`);
     const input = this.scr.querySelector('input')!;
     input.addEventListener('keydown', e => { if (e.key === 'Enter') this.act('name', {}, this.scr); }); input.focus();
   }
-  showMenu(m: { self: string; lobbies: LobbyView[]; lobby: LobbyView | null; error: string; count: number | null }) {
+  /** Course cards: a radio group the host picks from, or (for everyone else) the lobby's course on its own. */
+  private courses(cur: CourseId, pick: boolean) {
+    const card = (id: CourseId) => { const c = COURSES[id], t = totals(id); return `<b>${esc(pick ? c.short : c.name)}</b><small>${esc(c.place)}</small><small>Par ${t.par} · ${t.yards.toLocaleString('en-US')} yd</small>${pick ? '' : `<small>${esc(c.look)}</small>`}`; };
+    return pick ? `<label id="crs-l">Course</label><div class="crs" role="radiogroup" aria-labelledby="crs-l">${COURSE_IDS.map(id => `<button role="radio" aria-checked="${id === cur}" data-act="course" data-v="${id}">${card(id)}</button>`).join('')}</div>`
+      : `<label>Course</label><div class="crs solo"><div class="one">${card(cur)}</div></div>`;
+  }
+  showMenu(m: { self: string; lobbies: LobbyView[]; lobby: LobbyView | null; error: string; count: number | null; pick: CourseId }) {
     const err = `<div class="err" role="alert">${esc(m.error)}</div>`;
     const hostName = (l: LobbyView) => l.players.find(p => p.sessionId === l.hostSessionId)?.name ?? '—';
     if (m.lobby) {
       const l = m.lobby, host = l.hostSessionId === m.self, me = l.players.find(p => p.sessionId === m.self);
       const allReady = l.players.length >= 2 && l.players.every(p => p.ready);
       this.screen(`${this.wm()}<div class="glass">${m.count !== null ? `<p class="count" aria-live="polite">${m.count}</p><p class="tag">Starting</p>` : ''}
-        <h2>${esc(l.name)}</h2><p class="sub">${l.players.length}/4 players · hosted by ${esc(hostName(l))}</p>
+        <h2>${esc(l.name)}</h2><p class="sub">${l.players.length}/4 players · hosted by ${esc(hostName(l))}</p>${this.courses(l.course, host && l.state === 'open' && m.count === null)}
         <div class="cards">${l.players.map(p => `<div class="card"><div class="av">${esc(p.name.slice(0, 1).toUpperCase())}</div><div class="meta"><b>${esc(p.name)}</b>
           <div class="chips">${p.sessionId === l.hostSessionId ? '<span class="chip gold">Host</span>' : ''}${p.sessionId === m.self ? '<span class="chip">You</span>' : ''}</div></div>
           <span class="chip ${p.ready ? 'ok' : ''}">${p.ready ? 'Ready' : 'Not ready'}</span></div>`).join('')}</div>${err}
@@ -197,13 +206,13 @@ export class UI {
     this.screen(`${this.wm()}<div class="glass"><h2>Waiting room</h2><p class="sub">Join a lobby or start your own. Up to 4 players race in each.</p><div class="cards">${m.lobbies.map(l => {
       const can = l.state === 'open' && l.players.length < 4, [cls, txt] = status(l);
       return `<div class="card"><div class="meta"><b>${esc(l.name)}</b><small>Host ${esc(hostName(l))}</small>
-        <div class="chips"><span class="chip">${l.players.length}/4 players</span><span class="chip ${cls}">${txt}</span></div></div>
+        <div class="chips"><span class="chip gold">${esc(COURSES[l.course]?.short ?? l.course)}</span><span class="chip">${l.players.length}/4 players</span><span class="chip ${cls}">${txt}</span></div></div>
         <button data-act="join" data-id="${esc(l.id)}" ${can ? '' : 'disabled'} aria-label="Join ${esc(l.name)}">Join</button></div>`;
     }).join('') || '<div class="empty">No lobbies yet. Create one and invite your friends.</div>'}</div>${err}
-      <button class="pri wide" data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button></div>`);
+      ${full ? '' : this.courses(m.pick, true)}<button class="pri wide" data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button></div>`);
   }
-  showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[]) {
-    this.screen(`${this.wm()}<div class="glass"><h2>Results</h2><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
+  showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[], course: string) {
+    this.screen(`${this.wm()}<div class="glass"><h2>Results</h2><p class="sub">${esc(course)}</p><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
       `<tr><td>${r.place}</td><td>${esc(r.name)}</td><td>${r.timeS === undefined ? 'DNF' : this.clock(r.timeS)}</td><td>${r.strokes}</td></tr>`).join('')}</table>
       <button class="pri wide" data-act="back" style="margin-top:18px">Back to waiting room</button></div>`);
   }
@@ -286,8 +295,8 @@ export class UI {
   /** Expanded mini map: terrain, markers, the target and the line from the ball to the hovered point (PRD/02 section 7). */
   drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null, heading = 0) {
     const c = this.rfCanvas(); if (c.width !== c.clientWidth || c.height !== c.clientHeight) { c.width = c.clientWidth; c.height = c.clientHeight; }
-    const ctx = c.getContext('2d')!, v = rfView(h.index, c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(h.index, 2, false, true), v.x0, v.y0, v.w, v.h);
+    const ctx = c.getContext('2d')!, v = rfView(keyOf(h), c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(keyOf(h), 2, false, true), v.x0, v.y0, v.w, v.h);
     const dot = (p: { x: number; z: number }, col: string, r: number) => { const [x, y] = v.toScreen(p.x, p.z); ctx.fillStyle = col; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); return [x, y] as const; };
     dot(h.tee, '#222', 5); dot(h.pin, '#ffe14d', 6); { const [gx, gy] = v.toScreen(golfer.x, golfer.z); this.heading(ctx, gx, gy, heading, 1.6); }
     const [bx, by] = dot(ball, '#fff', 6); ctx.strokeStyle = '#ffe14d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(bx, by, 10, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
@@ -325,7 +334,7 @@ export class UI {
       return [W / 2 + r * s, H - 10 - a * s];
     };
     c.fillStyle = '#233'; c.fillRect(0, 0, W, H);
-    const g = GRIDS[h.index]!, img = gridCanvas(h.index, 1, false, true);
+    const g = gridOf(keyOf(h)), img = gridCanvas(keyOf(h), 1, false, true);
     const [x0, zTop] = P(g.x0, g.z0 + g.nz * g.cell);                                // top-left of the grid image on the map
     c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
     const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);

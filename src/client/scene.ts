@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { BALL_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M } from '../sim/physics';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
+import { DEFAULT_COURSE, gridKey, keyOf, type CourseId } from '../shared/courses';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { ground, groundNormal, isCoastal, propSpots, seaY, setTurf, terrainMesh } from './terrain';
+import { baseY, ground, groundNormal, isCoastal, propSpots, setTurf, terrainMesh } from './terrain';
 import { SPEC, type Tier } from './graphics';
 import { dropTurf, loadTurf, type Turf } from './turf';
 import { Grass } from './grass';
@@ -26,7 +27,8 @@ interface Look {
   /** a released swing playing out: started at t0 (ms), from `depth`, standing at the ball spot `at` facing `rotY` */
   rel?: { t0: number; depth: number; putt: boolean; at: THREE.Vector3; rotY: number };
 }
-const DEFAULT_CLUB = 6;   // 7-iron in other players' hands (their club choice is not sent)
+const DEFAULT_CLUB = 6;
+const MAX_PROPS = 320;   // parkland tree lines; coastal holes place at most 180 (terrain.propSpots)   // 7-iron in other players' hands (their club choice is not sent)
 const BOX_GRIP = clubMatrix([-0.36, 0.83, 0.12], [0, -0.62, 0.78], [0, 0, 1]);   // the box stand-in's right hand
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
@@ -52,6 +54,7 @@ export class World {
   ents = new Map<string, Ent>();
   /** hole (0-based) the local player is on: other players' balls, golfers and tracers on other holes are hidden */
   myHole = 0;
+  courseId: CourseId = DEFAULT_COURSE;
   private course = new THREE.Group();
   private props = new THREE.Group();
   /** id of the local player: their ball gets a yellow beacon and a screen marker */
@@ -73,9 +76,9 @@ export class World {
   private turf: Promise<Turf | null>;
   private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3(); private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion();
   /** Ground height at sim (x, z) on a hole (default: the one I am on). */
-  groundAt(x: number, z: number, hole = this.myHole) { return ground(hole, x, z); }
+  groundAt(x: number, z: number, hole = this.myHole) { return ground(gridKey(this.courseId, hole), x, z); }
   /** A three-space point standing on the ground of `hole` at sim (x, z), lifted by `dy`. */
-  private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, ground(hole, x, z) + dy, z); }
+  private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, this.groundAt(x, z, hole) + dy, z); }
   constructor(canvas: HTMLCanvasElement, tier: Tier) {
     this.tier = tier; this.turf = loadTurf(tier);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
@@ -119,7 +122,7 @@ export class World {
       const shade = SHADES[i % 4]!;
       const look = this.makeGolfer(shade, p.name);
       const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(BALL_VISUAL_RADIUS_M, 12, 8), this.mat('#ffffff')),
-        cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
+        cart: makeCart(shade), cs: cartSpawn(gridKey(h.course, p.hole), i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
       e.golfer.position.copy(this.onGround(p.hole, p.ball.x + 1, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
@@ -132,12 +135,12 @@ export class World {
     if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
     this.setBall(e, ball);
     e.golfer.position.copy(this.onGround(hole, ball.x + 1, ball.z - 0.5));
-    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(hole, e.slot), 0, 0);   // the cart comes to the new tee too
+    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(gridKey(this.courseId, hole), e.slot), 0, 0);   // the cart comes to the new tee too
   }
   /** Draws a cart state: position, heading, wheel spin and front-wheel lock. */
   placeCart(e: Ent, s: CartState, steer: number, dt: number) {
     e.cs = s; e.steer = steer; e.cart.root.position.copy(this.onGround(e.hole, s.x, s.z));
-    const n = groundNormal(e.hole, s.x, s.z), q = this.tmpQ.setFromUnitVectors(UP, this.tmpA.set(-n.x, n.y, n.z));   // the cart follows the ground's tilt
+    const n = groundNormal(gridKey(this.courseId, e.hole), s.x, s.z), q = this.tmpQ.setFromUnitVectors(UP, this.tmpA.set(-n.x, n.y, n.z));   // the cart follows the ground's tilt
     e.cart.root.quaternion.copy(q).multiply(this.tmpQ2.setFromAxisAngle(UP, -s.yaw));
     poseCart(e.cart, forwardSpeed(s), steer, dt);
   }
@@ -145,9 +148,9 @@ export class World {
   remote(m: Mover) { const e = this.ents.get(m.id); if (e && m.id !== this.selfId && m.hole === e.hole) { e.remote = m; e.driving = m.driving; } }
   /** Rebuilds the terrain for a hole without touching the players. */
   buildCourse(h: HoleInfo) {
-    this.course.clear();
-    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
-    base.position.y = seaY(h.index) - 0.6; // the sea (or the forest floor) just under sea level: shallow depth buffers z-fight at a few centimetres
+    this.course.clear(); this.courseId = h.course;
+    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(keyOf(h)) ? '#3f86bd' : '#265c34'));
+    base.position.y = baseY(keyOf(h)) - 0.6; // the sea (or the forest floor) just under the terrain: shallow depth buffers z-fight at a few centimetres
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
     const pin = this.onGround(h.index, h.pin.x, h.pin.z); this.pinTop.set(pin.x, pin.y + 2.6, pin.z);
@@ -159,7 +162,7 @@ export class World {
     const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M * 1.06, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#f2f2ee', polygonOffset: true, polygonOffsetFactor: -2 }));
     cup.position.set(pin.x, pin.y + 0.012, pin.z); rim.position.set(pin.x, pin.y + 0.013, pin.z);
     this.course.add(pole, flag, cup, rim);
-    this.spots = propSpots(h.index); this.propHole = h.index;
+    this.spots = propSpots(keyOf(h)); this.propHole = h.index;
     void this.setProps(this.spots);
   }
 
@@ -168,9 +171,9 @@ export class World {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
     this.props.clear();
-    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
+    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'], oak: ['tree-oak-a', 'tree-oak-b'], maple: ['tree-maple-a', 'tree-maple-b'] } as const;
     let i = 0;
-    for (const s of spots.slice(0, 180)) {
+    for (const s of spots.slice(0, MAX_PROPS)) {
       const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
       i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
@@ -301,7 +304,7 @@ export class World {
       const r = e.remote; if (!r) continue;
       const c = e.cs, dyaw = Math.atan2(Math.sin(r.cart.yaw - c.yaw), Math.cos(r.cart.yaw - c.yaw));
       this.placeCart(e, { x: c.x + (r.cart.x - c.x) * k, z: c.z + (r.cart.z - c.z) * k, yaw: c.yaw + dyaw * k, vx: r.cart.vx, vz: r.cart.vz }, Math.max(-1, Math.min(1, dyaw * 4)), dt);
-      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; g.y = ground(e.hole, -g.x, g.z); e.golfer.rotation.y = -r.yaw;
+      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; g.y = this.groundAt(-g.x, g.z, e.hole); e.golfer.rotation.y = -r.yaw;
     }
     const own = this.ents.get(this.selfId);
     // Hidden once you're at your ball: up close the tall beacon read as an aim line, which the owner ruled out.
@@ -327,16 +330,16 @@ export class World {
   }
   /** Camera looking at sim (x, z) from `dist` behind along `yaw`; `y` is the eye height above the ground there. */
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
-    const fx = Math.sin(yaw), fz = Math.cos(yaw), gy = ground(this.myHole, x, z);
+    const fx = Math.sin(yaw), fz = Math.cos(yaw), gy = this.groundAt(x, z);
     const target = this.tmpA.set(-x, gy + y, z);
     const cx = x - fx * dist * Math.cos(pitch), cz = z - fz * dist * Math.cos(pitch);
-    this.cam.position.set(-cx, Math.max(gy + y + dist * Math.sin(pitch), ground(this.myHole, cx, cz) + 1), cz);   // never inside a hill behind the player
+    this.cam.position.set(-cx, Math.max(gy + y + dist * Math.sin(pitch), this.groundAt(cx, cz) + 1), cz);   // never inside a hill behind the player
     this.cam.lookAt(target);
     if (this.sun.castShadow) {   // shadow box centred on the player, snapped to whole texels so edges do not shimmer
       const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, Math.round(gy), Math.round(target.z / snap) * snap);
       this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, c.y + 100, c.z + 30); this.sun.target.updateMatrixWorld();
     }
-    this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
+    this.grass.update(gridKey(this.courseId, this.myHole), this.cam.position.x, this.cam.position.z, performance.now() / 1000);
     this.renderer.render(this.scene, this.cam);
   }
 }

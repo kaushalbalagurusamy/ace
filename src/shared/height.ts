@@ -3,11 +3,11 @@
 // Add a course: run scripts/build-course.mjs --course <id>, then register its HEIGHTS below.
 import type { HoleHeight } from './height-types';
 import { HEIGHTS as PEBBLE } from './courses/pebble-height';
+import { HEIGHTS as BETHPAGE_BLACK } from './courses/bethpage-black-height';
+import { HEIGHTS as ARONIMINK } from './courses/aronimink-height';
 
 export type { HoleHeight };
-export const COURSE_HEIGHTS: Record<string, HoleHeight[]> = { pebble: PEBBLE };
-/** The course the game plays today. */
-export const DEFAULT_COURSE = 'pebble';
+export const COURSE_HEIGHTS: Record<string, HoleHeight[]> = { pebble: PEBBLE, 'bethpage-black': BETHPAGE_BLACK, aronimink: ARONIMINK };
 
 export interface Vec3 { x: number; y: number; z: number }
 const grids = new Map<HoleHeight, Int16Array>();

@@ -2118,5 +2118,161 @@
     "wheel_r": 0.22,
     "ground_y": -0.43,
     "stretch_y": 1.25
+  },
+  {
+    "id": "bg-bethpage-04",
+    "file": "assets/backdrops/bg-bethpage-04.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 4 of Bethpage Black, Farmingdale, New York: a par 5 climbing a hillside, a huge cross bunker cut into the slope with rugged fescue-covered faces, a second fairway above it and a green ringed by deep bunkers, enclosed by dense mature oak and maple forest, a northeastern parkland setting in high summer. Use the reference map only for the hole layout: the shape of the fairway, green, bunkers, tee, tree lines and any water. Render it as a real photograph: a cinematic high-altitude aerial drone photo at a low oblique angle, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no roads, no buildings in the foreground, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1746,
+      "input_tokens_details": {
+        "image_tokens": 1517,
+        "text_tokens": 229
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7396
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/bethpage-black/hole-04-clean.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "courses (Bethpage Black, Aronimink)",
+    "placeholder": "assets/backdrops/bg-bethpage-04-sm.webp",
+    "source_png": "assets/images/bg-bethpage-04.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/bethpage-black/hole-04-clean.png"
+    ],
+    "sha256": "b6f993b2b2478d9bd30c4668030d87b78ff6c6ab0406605b6668cb12b99569c7",
+    "sha256_placeholder": "0880d5e5e48ce9545505d7349c2d014dc2fb676f5410a316b72abfd546a1d29c",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-bethpage-15",
+    "file": "assets/backdrops/bg-bethpage-15.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 15 of Bethpage Black, Farmingdale, New York: a long par 4 rising to an elevated green perched above steep bunkers with wispy golden fescue on their faces, a narrow fairway lined by heavy walls of oak forest, a northeastern parkland setting in high summer. Use the reference map only for the hole layout: the shape of the fairway, green, bunkers, tee, tree lines and any water. Render it as a real photograph: a cinematic high-altitude aerial drone photo at a low oblique angle, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no roads, no buildings in the foreground, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1748,
+      "input_tokens_details": {
+        "image_tokens": 1530,
+        "text_tokens": 218
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7398
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/bethpage-black/hole-15-clean.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "courses (Bethpage Black, Aronimink)",
+    "placeholder": "assets/backdrops/bg-bethpage-15-sm.webp",
+    "source_png": "assets/images/bg-bethpage-15.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/bethpage-black/hole-15-clean.png"
+    ],
+    "sha256": "8811e8f9110d60cd7e6721103ba4eb0a581762c8f8d041ca04d3721f74ae62de",
+    "sha256_placeholder": "4825d1bfedcf7a9d7feb6216381f356670d5e3630e05fb84877a784a6743dfc5",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-aronimink-18",
+    "file": "assets/backdrops/bg-aronimink-18.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 18 of Aronimink Golf Club, Newtown Square, Pennsylvania: the closing par 4 of a classic Donald Ross parkland course, a broad fairway with scattered bunkers climbing to a green backed by the grand stone clubhouse in the far distance, a calm pond near the tee, mature deciduous trees in early autumn colour. Use the reference map only for the hole layout: the shape of the fairway, green, bunkers, tee, tree lines and any water. Render it as a real photograph: a cinematic high-altitude aerial drone photo at a low oblique angle, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no roads, no buildings in the foreground, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1738,
+      "input_tokens_details": {
+        "image_tokens": 1512,
+        "text_tokens": 226
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7388
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/aronimink/hole-18-clean.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "courses (Bethpage Black, Aronimink)",
+    "placeholder": "assets/backdrops/bg-aronimink-18-sm.webp",
+    "source_png": "assets/images/bg-aronimink-18.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/aronimink/hole-18-clean.png"
+    ],
+    "sha256": "8d134fd72dcf9584bc520e52897655e1623d1805e0f099f638780815a821d7c7",
+    "sha256_placeholder": "25664b8aa928e51e36800a6cd9a18358afd00b6453dcee46d04f300c91a8101c",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-aronimink-09",
+    "file": "assets/backdrops/bg-aronimink-09.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 9 of Aronimink Golf Club, Newtown Square, Pennsylvania: a long par 5 of a classic Donald Ross parkland course, rolling fairways, dark still ponds beside the tee shot, deep bunkers guarding the green, mature deciduous trees in early autumn colour of gold and russet. Use the reference map only for the hole layout: the shape of the fairway, green, bunkers, tee, tree lines and any water. Render it as a real photograph: a cinematic high-altitude aerial drone photo at a low oblique angle, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no roads, no buildings in the foreground, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1702,
+      "input_tokens_details": {
+        "image_tokens": 1482,
+        "text_tokens": 220
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7352
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/aronimink/hole-09-clean.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "courses (Bethpage Black, Aronimink)",
+    "placeholder": "assets/backdrops/bg-aronimink-09-sm.webp",
+    "source_png": "assets/images/bg-aronimink-09.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/aronimink/hole-09-clean.png"
+    ],
+    "sha256": "235443f4860aab4897adc27b2137262b9751d7407bf750074b82b71158820706",
+    "sha256_placeholder": "fe6958989701b2a848c878c82e4274efbc5aa32b93bc10be065f1d3843570a62",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
   }
 ]

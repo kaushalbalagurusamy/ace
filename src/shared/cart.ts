@@ -1,6 +1,6 @@
 // Genesis Box Buggy (PRD/07): arcade cart kinematics, where a cart may drive, the tee spawn, and cart bumps.
 // Pure and shared: the client drives with it, the server checks reports and resolves bumps with it. Sim space (x right, z forward), metres.
-import { GRIDS } from './course-grid';
+import { gridOf } from './courses';
 import { decodeGrid } from './gridtools';
 import { golferSpot, type Pt } from '../client/rules';
 import type { CartState } from './protocol';
@@ -25,11 +25,11 @@ export type Ground = 'blocked' | 'rough' | 'full';
 const grids: (Uint8Array | undefined)[] = [];
 const G = 'g'.charCodeAt(0);
 function cls(i: number, x: number, z: number): number {
-  const g = GRIDS[i]!, cells = (grids[i] ??= decodeGrid(g));
+  const g = gridOf(i), cells = (grids[i] ??= decodeGrid(g));
   const ix = Math.floor((x - g.x0) / g.cell), iz = Math.floor((z - g.z0) / g.cell);
   return ix < 0 || iz < 0 || ix >= g.nx || iz >= g.nz ? 111 : cells[iz * g.nx + ix]!;
 }
-/** Where a cart may go on hole i: kept off greens and their fringe, the tee, bunkers, water and out of bounds; rough, trees and rocks are slow. */
+/** Where a cart may go on hole i (a courses.gridKey): kept off greens and their fringe, the tee, bunkers, water and out of bounds; rough, trees and rocks are slow. */
 export function cartGround(i: number, x: number, z: number): Ground {
   if (Math.hypot(x, z) <= TEE_KEEP_OFF_M) return 'blocked';            // every hole's tee is at the origin
   const c = String.fromCharCode(cls(i, x, z));
@@ -69,6 +69,7 @@ const spawns = new Map<number, CartState[]>();
 /** Minimum sideways distance of a parked cart from the golfer's address spot, metres. */
 export const CART_SIDE_M = 2.4;
 /** Parked carts beside the tee, facing the pin: slot k takes the k-th nearest drivable spot to the golfer, 2 radii clear of the earlier slots. */
+/** `holeIndex` is a courses.gridKey. */
 export function cartSpawn(holeIndex: number, slot: number): CartState {
   let list = spawns.get(holeIndex);
   if (!list) {

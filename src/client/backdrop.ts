@@ -1,14 +1,18 @@
-// Home-screen backdrop: generated aerial views of Pebble Beach holes that crossfade every 8 s with a slow Ken Burns move.
+// Home-screen backdrop: generated aerial views of holes on the three courses that crossfade every 8 s with a slow Ken Burns move.
 // Images live in assets/backdrops/ (manifest rows bg-*); each has a 640 px placeholder painted under the full image.
 
 export const SLIDES = [
-  { id: 'bg-hole-07', cap: 'Hole 7 · Par 3 · 106 yd' },
-  { id: 'bg-hole-18', cap: 'Hole 18 · Par 5 · 543 yd' },
-  { id: 'bg-hole-08', cap: 'Hole 8 · Par 4 · 418 yd' },
+  { id: 'bg-hole-07', cap: 'Pebble Beach · Hole 7 · Par 3 · 106 yd' },
+  { id: 'bg-bethpage-04', cap: 'Bethpage Black · Hole 4 · Par 5 · 517 yd' },
+  { id: 'bg-hole-18', cap: 'Pebble Beach · Hole 18 · Par 5 · 543 yd' },
+  { id: 'bg-aronimink-18', cap: 'Aronimink · Hole 18 · Par 4 · 490 yd' },
+  { id: 'bg-hole-08', cap: 'Pebble Beach · Hole 8 · Par 4 · 418 yd' },
+  { id: 'bg-bethpage-15', cap: 'Bethpage Black · Hole 15 · Par 4 · 484 yd' },
   { id: 'bg-coast', cap: 'Carmel Bay · Pebble Beach Golf Links' },
-  { id: 'bg-hole-17', cap: 'Hole 17 · Par 3 · 208 yd' },
-  { id: 'bg-hole-06', cap: 'Hole 6 · Par 5 · 524 yd' },
-  { id: 'bg-hole-04', cap: 'Hole 4 · Par 4 · 331 yd' },
+  { id: 'bg-aronimink-09', cap: 'Aronimink · Hole 9 · Par 5 · 605 yd' },
+  { id: 'bg-hole-17', cap: 'Pebble Beach · Hole 17 · Par 3 · 208 yd' },
+  { id: 'bg-hole-06', cap: 'Pebble Beach · Hole 6 · Par 5 · 524 yd' },
+  { id: 'bg-hole-04', cap: 'Pebble Beach · Hole 4 · Par 4 · 331 yd' },
 ] as const;
 export const HOLD_MS = 8000;
 const url = (id: string, sm = false) => `/assets/backdrops/${id}${sm ? '-sm' : ''}.webp`;

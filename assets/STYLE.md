@@ -7,6 +7,7 @@ One cohesive look across every asset: **stylised low-poly, clean flat-shaded fac
 |---|---|
 | Cypress foliage | #2F4A3A (shadow #1F3329, highlight #4A6B52) |
 | Pine foliage | #3D5A3A, needles highlight #5C7F4D |
+| Parkland oak and maple foliage (Bethpage, Aronimink) | oak #3E5B2E, #4A6A35, #35502A; maple #56702F, #6B7A33, #4F6A2C |
 | Bark / wood | #5B4636, dark #3A2C22 |
 | Coastal rock | #8A8F8C, shadow #5F6663, lichen accent #9AA37A |
 | Sand | #E3D3A8 |
