@@ -13,6 +13,14 @@ interface Rest { q: THREE.Quaternion; p: THREE.Vector3; mq: THREE.Quaternion; mp
 const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _e = new THREE.Euler(), _v = new THREE.Vector3(), _w = new THREE.Vector3();
 const _a = new THREE.Vector3(), _b = new THREE.Vector3(), _c = new THREE.Vector3(), _t = new THREE.Vector3(), _u = new THREE.Vector3(), _p = new THREE.Vector3();
 
+/** Top-down turn of a pose in degrees, closed (away from the target) > 0, open < 0: the hip line after the pelvis rotation and the
+ *  shoulder line after the pelvis then the torso (the torso applied in the pelvis's frame, as the rig does), projected on the ground. */
+export function turnAngles(p: Pose): { hips: number; shoulders: number } {
+  const qp = new THREE.Quaternion().setFromEuler(new THREE.Euler(...p.pelvis)), qt = new THREE.Quaternion().setFromEuler(new THREE.Euler(...p.torso));
+  const ang = (q: THREE.Quaternion) => { const v = new THREE.Vector3(1, 0, 0).applyQuaternion(q); return (Math.atan2(v.z, v.x) * 180) / Math.PI; };
+  return { hips: ang(qp), shoulders: ang(qp.clone().multiply(qt)) };
+}
+
 /** Vertical drop for a hip at `hip` so a limb of length `reach` touches `target` (0 when it already can). */
 export function requiredDrop(hip: V3, target: V3, reach: number): number {
   const dx = hip[0] - target[0], dy = hip[1] - target[1], dz = hip[2] - target[2], h2 = dx * dx + dz * dz;
@@ -52,7 +60,8 @@ export class GolferRig {
     _v.copy(R.Hips.mp).add(_w.set(...p.shift)).applyMatrix4(this.model.matrixWorld);
     hips.position.copy(hips.parent!.worldToLocal(_v));
     this.rot('Hips', p.pelvis, 1);
-    for (const n of ['Spine02', 'Spine01', 'Spine'] as const) this.rot(n, p.torso, 1 / 3);
+    // the chest and ribcage skin follows the lower spine bones most, so most of the turn goes there (an even split left the chest square)
+    this.rot('Spine02', p.torso, 0.55); this.rot('Spine01', p.torso, 0.3); this.rot('Spine', p.torso, 0.15);
     this.rot('Head', p.head, 1);
     this.model.updateMatrixWorld(true);
     // legs: ankles to the stance, knees forward (following half the pelvis turn). The ankle targets are pinned to the ground;
@@ -172,6 +181,14 @@ export function tintPolo(model: THREE.Object3D, colour: string) {
       s.fragmentShader = s.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform vec3 uEye; varying float vBindH; float eyeMask;')
         .replace('#include <map_fragment>', `#include <map_fragment>
   { float mx = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)), mn = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
+    // texture clean-up (critic): light, unsaturated streaks on the trousers become the charcoal fabric; pale pink and orange
+    // blotches on the shirt become white. Skin and the gold embroidery are strongly saturated, so they are left alone.
+    float sat = (mx - mn) / max(mx, 1e-3);
+    float legs = smoothstep(0.07, 0.09, vBindH) * (1.0 - smoothstep(0.54, 0.555, vBindH));
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.032, 0.034, 0.039) * (0.8 + 1.5 * mn), legs * smoothstep(0.09, 0.16, mx) * (1.0 - smoothstep(0.28, 0.4, sat)));
+    float shirt = smoothstep(0.575, 0.59, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(mx), shirt * smoothstep(0.3, 0.4, mx) * smoothstep(0.06, 0.12, sat) * (1.0 - smoothstep(0.42, 0.52, sat)));
+    mx = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)); mn = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
     float white = smoothstep(0.30, 0.45, mx) * (1.0 - smoothstep(0.10, 0.2, (mx - mn) / max(mx, 1e-3)));
     float band = smoothstep(0.555, 0.575, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
     diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * uTint, white * band);
