@@ -91,18 +91,19 @@ const totalArea = tris.reduce((s, t) => s + t.ar, 0); if (!tris.length) throw ne
 
 // 3. Cards: area-weighted points on the crown, quads tilted between outward-facing and horizontal, slightly proud of the surface.
 const nc = +opt.cards, s0 = Math.sqrt((2.2 * totalArea) / nc) * +opt.size, cum = []; let acc = 0; for (const t of tris) cum.push((acc += t.ar));
-const P = [], Nn = [], UV = [], I = [];
+const P = [], Nn = [], UV = [], I = [], asp = Math.sqrt(+(opt.aspect ?? 1));   // --aspect 2: cards twice as long as wide (wind-sheared plates)
 for (let k = 0; k < nc; k++) {
   const r = rnd() * acc; let lo = 0, hi = cum.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < r) lo = m + 1; else hi = m; }
   const t = tris[lo]; let u = rnd(), v = rnd(); if (u + v > 1) { u = 1 - u; v = 1 - v; }
   const p = add(add(t.a, sub(t.b, t.a), u), sub(t.c, t.a), v), s = s0 * (0.7 + 0.6 * rnd());
   if (!inTier(p[1])) { k--; continue; }   // shortcut: rejection sampling, fine while the bands keep well over half the crown
   const facing = norm(add(t.n.map(x => x * (1 - +opt.flat)), [0, +opt.flat, 0]));   // plane normal of the card
-  const rr = norm([rnd() - 0.5, rnd() - 0.5, rnd() - 0.5]), ta = norm(sub(rr, facing.map(x => x * (rr[0] * facing[0] + rr[1] * facing[1] + rr[2] * facing[2])))), bb = cross(facing, ta);
+  // --wind x|z: card long axis follows that axis (with jitter), so the sprays streak leeward like the crown itself
+  const jit = [rnd() - 0.5, rnd() - 0.5, rnd() - 0.5], rr = norm(opt.wind ? add(opt.wind === 'x' ? [1, 0, 0] : [0, 0, 1], jit, 0.7) : jit), ta = norm(sub(rr, facing.map(x => x * (rr[0] * facing[0] + rr[1] * facing[1] + rr[2] * facing[2])))), bb = cross(facing, ta);
   const tilt = (rnd() - 0.5) * 1.2, ba = norm(add(bb.map(x => x * Math.cos(tilt)), facing, Math.sin(tilt))), c = add(p, t.n, s * 0.12);
   const tile = Math.floor(rnd() * N * N), u0 = (tile % N) / N, v0 = Math.floor(tile / N) / N, fl = rnd() < 0.5, base = P.length / 3;
   for (const [i, j] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-    P.push(...add(add(c, ta, (i * s) / 2), ba, (j * s) / 2)); Nn.push(...norm(add(t.n, [0, 0.6, 0])));
+    P.push(...add(add(c, ta, (i * s * asp) / 2), ba, (j * s) / asp / 2)); Nn.push(...norm(add(t.n, [0, 0.6, 0])));
     UV.push(u0 + (((fl ? -i : i) + 1) / 2) / N, v0 + ((1 - j) / 2) / N);
   }
   I.push(base, base + 1, base + 2, base, base + 2, base + 3);
