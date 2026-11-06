@@ -617,7 +617,10 @@
     },
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/golfer-v2/",
+      "renders": "assets/qa/golfer-v3/",
+      "compare_against": "refs/golfer/character-reference.png",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": true,
       "views": [
         "front",
         "side",
@@ -625,12 +628,16 @@
         "face",
         "face-side",
         "address",
-        "top"
+        "address-faceon",
+        "top",
+        "top-faceon",
+        "top-driver-faceon",
+        "finish"
       ],
-      "rendered_by": "scripts/qa/render-golfer.mjs (the game's own rig code, 7-iron code club)",
-      "rule": "pass = no score below 3 and mean >= 4.0",
-      "compare_against": "refs/golfer/character-reference.png",
-      "wired": true
+      "v3_changes": "emissive violet eyes (#7a5cff); top re-keyed (hands above the trail shoulder, lead arm across the chest, shaft level toward the target); 10 cm knee flex at address; holds the slot's generated club model (7-iron, driver in top-driver-faceon)",
+      "previous": {
+        "v2": "FAIL, mean 3.6 (independent critic): eyes not violet, top pose arms straight up, no knee flex, generic stick club"
+      }
     }
   },
   {
@@ -775,7 +782,7 @@
     "balance_after": 730,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-ut/v2/",
+      "renders": "assets/qa/club-ut/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -783,28 +790,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-ut-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: oriented hosel-up (was inverted), scaled to an 80 mm head (the old \"head small\" note), code shaft replaces the long thin hosel stub above the ferrule. Flat chrome and mirrored back text on the face side remain (texture).",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; 18\u00b0 stamp on the toe of the back (visible in photo-1..3)",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 4,
-          "b": 4,
-          "c": 3,
-          "d": 3,
-          "e": 4
-        },
-        "mean": 3.6,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Silhouette, hollow-body cap with two screws, black insert, APEX, Callaway and UT stamps read correctly as an iron-style UDI. Chrome is flat near-white, plastic looking; visible facets; hosel too long and thin; head a bit small; mirrored or garbled top-edge text.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-ut/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: oriented hosel-up (was inverted), scaled to an 80 mm head (the old \"head small\" note), code shaft replaces the long thin hosel stub above the ferrule. Flat chrome and mirrored back text on the face side remain (texture).",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 4,
+            "b": 4,
+            "c": 3,
+            "d": 3,
+            "e": 4
+          },
+          "mean": 3.6,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Silhouette, hollow-body cap with two screws, black insert, APEX, Callaway and UT stamps read correctly as an iron-style UDI. Chrome is flat near-white, plastic looking; visible facets; hosel too long and thin; head a bit small; mirrored or garbled top-edge text.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-ut/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       180.0,
@@ -839,7 +849,7 @@
     "balance_after": 730,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-iron/v2/",
+      "renders": "assets/qa/club-iron/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -847,28 +857,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-iron-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: oriented hosel-up, 77 mm head, grip-end origin. Meshy textured both sides with the cavity back (no grooved face); flat chrome remains.",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; chrome, grooved face, ferrule",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 4,
-          "b": 4,
-          "c": 3,
-          "d": 3,
-          "e": 4
-        },
-        "mean": 3.6,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Cavity-back forged iron silhouette, Callaway script and V, X FORGED legible; shallow cavity; flat white-grey no chrome gradient; baked facets on hosel and head; sole view slab-like; hosel slightly long.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-iron/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: oriented hosel-up, 77 mm head, grip-end origin. Meshy textured both sides with the cavity back (no grooved face); flat chrome remains.",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 4,
+            "b": 4,
+            "c": 3,
+            "d": 3,
+            "e": 4
+          },
+          "mean": 3.6,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Cavity-back forged iron silhouette, Callaway script and V, X FORGED legible; shallow cavity; flat white-grey no chrome gradient; baked facets on hosel and head; sole view slab-like; hosel slightly long.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-iron/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       180.0,
@@ -903,7 +916,7 @@
     "balance_after": 730,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-wedge-50/v2/",
+      "renders": "assets/qa/club-wedge-50/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -911,28 +924,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-wedge-opus-sp-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: oriented hosel-up, 78 mm head. Both sides carry the back texture; the small dark mark at the hosel remains.",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; chrome, grooved face, ferrule, 50 stamp",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 3,
-          "b": 4,
-          "c": 2,
-          "d": 3,
-          "e": 2
-        },
-        "mean": 2.8,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Plausible teardrop head and markings; flat white with visible facets, no chrome read; odd rectangular cut-out in the hosel; bulbous sole; indistinguishable from the other wedges without markings.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-wedge-50/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: oriented hosel-up, 78 mm head. Both sides carry the back texture; the small dark mark at the hosel remains.",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 3,
+            "b": 4,
+            "c": 2,
+            "d": 3,
+            "e": 2
+          },
+          "mean": 2.8,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Plausible teardrop head and markings; flat white with visible facets, no chrome read; odd rectangular cut-out in the hosel; bulbous sole; indistinguishable from the other wedges without markings.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-wedge-50/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       180.0,
@@ -967,7 +983,7 @@
     "balance_after": 730,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-wedge-62/v2/",
+      "renders": "assets/qa/club-wedge-62/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -975,28 +991,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-wedge-full-toe-sp-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: oriented hosel-up, 80 mm head. Texture artifacts (dark patches) may remain.",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; chrome, grooved face, 62 stamp; full-toe outline and SP-under-FULL-TOE NOT changed",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 3,
-          "b": 4,
-          "c": 2,
-          "d": 3,
-          "e": 3
-        },
-        "mean": 3.0,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Rounded high toe and FULL TOE SP text, groove lines, V logo good; black rectangular patches on the top/toe edge and hosel; stray glyph panel on the sole; faceted white; bulbous sole.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-wedge-62/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: oriented hosel-up, 80 mm head. Texture artifacts (dark patches) may remain.",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 3,
+            "b": 4,
+            "c": 2,
+            "d": 3,
+            "e": 3
+          },
+          "mean": 3.0,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Rounded high toe and FULL TOE SP text, groove lines, V logo good; black rectangular patches on the top/toe edge and hosel; stray glyph panel on the sole; faceted white; bulbous sole.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-wedge-62/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       180.0,
@@ -1031,7 +1050,7 @@
     "balance_after": 730,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-putter/v2/",
+      "renders": "assets/qa/club-putter/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -1039,28 +1058,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-putter-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: turned 180 degrees so the white face insert faces forward (the first renders showed the back), 105 mm head, code shaft and grip above the model's own shaft.",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; all-black centre shaft and ferrule, gloss body; the white face insert is the model's (faces forward since v2); the perpendicular alignment tick NOT added",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 3,
-          "b": 2,
-          "c": 3,
-          "d": 3,
-          "e": 2
-        },
-        "mean": 2.6,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Black mallet with two forward wings and centre shaft present; no white face insert visible, a dark plate with a screw-like medallion instead; alignment dashes partial; scratch-like specular streaks; thin kinked shaft; head cropped in renders.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-putter/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: turned 180 degrees so the white face insert faces forward (the first renders showed the back), 105 mm head, code shaft and grip above the model's own shaft.",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 3,
+            "b": 2,
+            "c": 3,
+            "d": 3,
+            "e": 2
+          },
+          "mean": 2.6,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Black mallet with two forward wings and centre shaft present; no white face insert visible, a dark plate with a screw-like medallion instead; alignment dashes partial; scratch-like specular streaks; thin kinked shaft; head cropped in renders.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-putter/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       0.0,
@@ -1092,7 +1114,7 @@
     "balance_after": 670,
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-driver/v2/",
+      "renders": "assets/qa/club-driver/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -1100,28 +1122,31 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-driver-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "not regenerated: the mesh is sound but was inverted (Meshy kept the sole-view photo frame: hosel down), which caused the distorted views and the \"peg off the sole\"; now oriented hosel-up, face +Z, scaled to a 122 mm head, grip-end origin with a code shaft and grip. The hosel adapter stub on the crown remains (geometry).",
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; shared fixes only; crown peg, toe logo and garbled decals NOT fixed (needs mesh/texture editing)",
       "previous": {
-        "verdict": "FAIL",
-        "scores": {
-          "a": 2,
-          "b": 3,
-          "c": 2,
-          "d": 2,
-          "e": 3
-        },
-        "mean": 2.4,
-        "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
-        "notes": "Distorted tilted sliver in the front view; faceted low-poly blob in side view; stray rectangular peg and blade hangs off the sole; sole view is a hollow-looking shell; graphics recognisable (white panels, green line, E, ELYTE) but smeared; stray 'O5' for 10.5. Threequarter view is the best.",
-        "date": "2026-11-05",
-        "renders": "assets/qa/club-driver/",
-        "rule": "pass = no score below 3 and mean >= 4.0",
-        "wired": false
-      },
-      "wired": true
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "not regenerated: the mesh is sound but was inverted (Meshy kept the sole-view photo frame: hosel down), which caused the distorted views and the \"peg off the sole\"; now oriented hosel-up, face +Z, scaled to a 122 mm head, grip-end origin with a code shaft and grip. The hosel adapter stub on the crown remains (geometry).",
+        "v1": {
+          "verdict": "FAIL",
+          "scores": {
+            "a": 2,
+            "b": 3,
+            "c": 2,
+            "d": 2,
+            "e": 3
+          },
+          "mean": 2.4,
+          "critic": "fresh read-only subagent (Claude Sonnet), scores quoted verbatim from its message",
+          "notes": "Distorted tilted sliver in the front view; faceted low-poly blob in side view; stray rectangular peg and blade hangs off the sole; sole view is a hollow-looking shell; graphics recognisable (white panels, green line, E, ELYTE) but smeared; stray 'O5' for 10.5. Threequarter view is the best.",
+          "date": "2026-11-05",
+          "renders": "assets/qa/club-driver/",
+          "rule": "pass = no score below 3 and mean >= 4.0",
+          "wired": false
+        }
+      }
     },
     "orient_deg": [
       180.0,
@@ -1544,7 +1569,7 @@
     ],
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-wedge-54/v2/",
+      "renders": "assets/qa/club-wedge-54/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -1552,30 +1577,33 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-wedge-opus-sp-plus-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "regenerated from single photo club-wedge-opus-sp-plus-2: the detached fin came from the tungsten callout in photo 4 and is gone. Oriented, 78 mm head.",
-      "previous": "see earlier_attempts",
-      "wired": true
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; chrome, grooved face, 54 stamp; clean OPUS / SP+ decals and the tungsten band NOT added",
+      "previous": {
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "regenerated from single photo club-wedge-opus-sp-plus-2: the detached fin came from the tungsten callout in photo 4 and is gone. Oriented, 78 mm head.",
+        "v1": "see earlier_attempts"
+      }
     },
     "fit": "src/client/clubs.ts fitGeneratedHead: orient_deg, head heel-to-toe length from CLUBS, hosel top under the grip end, sole at -length"
   },
   {
     "id": "club-3w",
     "file": "assets/models/club-3w.glb",
-    "tool": "Meshy multi-image-to-3D",
+    "tool": "derived from club-driver.glb (file copy, fitted smaller and lofted in code)",
     "model": "meshy-6",
     "tier": "Pro",
     "stage": "textured",
     "seed_photos": [
-      "refs/callaway/club-3w-4.jpg"
+      "refs/callaway/club-driver-1.jpg"
     ],
     "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
     "product": "Callaway Elyte Triple Diamond Fairway Wood (2025)",
     "loft_label": "15 deg",
-    "task_id": "01a1aec1-c19d-7670-b57e-15281b585123",
-    "credits_used": 30,
+    "task_id": null,
+    "credits_used": 0,
     "date": "2026-11-05",
     "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
     "subagent": "build session (script)",
@@ -1583,8 +1611,8 @@
     "balance_before": 545,
     "balance_after": 515,
     "orient_deg": [
+      173.0,
       0.0,
-      180.0,
       0.0
     ],
     "earlier_attempts": [
@@ -1606,11 +1634,19 @@
         "note": "two hosels again; discarded before QA",
         "balance_before": 605,
         "balance_after": 545
+      },
+      {
+        "seed_photos": [
+          "refs/callaway/club-3w-4.jpg"
+        ],
+        "task_id": "01a1aec1-c19d-7670-b57e-15281b585123",
+        "credits_used": 30,
+        "qa": "v2 FAIL 1.6"
       }
     ],
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/club-3w/v2/",
+      "renders": "assets/qa/club-3w/v3/",
       "views": [
         "photo-1",
         "photo-2",
@@ -1618,13 +1654,17 @@
         "photo-4",
         "in-hand"
       ],
-      "rendered_by": "scripts/qa/render-clubs.mjs (the game's fitGeneratedHead, cameras at each reference photo's angle)",
       "compare_against": "refs/callaway/club-3w-1..4.jpg",
       "rule": "pass = no score below 3 and mean >= 4.0",
-      "v2_changes": "regenerated twice from single photos: club-3w-1 (sole view) again gave a mirrored head with two hosels, as club-3w-2 had; club-3w-4 (heel-toe view, shaft up) gave one hosel and a scored face. Oriented, 105 mm head.",
-      "previous": "see earlier_attempts",
-      "wired": true
+      "wired": true,
+      "v3_changes": "chrome PBR (metalness 1, low roughness, code studio env map) except woods (gloss); grooved code face material on irons/wedges/UT (back texture no longer on the face); ferrule tapers hosel to shaft; real shaft lengths; in-hand render shows the club in the golfer's hands; per critic fallback: the driver mesh scaled to a 105 mm head (about 64% of the driver volume) and lofted +7 degrees (orient_deg 173); no \"3\" crown stamp; the two Meshy 3W attempts are in earlier_attempts",
+      "previous": {
+        "v2": "FAIL (independent critic)",
+        "v2_changes": "regenerated twice from single photos: club-3w-1 (sole view) again gave a mirrored head with two hosels, as club-3w-2 had; club-3w-4 (heel-toe view, shaft up) gave one hosel and a scored face. Oriented, 105 mm head.",
+        "v1": "see earlier_attempts"
+      }
     },
-    "fit": "src/client/clubs.ts fitGeneratedHead: orient_deg, head heel-to-toe length from CLUBS, hosel top under the grip end, sole at -length"
+    "fit": "src/client/clubs.ts fitGeneratedHead: orient_deg, head heel-to-toe length from CLUBS, hosel top under the grip end, sole at -length",
+    "derived_from": "club-driver"
   }
 ]
