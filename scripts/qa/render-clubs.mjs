@@ -8,7 +8,7 @@ const vite = spawn('npx', ['vite', '--port', '5393', '--strictPort', '--host', '
 await new Promise(r => setTimeout(r, 4000));
 try {
   const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }), p = await b.newPage({ viewport: { width: 640, height: 640 } });
-  p.on('pageerror', e => console.log('PAGEERR', e.message));
+  p.on('pageerror', e => console.log('PAGEERR', e.message)); p.on('console', m => { if (m.type() !== 'debug') console.log('CONSOLE', m.text()); });
   await p.goto('http://127.0.0.1:5393/scripts/qa/club.html', { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
   const out = {};
   for (const [file, id, dir, opts] of SHOTS) {
