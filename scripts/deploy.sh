@@ -9,6 +9,7 @@ SVC=srv-dbmbob3m8hqs73f9pbpg
 URL=https://ace-x92s.onrender.com
 api() { curl -sS -H "Authorization: Bearer $RENDER_API_KEY" -H 'Content-Type: application/json' "$@"; }
 git push github HEAD:main
+git push origin HEAD:main || echo "warning: could not push origin main (judges land there)"
 ID=$(api -X POST "https://api.render.com/v1/services/$SVC/deploys" -d '{}' | python3 -c 'import sys,json; d=json.load(sys.stdin); print(d.get("id") or d.get("deploy",{}).get("id",""))')
 [ -n "$ID" ] || { echo "deploy trigger failed"; exit 1; }
 echo "deploy $ID triggered"
