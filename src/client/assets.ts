@@ -6,7 +6,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
-interface Row { id: string; target_height_m?: number; height_m?: number; orient_deg?: number[]; qa?: { verdict?: string } }
+interface Row { id: string; target_height_m?: number; height_m?: number; orient_deg?: number[]; qa?: { verdict?: string }; grade?: string; post_process?: string | string[] }
 let manifest: Promise<Row[]> | null = null;
 /** QA renders only (?assets=pending): also draw models still awaiting their fidelity verdict, so the critic can judge them in place. Never set in play. */
 const PREVIEW_PENDING = typeof location !== 'undefined' && new URLSearchParams(location.search).get('assets') === 'pending';
@@ -47,6 +47,9 @@ export function normalise(scene: THREE.Object3D, height: number): THREE.Group {
   scene.position.set(-c.x, -b2.min.y, -c.z);
   return root;
 }
+
+/** True when a model's albedo was already graded toward the photo swatches offline (scripts/grade_glb.mjs), so it must not be tinted again. */
+export const isGraded = async (id: string) => { const r = (await rows()).find(x => x.id === id); return !!r && (!!r.grade || [r.post_process ?? []].flat().some(s => s.includes('grade_glb'))); };
 
 const models = new Map<string, Promise<THREE.Object3D | null>>();
 /** A normalised clone of a shipped model: scaled to its manifest height, centred on x/z, base at y = 0. null if it cannot load. */
