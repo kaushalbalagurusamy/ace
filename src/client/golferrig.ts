@@ -22,6 +22,8 @@ export class GolferRig {
   private inv = new THREE.Matrix4();
   /** `model` is the normalised golfer (assets.normalise): its local space is the Pose's model space. */
   constructor(private model: THREE.Object3D) {
+    // likeness (critic): the reference's face is longer and narrower than the mesh's; skinned to the head bone, so scale it there
+    const head = model.getObjectByName('Head'); if (head && !head.userData.narrowed) { head.scale.multiply(new THREE.Vector3(0.92, 1.04, 0.97)); head.userData.narrowed = true; }
     model.updateMatrixWorld(true);
     this.inv.copy(model.matrixWorld).invert();
     for (const n of NAMES) {
@@ -118,7 +120,7 @@ export function smoothShading(model: THREE.Object3D) {
 let glowTex: THREE.Texture | null = null;
 /** Soft additive violet glows over both eyes so they read at play distance (critic: the texture alone gives specks). Placed from
  *  the rig's `headfront` marker (on the face, between the eyes) and parented to the head so they follow every pose. */
-export function addEyeGlow(model: THREE.Object3D, spread = 0.031, size = 0.036) {
+export function addEyeGlow(model: THREE.Object3D, spread = 0.031, size = 0.022) {
   const head = model.getObjectByName('Head'), front = model.getObjectByName('headfront'); if (!head || !front) return;
   if (!glowTex) {
     const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d')!, g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
@@ -130,7 +132,7 @@ export function addEyeGlow(model: THREE.Object3D, spread = 0.031, size = 0.036) 
   const eyeY = 0.915 * new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3()).y;   // eye line, the same bind height the eye shader uses
   for (const side of [-1, 1]) {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: EYE, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
-    s.scale.setScalar(size); s.position.set(at.x + side * spread, eyeY, at.z + 0.03); model.add(s); head.attach(s);
+    s.scale.setScalar(size); s.position.set(at.x + side * spread, eyeY, at.z + 0.012); model.add(s); head.attach(s);
   }
 }
 
