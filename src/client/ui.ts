@@ -31,8 +31,8 @@ export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ??
 const k = (...keys: string[]) => keys.map(x => `<kbd>${x}</kbd>`).join('');
 const HELP_GROUPS: [string, [string, string][]][] = [
   ['Move', [[k('W', 'A', 'S', 'D'), 'Walk'], [k('Shift'), 'Walk at 5 m/s and halve the look speed for fine aim'], [k('Mouse'), 'Look and aim. Click the course to lock the mouse']]],
-  ['Swing', [[k('Space'), 'Take your stance at the ball. The mouse still turns your aim'], [`Hold ${k('Space')}`, 'Backswing: the meter fills. Release to hit; a short hold is a short shot'],
-    ['Hold into the red', '<b>MAX effort</b>: 10% more club speed, 25% less accurate'], [k('1', '…', '0', '-', '=', 'O'), 'Pick a club, up until the backswing starts'], [k('Esc'), 'Cancel the stance before you release']]],
+  ['Swing', [[k('Space'), 'Take your stance at the ball; the mouse still aims'], [`Hold ${k('Space')}`, 'Backswing fills the meter. Release to hit; a short hold is a short shot'],
+    ['Hold into red', '<b>MAX effort</b>: +10% club speed, 25% less accurate'], [`${k('1')}–${k('0')} ${k('-', '=', 'O')}`, 'Pick a club, up until the backswing'], [k('Esc'), 'Cancel before you release']]],
   ['Ball position', [[k('↑', '↓'), 'Forward for a higher flight, back for a lower one'], [k('→', '←'), 'Away from you for a draw, closer for a fade']]],
   ['Putting', [[k('P'), 'The putter'], [`${k('Space')} hold, release`, 'Stance, draw back, strike: the longer the hold, the harder the putt']]],
   ['Cart', [[k('E'), 'Get in or out of the Genesis cart (within 3 m)'], [k('W', 'A', 'S', 'D'), 'Drive. The mouse swings the chase camera']]],
@@ -58,7 +58,7 @@ const CSS = `
 @media (prefers-reduced-motion:reduce){.bd-l{transition:none}.bd-l.kb{animation:none;transform:scale(1.04)}}
 .htp-btn{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));z-index:2;display:flex;align-items:center;gap:8px}
 .htp-btn i{font-style:normal;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;font-size:12px;font-weight:700}
-.scr{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:72px 16px 48px;box-sizing:border-box}
+.scr{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:18px;padding:72px 16px 48px;box-sizing:border-box}.scr>:first-child{margin-top:auto}.scr>:last-child{margin-bottom:auto}
 .wm{font:600 clamp(64px,13vw,128px)/.9 "Playfair Display",Georgia,serif;margin:0;letter-spacing:.02em;text-shadow:0 4px 30px rgba(0,0,0,.45)}
 .wm span{color:var(--gold)}.wm.sm{font-size:clamp(40px,7vw,56px)}
 .tag{margin:-6px 0 6px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--mute);text-align:center}
@@ -88,19 +88,19 @@ const CSS = `
 .count{font:600 64px/1 "Playfair Display",Georgia,serif;color:var(--gold);text-align:center;margin:0 0 12px}
 .hint{color:var(--mute);font-size:13px;margin:12px 0 0}
 .spons{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
-#htp{width:min(880px,calc(100% - 32px));max-height:calc(100% - 48px);box-sizing:border-box;padding:28px;border-radius:20px;border:1px solid var(--line);background:rgba(10,22,17,.94);color:var(--ink);box-shadow:0 30px 90px rgba(0,0,0,.6)}
+#htp{width:min(1120px,calc(100% - 32px));max-height:calc(100% - 32px);box-sizing:border-box;padding:22px 26px;border-radius:20px;border:1px solid var(--line);background:rgba(10,22,17,.94);color:var(--ink);box-shadow:0 30px 90px rgba(0,0,0,.6)}
 #htp::backdrop{background:rgba(3,10,7,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .htp-head{display:flex;justify-content:space-between;align-items:center;margin:0}.htp-head h2{font:600 30px/1.1 "Playfair Display",Georgia,serif;margin:0}
 #home .x{width:40px;height:40px;padding:0;font-size:24px;font-weight:400}
-#htp .lede{color:var(--mute);margin:6px 0 20px}
-.htp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
-.htp-grid section{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+#htp .lede{color:var(--mute);margin:4px 0 14px}
+.htp-grid{columns:3 290px;column-gap:14px}
+.htp-grid section{break-inside:avoid;margin-bottom:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .htp-grid h3{margin:0 0 10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
-.kv{display:grid;grid-template-columns:minmax(84px,auto) 1fr;gap:12px;align-items:baseline;padding:5px 0;font-size:14px}.kv span:first-child{white-space:nowrap;color:var(--mute);font-size:13px}
-kbd{display:inline-block;min-width:22px;padding:2px 6px;margin:0 2px 2px 0;border-radius:6px;border:1px solid rgba(255,255,255,.25);border-bottom-width:2px;background:rgba(255,255,255,.08);font:600 12px/1.4 ui-monospace,Menlo,monospace;text-align:center;color:var(--ink)}
-#htp .foot{color:var(--mute);font-size:13px;margin:18px 0 0}
+.kv{display:grid;grid-template-columns:124px 1fr;gap:10px;align-items:baseline;padding:4px 0;font-size:13.5px;line-height:1.4}.kv span:first-child{color:var(--mute);font-size:13px}
+kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;border-radius:6px;border:1px solid rgba(255,255,255,.25);border-bottom-width:2px;background:rgba(255,255,255,.08);font:600 12px/1.4 ui-monospace,Menlo,monospace;text-align:center;color:var(--ink)}
+#htp .foot{color:var(--mute);font-size:13px;margin:4px 0 0}
 .scr table{border-collapse:collapse;width:100%}.scr td,.scr th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}.scr th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
-@media (max-width:520px){.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
+@media (max-width:520px){.tag{letter-spacing:.14em}.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
 #bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px}
 .slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
