@@ -54,6 +54,13 @@ export function rollDistance(v0: number, surface: Surface, stimp = 10): number {
 
 // ---- Cup capture (§5.2, Penner): the fastest a ball can cross the cup at offset b from its centre and still drop. ----
 const CUP_R = 0.054;
+/** Drawn ball radius (m). The ball is drawn about 10x real size so it reads on screen; the cup is drawn and hit-tested at the same
+ *  scale (owner QoL, 2026-11-05) so what you see is what drops. Ball flight, roll and capture SPEEDS stay real (TrackMan/Penner). */
+export const BALL_VISUAL_RADIUS_M = 0.22;
+export const CUP_VISUAL_SCALE = BALL_VISUAL_RADIUS_M / RADIUS;
+export const CUP_VISUAL_RADIUS_M = CUP_R * CUP_VISUAL_SCALE;
+/** Capture test on the drawn (scaled) cup: the offset is mapped back to the real cup, and the real capture speed applies. */
+export const captureSpeedVisual = (offsetM: number): number => captureSpeed(offsetM / CUP_VISUAL_SCALE);
 export function captureSpeed(b: number): number {
   if (Math.abs(b) >= CUP_R) return 0;
   return Math.max(0, 2 * Math.sqrt(CUP_R * CUP_R - b * b) - RADIUS) * Math.sqrt(G / (2 * RADIUS));

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BAG, PUTT_MAX_MS, launchFor, simulateShot } from '../src/sim';
+import { BAG, BALL_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M, PUTT_MAX_MS, captureSpeed, captureSpeedVisual, launchFor, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
@@ -42,8 +42,19 @@ describe('putting and holing out (AC-P3 roll, PRD/03 ยง6 cup capture, research ย
     expect(r.ball.z).toBeLessThan(pin.z);
     expect(r.ball.z).toBeGreaterThan(far.z);
   });
-  it('a putt aimed 10 degrees off the line misses', () => {
-    expect(ok(playPutt(h, start, 10, 0.07 * 750)).ball.holedOut).toBe(false);
+  it('a putt whose line passes outside the drawn cup rim misses (15 degrees off from 3 m: about 0.78 m wide of a 0.56 m cup)', () => {
+    expect(ok(playPutt(h, ball(pin.x, pin.z - 3), 15, holdFor(2.0))).ball.holedOut).toBe(false);
+  });
+  it('the drawn cup is the hitbox: a slow putt crossing inside the drawn rim drops, just outside it does not (owner QoL; speeds stay real)', () => {
+    expect(CUP_VISUAL_RADIUS_M).toBeCloseTo(0.054 * (BALL_VISUAL_RADIUS_M / 0.021335), 10);
+    // a gentle putt aimed so its line passes 0.4 m from the pin (inside the 0.56 m drawn cup) drops; at 0.7 m it misses
+    const inside = Math.atan2(0.4, 2) * 180 / Math.PI, outside = Math.atan2(0.7, 2) * 180 / Math.PI, v = Math.sqrt(2 * 0.5486 * 2 + 0.25);   // arrives at about 0.5 m/s: below the real capture speed at that offset
+    expect(ok(playPutt(h, ball(pin.x, pin.z - 2), inside, holdFor(v))).ball.holedOut).toBe(true);
+    expect(ok(playPutt(h, ball(pin.x, pin.z - 2), outside, holdFor(v))).ball.holedOut).toBe(false);
+  });
+  it('capture speed on the drawn cup equals the real capture speed at the proportional offset (physics unchanged)', () => {
+    for (const f of [0, 0.3, 0.6, 0.9]) expect(captureSpeedVisual(f * CUP_VISUAL_RADIUS_M)).toBeCloseTo(captureSpeed(f * 0.054), 10);
+    expect(captureSpeedVisual(0)).toBeGreaterThan(1.2); expect(captureSpeedVisual(0)).toBeLessThan(1.4);   // a firm putt still lips out, as in real golf
   });
   it('AC-P3 on the course: 1.83 m/s from the same spot rolls 3.05 m +-5%', () => {
     const r = ok(playPutt(h, ball(pin.x + 5, pin.z - 8), 0, holdFor(1.83))); // 9.4 m from the pin: on the green, aimed away from the cup

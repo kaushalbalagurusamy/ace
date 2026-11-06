@@ -1,5 +1,5 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, bounceRoll, captureSpeed, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
+import { BAG, bounceRoll, captureSpeedVisual, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
 import type { Lie, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
@@ -26,7 +26,7 @@ function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number,
   const sStar = Math.min(L, Math.max(0, (pin.x - x) * dx + (pin.z - z) * dz));
   const d = Math.hypot(x + dx * sStar - pin.x, z + dz * sStar - pin.z);
   const vAt = Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sStar));
-  const holed = vAt < captureSpeed(d);
+  const holed = vAt < captureSpeedVisual(d);   // drawn-size cup, real capture speeds
   const sEnd = holed ? sStar : L;
   const tEnd = (v0 - Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sEnd))) / a;
   const at = (s: number, t: number) => ({ t: t0 + t, p: { x: x + dx * s, y: 0, z: z + dz * s } });

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { BALL_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M } from '../sim/physics';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { makeCart, poseCart, type CartView } from './cartmodel';
@@ -108,7 +109,7 @@ export class World {
     players.forEach((p, i) => {
       const shade = SHADES[i % 4]!;
       const look = this.makeGolfer(shade, p.name);
-      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')),
+      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(BALL_VISUAL_RADIUS_M, 12, 8), this.mat('#ffffff')),
         cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
@@ -142,7 +143,11 @@ export class World {
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     pole.castShadow = flag.castShadow = true;
-    this.course.add(pole, flag);
+    // the cup, drawn at the same scale as the ball (CUP_VISUAL_RADIUS_M): its rim is exactly the server's capture hitbox
+    const cup = new THREE.Mesh(new THREE.CircleGeometry(CUP_VISUAL_RADIUS_M, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#0d0f0c', polygonOffset: true, polygonOffsetFactor: -2 }));
+    const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M * 1.06, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#f2f2ee', polygonOffset: true, polygonOffsetFactor: -2 }));
+    cup.position.set(pin.x, 0.012, pin.z); rim.position.set(pin.x, 0.013, pin.z);
+    this.course.add(pole, flag, cup, rim);
     this.spots = propSpots(h.index);
     void this.setProps(this.spots);
   }
