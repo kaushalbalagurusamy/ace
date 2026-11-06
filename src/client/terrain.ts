@@ -222,7 +222,8 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
   #ifdef HAS_FINE
     // real bowls here (fineTiles): the light does the face; the sand is raked in lines that fade before they alias
     float rph = dot(sim, vec2(0.6, 0.8)) * 19.0 + tNoise(vWxz * 0.35) * 7.0, rfw = fwidth(rph);
-    alb *= 1.0 + ws * (0.1 * sin(rph) * (1.0 - smoothstep(0.6, 2.2, rfw)) + 0.06);
+    alb *= 1.0 + ws * (0.07 * sin(rph + 2.0 * tNoise(vWxz * 1.3)) * (1.0 - smoothstep(0.6, 2.2, rfw)) + 0.06);
+    alb *= mix(vec3(1.0), vec3(1.05, 1.0, 0.9), ws);   // warm cream in the sun, not grey-white
     if (bowl) alb *= mix(1.0, 0.72 + 0.2 * tNoise(vWxz * 3.0), vBunk.y);   // the dense, darker grass collar down the face
   #else
     float wsSun = texture2D(uMaskB, muv + vec2(-0.507, -0.862) * 1.6 * uGrid.zw).g;
@@ -258,7 +259,7 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
 #endif
   if (rock > 0.0) {
     float hs = vWy - uSeaY, band = tNoise(vec2((vWxz.x + vWxz.y) * 0.08, vWy * 1.1)), grain = tNoise(vWxz * 1.7 + vWy);
-    vec3 ochre = mix(vec3(0.36, 0.21, 0.09), vec3(0.55, 0.36, 0.17), band) * (0.8 + 0.4 * grain);
+    vec3 ochre = mix(vec3(0.3, 0.18, 0.08), vec3(0.47, 0.3, 0.14), band) * (0.8 + 0.4 * grain);
     vec3 rc = mix(vec3(0.36, 0.35, 0.33) * (0.8 + 0.4 * grain), ochre, smoothstep(1.5, 7.0, hs)) * mix(0.55, 1.0, smoothstep(0.2, 1.6, hs));
     diffuseColor.rgb = mix(diffuseColor.rgb, rc, rock); turfW *= 1.0 - rock;
   }
@@ -371,12 +372,12 @@ function cellLerp(g: HoleGrid, f: Float32Array, x: number, z: number): number {
   return (1 - v) * ((1 - u) * f[k]! + u * f[k + 1]!) + v * ((1 - u) * f[k + g.nx]! + u * f[k + g.nx + 1]!);
 }
 const sstep = (a: number, b: number, t: number) => { const x = Math.min(1, Math.max(0, (t - a) / (b - a))); return x * x * (3 - 2 * x); };
-/** Bunker cross-section by signed distance to the traced edge (m, + in the sand): a rounded grass lip about 0.4 m proud a few metres
- *  out, a steep grass face down to the edge, then a sand floor 0.75 m down that dishes a little more toward the middle. */
+/** Bunker cross-section by signed distance to the traced edge (m, + in the sand): a rounded grass lip about 0.55 m proud a few metres
+ *  out, a steep grass face down to the edge, then a sand floor 1 m down that dishes a little more toward the middle. */
 export function bunkerProfile(sd: number): number {
-  if (sd >= 0) return -0.75 - 0.25 * sstep(0, 5, sd);
-  if (sd > -1.4) return 0.4 - 1.15 * sstep(-1.4, 0, sd);
-  return 0.4 * sstep(-4.5, -1.4, sd);
+  if (sd >= 0) return -1.0 - 0.3 * sstep(0, 5, sd);
+  if (sd > -1.2) return 0.55 - 1.55 * sstep(-1.2, 0, sd);
+  return 0.55 * sstep(-4.5, -1.2, sd);
 }
 /** How far the drawn ground departs from the physics ground at sim (x, z) (metres, 0 off Pebble and away from bunkers and mounds). */
 export function dip(hole: number, x: number, z: number): number {
@@ -387,7 +388,7 @@ export function dip(hole: number, x: number, z: number): number {
     const gd = cellLerp(g, m.green, x, z);
     if (gd > 2.5 && gd < 18) {
       const w = Math.sin(Math.PI * (gd - 2.5) / 15.5) * sstep(1, 6, cellLerp(g, m.fair, x, z)) * sstep(3, 8, cellLerp(g, m.seaD, x, z));
-      if (w > 0) off += 1.1 * w * (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.23 + Math.sin(z * 0.17) * 2.1) * Math.cos(z * 0.21 - x * 0.07)));
+      if (w > 0) off += (hole % HOLES_PER_COURSE === 16 ? 1.7 : 1.1) * w * (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.23 + Math.sin(z * 0.17) * 2.1) * Math.cos(z * 0.21 - x * 0.07)));
     }
   }
   return Math.abs(off) < 1e-4 ? 0 : off;
@@ -418,7 +419,7 @@ function fineTiles(hole: number, coarse: THREE.BufferGeometry, segX: number, seg
       const fx = -(dip(hole, x + e, z) - dip(hole, x - e, z)) / (2 * e), fz = (dip(hole, x, z + e) - dip(hole, x, z - e)) / (2 * e);
       n.divideScalar(Math.max(0.2, n.y)).add({ x: -fx, y: 0, z: -fz } as THREE.Vector3).normalize();
       pos.push(-x - cx, y, z - cz); nrm.push(n.x, n.y, n.z);
-      const sd = cellLerp(g, m.sd, x, z); bunk.push(sd > -4.5 ? sstep(-0.2, 0.2, sd) : -1, sstep(-1.9, -1.2, sd) * (1 - sstep(-0.1, 0.1, sd)));   // sand weight (-1: leave the mask), grass face
+      const sd = cellLerp(g, m.sd, x, z); bunk.push(sd > -4.5 ? sstep(-0.2, 0.2, sd) : -1, sstep(-1.7, -1.0, sd) * (1 - sstep(-0.1, 0.1, sd)));   // sand weight (-1: leave the mask), grass face
     }
     for (let b = 0; b < FINE_SEGS; b++) for (let a = 0; a < FINE_SEGS; a++) { const p = base + b * R + a; idx.push(p, p + 1, p + R, p + 1, p + R + 1, p + R); }   // sim x runs to three -x, so this winding faces up
     // skirt: each edge vertex again 0.4 m lower
