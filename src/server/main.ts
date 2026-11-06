@@ -163,8 +163,10 @@ function advance(r: Race, sid: string, me: RPlayer) {
   toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: HOLES[me.hole]!.info, ball: { ...me.ball } });
 }
 
-/** Deterministic 32-bit seed (FNV-1a) for a shot's random errors. */
+/** 32-bit seed (FNV-1a) for a shot's random errors, keyed by a per-process secret so clients cannot predict dispersion. */
+const SEED_SECRET = crypto.randomBytes(16).toString('hex');
 function shotSeed(s: string): number {
+  s = SEED_SECRET + '|' + s;
   let h = 0x811c9dc5;
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
   return h >>> 0;
