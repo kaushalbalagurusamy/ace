@@ -51,4 +51,16 @@ describe('parseClientMsg: untrusted wire input', () => {
     expect(p({ t: 'putt', aimDeg: 180 })).toBeNull(); expect(p({ t: 'putt', aimDeg: 1e308, holdMs: 300 })).toBeNull();
     for (const bad of [null, -1, 5001, '3', NaN]) expect(p({ t: 'putt', aimDeg: 0, holdMs: bad })).toBeNull();
   });
+  it('move: golfer and cart state, bounded numbers, yaw normalised, only the known fields pass through', () => {
+    const cart = { x: 3.8, z: -0.5, yaw: 0, vx: 0, vz: 12 };
+    expect(p({ t: 'move', x: 1, z: -0.5, yaw: 0.5, driving: false, cart, evil: 1 })).toEqual({ t: 'move', x: 1, z: -0.5, yaw: 0.5, driving: false, cart });
+    expect(p({ t: 'move', x: 1, z: 2, yaw: 0, driving: true, cart: { ...cart, extra: 'x' } })).toEqual({ t: 'move', x: 1, z: 2, yaw: 0, driving: true, cart });
+    expect((p({ t: 'move', x: 0, z: 0, yaw: -Math.PI / 2, driving: false, cart }) as { yaw: number }).yaw).toBeCloseTo(1.5 * Math.PI, 10);
+    expect((p({ t: 'move', x: 0, z: 0, yaw: 0, driving: false, cart: { ...cart, yaw: 7 } }) as { cart: { yaw: number } }).cart.yaw).toBeCloseTo(7 - 2 * Math.PI, 10);
+    for (const bad of [
+      { x: 5001 }, { z: -5001 }, { x: '1' }, { x: null }, { yaw: 1e308 }, { driving: 1 }, { driving: undefined }, { cart: null }, { cart: [] },
+      { cart: { ...cart, vx: 101 } }, { cart: { ...cart, vz: null } }, { cart: { ...cart, x: 1e9 } }, { cart: { x: 0, z: 0, yaw: 0, vx: 0 } },
+    ]) expect(p({ t: 'move', x: 0, z: 0, yaw: 0, driving: false, cart, ...bad }), JSON.stringify(bad)).toBeNull();
+    expect(parseClientMsg('{"t":"move","x":1e999,"z":0,"yaw":0,"driving":false,"cart":{"x":0,"z":0,"yaw":0,"vx":0,"vz":0}}')).toBeNull();
+  });
 });

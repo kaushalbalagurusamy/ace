@@ -3,6 +3,7 @@
 import { GRIDS } from './course-grid';
 import { decodeGrid } from './gridtools';
 import { golferSpot, type Pt } from '../client/rules';
+import type { CartState } from './protocol';
 
 export const CART = {
   TOP: 18, ACCEL: 6, BRAKE: 10, COAST: 2, REVERSE: 5,   // m/s and m/s²
@@ -17,7 +18,7 @@ export const CART = {
 export const GOLFER_RADIUS = 0.4;
 const TEE_KEEP_OFF_M = 3, FRINGE_M = 2;
 
-export interface CartState { x: number; z: number; yaw: number; vx: number; vz: number }
+export type { CartState };
 export interface CartInput { throttle: number; steer: number }
 export type Ground = 'blocked' | 'rough' | 'full';
 

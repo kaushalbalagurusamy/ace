@@ -1,5 +1,5 @@
 // Untrusted wire input: every incoming ws message passes through here and leaves as a clean, bounded ClientMsg or null.
-import type { ClientMsg } from '../shared/protocol';
+import type { CartState, ClientMsg } from '../shared/protocol';
 import { isValidBallPos } from '../sim';
 
 const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
@@ -8,6 +8,15 @@ const str = (v: unknown, min: number, max: number): v is string => typeof v === 
 const aim = (v: unknown): number | null => (num(v) && Math.abs(v) <= 1e6 ? ((v % 360) + 360) % 360 : null);
 /** How long Space was held, in ms. */
 const hold = (v: unknown): v is number => num(v) && v >= 0 && v <= 5000;
+/** A coordinate (m) or a velocity (m/s) within `max`; a heading in radians, normalised to [0, 2π). */
+const within = (v: unknown, max: number): v is number => num(v) && Math.abs(v) <= max;
+const rad = (v: unknown): number | null => (within(v, 1e6) ? ((v % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) : null);
+function cartState(v: unknown): CartState | null {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const c = v as Record<string, unknown>, yaw = rad(c.yaw);
+  if (!within(c.x, 5000) || !within(c.z, 5000) || yaw === null || !within(c.vx, 100) || !within(c.vz, 100)) return null;
+  return { x: c.x, z: c.z, yaw, vx: c.vx, vz: c.vz };
+}
 
 export function parseClientMsg(raw: string): ClientMsg | null {
   let m: Record<string, unknown>;
@@ -27,6 +36,11 @@ export function parseClientMsg(raw: string): ClientMsg | null {
     case 'putt': {
       const a = aim(m.aimDeg);
       return a !== null && hold(m.holdMs) ? { t: 'putt', aimDeg: a, holdMs: m.holdMs } : null;
+    }
+    case 'move': {
+      const yaw = rad(m.yaw), cart = cartState(m.cart);
+      if (!within(m.x, 5000) || !within(m.z, 5000) || yaw === null || typeof m.driving !== 'boolean' || !cart) return null;
+      return { t: 'move', x: m.x, z: m.z, yaw, driving: m.driving, cart };
     }
     default: return null;
   }

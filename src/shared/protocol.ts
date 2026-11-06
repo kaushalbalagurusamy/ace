@@ -15,7 +15,14 @@ export type ClientMsg =
    *  integers -2..2, default 0). The server derives length (holdMs/750, 0.05..1) and max effort (holdMs >= 1100) itself. Aim = degrees clockwise from +z. */
   | { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number }
   /** Putter: hold and release Space; same length curve, no max effort. */
-  | { t: 'putt'; aimDeg: number; holdMs: number };
+  | { t: 'putt'; aimDeg: number; holdMs: number }
+  /** About 10 Hz during a race (PRD/07): where my golfer stands (yaw = facing, radians clockwise from +z) and my cart's state.
+   *  While driving, the golfer is in the cart. The server clamps speeds, rejects teleports (answering `snap`) and resolves bumps. */
+  | { t: 'move'; x: number; z: number; yaw: number; driving: boolean; cart: CartState };
+
+/** A cart's position (m), heading (radians clockwise from +z) and velocity (m/s), in the hole's sim frame. */
+export interface CartState { x: number; z: number; yaw: number; vx: number; vz: number }
+export interface Mover { id: string; hole: number; x: number; z: number; yaw: number; driving: boolean; cart: CartState }
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
 export interface HoleInfo { index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
@@ -32,4 +39,10 @@ export type ServerMsg =
   | { t: 'holedOut'; playerId: string; hole: number; strokes: number; splitS: number; /** true after hole 18 */ finished: boolean }
   /** Sent to the whole lobby 2 s after a hole-out: that player is now on the tee of `hole`. Strokes in `ball` are cumulative. */
   | { t: 'nextHole'; playerId: string; hole: HoleInfo; ball: BallState }
-  | { t: 'raceEnd'; results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };
+  /** About 10 Hz to the lobby: every racer's golfer and cart. */
+  | { t: 'movers'; players: Mover[] }
+  /** To one player: a bump to apply now (add dx, dz to the position; dvx, dvz to the cart's velocity). strength 0..1 for the sound and shake. */
+  | { t: 'bump'; target: 'cart' | 'golfer'; dx: number; dz: number; dvx: number; dvz: number; strength: number }
+  /** To one player whose `move` was refused (a teleport or entering from too far): the server's last accepted state. */
+  | { t: 'snap'; x: number; z: number; driving: boolean; cart: CartState }
+  | { t: 'raceEnd';results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };
