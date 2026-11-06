@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { isCoastal, propSpots, setTurf, terrainMesh } from './terrain';
+import { ground, groundNormal, isCoastal, propSpots, seaY, setTurf, terrainMesh } from './terrain';
 import { SPEC, type Tier } from './graphics';
 import { dropTurf, loadTurf, type Turf } from './turf';
 import { Grass } from './grass';
@@ -36,6 +36,7 @@ export interface Ent {
 }
 // Sim space is left-handed (x right, z forward); three is right-handed, so mirror x.
 const V = (x: number, y: number, z: number) => new THREE.Vector3(-x, y, z);
+const UP = new THREE.Vector3(0, 1, 0);
 /** Golfer-to-ball distance (m) under which your ball's beacon is hidden. */
 const BEACON_HIDE_M = 15;
 
@@ -55,7 +56,7 @@ export class World {
     const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 14, 8).translate(0, 7, 0), m), tip = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.4, 10).rotateX(Math.PI).translate(0, 15, 0), m);
     beam.renderOrder = tip.renderOrder = 20; g.add(beam, tip); g.visible = false; return g;
   })();
-  private propToken = 0;
+  private propToken = 0; private propHole = 0;
   private pinTop = new THREE.Vector3();
   private fog = new THREE.Fog('#cfe6f4', 220, 900);
   private sun = new THREE.DirectionalLight('#ffffff', 1.5);
@@ -65,7 +66,11 @@ export class World {
   /** current graphics tier (graphics.ts SPEC); the turf promise is for this tier's texture size */
   tier: Tier;
   private turf: Promise<Turf | null>;
-  private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3();
+  private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3(); private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion();
+  /** Ground height at sim (x, z) on a hole (default: the one I am on). */
+  groundAt(x: number, z: number, hole = this.myHole) { return ground(hole, x, z); }
+  /** A three-space point standing on the ground of `hole` at sim (x, z), lifted by `dy`. */
+  private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, ground(hole, x, z) + dy, z); }
   constructor(canvas: HTMLCanvasElement, tier: Tier) {
     this.tier = tier; this.turf = loadTurf(tier);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
@@ -112,7 +117,7 @@ export class World {
         cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
-      e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
+      e.golfer.position.copy(this.onGround(p.hole, p.ball.x + 1, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
     });
   }
   /** Puts a player on the tee of a hole (after their hole-out): ball reset, tracer and replay cleared. */
@@ -121,12 +126,14 @@ export class World {
     e.hole = hole; e.done = false; e.anim = undefined;
     if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
     this.setBall(e, ball);
-    e.golfer.position.copy(V(ball.x + 1, 0, ball.z - 0.5));
+    e.golfer.position.copy(this.onGround(hole, ball.x + 1, ball.z - 0.5));
     e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(hole, e.slot), 0, 0);   // the cart comes to the new tee too
   }
   /** Draws a cart state: position, heading, wheel spin and front-wheel lock. */
   placeCart(e: Ent, s: CartState, steer: number, dt: number) {
-    e.cs = s; e.cart.root.position.copy(V(s.x, 0, s.z)); e.cart.root.rotation.y = -s.yaw;
+    e.cs = s; e.cart.root.position.copy(this.onGround(e.hole, s.x, s.z));
+    const n = groundNormal(e.hole, s.x, s.z), q = this.tmpQ.setFromUnitVectors(UP, this.tmpA.set(-n.x, n.y, n.z));   // the cart follows the ground's tilt
+    e.cart.root.quaternion.copy(q).multiply(this.tmpQ2.setFromAxisAngle(UP, -s.yaw));
     poseCart(e.cart, forwardSpeed(s), steer, dt);
   }
   /** Another player's latest report; tick() eases their golfer and cart toward it. */
@@ -135,15 +142,15 @@ export class World {
   buildCourse(h: HoleInfo) {
     this.course.clear();
     const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
-    base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
+    base.position.y = seaY(h.index) - 0.6; // the sea (or the forest floor) just under sea level: shallow depth buffers z-fight at a few centimetres
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
-    const pin = V(h.pin.x, 0, h.pin.z); this.pinTop.set(pin.x, 2.6, pin.z);
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
-    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
+    const pin = this.onGround(h.index, h.pin.x, h.pin.z); this.pinTop.set(pin.x, pin.y + 2.6, pin.z);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, pin.y + 1.2, pin.z);
+    const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, pin.y + 2.1, pin.z);
     pole.castShadow = flag.castShadow = true;
     this.course.add(pole, flag);
-    this.spots = propSpots(h.index);
+    this.spots = propSpots(h.index); this.propHole = h.index;
     void this.setProps(this.spots);
   }
 
@@ -158,7 +165,7 @@ export class World {
       const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
       i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
+      m.position.copy(this.onGround(this.propHole, s.x, s.z, -0.15));   // sunk a little so trunks on a slope do not float m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
     }
   }
   private makeGolfer(shade: string, name: string) {
@@ -201,7 +208,7 @@ export class World {
   /** The swing was released: play the downswing, impact and finish from this depth at the ball. */
   release(id: string, depth: number, putt: boolean) {
     const e = this.ents.get(id); if (!e) return;
-    e.look.rel = { t0: performance.now(), depth, putt, at: V(e.ball.x, 0, e.ball.z), rotY: e.golfer.rotation.y };
+    e.look.rel = { t0: performance.now(), depth, putt, at: this.onGround(e.hole, e.ball.x, e.ball.z), rotY: e.golfer.rotation.y };
   }
   /** Poses one golfer for this frame: release > stance > walk/idle; in a stance or swing it stands at the ball. */
   private animate(e: Ent, now: number, dt: number) {
@@ -215,7 +222,7 @@ export class World {
       const r = releasePose(L.rel.depth, now - L.rel.t0, spec.length, L.rel.putt); target = r.pose; putt = L.rel.putt;
       if (r.done) L.rel = undefined; else { at = L.rel.at; e.golfer.rotation.y = L.rel.rotY; }
     } else if (L.stance) {
-      putt = L.stance.putt; target = putt ? puttPose(-L.stance.depth, spec.length) : backswingPose(L.stance.depth, spec.length); at = V(e.ball.x, 0, e.ball.z);
+      putt = L.stance.putt; target = putt ? puttPose(-L.stance.depth, spec.length) : backswingPose(L.stance.depth, spec.length); at = this.onGround(e.hole, e.ball.x, e.ball.z);
     } else {
       L.walk += strideRate(Math.min(L.speed, 6)) * dt;   // shortcut: the 15 m/s walk is drawn as a capped stride; a run cycle would suit it better
       target = L.speed > 0.3 ? walkPose(L.walk, Math.min(1, L.speed / 3)) : POSES.idle;
@@ -227,8 +234,8 @@ export class World {
     } else { L.holder.rotation.y = 0; L.holder.position.set(0, 0, 0); }
     if (L.club) L.rig.apply(L.cur, L.club.matrix); else L.rig.apply(L.cur);
   }
-  setBall(e: Ent, b: BallState) { e.ball = b; e.ballMesh.position.copy(V(b.x, 0.22, b.z)); e.ballMesh.visible = !b.holedOut; }
-  placeGolfer(e: Ent, x: number, z: number, yawRad: number) { e.golfer.position.copy(V(x, 0, z)); e.golfer.rotation.y = -yawRad; }
+  setBall(e: Ent, b: BallState) { e.ball = b; e.ballMesh.position.copy(this.onGround(e.hole, b.x, b.z, 0.22)); e.ballMesh.visible = !b.holedOut; }
+  placeGolfer(e: Ent, x: number, z: number, yawRad: number) { e.golfer.position.copy(this.onGround(e.hole, x, z)); e.golfer.rotation.y = -yawRad; }
 
   shot(m: Extract<ServerMsg, { t: 'shotResult' }>) {
     const e = this.ents.get(m.playerId); if (!e || m.samples.length < 2) return;
@@ -266,13 +273,13 @@ export class World {
       const r = e.remote; if (!r) continue;
       const c = e.cs, dyaw = Math.atan2(Math.sin(r.cart.yaw - c.yaw), Math.cos(r.cart.yaw - c.yaw));
       this.placeCart(e, { x: c.x + (r.cart.x - c.x) * k, z: c.z + (r.cart.z - c.z) * k, yaw: c.yaw + dyaw * k, vx: r.cart.vx, vz: r.cart.vz }, Math.max(-1, Math.min(1, dyaw * 4)), dt);
-      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; e.golfer.rotation.y = -r.yaw;
+      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; g.y = ground(e.hole, -g.x, g.z); e.golfer.rotation.y = -r.yaw;
     }
     const own = this.ents.get(this.selfId);
     // Hidden once you're at your ball: up close the tall beacon read as an aim line, which the owner ruled out.
     const near = !!own && !own.anim && this.ownBallDistM < BEACON_HIDE_M;
     this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole && !near;
-    if (own) this.beacon.position.set(own.ballMesh.position.x, 0, own.ballMesh.position.z);
+    if (own) this.beacon.position.set(own.ballMesh.position.x, own.ballMesh.position.y - 0.22, own.ballMesh.position.z);
     for (const e of this.ents.values()) {
       const a = e.anim; if (!a) continue;
       const t = (now - a.t0) / 1000;
@@ -290,14 +297,16 @@ export class World {
       if (e.golfer.visible) this.animate(e, now, dt);   // shortcut: the driver is hidden in the cart rather than seated; add a seated pose if it matters
     }
   }
+  /** Camera looking at sim (x, z) from `dist` behind along `yaw`; `y` is the eye height above the ground there. */
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
-    const fx = Math.sin(yaw), fz = Math.cos(yaw);
-    const target = this.tmpA.set(-x, y, z);
-    this.cam.position.set(-(x - fx * dist * Math.cos(pitch)), y + dist * Math.sin(pitch), z - fz * dist * Math.cos(pitch));
+    const fx = Math.sin(yaw), fz = Math.cos(yaw), gy = ground(this.myHole, x, z);
+    const target = this.tmpA.set(-x, gy + y, z);
+    const cx = x - fx * dist * Math.cos(pitch), cz = z - fz * dist * Math.cos(pitch);
+    this.cam.position.set(-cx, Math.max(gy + y + dist * Math.sin(pitch), ground(this.myHole, cx, cz) + 1), cz);   // never inside a hill behind the player
     this.cam.lookAt(target);
     if (this.sun.castShadow) {   // shadow box centred on the player, snapped to whole texels so edges do not shimmer
-      const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, 0, Math.round(target.z / snap) * snap);
-      this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, 100, c.z + 30); this.sun.target.updateMatrixWorld();
+      const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, Math.round(gy), Math.round(target.z / snap) * snap);
+      this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, c.y + 100, c.z + 30); this.sun.target.updateMatrixWorld();
     }
     this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
     this.renderer.render(this.scene, this.cam);

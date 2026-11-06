@@ -12,7 +12,10 @@ import { canAddress, golferSpot, lookScale, moveAxis, walkSpeed } from './rules'
 import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
-import { suggestClub, type Lie } from '../sim';
+import { BAG as SIM_BAG, suggestClub } from '../sim';
+import { asLie, lieInfo } from './lieinfo';
+import { stanceSlope } from '../shared/height';
+import { groundNormal } from './terrain';
 import { CART, canEnter, cartGround, cartSpawn, exitSpot, forwardSpeed, stepCart } from '../shared/cart';
 import type { CartState } from '../shared/protocol';
 /** The Box Buggy (PRD/07): my cart's state, whether I am in it, and the chase camera (mouse orbit offset, smoothed yaw, bump shake). */
@@ -153,7 +156,7 @@ function shotSounds(m: Extract<ServerMsg, { t: 'shotResult' }>) {
   const impact = putt ? 'sfx-impact-putter' : m.ballSpeedMs > 62 ? 'sfx-impact-driver' : m.ballSpeedMs > 46 ? 'sfx-impact-fairway' : m.ballSpeedMs > 32 ? 'sfx-impact-iron' : 'sfx-impact-wedge';
   void audio.play(impact, vol);
   if (putt) return;
-  const land = m.samples.find(s => s.t > 0.4 && s.p.y <= 0.06)?.t ?? m.samples.at(-1)?.t ?? 0;
+  const land = m.samples.find(s => s.t > 0.4 && s.p.y - world.groundAt(s.p.x, s.p.z, m.hole) <= 0.06)?.t ?? m.samples.at(-1)?.t ?? 0;
   const surface = m.penalty ? (m.penalty.startsWith('Water') ? 'water' : 'rough') : ({ green: 'green', fairway: 'fairway', firstCut: 'fairway', rough: 'rough', bunker: 'sand', fringe: 'green' } as Record<string, string>)[m.ball.surface] ?? 'fairway';
   setTimeout(() => void audio.play(`sfx-land-${surface}`, vol * 0.8), land * 1000);
 }
@@ -269,6 +272,11 @@ function frame(now: number) {
   } else { stuckSince = 0; ui.meterShow(null); ui.ballPosGrid(null); }
   if (!swing) { ui.meterShow(null); ui.ballPosGrid(null); }
   const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving });
+  if (me && (canStance || (swing && swing.sentAt === undefined))) {         // the lie panel at the ball: penalties and stance angles for this aim and club
+    const n = groundNormal(hole.index, me.ball.x, me.ball.z), aim = swing ? swing.fsm.aim() : aimDeg(yaw), slope = stanceSlope(n, aim);
+    const onTee = Math.hypot(me.ball.x - hole.tee.x, me.ball.z - hole.tee.z) <= 3;                     // the server's tee rule (race.ts TEE_RADIUS_M)
+    ui.liePanel(lieInfo(onTee ? 'tee' : me.ball.surface, SIM_BAG.find(c => c.key === BAG[club]!.key)!, slope, n), slope);
+  } else ui.liePanel(null);
   const base = swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`;
   const nearCart = go && !swing && !driving && canEnter(pos, cart);
   ui.prompt(driving && go ? `WASD drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
@@ -302,7 +310,7 @@ function frame(now: number) {
   }));
   const cam = me?.anim ? me.ballMesh.position : null; // camera follows the ball while it flies
   shake = Math.max(0, shake - dt * 2.5); const jx = shake * shake * 0.5 * (Math.random() - 0.5), jz = shake * shake * 0.5 * (Math.random() - 0.5);   // bump shake (trauma²)
-  world.render((cam ? -cam.x : pos.x) + jx, (cam ? cam.z : pos.z) + jz, swing ? swing.fsm.aim() * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : driving ? 1.8 : 1.5, cam ? 25 : driving ? 11 : 8);
+  world.render((cam ? -cam.x : pos.x) + jx, (cam ? cam.z : pos.z) + jz, swing ? swing.fsm.aim() * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, (cam.y - world.groundAt(-cam.x, cam.z)) * 0.7) : driving ? 1.8 : 1.5, cam ? 25 : driving ? 11 : 8);
 }
 requestAnimationFrame(frame);
 
@@ -312,20 +320,20 @@ const rfWorld = (e: MouseEvent) => { const r = rfCanvas.getBoundingClientRect();
 rfCanvas.addEventListener('mousemove', e => {
   const me = own(); if (!rfOpen || !hole || !me) return;
   const { p, cx, cy } = rfWorld(e); rfHover = p;
-  const fromBall = Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, toPin = Math.hypot(p.x - hole.pin.x, p.z - hole.pin.z) * YD;
-  ui.rfTip(`From your ball: ${Math.round(fromBall)} yd\nTo the pin: ${Math.round(toPin)} yd\nElevation: flat\nPlays like: ${playsLikeFrom(fromBall, me.ball.surface)}`, cx, cy);
+  const fromBall = Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, toPin = Math.hypot(p.x - hole.pin.x, p.z - hole.pin.z) * YD, rise = riseM(me.ball, p), ft = Math.round(rise * 3.2808);
+  ui.rfTip(`From your ball: ${Math.round(fromBall)} yd\nTo the pin: ${Math.round(toPin)} yd\nElevation: ${ft === 0 ? 'level' : `${ft > 0 ? '+' : '−'}${Math.abs(ft)} ft`}\nPlays like: ${playsLikeFrom(fromBall, me.ball.surface, rise * YD)}`, cx, cy);
 });
-const LIES: readonly string[] = ['tee', 'fairway', 'firstCut', 'rough', 'bunker', 'fringe', 'green'];
-const asLie = (s: string): Lie => (LIES.includes(s) ? s : 'rough') as Lie;   // paths and other surfaces play like rough for club choice
-function playsLikeFrom(yd: number, surface: string): string {
-  const s = suggestClub(yd, asLie(surface));
+/** Real rise (m) from the ball to a point: the plays-like distance adds it, yard for yard. */
+const riseM = (a: { x: number; z: number }, b: { x: number; z: number }) => world.groundAt(b.x, b.z) - world.groundAt(a.x, a.z);
+function playsLikeFrom(yd: number, surface: string, riseYd: number): string {
+  const s = suggestClub(yd, asLie(surface), { riseYd });
   return s.holdPct ? `${s.label} at about ${s.holdPct}%` : s.label;
 }
 // Clicking a target auto-selects the club from the ball's actual lie (PRD/02 section 7); no auto-aim, and number keys still override.
 rfCanvas.addEventListener('click', e => {
   const me = own(); if (!rfOpen || !hole || !me) return;
   const p = rfWorld(e).p; rfTarget = p;
-  const s = suggestClub(Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, asLie(me.ball.surface));
+  const s = suggestClub(Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, asLie(me.ball.surface), { riseYd: riseM(me.ball, p) * YD });
   const ci = BAG.findIndex(b => b.key === s.club);
   if (ci >= 0 && (!swing || (swing.sentAt === undefined && swing.fsm.setClub(BAG[ci]!.key, ci === PUTTER)))) { club = ci; ui.setClub(ci); }
   ui.toast(s.text);
