@@ -175,11 +175,12 @@ export class World {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
     const ids = { cypress: ['tree-cypress-r1', 'tree-cypress-r2', 'tree-cypress-r3'], pine: ['tree-pine-r1'], rock: ['rock-r1', 'rock-r2', 'rock-r3', 'rock-r4'] } as const;
-    const groups = new Map<string, { kind: PropSpot['kind']; v: number; list: PropSpot[] }>();
-    spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, k = l[v]!; (groups.get(k) ?? groups.set(k, { kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
+    // one batch per model and 80 m tile, so the camera and the 90 m shadow box cull the far batches (an M1 Air keeps 60 fps on Medium)
+    const groups = new Map<string, { id: string; kind: PropSpot['kind']; v: number; list: PropSpot[] }>();
+    spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
     const built: THREE.Object3D[] = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
-    for (const [id, gr] of groups) {
-      const tpl = (await loadModel(id)) ?? makeProp(gr.kind, gr.v);
+    for (const gr of groups.values()) {
+      const id = gr.id, tpl = (await loadModel(id)) ?? makeProp(gr.kind, gr.v);
       if (token !== this.propToken) return;                      // a newer hole replaced this request
       tpl.updateMatrixWorld(true);
       // grade generated textures toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake

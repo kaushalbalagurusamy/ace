@@ -209,7 +209,7 @@ export function makeBackdrop(hole: number, farM: number): THREE.Group {
   if (hasSea) {
     const y = seaY(hole);
     const taper = (a: number) => Math.min(1, (span - Math.abs(a - seaA)) / 0.35);   // the hills fall to the water at both ends, no cut-off slab
-    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => taper(a) * (30 + 70 * (0.5 + 0.5 * noise3(a * 2.2, 1, hole)) ** 1.5 + 14 * noise3(a * 9, 2, hole)), '#3a4a44', '#7a8ea3', 0.3));
+    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => taper(a) * (14 + 38 * (0.5 + 0.5 * noise3(a * 2.2, 1, hole)) ** 1.5 + 7 * noise3(a * 9, 2, hole)), '#3a4a44', '#7a8ea3', 0.3));
     grp.add(band(cx, cz, R - 3, seaA - span, seaA + span, y, a => 3 + 4 * Math.abs(noise3(a * 90, 5, hole)), '#d9d6cb', '#2a3a2c', 0.2));   // pale beach line and the dark shore trees
     grp.add(band(cx, cz, R * 0.75, seaA + span, seaA + Math.PI * 2 - span, 0, crowns, '#1f2a1f', '#2c3a2b', 0.3));
   } else grp.add(band(cx, cz, R * 0.75, 0, Math.PI * 2, 0, crowns, '#1f2a1f', '#2c3a2b', 0.3));
