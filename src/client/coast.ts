@@ -148,10 +148,12 @@ export function makeBuildings(hole: number, pinZ: number): THREE.Group | null {
   const B = BUILDINGS;
   for (const [x, dz, w, d, h] of B) {
     const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [wall, wall, plain, plain, wall, wall]);
-    facade.repeat.set(1, 1); body.position.set(-x, h / 2, pinZ + dz);
+    // sit on the lowest corner of the real ground so no corner floats (the uphill side is buried a little)
+    const z = pinZ + dz, y0 = Math.min(...[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => ground(hole, x + a! * w / 2, z + b! * d / 2))) - 0.2;
+    facade.repeat.set(1, 1); body.position.set(-x, y0 + h / 2, z);
     // a low hip roof: a 4-sided pyramid frustum, stretched to the footprint
     const r = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.72, 1, 4, 1).rotateY(Math.PI / 4), roof);
-    r.scale.set(w * 1.02, h * 0.38, d * 1.08); r.position.set(-x, h + h * 0.19, pinZ + dz);
+    r.scale.set(w * 1.02, h * 0.38, d * 1.08); r.position.set(-x, y0 + h + h * 0.19, z);
     body.castShadow = r.castShadow = true; body.receiveShadow = true; g.add(body, r);
   }
   // box UVs run 0..1 per face: the facade texture holds two storeys of windows, so wide walls get more columns
