@@ -12,6 +12,7 @@ import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
 import { suggestClub, type Lie } from '../sim';
+import { Adaptive, TIER_LABEL, loadPref, pickTier, probeHardware, savePref, type Pref } from './graphics';
 let lookMult = loadMult();
 let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
@@ -39,7 +40,11 @@ const act = (a: Action | null) => {
   if (a.type === 'send-shot') { const L = a.msg.holdMs / 750; void audio.play(L < 0.4 ? 'sfx-swing-soft' : L < 0.85 ? 'sfx-swing-full' : 'sfx-swing-max', 0.7); }
 };
 
-const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })));
+// Graphics: Auto starts from the hardware and adapts to the frame rate; a manual pick overrides it (PRD/06 "Graphics presets").
+const hw = probeHardware(), adapt = new Adaptive(pickTier(hw));
+let gfxPref: Pref = loadPref();
+const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })), gfxPref === 'auto' ? adapt.tier : gfxPref);
+console.info('graphics:', hw.renderer ?? 'renderer masked', `max texture ${hw.maxTexture}`, `Auto picked ${adapt.tier}`);
 (window as unknown as { __ace?: unknown }).__ace = { world }; // debug handle for browser checks
 const validName = (n: string) => n.trim().length >= 2 && n.trim().length <= 16;
 
@@ -155,7 +160,7 @@ const ownDist = () => { const b = own()?.ball; return b ? Math.hypot(b.x - pos.x
 const aimDeg = (y: number) => ((y * 180 / Math.PI) % 360 + 360) % 360;
 
 addEventListener('keydown', e => {
-  if (phase !== 'race' || (e.target as HTMLElement).tagName === 'INPUT') return;
+  if (phase !== 'race' || ['INPUT', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
   if (['Space', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
   keys.add(e.code);
@@ -187,12 +192,27 @@ document.addEventListener('pointerlockchange', () => { if (!document.pointerLock
 /** One saved setting for the slider and the , . keys. */
 function setLook(v: number, byPlayer = true) { lookMult = v; saveMult(v, undefined, byPlayer); ui.syncSettings(); }
 ui.bindSettings(() => lookMult, v => setLook(sliderValue(v)), () => { lookMult = resetMult(); ui.syncSettings(); });
+ui.bindGraphics(() => ({ pref: gfxPref, auto: adapt.tier }), p => {
+  gfxPref = p; savePref(p); adapt.reset(performance.now());
+  world.applyTier(p === 'auto' ? adapt.tier : p);
+});
+addEventListener('keydown', e => { if (e.code === 'F3') { e.preventDefault(); ui.toggleFps(); } });
 
 // ---- frame loop ----
-let last = performance.now(), stuckSince = 0;
+let last = performance.now(), stuckSince = 0, fpsFrames = 0, fpsSince = last;
 function frame(now: number) {
   requestAnimationFrame(frame);
-  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  const rawMs = now - last, dt = Math.min(0.1, rawMs / 1000); last = now;
+  fpsFrames++;
+  if (now - fpsSince >= 500) {
+    const ms = (now - fpsSince) / fpsFrames, r = world.renderer.info.render;
+    ui.fps(`${Math.round(1000 / ms)} fps  ${ms.toFixed(1)} ms\n${TIER_LABEL[world.tier]}${gfxPref === 'auto' ? ' (Auto)' : ''}  ${r.calls} draws  ${Math.round(r.triangles / 1000)}k tris`);
+    fpsFrames = 0; fpsSince = now;
+  }
+  if (gfxPref === 'auto' && phase === 'race') {   // never mid-swing or while the own ball flies: the decision waits for rest
+    const me = world.ents.get(selfId), t = adapt.sample(rawMs, now, !!swing || !!me?.anim);
+    if (t) { world.applyTier(t); ui.syncGraphics(); }
+  }
   if (phase !== 'race' || !hole) { if (phase === 'results' || phase === 'race') world.render(pos.x, pos.z, yaw, pitch); return; }
   const me = own(), go = started();
   if (!swing && go && !ui.settingsOpen()) {                                  // arrow keys move; WASD is for the ball position in the stance

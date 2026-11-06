@@ -2,6 +2,7 @@ import { GRIDS } from '../shared/course-grid';
 import { gridCanvas, rfView } from './terrain';
 import { edgePoint, mapArrowRotation, type Marker } from './overlay';
 import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
+import { TIERS, TIER_LABEL, type Pref, type Tier } from './graphics';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 
@@ -57,7 +58,8 @@ const CSS = `
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
 #pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
 #gear{left:10px;top:84px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
-#settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(18,24,22,.96);border:1px solid #567}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}
+#settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(18,24,22,.96);border:1px solid #567}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}#settings select{margin-left:8px;font:inherit}
+#fps{right:10px;top:236px;display:none;font:12px/1.4 ui-monospace,monospace;white-space:pre}
 #banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
 #arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
 #keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
@@ -81,10 +83,10 @@ export class UI {
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">Arrows move · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed</div>
+      <div class="hud" id="keys">Arrows move · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
-      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
+      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.root.append(this.scr, this.hud);
     this.mini = this.hud.querySelector('canvas')!;
     this.scr.addEventListener('click', e => {
@@ -164,7 +166,19 @@ export class UI {
     panel.querySelector<HTMLElement>('#sensreset')!.onclick = () => { reset(); sync(); }; this.syncSettings = sync; sync();
   }
   syncSettings: () => void = () => {};
-  toggleSettings(open?: boolean) { const p = this.$('settings'); const show = open ?? p.style.display !== 'block'; p.style.display = show ? 'block' : 'none'; if (show) { document.exitPointerLock(); this.syncSettings(); } return show; }
+  /** Graphics select: "Auto (High)" names the tier Auto is running; the other options override it. */
+  bindGraphics(get: () => { pref: Pref; auto: Tier }, set: (p: Pref) => void) {
+    const sel = this.$('gfx') as HTMLSelectElement;
+    const sync = () => { const g = get(); sel.options[0]!.text = `Auto (${TIER_LABEL[g.auto]})`; sel.value = g.pref; };
+    sel.onchange = () => { set(sel.value as Pref); sync(); sel.blur(); };
+    this.syncGraphics = sync; sync();
+  }
+  syncGraphics: () => void = () => {};
+  /** F3 readout; `toggleFps` flips it, `fps` writes it (only while shown). */
+  fpsOn = false;
+  toggleFps() { this.fpsOn = !this.fpsOn; this.$('fps').style.display = this.fpsOn ? 'block' : 'none'; }
+  fps(text: string) { if (this.fpsOn) this.$('fps').textContent = text; }
+  toggleSettings(open?: boolean) { const p = this.$('settings'); const show = open ?? p.style.display !== 'block'; p.style.display = show ? 'block' : 'none'; if (show) { document.exitPointerLock(); this.syncSettings(); this.syncGraphics(); } return show; }
   settingsOpen = () => this.$('settings').style.display === 'block';
   private bannerT = 0;
   /** A big, long-lasting message for events the player must not miss (penalties). */
