@@ -457,7 +457,11 @@ function dryLand(hole: number, x: number, z: number): boolean {
   for (let dz = -2; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) { const ix = cx + dx, iz = cz + dz; if (ix >= 0 && iz >= 0 && ix < g.nx && iz < g.nz && sea[iz * g.nx + ix]) return false; }
   return true;
 }
+const TEE_CLEAR_M = 15;   // no crown overhangs the tee (every tee is the sim origin), so the opening view is never inside a canopy
 export function propSpots(hole: number): PropSpot[] {
+  return rawPropSpots(hole).filter(s => Math.hypot(s.x, s.z) > TEE_CLEAR_M);
+}
+function rawPropSpots(hole: number): PropSpot[] {
   if (themeOf(hole) === 'parkland') return treeLines(hole);
   const g = gridOf(hole), sea = seaField(hole).sea; let seed = (hole + 1) * 2654435761 >>> 0;
   const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
