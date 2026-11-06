@@ -3,6 +3,7 @@
 // and the cards are scattered over the generated crown surface (triangles whose albedo is green), so the asset stays generated.
 // Optionally deletes tiny disconnected islands (floating shards) first.
 // Usage: node scripts/foliage_cards.mjs IN.glb CONCEPT.png OUT.glb [--cards 1500] [--green #2E4630] [--min-island 0.002] [--size 1] [--flat 0.6] [--seed 1] [--min-y 0.35] [--tiers 4]
+//   --volume 1: cards on the concept silhouette revolved about the trunk (for a generated skeleton with a thin crown; pair with --drop-crown 1)
 //   --flat: 0 = cards face outward from the crown surface, 1 = cards lie horizontal (cypress pads); --size scales the card edge.
 import { createRequire } from 'node:module';
 const req = createRequire((process.env.GT_MODULES ?? '/Users/kaushal/.npm/_npx/a6797f7ff67bb1f2/node_modules') + '/x.js');
@@ -89,6 +90,33 @@ for (const node of root.listNodes()) {
     if (low.size) { idx.setArray(new Uint32Array(ia.filter((_, k) => !low.has(Math.floor(k / 3))))); lowRemoved += low.size; }
   }
 }
+// --volume 1: the generated mesh is a bare branch skeleton (thin crown), so the crown shell is taken from the concept's own silhouette instead:
+// each image row's foliage extent, revolved about the trunk, scaled so the concept's tree height equals the model's. Cards go on that shell.
+if (opt.volume) {
+  let top = -1, bot = -1, maxW = 0; const ext = [];
+  for (let y = 0; y < ci.height; y++) {
+    let L = -1, R = -1, any = false;
+    for (let x = 0; x < ci.width; x++) { const p = (y * ci.width + x) * 4; if ((cd[p] + cd[p + 1] + cd[p + 2]) / 3 < 235) any = true; if (fol(x, y) && isGreen(cd[p], cd[p + 1], cd[p + 2])) { if (L < 0) L = x; R = x; } }
+    if (any) { if (top < 0) top = y; bot = y; } ext.push([L, R]); if (R - L > maxW) maxW = R - L;
+  }
+  let tx = 0, tn = 0; for (let y = bot - 8; y <= bot; y++) for (let x = 0; x < ci.width; x++) { const p = (y * ci.width + x) * 4; if ((cd[p] + cd[p + 1] + cd[p + 2]) / 3 < 235) { tx += x; tn++; } }
+  const cx0 = tx / tn, k = (yMax - yMin) / (bot - top), rows = [];
+  let mx = 0, mz = 0, mn = 0;   // model trunk axis: centroid of the lowest 3% of vertices
+  for (const node of root.listNodes()) { const M = node.getWorldMatrix(); for (const prim of node.getMesh()?.listPrimitives() ?? []) { const pos = prim.getAttribute('POSITION'); for (let i = 0; i < (pos?.getCount() ?? 0); i++) { const v = pos.getElement(i, []), y = M[1] * v[0] + M[5] * v[1] + M[9] * v[2] + M[13]; if (y < yMin + 0.03 * (yMax - yMin)) { mx += M[0] * v[0] + M[4] * v[1] + M[8] * v[2] + M[12]; mz += M[2] * v[0] + M[6] * v[1] + M[10] * v[2] + M[14]; mn++; } } } }
+  mx /= mn; mz /= mn;
+  const r = j => (ext[j][1] - ext[j][0] > maxW * 0.12 ? (ext[j][1] - ext[j][0]) / 2 : 0);
+  for (let j = top + 3; j < bot - 3; j++) if (r(j) > 0) {
+    const slope = (r(j - 3) - r(j + 3)) / 6, rad = r(j) * k, w = rad * Math.hypot(1, slope);   // slope: dr/dy with y up (pixels)
+    rows.push({ y: yMax - (j - top) * k, xc: ((ext[j][0] + ext[j][1]) / 2 - cx0) * k, rad, slope, ar: 2 * Math.PI * w * k });
+  }
+  if (!rows.length) throw new Error('no crown rows in concept silhouette');
+  // a revolved profile turns side lobes into a skirt: round the underside off over the lowest quarter of the crown
+  const y0 = rows.at(-1).y, y1 = rows[0].y; for (const rw of rows) { const f = Math.min(1, (rw.y - y0) / (0.25 * (y1 - y0))); rw.rad *= 0.55 + 0.45 * Math.sqrt(f); }
+  // clumps: random centres on the shell; cards near one sit proud of the shell, between them sink in, so the outline is lobed, not a hedge
+  const R = Math.max(...rows.map(rw => rw.rad)), clumps = Array.from({ length: +(opt.clumps ?? 28) }, () => { const rw = rows[Math.floor(rnd() * rows.length)], th = rnd() * 2 * Math.PI; return [rw.xc + Math.cos(th) * rw.rad, rw.y, Math.sin(th) * rw.rad]; });
+  tris.length = 0;
+  for (const rw of rows) tris.push({ vol: rw, ar: rw.ar, mx, mz, clumps, R });
+}
 const totalArea = tris.reduce((s, t) => s + t.ar, 0); if (!tris.length) throw new Error('no green crown triangles found');
 
 // 3. Cards: area-weighted points on the crown, quads tilted between outward-facing and horizontal, slightly proud of the surface.
@@ -96,7 +124,12 @@ const nc = +opt.cards, s0 = Math.sqrt((2.2 * totalArea) / nc) * +opt.size, cum =
 const P = [], Nn = [], UV = [], I = [], asp = Math.sqrt(+(opt.aspect ?? 1));   // --aspect 2: cards twice as long as wide (wind-sheared plates)
 for (let k = 0; k < nc; k++) {
   const r = rnd() * acc; let lo = 0, hi = cum.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (cum[m] < r) lo = m + 1; else hi = m; }
-  const t = tris[lo]; let u = rnd(), v = rnd(); if (u + v > 1) { u = 1 - u; v = 1 - v; }
+  let t = tris[lo]; let u = rnd(), v = rnd(); if (u + v > 1) { u = 1 - u; v = 1 - v; }
+  if (t.vol) {   // a point on (or just inside) the revolved concept shell, its normal from the profile slope; depth jitter fills the crown edge
+    const { y, xc, rad, slope } = t.vol, th = rnd() * 2 * Math.PI, n = norm([Math.cos(th), slope, Math.sin(th)]);
+    const dc = Math.min(...t.clumps.map(c => Math.hypot(c[0] - xc - Math.cos(th) * rad, c[1] - y, c[2] - Math.sin(th) * rad))), d = (0.8 + 0.28 * Math.exp(-((dc / (0.3 * t.R)) ** 2))) * (1 - 0.25 * rnd() ** 2);
+    const q = [t.mx + xc + Math.cos(th) * rad * d, y + (rnd() - 0.5) * s0, t.mz + Math.sin(th) * rad * d]; t = { a: q, b: q, c: q, n };
+  }
   const p = add(add(t.a, sub(t.b, t.a), u), sub(t.c, t.a), v), s = s0 * (0.7 + 0.6 * rnd());
   if (!inTier(p[1])) { k--; continue; }   // shortcut: rejection sampling, fine while the bands keep well over half the crown
   const facing = norm(add(t.n.map(x => x * (1 - +opt.flat)), [0, +opt.flat, 0]));   // plane normal of the card
