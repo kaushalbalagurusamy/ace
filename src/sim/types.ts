@@ -20,23 +20,6 @@ export interface Placement { id: string; place: number }
  *  Returned in rank order. Place numbers use competition ranking (1,1,3). Does not mutate input. */
 // contract: export function rankPlayers(players: readonly PlayerResult[]): Placement[];
 
-// ---- Swing scoring (PRD/02 §3) ----
-export interface SwingInput {
-  /** ms, relative to the top of the backswing (t = 0). undefined = key not pressed by impact or released early. */
-  zMs?: number; xMs?: number; cMs?: number;
-}
-export interface SwingScore {
-  nZ: number; nX: number; nC: number;
-  E: number;
-  /** speed_max multiplier: 1 - 0.25E */ speedFactor: number;
-  /** smash_max multiplier: 1 - 0.10E */ smashFactor: number;
-  /** degrees, + = right (late X), - = left (early X): 6 * nX with sign */ pathDeg: number;
-  /** degrees, + = open (late C), - = closed (early C): 5 * nC with sign */ faceToPathDeg: number;
-}
-// contract: export const IDEAL_MS: { z: 0; x: 60; c: 150 };
-/** Pure function of the inputs only (no frame counts, no clocks). Missing key => n = 1 with sign 0 (no direction). */
-// contract: export function scoreSwing(input: SwingInput): SwingScore;
-
 // ---- Ball physics (PRD/03) ----
 export type Surface = 'green' | 'fringe' | 'fairway' | 'firstCut' | 'rough' | 'bunker';
 /** Constant rolling deceleration (m/s^2) on a flat surface. Green: Stimp S gives 36 / (2 * S) ft/s^2 converted to m/s^2. */
@@ -68,19 +51,16 @@ export interface ShotResult {
 
 export interface Club { key: string; label: string; loftDeg: number; maxClubSpeedMph: number }
 // contract: export const BAG: readonly Club[];
-/** Launch for a given club and swing score on a flat fairway-equivalent strike (aimed straight at azimuth 0). */
-// contract: export function launchFor(club: Club, score: SwingScore): Launch;
+/** Launch for a club and a Strike (delivery.ts): perfect delivery unless ball position, lie or max effort say otherwise. */
+// contract: export function launchFor(club: Club, strike?: Strike): Launch;
 
 // ---- Swing length: continuous, set by holding Space (docs/slices/space-hold-swing/spec.md) ----
 // contract: export const MIN_LENGTH = 0.05, MAX_LENGTH = 1, FULL_TURN_MS = 750;
 // contract: export function isValidLength(n: unknown): n is number;      // any finite number (clamping is separate)
 // contract: export function clampLength(n: number): number;               // clamp to [MIN, MAX]; RangeError if not finite
 // contract: export function lengthFromHold(heldMs: number): number;       // clampLength(heldMs / FULL_TURN_MS); RangeError if not finite
-/** Downswing duration scale: piecewise-linear through (0.05,0.48) (0.25,0.6) (0.5,0.75) (0.75,0.9) (1,1). RangeError outside [0.05,1]. */
-// contract: export function durationScale(length: number): number;
 /** Club-speed multiplier: piecewise-linear through (0.05,0.18) (0.25,0.5) (0.5,0.68) (0.75,0.86) (1,1). RangeError outside [0.05,1]. */
 // contract: export function lengthSpeedFactor(length: number): number;
 /** Putt ball speed (m/s) = 15 x length (the old drawMs/1500 x 15 curve). RangeError outside [0.05,1]. */
 // contract: export function puttSpeedMs(length: number): number;
-// contract (extended): scoreSwing(input: SwingInput, length?: number): SwingScore   // default 1; Z/X/C are ms relative to the Space release
-// contract (extended): launchFor(club: Club, score: SwingScore, length?: number): Launch // default 1
+// contract: export const MAX_EFFORT_HOLD_MS = 1100; effortFromHold(holdMs, putt): { length, maxEffort }  // RangeError if not finite

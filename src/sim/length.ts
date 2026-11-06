@@ -10,6 +10,12 @@ export function clampLength(n: number): number {
   if (!isValidLength(n)) throw new RangeError(`invalid swing length: ${String(n)}`);
   return Math.min(MAX_LENGTH, Math.max(MIN_LENGTH, n));
 }
+/** Holding Space this long (or more) releases a full swing as a max-effort shot. */
+export const MAX_EFFORT_HOLD_MS = 1100;
+export function effortFromHold(holdMs: number, putt: boolean): { length: number; maxEffort: boolean } {
+  if (!isValidLength(holdMs)) throw new RangeError(`invalid hold: ${String(holdMs)}`);
+  return { length: clampLength(holdMs / FULL_TURN_MS), maxEffort: !putt && holdMs >= MAX_EFFORT_HOLD_MS };
+}
 export const lengthFromHold = (heldMs: number): number => clampLength(heldMs / FULL_TURN_MS);
 
 function assertLength(n: unknown): asserts n is number {
@@ -24,12 +30,9 @@ function interp(pts: Pts, x: number): number {
   return pts[pts.length - 1]![1];
 }
 
-/** Tunable config. Downswing duration relative to a full swing (the 25/50/75/100 anchors are the earlier discrete steps). */
-const DURATION: Pts = [[0.05, 0.48], [0.25, 0.6], [0.5, 0.75], [0.75, 0.9], [1, 1]];
 /** Tunable config. Club speed by length, tuned so a perfect 25% 62-degree swing carries 40 to 75 yd. */
 const SPEED: Pts = [[0.05, 0.18], [0.25, 0.5], [0.5, 0.68], [0.75, 0.86], [1, 1]];
 
-export function durationScale(length: number): number { assertLength(length); return interp(DURATION, length); }
 export function lengthSpeedFactor(length: number): number { assertLength(length); return interp(SPEED, length); }
 /** Putt ball speed (m/s): 15 m/s x length, the old drawMs / 1500 x 15 curve. */
 export function puttSpeedMs(length: number): number { assertLength(length); return 15 * length; }

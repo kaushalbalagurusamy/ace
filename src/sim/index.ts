@@ -1,5 +1,5 @@
 export * from './types';
 export * from './ranking';
-export * from './swing';
+export * from './delivery';
 export * from './physics';
 export * from './length';

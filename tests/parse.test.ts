@@ -26,10 +26,10 @@ describe('parseClientMsg: untrusted wire input', () => {
     expect(p({ t: 'hello', sessionId: 's', name: 'Bob', token: 5 })).toBeNull();
   });
   it('shot: aim must be finite and is normalised to 0..360, so overflow cannot become NaN downstream', () => {
-    expect((p({ t: 'shot', clubKey: '1', aimDeg: 370 }) as { aimDeg: number }).aimDeg).toBeCloseTo(10, 10);
-    expect((p({ t: 'shot', clubKey: '1', aimDeg: -90 }) as { aimDeg: number }).aimDeg).toBeCloseTo(270, 10);
-    for (const bad of [1e308, -1e308, 1e12, null, 'x']) expect(p({ t: 'shot', clubKey: '1', aimDeg: bad }), String(bad)).toBeNull();
-    expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":1e999}')).toBeNull(); // parses to Infinity
+    expect((p({ t: 'shot', clubKey: '1', aimDeg: 370, holdMs: 500 }) as { aimDeg: number }).aimDeg).toBeCloseTo(10, 10);
+    expect((p({ t: 'shot', clubKey: '1', aimDeg: -90, holdMs: 500 }) as { aimDeg: number }).aimDeg).toBeCloseTo(270, 10);
+    for (const bad of [1e308, -1e308, 1e12, null, 'x']) expect(p({ t: 'shot', clubKey: '1', aimDeg: bad, holdMs: 500 }), String(bad)).toBeNull();
+    expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":1e999,"holdMs":500}')).toBeNull(); // parses to Infinity
   });
   it('shot: holdMs finite and 0..5000; ball position integers -2..2; the exact fields pass through', () => {
     expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 });
@@ -43,8 +43,8 @@ describe('parseClientMsg: untrusted wire input', () => {
     expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, zMs: 5, xMs: 60, cMs: 150, length: 0.5 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, fb: 0, io: 0 });
   });
   it('shot: club key must be a short string', () => {
-    expect(p({ t: 'shot', clubKey: 7, aimDeg: 0 })).toBeNull();
-    expect(p({ t: 'shot', clubKey: 'x'.repeat(5), aimDeg: 0 })).toBeNull();
+    expect(p({ t: 'shot', clubKey: 7, aimDeg: 0, holdMs: 500 })).toBeNull();
+    expect(p({ t: 'shot', clubKey: 'x'.repeat(5), aimDeg: 0, holdMs: 500 })).toBeNull();
   });
   it('putt: aim normalised, holdMs required, finite and 0..5000', () => {
     expect(p({ t: 'putt', aimDeg: 180, holdMs: 300 })).toEqual({ t: 'putt', aimDeg: 180, holdMs: 300 });

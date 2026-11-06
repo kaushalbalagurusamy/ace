@@ -1,12 +1,12 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, LAND_ROLL_FRACTION, clampLength, isValidLength, launchFor, puttSpeedMs, rollingDecel, scoreSwing, simulateShot } from '../sim';
-import type { Surface, TrajectoryPoint } from '../sim';
+import { BAG, LAND_ROLL_FRACTION, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
+import type { Lie, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
 const CUP_RADIUS_M = 0.054;
 const HOLE_SPEED_MS = 1.6;
 const DROP_WAIT_S = 2;
-const LIE_SPEED: Record<Surface, number> = { fairway: 1, firstCut: 0.97, rough: 0.85, bunker: 0.75, fringe: 0.9, green: 0.9 };
+const TEE_RADIUS_M = 3; // a ball this close to the hole's tee is teed up
 const DT = 1 / 60;
 
 export { hole, type Hole } from './course';
@@ -14,10 +14,10 @@ import type { Hole } from './course';
 
 export interface Played {
   samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number;
-  grade: { z: number; x: number; c: number }; ball: BallState; penalty?: string;
+  effort: { fb: number; io: number; maxEffort: boolean; length: number }; ball: BallState; penalty?: string;
   /** seconds from strike to ball at rest */ flightS: number; /** extra lock-out after the shot (drop wait) */ dropWaitS: number;
 }
-export interface ShotReq { clubKey: string; aimDeg: number; zMs?: number; xMs?: number; cMs?: number; length?: number }
+export interface ShotReq { clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; seed?: number }
 
 /** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Stops at the cup if it passes slow enough. */
 function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number, a: number, t0: number) {
@@ -72,12 +72,13 @@ function settle(h: Hole, prev: BallState, x: number, z: number, holed: boolean, 
 export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { error: string } {
   const club = BAG.find(c => c.key === req.clubKey);
   if (!club || club.key === 'P') return { error: 'unknown club (use putt for the putter)' };
-  const raw = req.length ?? 1;
-  if (!isValidLength(raw)) return { error: 'invalid swing length (must be a finite number)' };
-  const length = clampLength(raw);
-  const score = scoreSwing(req, length);
-  const launch = launchFor(club, score, length);
-  launch.ballSpeed *= LIE_SPEED[prev.surface as Surface] ?? 1;
+  if (!isValidLength(req.holdMs)) return { error: 'invalid hold time (must be a finite number)' };
+  const ballPos = { fb: req.fb ?? 0, io: req.io ?? 0 };
+  if (!isValidBallPos(ballPos)) return { error: 'invalid ball position (fb and io are integers from -2 to 2)' };
+  const { length, maxEffort } = effortFromHold(Math.max(0, req.holdMs), false);
+  const onTee = Math.hypot(prev.x - h.info.tee.x, prev.z - h.info.tee.z) <= TEE_RADIUS_M;
+  const lie: Lie = onTee ? 'tee' : h.surfaceAt(prev.x, prev.z);
+  const launch = launchFor(club, { length, ballPos, maxEffort, seed: req.seed ?? 0, lie });
   const sim = simulateShot(launch);
   const a = (req.aimDeg * Math.PI) / 180, sin = Math.sin(a), cos = Math.cos(a);
   const world = (sx: number, sz: number) => ({ x: prev.x + sx * cos + sz * sin, z: prev.z - sx * sin + sz * cos });
@@ -92,20 +93,21 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
     }
   }
   return settle(h, prev, x, z, holed, {
-    samples, carryM: sim.carryM, offlineM: sim.offlineM, flightS, clubSpeedMph: club.maxClubSpeedMph * score.speedFactor,
-    ballSpeedMs: launch.ballSpeed, grade: { z: score.nZ, x: score.nX, c: score.nC },
+    samples, carryM: sim.carryM, offlineM: sim.offlineM, flightS, clubSpeedMph: club.maxClubSpeedMph * lengthSpeedFactor(length) * (maxEffort ? maxEffortSpeedFactor(club) : 1),
+    ballSpeedMs: launch.ballSpeed, effort: { fb: ballPos.fb, io: ballPos.io, maxEffort, length },
   });
 }
 
-export function playPutt(h: Hole, prev: BallState, aimDeg: number, length: number): Played | { error: string } {
+export function playPutt(h: Hole, prev: BallState, aimDeg: number, holdMs: number): Played | { error: string } {
   if (prev.surface !== 'green') return { error: 'putter only works on the green' };
-  if (!isValidLength(length)) return { error: 'invalid putt length (must be a finite number)' };
-  const v0 = puttSpeedMs(clampLength(length));
+  if (!isValidLength(holdMs)) return { error: 'invalid hold time (must be a finite number)' };
+  const { length } = effortFromHold(Math.max(0, holdMs), true);
+  const v0 = puttSpeedMs(length);
   const a = (aimDeg * Math.PI) / 180;
   const decel = rollingDecel('green', 10);
   const r = roll(h, prev.x, prev.z, Math.sin(a), Math.cos(a), v0, decel, 0);
   const samples = [{ t: 0, p: { x: prev.x, y: 0, z: prev.z } }, ...r.pts];
   return settle(h, prev, r.x, r.z, r.holed, {
-    samples, carryM: 0, offlineM: 0, flightS: r.t, clubSpeedMph: 0, ballSpeedMs: v0, grade: { z: 0, x: 0, c: 0 },
+    samples, carryM: 0, offlineM: 0, flightS: r.t, clubSpeedMph: 0, ballSpeedMs: v0, effort: { fb: 0, io: 0, maxEffort: false, length },
   });
 }

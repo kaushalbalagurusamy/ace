@@ -163,6 +163,13 @@ function advance(r: Race, sid: string, me: RPlayer) {
   toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: HOLES[me.hole]!.info, ball: { ...me.ball } });
 }
 
+/** Deterministic 32-bit seed (FNV-1a) for a shot's random errors. */
+function shotSeed(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+  return h >>> 0;
+}
+
 function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
   const before = mgr.lobbyOf(sid);
   const fail = (res: { ok: boolean; error?: string }) => { if (!res.ok) { err(ws, res.error as never); return true; } return false; };
@@ -188,7 +195,8 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       const now = Date.now();
       if (me.ball.holedOut) return err(ws, 'NOT_YOUR_TURN', 'already holed out');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
-      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, m) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.length), now);
+      const seed = shotSeed(`${sid}|${me.hole}|${me.ball.strokes}|${r.goAtMs}`);
+      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, seed }) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
       return;
     }
     default: return err(ws, 'BAD_MESSAGE', 'unexpected hello');

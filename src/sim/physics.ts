@@ -1,5 +1,7 @@
-import type { Club, Launch, ShotResult, Surface, SwingScore, TrajectoryPoint } from './types';
+import type { Club, Launch, ShotResult, Surface, TrajectoryPoint } from './types';
 import { lengthSpeedFactor } from './length';
+import { CENTRE, LOFT_PER_FB_DEG, MAX_EFFORT, PATH_PER_IO_DEG, gauss, mulberry32 } from './delivery';
+import type { Lie, Strike } from './delivery';
 
 // ALL CONSTANTS BELOW ARE PLACEHOLDER until PRD/03 §8 sources are checked.
 const RHO = 1.225; // ISA sea level, kg/m^3
@@ -147,18 +149,68 @@ export const BAG: readonly Club[] = [
   club('P', 'Putter', 3, 10),
 ];
 
-// PLACEHOLDER delivery: driver +5 AoA, 3W +2, others struck down more with loft.
-const aoa = (c: Club) => (c.key === '1' ? 5 : c.key === '2' ? 2 : c.key === '3' ? -1 : -2 - 0.06 * c.loftDeg);
+/** Lie and turf (PRD/03 §4, ASSUMED effects). Bunker speed is `speed` for non-wedges and `wedgeSpeed` for lofts >= 50. */
+export const LIE: Record<Lie, { speed: number; wedgeSpeed?: number; spin: number; launch: number }> = {
+  tee: { speed: 1, spin: 1, launch: 0 },
+  fairway: { speed: 1, spin: 1, launch: 0 },
+  firstCut: { speed: 0.97, spin: 0.85, launch: 0.5 },
+  rough: { speed: 0.85, spin: 0.55, launch: 1.5 },
+  bunker: { speed: 0.55, wedgeSpeed: 0.75, spin: 0.6, launch: 2 },
+  fringe: { speed: 0.9, spin: 1, launch: 0 },
+  green: { speed: 0.9, spin: 1, launch: 0 },
+};
+const ROUGH_FACE_NOISE_DEG = 1.5;
 
-export function launchFor(c: Club, score: SwingScore, length = 1): Launch {
-  const lf = lengthSpeedFactor(length); // throws RangeError on an invalid length
-  const smash = 1.48 - ((Math.min(c.loftDeg, 62) - 8) * 0.23) / 54; // 1.48 driver -> 1.25 at 62°
-  const ballSpeed = c.maxClubSpeedMph * MPH * score.speedFactor * lf * smash * score.smashFactor;
-  const a = aoa(c);
-  const launchDeg = 0.6 * c.loftDeg + 1.25 * a + 1;
-  const spinLoft = c.loftDeg - a;
-  let backspinRpm = 185 * spinLoft;
-  if (c.loftDeg >= 8 && c.loftDeg <= 18) backspinRpm = Math.max(2500, backspinRpm); // woods/hybrid floor
-  // Swing path (X timing) sets the start line: half the path angle (PRD/02 §3: early X pulls left, late X pushes right).
-  return { ballSpeed, launchDeg, azimuthDeg: 0.5 * score.pathDeg + 0, backspinRpm, spinAxisDeg: 3 * score.faceToPathDeg + 0 };
+/** Angle of attack: driver and 3-wood keep their up-AoA only off the tee (PRD/03 §4). */
+const aoa = (c: Club, lie: Lie) =>
+  c.key === '1' ? (lie === 'tee' ? 5 : -1) : c.key === '2' ? (lie === 'tee' ? 2 : -2.9) : c.key === '3' ? -1 : -2 - 0.06 * c.loftDeg;
+
+const smashOf = (c: Club) => 1.48 - ((Math.min(c.loftDeg, 62) - 8) * 0.23) / 54; // 1.48 driver -> 1.25 at 62°
+
+/** Club-speed factor k >= 1 that makes a full centre swing carry MAX_EFFORT.distanceFactor times as far (bisection through the sim). */
+const effortCache = new Map<string, number>();
+export function maxEffortSpeedFactor(c: Club): number {
+  if (c.key === 'P') return 1;
+  const hit = effortCache.get(c.key);
+  if (hit !== undefined) return hit;
+  const base = launchFor(c);
+  const carry = (k: number) => simulateShot({ ...base, ballSpeed: base.ballSpeed * k }).carryM;
+  const target = carry(1) * MAX_EFFORT.distanceFactor;
+  let lo = 1, hi = 1.8;
+  for (let i = 0; i < 25; i++) { const mid = (lo + hi) / 2; if (carry(mid) < target) lo = mid; else hi = mid; }
+  const k = (lo + hi) / 2;
+  effortCache.set(c.key, k);
+  return k;
+}
+
+export function launchFor(c: Club, strike: Strike = {}): Launch {
+  const putter = c.key === 'P';
+  const lie = strike.lie ?? 'tee';
+  const lf = lengthSpeedFactor(strike.length ?? 1); // throws RangeError on an invalid length
+  const maxEffort = !putter && (strike.maxEffort ?? false);
+  const { fb, io } = putter ? CENTRE : (strike.ballPos ?? CENTRE);
+  const seed = strike.seed ?? 0;
+  const L = LIE[lie];
+  const lieSpeed = lie === 'bunker' && c.loftDeg >= 50 ? L.wedgeSpeed! : putter && (lie === 'fringe' || lie === 'green') ? 1 : L.speed;
+  const ballSpeed = c.maxClubSpeedMph * MPH * lf * (maxEffort ? maxEffortSpeedFactor(c) : 1) * smashOf(c) * lieSpeed;
+
+  const a = aoa(c, lie);
+  const launchDeg = 0.6 * c.loftDeg + 1.25 * a + 1 + 0.6 * LOFT_PER_FB_DEG * fb + L.launch;
+  // Woods and hybrids keep their tee-reference spin floor (2500 rpm) and then follow the spin-loft change of a different attack angle,
+  // so a driver off the ground (steeper) spins more than off the tee instead of both being clamped to the floor.
+  const aoaRef = aoa(c, 'tee');
+  let centreSpin = 185 * (c.loftDeg - aoaRef);
+  if (c.loftDeg >= 8 && c.loftDeg <= 18) centreSpin = Math.max(2500, centreSpin);
+  centreSpin += 185 * (aoaRef - a);
+  const backspinRpm = (centreSpin + 185 * LOFT_PER_FB_DEG * fb) * L.spin;
+
+  let F = 0, P = PATH_PER_IO_DEG * io;
+  if (maxEffort) {
+    const rng = mulberry32(seed), s = strike.dispersionScale ?? 1;
+    F += gauss(rng) * MAX_EFFORT.sigmaFaceDeg * s;
+    P += gauss(rng) * MAX_EFFORT.sigmaPathDeg * s;
+  }
+  if (lie === 'rough' && !putter) F += (mulberry32(seed + 0x9e3779b9)() * 2 - 1) * ROUGH_FACE_NOISE_DEG;
+  const kappa = c.loftDeg < 20 ? 0.15 : 0.25;
+  return { ballSpeed, launchDeg, azimuthDeg: (1 - kappa) * F + kappa * P + 0, backspinRpm, spinAxisDeg: 3 * (F - P) + 0 };
 }
