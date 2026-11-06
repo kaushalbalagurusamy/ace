@@ -10,7 +10,7 @@ const OUT = 'assets/qa/realism'; mkdirSync(OUT, { recursive: true });
 // name: [real photo, view = hole(1-based), cam x,y,z, target x,y,z, fov] in sim metres (x right, z from the tee toward the pin)
 export const VIEWS = {
   'h07-tee': ['coast-tee-shot.jpg', [7, -1, 7, -6, 8, 0, 100, 55]],
-  'h08-approach': ['h08-chasm.jpg', [8, -25, 9, 175, 45, -6, 300, 55]],
+  'h08-approach': ['h08-chasm.jpg', [8, -15, 7, 225, 40, -8, 330, 55]],
   'h18-seawall': ['h18-view-back.jpg', [18, 25, 9, 520, -10, 0, 260, 60]],
   'h17-green': ['h17-green.jpg', [17, 8, 1.7, 182, -25, 1, 225, 55]],
   'cypress': ['h18-green-cypress.jpg', [18, 2, 2.5, 455, 25, 6, 494, 55]],

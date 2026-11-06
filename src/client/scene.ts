@@ -183,7 +183,7 @@ export class World {
       if (token !== this.propToken) return;                      // a newer hole replaced this request
       tpl.updateMatrixWorld(true);
       // grade generated textures toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
-      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#a4ad97' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; } });
+      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
       tpl.traverse(o => {
         const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
         const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);

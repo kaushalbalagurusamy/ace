@@ -21,8 +21,10 @@ export function noise3(x: number, y: number, z: number): number {
 
 /** Land/sea contour of a hole in sim metres: marching squares over the cell-centre sea values at 0.5. Each segment is [ax, az, bx, bz]
  *  wound so the sea lies on its right (the seaward normal is (dz, -dx) / |d|). */
-export function shoreSegments(hole: number): number[][] {
-  const g = GRIDS[hole]!, { sea } = seaField(hole), out: number[][] = [];
+export const shoreSegments = (hole: number) => maskSegments(hole, seaField(hole).sea);
+/** Marching squares over any per-cell 0/1 field of a hole (1 on the right of each segment). */
+export function maskSegments(hole: number, sea: ArrayLike<number>): number[][] {
+  const g = GRIDS[hole]!, out: number[][] = [];
   const v = (x: number, z: number) => sea[Math.min(g.nz - 1, Math.max(0, z)) * g.nx + Math.min(g.nx - 1, Math.max(0, x))]!;
   const P = (x: number, z: number): [number, number] => [g.x0 + (x + 0.5) * g.cell, g.z0 + (z + 0.5) * g.cell];
   for (let z = 0; z < g.nz - 1; z++) for (let x = 0; x < g.nx - 1; x++) {

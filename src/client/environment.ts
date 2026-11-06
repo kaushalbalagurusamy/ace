@@ -3,8 +3,9 @@
 // from it once per load for image-based light, an ACES tone map and exponential fog in the measured horizon colour.
 import * as THREE from 'three';
 
-/** Sun direction (three space, unit): about 35 degrees up, from the south-west over the bay on the coastal holes. */
-export const SUN_DIR = new THREE.Vector3(0.55, 0.57, 0.61).normalize();
+/** Sun direction (three space, unit): about 38 degrees up, behind and to the right of a player facing the pin, as on the hole 7 tee photo
+ *  (front-lit greens and trees; terrain.ts's bunker-lip shading uses the same direction in sim space). */
+export const SUN_DIR = new THREE.Vector3(0.4, 0.62, -0.68).normalize();
 /** Photo swatches (pebble-look.md): horizon haze and the zenith, used by the fog, the ocean reflection and the far shore. */
 export const HAZE = new THREE.Color('#9fb7cf');
 export const ZENITH = new THREE.Color('#4f86c9');

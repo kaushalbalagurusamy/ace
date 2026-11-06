@@ -183,7 +183,7 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
     float ws = wt[5] / sum, lip = smoothstep(0.04, 0.3, ws) * (1.0 - smoothstep(0.42, 0.75, ws)) * (1.0 - wt[4] / sum) * (0.6 + 0.6 * tNoise(vWxz * 2.3));
     alb = mix(alb, mix(vec3(0.17, 0.2, 0.08), vec3(0.42, 0.38, 0.2), tNoise(vWxz * 5.0)), clamp(lip, 0.0, 0.85));
     // the flat ground has no bunker bowl, so fake its face: the lip toward the sun shades the sand behind it (sun from environment.ts SUN_DIR)
-    float wsSun = texture2D(uMaskB, muv + vec2(-0.669, 0.742) * 1.6 * uGrid.zw).g;
+    float wsSun = texture2D(uMaskB, muv + vec2(-0.507, -0.862) * 1.6 * uGrid.zw).g;
     alb *= 1.0 - 0.45 * ws * clamp(1.0 - wsSun * 1.4, 0.0, 1.0);
     float sp = dot(sim, uStripe);
     alb *= 1.0 + 0.11 * (wt[0] / sum) * (smoothstep(-0.25, 0.25, sin(sp * 0.5236)) - 0.5) + 0.06 * (wt[4] / sum) * (smoothstep(-0.3, 0.3, sin(sp * 3.1416)) - 0.5);
