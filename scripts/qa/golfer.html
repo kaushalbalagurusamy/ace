@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">
+// QA view of the rigged golfer through the game's own rig code (src/client/golferrig.ts): same neutral background and lighting as
+// scripts/qa/render-assets.mjs. The asset loads directly here (no PASS gate) because this page is what the critic judges.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { normalise } from '/src/client/assets.ts';
+import { GolferRig, smoothShading, tintPolo } from '/src/client/golferrig.ts';
+import { POSES, backswingPose, releasePose, puttPose, swingPoses, walkPose } from '/src/client/golferanim.ts';
+import { CLUBS, fitGeneratedHead, makeCodeClub } from '/src/client/clubs.ts';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(640, 640); document.body.append(r.domElement);
+const V = { front: [0, 0, 1], side: [1, 0, 0], back: [0, 0, -1], dtl: [-1, 0.12, 0], faceon: [0, 0.08, 1], threequarter: [0.7, 0.3, 0.9], above: [0, 1, 0.02] };
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setDRACOLoader(new DRACOLoader().setDecoderPath('/node_modules/three/examples/jsm/libs/draco/gltf/'));
+const gltf = await loader.loadAsync('/assets/models/golfer.glb'), rows = await (await fetch('/assets/manifest.json')).json();
+// the club in hand is the generated head for that slot (fitted as the game does), the code club only if the file is missing
+const club = async spec => { try { return fitGeneratedHead((await loader.loadAsync(`/assets/models/${spec.model}.glb`)).scene, spec, rows.find(r => r.id === spec.model)?.orient_deg); } catch { return makeCodeClub(spec); } };
+// show(view, pose, {club, tint, depth, ms}): pose is 'rest' | 'idle' | 'address' | 'top' | 'back' (depth) | 'release' (depth, ms) | 'putt' | 'walk'
+window.show = async (view, pose, o = {}) => {
+  const model = normalise(cloneSkinned(gltf.scene), 1.8), rig = new GolferRig(model), spec = CLUBS[o.club ?? 6];
+  smoothShading(model); tintPolo(model, o.tint ?? '#ffffff');   // white polo = untinted; also lights the violet eyes
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#8a8a8a'); scene.add(model);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#707070', 1.6)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(3, 5, 4); const fill = new THREE.DirectionalLight('#ffffff', 0.8); fill.position.set(-4, 2, -3); scene.add(key, fill);
+  let p = null;
+  if (pose === 'idle') p = POSES.idle; else if (pose === 'address') p = backswingPose(0, spec.length); else if (pose === 'top') p = backswingPose(1, spec.length);
+  else if (pose === 'back') p = backswingPose(o.depth ?? 0.5, spec.length); else if (pose === 'release') p = releasePose(o.depth ?? 1, o.ms ?? 0, spec.length).pose;
+  else if (pose === 'P') p = swingPoses(spec.length)[o.n]; else if (pose === 'putt') p = puttPose(o.t ?? 0, spec.length); else if (pose === 'walk') p = walkPose(o.phase ?? 1, 1);
+  if (p) { const c = await club(spec); c.matrixAutoUpdate = false; rig.apply(p, c.matrix); model.add(c); }
+  model.updateMatrixWorld(true);
+  // fixed frame (a skinned mesh's box is its bind pose): 2.4 m tall around the golfer, the same for every shot
+  const ctr = o.face ? new THREE.Vector3(0, 1.62, 0) : new THREE.Vector3(0, 1.0, 0.2), s = new THREE.Vector3(1.8, 2.4, 1.8), d = o.face ? 1.3 : 2.4 * 2.3;   // o.face: head close-up
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 1000), v = new THREE.Vector3(...V[view]).normalize(); cam.position.copy(ctr).addScaledVector(v, d); cam.lookAt(ctr);
+  r.render(scene, cam); let tris = 0; gltf.scene.traverse(m => { if (m.isMesh) tris += m.geometry.index ? m.geometry.index.count / 3 : 0; });
+  // top-down measurement from the posed joints: degrees the line from trail to lead joint is turned away from the target (closed > 0, open < 0)
+  const closed = (lead, trail) => { const a = rig.modelPos(lead), b = rig.modelPos(trail); return +(Math.atan2(a.z - b.z, a.x - b.x) * 180 / Math.PI).toFixed(1); };
+  return { tris, shouldersClosed: closed('LeftArm', 'RightArm'), hipsClosed: closed('LeftUpLeg', 'RightUpLeg'), pelvisX: +rig.modelPos('Hips').x.toFixed(3), handToGripCm: { lead: +(rig.handError.lead * 100).toFixed(1), trail: +(rig.handError.trail * 100).toFixed(1) }, joints: Object.fromEntries(['LeftForeArm', 'LeftHand', 'RightForeArm', 'RightHand', 'Head'].map(n => [n, rig.modelPos(n).toArray().map(x => +x.toFixed(3))])) };
+};
+window.ready = true;
+</script>
