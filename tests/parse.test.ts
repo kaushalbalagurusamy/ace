@@ -64,3 +64,13 @@ describe('parseClientMsg: untrusted wire input', () => {
     expect(parseClientMsg('{"t":"move","x":1e999,"z":0,"yaw":0,"driving":false,"cart":{"x":0,"z":0,"yaw":0,"vx":0,"vz":0}}')).toBeNull();
   });
 });
+
+describe('shot chip flag', () => {
+  it('chip must be a boolean when present; true passes through, false is dropped', async () => {
+    const { parseClientMsg } = await import('../src/server/parse');
+    const p = (m: unknown) => parseClientMsg(JSON.stringify(m));
+    expect(p({ t: 'shot', clubKey: 'O', aimDeg: 0, holdMs: 300, chip: true })).toMatchObject({ chip: true });
+    expect(p({ t: 'shot', clubKey: 'O', aimDeg: 0, holdMs: 300, chip: false })).not.toHaveProperty('chip');
+    expect(p({ t: 'shot', clubKey: 'O', aimDeg: 0, holdMs: 300, chip: 'yes' })).toBeNull();
+  });
+});

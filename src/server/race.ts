@@ -12,10 +12,10 @@ import type { Hole } from './course';
 
 export interface Played {
   samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number;
-  effort: { fb: number; io: number; maxEffort: boolean; length: number }; ball: BallState; penalty?: string;
+  effort: { fb: number; io: number; maxEffort: boolean; length: number; chip?: boolean }; ball: BallState; penalty?: string;
   /** seconds from strike to ball at rest */ flightS: number; /** extra lock-out after the shot (drop wait) */ dropWaitS: number;
 }
-export interface ShotReq { clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; seed?: number }
+export interface ShotReq { clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; seed?: number; chip?: boolean }
 
 /** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Drops if it crosses the cup below the capture speed for its offset. */
 function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number, a: number, t0: number) {
@@ -73,7 +73,7 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   if (!isValidLength(req.holdMs)) return { error: 'invalid hold time (must be a finite number)' };
   const ballPos = { fb: req.fb ?? 0, io: req.io ?? 0 };
   if (!isValidBallPos(ballPos)) return { error: 'invalid ball position (fb and io are integers from -3 to 3)' };
-  const { length, maxEffort } = effortFromHold(Math.max(0, req.holdMs), false);
+  const { length, maxEffort } = effortFromHold(Math.max(0, req.holdMs), false, req.chip === true);
   const onTee = Math.hypot(prev.x - h.info.tee.x, prev.z - h.info.tee.z) <= TEE_RADIUS_M;
   const lie: Lie = onTee ? 'tee' : h.surfaceAt(prev.x, prev.z);
   const launch = launchFor(club, { length, ballPos, maxEffort, seed: req.seed ?? 0, lie });
@@ -96,7 +96,7 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   }
   return settle(h, prev, x, z, holed, {
     samples, carryM: sim.carryM, offlineM: sim.offlineM, flightS, clubSpeedMph: club.maxClubSpeedMph * lengthSpeedFactor(length) * (maxEffort ? maxEffortSpeedFactor(club) : 1),
-    ballSpeedMs: launch.ballSpeed, effort: { fb: ballPos.fb, io: ballPos.io, maxEffort, length },
+    ballSpeedMs: launch.ballSpeed, effort: { fb: ballPos.fb, io: ballPos.io, maxEffort, length, ...(req.chip === true && { chip: true }) },
   });
 }
 

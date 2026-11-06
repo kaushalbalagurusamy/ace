@@ -114,3 +114,17 @@ describe('mouse aim and club change in the stance (owner: both stay live until t
     const h = armed(raw()); h.key('Escape', true, 0); expect(h.setAim(1)).toBe(false);
   });
 });
+
+describe('chip stroke (owner 2026-11-05): Shift in the stance toggles a 0-25% shoulder stroke', () => {
+  const stanceAt = (putt = false) => { const f = new SwingFSM({ putt, aimDeg: 0, clubKey: putt ? 'P' : 'O' }); f.key('Space', true, 0); return f; };
+  it('a Shift press in the stance toggles chip, a second press toggles it back; the putter ignores it', () => {
+    const f = stanceAt(); expect(f.isChip()).toBe(false); f.key('ShiftLeft', true, 1); expect(f.isChip()).toBe(true); f.key('ShiftRight', true, 2); expect(f.isChip()).toBe(false);
+    const p = stanceAt(true); p.key('ShiftLeft', true, 1); expect(p.isChip()).toBe(false);
+  });
+  it('the chip shot carries chip: true and never auto-releases into max effort', () => {
+    const f = stanceAt(); f.key('ShiftLeft', true, 1); f.key('Space', true, 10);
+    expect(f.tick(10 + 2000)).toBeNull();
+    const a = f.key('Space', false, 10 + 2000); expect(a && a.type === 'send-shot' && a.msg.chip).toBe(true);
+    expect(a && a.type === 'send-shot' && a.msg.holdMs).toBe(750);
+  });
+});

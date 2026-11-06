@@ -30,7 +30,7 @@ export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ??
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
 <li><b>Move</b> with <b>W A S D</b> (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
 <li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
-<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. The <b>arrow keys</b> set the ball position on a 7x7 grid (the outer ring hits a stinger, hook, slice or towering shot) (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
+<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. In the stance, a <b>Shift</b> tap switches to a <b>chip</b> (feet together, shoulders only: the whole meter is 0-25% power for fine touch). The <b>arrow keys</b> set the ball position on a 7x7 grid (the outer ring hits a stinger, hook, slice or towering shot) (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
 <li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
 <li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
 <li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>
@@ -207,10 +207,13 @@ export class UI {
   rfCanvas = () => this.hud.querySelector<HTMLCanvasElement>('#rf canvas')!;
   rfTip = (t: string | null, x = 0, y = 0) => { const e = this.hud.querySelector<HTMLElement>('#rftip')!; e.style.display = t ? 'block' : 'none'; if (t) { e.textContent = t; e.style.left = `${x + 14}px`; e.style.top = `${y + 14}px`; } };
   prompt(t: string) { const e = this.$('prompt'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
-  meterShow(frac: number | null, label = '') {
+  meterShow(frac: number | null, label = '', maxZone = true) {
     const e = this.$('meter'); e.style.display = frac === null ? 'none' : 'block';
-    // the bar spans 0 to 1100 ms of hold (1.4667 of the full turn); the red band is the max-effort zone beyond the full 750 ms
-    if (frac !== null) { this.$('mlabel').textContent = label; this.$('fill').style.width = `${Math.min(1, Math.max(0, frac / (1100 / 750))) * 100}%`; }
+    // full swing: the bar spans 0..1100 ms (1.4667 turns) and the red band is the max-effort zone; putt and chip: the bar is the full 750 ms, no red band
+    if (frac !== null) {
+      this.$('mlabel').textContent = label; (e.querySelector('.max') as HTMLElement).style.display = maxZone ? 'block' : 'none';
+      this.$('fill').style.width = `${Math.min(1, Math.max(0, frac / (maxZone ? 1100 / 750 : 1))) * 100}%`;
+    }
   }
   countdown(t: string) { const e = this.$('cd'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   toast(t: string) { const e = this.$('toast'); e.style.display = 'block'; e.textContent = t; clearTimeout(this.toastT); this.toastT = window.setTimeout(() => (e.style.display = 'none'), 3000); }
@@ -218,7 +221,7 @@ export class UI {
     const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), fx = (n: number) => (n === 0 ? '0' : n > 0 ? `+${n}` : `${n}`);
     const off = m.offlineM * YD;
     e.innerHTML = `<b>Shot</b><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
-      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)} &middot; ${esc(shotShape(m.effort.fb, m.effort.io))}<br>Effort: ${m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
+      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)} &middot; ${esc(shotShape(m.effort.fb, m.effort.io))}<br>Effort: ${m.effort.chip ? 'Chip' : m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
     e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */

@@ -130,3 +130,15 @@ describe('7x7 shot shaping: the outer ring is a hook, slice, stinger or towering
   });
   it('forward 3 flies higher than forward 2', () => { expect(launchFor(five, { ballPos: { fb: 3, io: 0 } }).launchDeg).toBeGreaterThan(launchFor(five, { ballPos: { fb: 2, io: 0 } }).launchDeg); });
 });
+
+describe('chip effort mapping (owner 2026-11-05)', () => {
+  it('the whole meter spans 0..25% of a full swing, floored at 0.05, never max effort', async () => {
+    const { effortFromHold, CHIP_MAX_LENGTH } = await import('../src/sim/length');
+    expect(CHIP_MAX_LENGTH).toBe(0.25);
+    expect(effortFromHold(750, false, true)).toEqual({ length: 0.25, maxEffort: false });
+    expect(effortFromHold(5000, false, true)).toEqual({ length: 0.25, maxEffort: false });
+    expect(effortFromHold(375, false, true).length).toBeCloseTo(0.125, 10);
+    expect(effortFromHold(10, false, true).length).toBe(0.05);
+    expect(effortFromHold(750, false, false).length).toBe(1);
+  });
+});

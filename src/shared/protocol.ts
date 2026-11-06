@@ -13,7 +13,7 @@ export type ClientMsg =
   | { t: 'startSolo' }
   /** One-button swing (docs/slices/simple-swing/spec.md): how long Space was held (ms) and the ball position in the stance (fb: forward+/back-, io: away+/closer-,
    *  integers -2..2, default 0). The server derives length (holdMs/750, 0.05..1) and max effort (holdMs >= 1100) itself. Aim = degrees clockwise from +z. */
-  | { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number }
+  | { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; chip?: boolean }
   /** Putter: hold and release Space; same length curve, no max effort. */
   | { t: 'putt'; aimDeg: number; holdMs: number }
   /** About 10 Hz during a race (PRD/07): where my golfer stands (yaw = facing, radians clockwise from +z) and my cart's state.
@@ -35,7 +35,7 @@ export type ServerMsg =
   | { t: 'lobby'; lobby: LobbyView | null }
   | { t: 'countdown'; seconds: number }
   | { t: 'raceStart'; hole: HoleInfo; players: PlayerRace[]; goAtMs: number }
-  | { t: 'shotResult'; playerId: string; hole: number; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; effort: { fb: number; io: number; maxEffort: boolean; length: number }; ball: BallState; penalty?: string }
+  | { t: 'shotResult'; playerId: string; hole: number; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; effort: { fb: number; io: number; maxEffort: boolean; length: number; chip?: boolean }; ball: BallState; penalty?: string }
   | { t: 'holedOut'; playerId: string; hole: number; strokes: number; splitS: number; /** true after hole 18 */ finished: boolean }
   /** Sent to the whole lobby 2 s after a hole-out: that player is now on the tee of `hole`. Strokes in `ball` are cumulative. */
   | { t: 'nextHole'; playerId: string; hole: HoleInfo; ball: BallState }

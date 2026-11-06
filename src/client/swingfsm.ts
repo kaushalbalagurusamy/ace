@@ -4,7 +4,7 @@
 import { FULL_TURN_MS, MAX_EFFORT_HOLD_MS } from '../sim/length';
 import { BALL_STEPS } from '../sim/delivery';
 
-export type ShotMsg = { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb: number; io: number };
+export type ShotMsg = { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb: number; io: number; chip?: boolean };
 export type PuttMsg = { t: 'putt'; aimDeg: number; holdMs: number };
 export type Action = { type: 'send-shot'; msg: ShotMsg } | { type: 'send-putt'; msg: PuttMsg } | { type: 'cancel' };
 
@@ -15,13 +15,15 @@ const clamp2 = (n: number) => Math.min(BALL_STEPS, Math.max(-BALL_STEPS, n)); //
 
 export class SwingFSM {
   phase: Phase = 'idle';
-  private t0 = 0; private fb = 0; private io = 0; private lastMeter = 0;
+  private t0 = 0; private fb = 0; private io = 0; private lastMeter = 0; private chip = false;
   private o: { putt: boolean; aimDeg: number; clubKey: string };
 
   constructor(o: { putt: boolean; aimDeg: number; clubKey: string }) { this.o = { ...o }; }
 
   ballPos() { return { fb: this.fb, io: this.io }; }
   aim() { return this.o.aimDeg; }
+  /** Chip stroke: toggled by a Shift press in the stance (not with the putter); the meter then spans 0..25% power, no max effort. */
+  isChip() { return this.chip && !this.o.putt; }
   club() { return { clubKey: this.o.clubKey, putt: this.o.putt }; }
   private adjustable() { return this.phase === 'idle' || this.phase === 'stance'; }
   /** Mouse re-aim: allowed until the backswing starts, then the aim is locked until the shot resolves. */
@@ -41,6 +43,7 @@ export class SwingFSM {
       if (this.phase !== 'backswing') return null;
       return this.release(Math.max(0, t - this.t0));
     }
+    if ((code === 'ShiftLeft' || code === 'ShiftRight') && down && this.phase === 'stance' && !this.o.putt) { this.chip = !this.chip; return null; }
     const step = BALL_KEYS[code];
     if (step && down && this.phase === 'stance' && !this.o.putt) { if (step[0] === 'fb') this.fb = clamp2(this.fb + step[1]); else this.io = clamp2(this.io + step[1]); }
     return null;
@@ -49,12 +52,13 @@ export class SwingFSM {
   private release(holdMs: number): Action {
     this.phase = 'done';
     if (this.o.putt) { this.lastMeter = Math.min(holdMs, FULL_TURN_MS) / FULL_TURN_MS; return { type: 'send-putt', msg: { t: 'putt', aimDeg: this.o.aimDeg, holdMs: Math.min(holdMs, FULL_TURN_MS) } }; }
+    if (this.chip) { const h = Math.min(holdMs, FULL_TURN_MS); this.lastMeter = h / FULL_TURN_MS; return { type: 'send-shot', msg: { t: 'shot', clubKey: this.o.clubKey, aimDeg: this.o.aimDeg, holdMs: h, fb: this.fb, io: this.io, chip: true } }; }
     const h = Math.min(holdMs, MAX_EFFORT_HOLD_MS); this.lastMeter = h / FULL_TURN_MS;
     return { type: 'send-shot', msg: { t: 'shot', clubKey: this.o.clubKey, aimDeg: this.o.aimDeg, holdMs: h, fb: this.fb, io: this.io } };
   }
 
   /** Auto-release at 1.10 s for full swings (max effort); the putter never auto-releases. */
-  tick(t: number): Action | null { return this.phase === 'backswing' && !this.o.putt && t - this.t0 >= MAX_EFFORT_HOLD_MS ? this.release(t - this.t0) : null; }
+  tick(t: number): Action | null { return this.phase === 'backswing' && !this.o.putt && !this.chip && t - this.t0 >= MAX_EFFORT_HOLD_MS ? this.release(t - this.t0) : null; }
 
   /** Cancels a stance or backswing (blur, lost key-up, lost pointer lock, Esc). After the release the shot goes ahead, so it does nothing. */
   abort(): Action | null { if (!this.adjustable() && this.phase !== 'backswing') return null; this.phase = 'cancelled'; return { type: 'cancel' }; }

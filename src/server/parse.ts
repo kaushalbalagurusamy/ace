@@ -31,7 +31,8 @@ export function parseClientMsg(raw: string): ClientMsg | null {
     case 'shot': {
       const a = aim(m.aimDeg), fb = m.fb === undefined ? 0 : m.fb, io = m.io === undefined ? 0 : m.io;   // null is not 'missing': it is rejected
       if (!str(m.clubKey, 1, 4) || a === null || !hold(m.holdMs) || !isValidBallPos({ fb, io })) return null;
-      return { t: 'shot', clubKey: m.clubKey, aimDeg: a, holdMs: m.holdMs, fb: fb as number, io: io as number };
+      if (m.chip !== undefined && typeof m.chip !== 'boolean') return null;
+      return { t: 'shot', clubKey: m.clubKey, aimDeg: a, holdMs: m.holdMs, fb: fb as number, io: io as number, ...(m.chip === true && { chip: true }) };
     }
     case 'putt': {
       const a = aim(m.aimDeg);

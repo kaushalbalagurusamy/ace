@@ -12,8 +12,11 @@ export function clampLength(n: number): number {
 }
 /** Holding Space this long (or more) releases a full swing as a max-effort shot. */
 export const MAX_EFFORT_HOLD_MS = 1100;
-export function effortFromHold(holdMs: number, putt: boolean): { length: number; maxEffort: boolean } {
+/** Chip stroke (owner 2026-11-05): feet together, shoulders only; the whole meter spans 0..25% of a full swing, no max effort. */
+export const CHIP_MAX_LENGTH = 0.25;
+export function effortFromHold(holdMs: number, putt: boolean, chip = false): { length: number; maxEffort: boolean } {
   if (!isValidLength(holdMs)) throw new RangeError(`invalid hold: ${String(holdMs)}`);
+  if (chip && !putt) return { length: clampLength(CHIP_MAX_LENGTH * Math.min(holdMs, FULL_TURN_MS) / FULL_TURN_MS), maxEffort: false };
   return { length: clampLength(holdMs / FULL_TURN_MS), maxEffort: !putt && holdMs >= MAX_EFFORT_HOLD_MS };
 }
 export const lengthFromHold = (heldMs: number): number => clampLength(heldMs / FULL_TURN_MS);

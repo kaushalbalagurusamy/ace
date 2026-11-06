@@ -227,7 +227,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       if (me.mv.driving) return err(ws, 'NOT_YOUR_TURN', 'get out of the cart to play (E)');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
       const seed = shotSeed(`${sid}|${me.hole}|${me.ball.strokes}|${r.goAtMs}`);
-      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, seed }) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
+      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, chip: m.chip, seed }) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
       return;
     }
     case 'move': {

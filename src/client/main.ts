@@ -262,7 +262,7 @@ function frame(now: number) {
       const f = swing?.fsm;
       if (f && swing) {
         const ph = f.phase, fr = f.meter(now), putt = f.club().putt;
-        ui.meterShow(fr, ph === 'stance' ? 'Hold Space, release to hit' : putt ? 'Release to putt' : fr >= 1 ? 'MAX ZONE: release for a full shot, hold on for MAX effort' : 'Release to hit');
+        const chip = f.isChip(); ui.meterShow(fr, ph === 'stance' ? (putt ? 'Hold Space, release to putt' : chip ? 'CHIP (0-25% power) · hold Space, release · Shift: full swing' : 'Hold Space, release to hit · Shift: chip') : putt ? 'Release to putt' : chip ? `Chip · ${Math.round(Math.min(1, fr) * 25)}% power` : fr >= 1 ? 'MAX ZONE: release for a full shot, hold on for MAX effort' : 'Release to hit', !putt && !chip);
         ui.ballPosGrid(putt ? null : f.ballPos());
       }
     }
@@ -288,7 +288,7 @@ function frame(now: number) {
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
     world.setClub(selfId, club);
     const f = swing && swing.sentAt === undefined ? swing.fsm : null;   // stance and backswing pose the golfer at the ball; depth follows the hold
-    world.setStance(selfId, f ? { depth: f.phase === 'backswing' ? Math.min(1, f.meter(now)) : 0, putt: f.club().putt } : null);
+    world.setStance(selfId, f ? { depth: f.phase === 'backswing' ? Math.min(1, f.meter(now)) : 0, putt: f.club().putt || f.isChip() } : null);   // a chip uses the shoulder-only pendulum
   }
   world.ownBallDistM = ownDist();
   world.tick(now);
