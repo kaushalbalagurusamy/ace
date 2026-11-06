@@ -4,6 +4,7 @@
 // Optionally deletes tiny disconnected islands (floating shards) first.
 // Usage: node scripts/foliage_cards.mjs IN.glb CONCEPT.png OUT.glb [--cards 1500] [--green #2E4630] [--min-island 0.002] [--size 1] [--flat 0.6] [--seed 1] [--min-y 0.35] [--tiers 4]
 //   --volume 1: cards on the concept silhouette revolved about the trunk (for a generated skeleton with a thin crown; pair with --drop-crown 1)
+//   --up U: upward bias of the card normals (default 0.6; higher lifts the dark crown underside)
 //   --flat: 0 = cards face outward from the crown surface, 1 = cards lie horizontal (cypress pads); --size scales the card edge.
 import { createRequire } from 'node:module';
 const req = createRequire((process.env.GT_MODULES ?? '/Users/kaushal/.npm/_npx/a6797f7ff67bb1f2/node_modules') + '/x.js');
@@ -118,6 +119,9 @@ if (opt.volume) {
   for (const rw of rows) tris.push({ vol: rw, ar: rw.ar, mx, mz, clumps, R });
 }
 const totalArea = tris.reduce((s, t) => s + t.ar, 0); if (!tris.length) throw new Error('no green crown triangles found');
+// --outward 1: generated leaf sheets have mixed winding; turn every card to face away from the crown centre and make the cards single-sided,
+// so no card shows its back (a double-sided card's back takes the flipped, downward normal and renders as a black sliver)
+if (opt.outward) { const cc = [0, 1, 2].map(j => tris.reduce((s, t) => s + t.a[j] * t.ar, 0) / totalArea); for (const t of tris) if (!t.vol && t.n[0] * (t.a[0] - cc[0]) + t.n[1] * (t.a[1] - cc[1]) + t.n[2] * (t.a[2] - cc[2]) < 0) t.n = t.n.map(x => -x); }
 
 // 3. Cards: area-weighted points on the crown, quads tilted between outward-facing and horizontal, slightly proud of the surface.
 const nc = +opt.cards, s0 = Math.sqrt((2.2 * totalArea) / nc) * +opt.size, cum = []; let acc = 0; for (const t of tris) cum.push((acc += t.ar));
@@ -138,7 +142,7 @@ for (let k = 0; k < nc; k++) {
   const tilt = (rnd() - 0.5) * 1.2, ba = norm(add(bb.map(x => x * Math.cos(tilt)), facing, Math.sin(tilt))), c = add(p, t.n, s * 0.12);
   const tile = Math.floor(rnd() * N * N), u0 = (tile % N) / N, v0 = Math.floor(tile / N) / N, fl = rnd() < 0.5, base = P.length / 3;
   for (const [i, j] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-    P.push(...add(add(c, ta, (i * s * asp) / 2), ba, (j * s) / asp / 2)); Nn.push(...norm(add(t.n, [0, 0.6, 0])));
+    P.push(...add(add(c, ta, (i * s * asp) / 2), ba, (j * s) / asp / 2)); Nn.push(...norm(add(t.n, [0, +(opt.up ?? 0.6), 0])));
     UV.push(u0 + (((fl ? -i : i) + 1) / 2) / N, v0 + ((1 - j) / 2) / N);
   }
   I.push(base, base + 1, base + 2, base, base + 2, base + 3);
@@ -146,7 +150,7 @@ for (let k = 0; k < nc; k++) {
 const buf = root.listBuffers()[0] ?? doc.createBuffer();
 const acc3 = (arr, type) => doc.createAccessor().setArray(arr).setType(type).setBuffer(buf);
 const mat = doc.createMaterial('foliage-cards').setBaseColorTexture(doc.createTexture('foliage-atlas').setImage(new Uint8Array(atlasPng)).setMimeType('image/png'))
-  .setAlphaMode('MASK').setAlphaCutoff(0.5).setDoubleSided(true).setRoughnessFactor(1).setMetallicFactor(0);
+  .setAlphaMode('MASK').setAlphaCutoff(0.5).setDoubleSided(!opt.outward).setRoughnessFactor(1).setMetallicFactor(0);
 const prim = doc.createPrimitive().setAttribute('POSITION', acc3(new Float32Array(P), 'VEC3')).setAttribute('NORMAL', acc3(new Float32Array(Nn), 'VEC3'))
   .setAttribute('TEXCOORD_0', acc3(new Float32Array(UV), 'VEC2')).setIndices(acc3(new Uint32Array(I), 'SCALAR')).setMaterial(mat);
 const cardNode = doc.createNode('foliage-cards').setMesh(doc.createMesh('foliage-cards').addPrimitive(prim));

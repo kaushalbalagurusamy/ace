@@ -5865,5 +5865,1175 @@
     "credits_used": 35,
     "balance_before": 1710,
     "balance_after": 1580
+  },
+  {
+    "id": "tree-pine-r19b",
+    "file": "assets/models/tree-pine-r19b.glb",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2B381F\" --rest \"#4B4636\" --sat 0.7 --rough 1 --thicken 1.1:0.1 --squash 0.88 --widen 1.35",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.2 --size 2048",
+      "node scripts/grade_glb.mjs --rest \"#403A2E\" --sat 1",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#2B381F\" --cards 4500 --flat 0.1 --size 3.4 --cell 200 --min-island 0.01 --up 1.0 --sprite 1 --outward 1 --min-y 0.3 --drop-crown 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "PASS",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 4.0,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r26.json",
+      "notes": "Reads correctly as a Monterey pine, not a cypress: a tall clean trunk taking about 45% of the height under a broad, asymmetric umbrella crown. This matches the tall left-hand pine in h18-view-back.jpg and the rounded crowns on the h06-cliffs.jpg forest skyline. The dark blue-green needle colour matches the hazy pine mass in h18-across-bay.jpg and h06-cliffs.jpg, and the needle tufts read well up close. Defects: the crown is one continuous dense blob. Real Monterey pines show separate lumpy clumps with sky gaps between them and a flatter, more irregular top. The lower-left lobe droops like a weeping tree, and the bark is smooth purple-brown, where the real bark is dark grey-brown and deeply furrowed. Fixes: break the crown into 4-6 separate clumps with gaps, flatten the top slightly, add furrowed grey-brown bark, and remove the stray upright card on the left edge of top.jpg.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r19b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": true
+    }
+  },
+  {
+    "id": "tree-pine-r16e",
+    "file": "assets/models/raw/rejected/tree-pine-r16e.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "source_tool": "Meshy image-to-3D (see that model's row)",
+    "source_task_id": null,
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r16-pine.json",
+      "notes": "Silhouette is the strongest part: a clear bare trunk for about 45% of the height under an irregular, offset, rounded dome matches the tall left-hand pine in h18-view-back and the lumpy dome skyline in h06-cliffs. However, the crown reads as one dense bush; real Monterey pines show separate clumped masses with sky gaps between them, and the trunk is too straight and uniformly thin. The foliage is a cold blue-teal, while the photos show a deeper olive or yellow-green in sun, almost black-green in shade. The bark is a smooth mauve-grey; it should be a darker brown-grey with deep vertical furrows. The needle cards show as hard star-shaped spikes, with dark card-edge slivers and a flat, unlit black interior (see top.jpg and threequarter.jpg), and the trunk has almost no bark relief and a hard-cut base with no root flare. Fixes, in priority order: warm and darken the foliage hue, cut 2-4 gaps into the crown to split it into clumps, add a furrowed brown bark normal and albedo map with a slight lean or taper and root flare, and soften the card alpha edges.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r16e/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r16i",
+    "file": "assets/models/raw/rejected/tree-pine-r16i.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r17.json",
+      "notes": "Clear straight bole under an irregular, gappy, rounded crown reads as a mature Monterey pine and broadly matches the tall left-hand pine in h18-view-back.jpg and the pine skyline in h06-cliffs.jpg; dark blue-green needle colour is right. The crown is too narrow (about 0.5x height wide) compared with the photo pine, which is about as wide as it is tall with a flatter, umbrella-like top, and the bole is a thin, nearly limbless pole where the photo shows a few heavy, upswept main limbs. The bark reads mauve/purple-grey; push it towards dark grey-brown with deeper vertical furrows. Needle-tuft cards are visible, but interior cards render near-black and the masses read as lumpy broadleaf clumps from the threequarter view; lighten or AO-tint interior cards and cluster tufts at branch tips. Fixes: widen the crown by about 40% and flatten the top, thicken the bole by about 30% with 3-4 visible scaffold limbs, and warm the bark.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r16i/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r16j",
+    "file": "assets/models/raw/rejected/tree-pine-r16j.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r17.json",
+      "notes": "Almost the same form as r16i: tall clear bole and an irregular open crown, consistent with the Monterey pines in h18-view-back.jpg and h06-cliffs.jpg. The foliage is darker and more contrasty than r16i, with many near-black card faces and dark voids (top view centre), so the crown reads blotchy rather than the even dark green seen in the photos. It has the same shape defects as r16i: the crown is too narrow and domed instead of broad and flat-topped, and the trunk is too slender and branchless. The bark is mauve-tinted instead of grey-brown. Fixes: reduce shadow darkness on inner cards, widen and flatten the crown, thicken the bole and expose a few main limbs. Of the two pines, r16i is the better base.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r16j/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r17a",
+    "file": "assets/models/raw/rejected/tree-pine-r17a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r18.json",
+      "notes": "The front view is a reasonable match for the tall left-hand pine in h18-view-back.jpg: a long clear straight trunk (about 45% of height) under a broad domed crown, and the dark green needle tufts sit well against the h06-cliffs forest skyline. The threequarter view reads as a smooth, continuous mushroom dome. The real Monterey pines are flatter-topped and break into separate clumped foliage masses with sky gaps between them, so split the crown into 4-6 distinct pads on visible limbs and flatten the top. The bark is a smooth pinkish-mauve grey, but Monterey pine bark is dark brown-grey and deeply furrowed, so darken it, warm it and add furrow normal detail. There are artefacts: black flat-card wedges inside the crown (threequarter, upper right and centre) and pale grey or white card patches showing through in the top view. Fix the card normals or backface shading and remove the untextured cards. Scale proportions are plausible for about 22 m.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r17a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r17b",
+    "file": "assets/models/raw/rejected/tree-pine-r17b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r19.json",
+      "notes": "The silhouette is close to the broad rounded umbrella pine on the left of h18-view-back.jpg and the irregular rounded crowns along the h06-cliffs.jpg skyline: a clear straight trunk about 45% of the height, with a domed crown made of several lobes. The crown has a see-through hole in the middle (front and threequarter views), and the trunk is a uniform straight cylinder with almost no flare, taper or lean, so it looks generic rather than windswept. The bark is a reddish-purple brown, while Monterey pine bark is a darker grey-brown with deep furrows. Shift it toward desaturated umber-grey and strengthen the vertical furrow normal. Up close, the foliage cards look like broadleaf leaf sprays rather than pine needle tufts, and many cards show hard black slivers. These look like back faces or alpha-cutout edges with no lighting, so turn on double-sided lighting or flip the normals, and swap in a needle-tuft atlas with radial bundles of needles. Fill the central gap, add 2-3 smaller cloud clusters lower on the main limbs, and give the trunk some taper and root flare; then it should clear 4 on every axis.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r17b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r17c",
+    "file": "assets/models/raw/rejected/tree-pine-r17c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "source_tool": "Meshy image-to-3D (see that model's row)",
+    "source_task_id": null,
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r20.json",
+      "notes": "A clear bole of about 45% height under a domed crown roughly matches the tall pines on the left of h18-view-back, but the crown is one dense, evenly filled ball. The Monterey pines in h18-view-back and the h06-cliffs skyline have lumpy, separated tufts with sky gaps and visible heavy limbs. The trunk has a kink at mid-height, a stray stub limb sticks out on the left and the base is a crude faceted flare. The foliage is a cool blue-teal green, while the photos show a deeper, darker olive green. The bark reads purple-brown and smooth where it should be dark grey-brown and deeply furrowed. Many cards are near-black or back-facing, giving black shards along the crown edges (fix the normals or make the cards two-sided with matching shading). Fixes: break the crown into 4-6 separated tuft clusters on visible scaffold limbs, straighten the trunk, shift the foliage hue to a warmer dark green and add a furrowed grey-brown bark texture.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r17c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r17d",
+    "file": "assets/models/raw/rejected/tree-pine-r17d.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r20.json",
+      "notes": "This is the better pine. Its straight, tall bole and flattened, asymmetric umbrella crown with a sky gap near the top match the left-hand pine in h18-view-back and the flat-topped pine skyline in h06-cliffs. Colour has the same faults as r17c: blue-teal needles instead of the deep olive green in the photos, and smooth purplish bark instead of dark grey-brown, deeply furrowed plates. Dark and black card faces still show along the crown edges and underside, and the crown is still fairly uniform where the photos show clumped tufts. The top view is an irregular blob, which is acceptable. Fixes: warm and darken the foliage hue, swap in a furrowed grey-brown bark, fix the black back-faces and add 2-3 more visible gaps between tuft clusters. That should lift it to a pass.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r17d/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r18b",
+    "file": "assets/models/raw/rejected/tree-pine-r18b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r21.json",
+      "notes": "The overall form, a tall clean bole carrying a broad irregular dome, roughly matches the mature pines on the left of h18-view-back.jpg and the rounded crowns on the skyline in h06-cliffs.jpg, and the trunk-to-height ratio reads as a believable ~22 m tree. But the crown reads as a generic broadleaf or umbrella tree. It is too open and lollipop-like, with long bare limbs and see-through gaps, where the real Monterey pines have dense, heavy, clumpy masses of foliage that hang lower on the trunk, often with several leaders and a lumpier, flatter-topped outline. The foliage cards are textured like leaves rather than tufts of long needles, and many cards render as near-black slivers (back faces or unlit faces), which makes the crown look speckled with dark holes. Fixes: use a needle-tuft cluster texture, set two-sided normals or flip the back-face normals on the cards, and densify the canopy into 3-5 heavy clumps with fewer visible bare branches. The foliage is a desaturated grey-sage, where the photos show a deeper, darker blue-green, and the bark is a smooth light grey-brown, where Monterey pine bark is dark, thick and deeply furrowed. Darken both, add furrow relief to the bark normal map, and hide the hexagonal cut at the trunk base with root flare or by sinking it into the ground.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r18b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r18d",
+    "file": "assets/models/raw/rejected/tree-pine-r18d.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r22.json",
+      "notes": "The silhouette is close to the tall left-hand pine in h18-view-back.jpg and the pines on the h06-cliffs.jpg skyline: a clean upright bole about 40% of the height, a few big ascending limbs and a broad irregular dome with gaps. It is also clearly not a flat cypress pad. The foliage is a plausible dark blue-grey-green, but at close range the leaf cards read as serrated broadleaf or oak clusters rather than pine needle tufts. Make the cards radial needle brushes with lighter tips, warm the green slightly and darken it toward the reference's deep olive-green. Stray dark card slivers float near the inner limbs in threequarter.jpg and loose cards stick out on the left and bottom of top.jpg; cull or reattach them. The bark is a fairly smooth grey-brown cylinder with a stubby flare. Add deep dark-grey furrowed plates with a vertical relief normal map, and make the trunk taper continuously instead of staying uniform above the flare. Scale reads correctly for a ~22 m tree, though the basal flare looks slightly heavy. The crown could also use 2-3 distinct clumped tiers rather than one continuous dome, to match the clustered skyline in h06.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r18d/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r18e",
+    "file": "assets/models/raw/rejected/tree-pine-r18e.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r24.json",
+      "notes": "The single straight bare trunk (about 40% of height) under a broad domed crown matches the tall left-hand pine in h18-view-back. But the crown is one even, closed dome that reads more like an oak, without the lumpy separate clumps and sky gaps of the pines on the h06-cliffs skyline; the top view is a solid mat. Foliage is a plausible dark blue-green, a little too cool and grey next to the deeper olive green in the photos. Dark, flat streak cards poke out of the crown edges (front view, right side, and threequarter, lower left). The trunk base is a hard, faceted, flat-cut polygon. Fixes: break the crown into 4-6 distinct clumps with gaps, cull or soften the protruding dark cards, warm the foliage slightly toward olive, and flare and round the root collar.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r18e/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r18f",
+    "file": "assets/models/raw/rejected/tree-pine-r18f.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r24.json",
+      "notes": "This is the better form of the two. Its open, clumped crown has visible limbs and sky gaps, which is closer to the irregular Monterey pine crowns in h06-cliffs and h18-across-bay, and the tall clean trunk matches h18-view-back. The defects are in detail. Small foliage cards float detached from any branch in the right-hand gap (front view, around the upper-right and mid-right clumps). The underside of the left clump has near-black shadow patches, and a few spiky cards stick out above the crown in the top view. The colour is the same slightly cool blue-grey-green as r18e. The bark is a plausible grey-brown, but the base is the same faceted flat cut. Fixes: attach or delete the orphan cards, lift the black undersides with ambient light or vertex AO clamping, trim the stray top cards, warm the green slightly and flare the trunk base. With those changes it should pass.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r18f/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r19a",
+    "file": "assets/models/raw/rejected/tree-pine-r19a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "pine recipe of tree-pine-r19b (grade_glb, bake_detail on concept-pine-r4, grade_glb bark pass, foliage_cards with pine-needle-sheet, gltf-transform optimize) with this candidate's own grade colours, card count and size; the passing r19b row lists the exact commands"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r25.json",
+      "notes": "The tall straight bare trunk (about 45% of height) under an irregular, rounded, clumpy dome matches the left-hand Monterey pines in h18-view-back.jpg and the pine skyline in h06-cliffs.jpg, and it does not read as a flat-padded cypress. The red-grey bark is right, but the foliage is a little too light and sage-blue compared with the deep, dark olive-green masses in all three photos. Defects: the three-quarter view has a large see-through hole in the middle of the crown that splits it into separate clumps, while the photographed crowns are dense, continuous domes. There are stray floating needle-card shards off the upper-right of the crown (three-quarter view). Dark flat triangular cards are visible at the branch junctions (front view). Fixes: add needle clusters to fill the central gap so the crown is one mass, delete or reattach the orphan cards, hide the branch-junction cards inside foliage or retexture them as bark, and darken and desaturate the foliage tint by about 15% toward deep olive.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r19a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r16b",
+    "file": "assets/models/raw/rejected/tree-oak-r16b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15b",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6df-7579-bf1f-2d82c2215964",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r17.json",
+      "notes": "The broad, spreading, slightly irregular dome on a stout forked trunk matches the big parkland oaks in commons-bmw-aronimink-tournament-151 (forked trunk, wide crown) and the tree line in commons-2009-us-open-at-bethpage-black. The crown sits too low, though: the clear bole is only about 15-20% of height, while the photo oaks show a taller clear trunk (about 30-35%) with the crown lifted. The foliage is too yellow-lime and high-contrast mottled; the photos (commons-bethpage-golf-course.jpg, Aronimink 322/327) show a more uniform mid-to-deep green. Leaf cards read as large flat shards at the crown edge, and in the front view several stray flat slivers poke out horizontally from the lower limbs (left of the trunk at about y=420); remove or reorient those cards. Fixes: raise the crown base, desaturate and darken the foliage about 15-20% towards the green of the photos, use smaller leaf cards, and clean up the stray cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r16b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r17a",
+    "file": "assets/models/raw/rejected/tree-oak-r17a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15b",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6df-7579-bf1f-2d82c2215964",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r18.json",
+      "notes": "The short, stout grey trunk forking into several limbs under a wide crown broadly matches the parkland oaks in commons-bmw-aronimink-tournament-151 and the Bethpage 2009 US Open treeline. The overall foliage green is in range, but the lime-yellow speckled highlights are noisier than the deeper, more uniform mid-green masses in commons-bethpage-golf-course.jpg. The crown is a near-round blob in the top view and a lollipop in side view. Real oaks show irregular lobed masses with see-through gaps and a higher, more uneven crown base, so add lobing and gaps and raise one or two heavy limbs. The worst defects are flat zero-thickness fin planes sticking out of the limb junctions (front view, both sides at about trunk-top height), a floating detached card at the right edge, and a detached foliage clump floating off the crown in the top view. Delete or attach those fragments and make sure branch geometry is not single-sided planes. The leaf cards read as large jagged paper shards up close, so use smaller, denser clusters with alpha-cut leaf edges. Scale reads plausibly as a mature 16 m tree.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r17a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r18d",
+    "file": "assets/models/raw/rejected/tree-oak-r18d.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15c",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0ca-50f2-757e-87fa-77ad20ab868a",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r23.json",
+      "notes": "The foliage greens match the sunlit mid-greens in commons-bethpage-golf-course.jpg, and the grey-brown trunk is plausible. The crown is too dense and bushy, a closed lollipop dome that starts only about 20% up the tree. The parkland oaks in the Aronimink photos (151, 327) and Bethpage 2009 have a clear trunk of roughly 30-40% of height, with scaffold limbs and sky gaps showing through the crown. Large leaf cards read as flat, smeared planes, with stretched texture streaks on the upper left and right, and the bark is smooth and untextured. Fixes: raise the crown base, thin the clumps so the main limbs show, shrink and rotate the cards so no plane shows edge-on, and add vertical furrowed bark texture.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r18d/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r18e",
+    "file": "assets/models/raw/rejected/tree-oak-r18e.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15c",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0ca-50f2-757e-87fa-77ad20ab868a",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r23.json",
+      "notes": "Clearly better than r18d. It has an open crown with visible forking scaffold limbs and sky holes, close to the oaks in commons-bmw-aronimink-tournament-151 and 327. The darker, slightly blue-green foliage suits the overcast Aronimink and Bethpage 2009 shots. The crown still starts low (clear trunk about 20-25% of height compared with about 35% in the photos) and is a little tall and ovoid rather than broad and spreading. Detail is the blocker: leaf clumps are chunky flat cards with hard, near-black undersides and jagged cut-out edges, and the bark is a flat purple-grey with no ridged oak furrows. Fixes: lift the crown base and widen the lower limbs horizontally, use smaller, softer-edged leaf clusters with less black in the shading, warm the bark towards grey-brown, and add a furrowed bark normal or albedo.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r18e/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r19c",
+    "file": "assets/models/raw/rejected/tree-oak-r19c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15c",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0ca-50f2-757e-87fa-77ad20ab868a",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r25.json",
+      "notes": "The broad, rounded, open-grown crown on a grey-brown trunk is in the right family as the specimen parkland trees in the Aronimink photos (aronimink-151, -327), but the trunk is short (clear bole only about 20% of height) and the scaffold branches splay out low. The Bethpage photos (2009-us-open, commons-bethpage-golf-course) and Aronimink show taller clear boles (30-40%) carrying a higher, denser dome. The foliage is built from oversized individual leaf cards with near-black backfaces and alpha fringes, so the crown looks like confetti or shrub leaves instead of the soft, massed, layered canopy in the photos. The crown is also very porous, with detached floating clumps (left at mid-height, lower-left near the trunk, lower-right, and an isolated clump at the edge in the top view). Because the leaves are so big, the tree reads closer to a 5-8 m shrub than a 16 m oak. Fixes: shrink the leaf cards by 3-4x and increase their density into clustered masses, lighten or remove the black backface and fringe shading (use two-sided lighting or normals that point outward from the crown), raise the first scaffold branches so the trunk is about 35% of height, and remove the orphan clumps.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r19c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r19d",
+    "file": "assets/models/raw/rejected/tree-oak-r19d.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r26.json",
+      "notes": "The overall form is right for a parkland oak. It has a short, stout trunk that splits into heavy scaffold limbs and a broad, rounded, spreading crown that is wider than it is tall. This matches the open-grown oaks in commons-bmw-aronimink-tournament-151 and the tree-line canopies in commons-bethpage-golf-course.jpg and the 2009 US Open photo. Colour and material fall short: the foliage cards show near-black shadow patches and back faces next to lime-yellow highlights. That gives a noisy, high-contrast checkerboard, while the photos show a fairly even mid-to-dark green canopy whose shading is soft and continuous. Detail defects: the leaf-card edges are jagged and blocky, and individual leaves at the crown edge read at roughly 0.5-1 m, too big for a 16 m tree. There are also stray floating cards, at the right of the crown (~510,460) and near the centre (~395,230) in threequarter.jpg. Fixes: lift the back-face and shadow tone (or use two-sided lighting with normals bent outward from the crown), lower the saturation of the highlight green, shrink the leaves per card and use more, finer clusters, and delete the orphan cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r19d/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r20b",
+    "file": "assets/models/raw/rejected/tree-oak-r20b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r27.json",
+      "notes": "The front view gets the broad, rounded parkland crown and the spreading scaffold limbs roughly right, close to the lone oak behind the green in aronimink-151. But the clear trunk is only about 1/5 of total height, where the Aronimink (151, 327) and Bethpage (2009 US Open) oaks show a tall bole of 1/3 or more. The crown is also full of see-through holes and ragged gaps, so it reads as a loose cloud of clumps rather than the dense, massed canopy in commons-bethpage-golf-course.jpg. The foliage is a bright, uniform, slightly yellow mid-green with little dark interior shading, while the photos show a deeper olive-green with near-black shadowed lobes, and the bark is a plausible grey-brown but flat. Defects: floating leaf cards detached from the crown (top edge and right side in front.jpg and threequarter.jpg), bare branch tips poking out of the canopy, and visible card edges. Fixes: raise the crown base so the clear trunk is about 30-35% of height, add 30-50% more leaf clusters packed toward the crown interior so the gaps close, darken the foliage toward olive (about #3f5a2a) with an interior AO/darkening gradient, and cull or reattach the stray leaf cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r20b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r16a",
+    "file": "assets/models/raw/rejected/tree-maple-r16a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6d8-76f0-b0ee-1bfd72f4d877",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r17.json",
+      "notes": "The crown is a dense, symmetric egg/lollipop shape (a perfect disc from the top view) on a pencil-thin trunk, which reads as a young nursery or street tree, not the mature parkland maples in commons-bethpage-golf-course.jpg or the Aronimink photos, which have broad rounded crowns with irregular lobes and sky gaps. The trunk is far too thin for a 14 m tree (the trunk-to-crown-width ratio is about 1:12; it should be about 1:6), so the tree reads smaller and toy-like. The foliage has the same over-saturated yellow-lime mottling as the oak, while the photos show a more even mid-green. Leaf cards show as large shards with no visible branch structure inside the crown. Fixes: triple the trunk girth, add visible scaffold limbs, broaden the crown to roughly as wide as it is tall with lobed, irregular edges and some gaps, and desaturate the foliage towards the photo greens.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r16a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r17a",
+    "file": "assets/models/raw/rejected/tree-maple-r17a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15b",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0ca-50fa-718d-99dc-ecec072ab83d",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r20.json",
+      "notes": "The crown is an upright egg or lollipop on a very short, plain trunk (only about 15% of height is visible bole). The mature parkland trees in commons-bethpage-golf-course.jpg, the Bethpage 2009 US Open photo and Aronimink 151/327 have broad, spreading domes as wide as or wider than they are tall. Those trees also have a clear trunk of about 30-40% of height that forks into thick scaffold limbs. The mid-to-dark summer green suits the photos, though the bright yellow-green speckle highlights are a little saturated. The leaf cards read as jagged flat blobs with visible card edges. The trunk is an untapered grey faceted cylinder with no root flare and no bark texture. Because of the short trunk and narrow crown, it reads as a young street tree or a large shrub, not a 14 m mature maple. Fixes: raise the crown base to about 35% height, widen the crown to roughly a 1.1:1 width-to-height ratio with 3-4 visible forking limbs, taper and flare the trunk, add grey ridged bark and reduce the yellow highlight speckle.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r17a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r20c",
+    "file": "assets/models/raw/rejected/tree-oak-r20c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r28.json",
+      "notes": "The broad, irregular, spreading crown on a thick short trunk with heavy limbs forking low (front view) matches the open-grown parkland oaks in aronimink-151 and the left edge of commons-bethpage-golf-course. The clear trunk is too short, though: under 1/4 of the height against about 1/3 in aronimink-151 and the bethpage-2009 treeline, so raise the crown base 1-2 m. The mid/yellow-green foliage is close to the Bethpage spring photo but slightly too saturated and light compared with the darker, duller greens of bethpage-2009 and aronimink-322, so darken the base by about 10-15% and desaturate it a little. Detail defects: loose leaf cards float clear of the crown on both sides of the front view (around x=130-170 and x=510, y=420), the card edges show jagged alpha-clip stairs, and the large see-through gaps in the upper crown (front, top-left) read as missing geometry rather than natural openings. Fix by culling or reattaching the orphan cards, using alpha-to-coverage or a softer cutoff, and adding inner-crown fill cards. The bark is a flat grey-brown with no visible furrowing, which is fine at game distance but plain up close.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r20c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r20b",
+    "file": "assets/models/raw/rejected/tree-maple-r20b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0d3-7962-728d-aa5b-5858f8b73d98",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 3.0,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r28.json",
+      "notes": "The rounded-oval crown broadly fits the deciduous parkland trees behind the green in aronimink-327 (right) and aronimink-322. However, the trunk is too slender for a mature 14 m maple and reads as a young street tree; double the trunk radius at the base and thicken the main scaffold limbs. A bare leader with a small leaf tuft spikes above the crown in both side views, which breaks the dome. Trim it or fold it into the crown. The top view is the worst defect: the foliage is a hollow ring with an empty centre that shows bare branches and stray leaf cards, so from the game's aerial or chase camera it looks like a donut. Fill the crown interior or top with cards. The foliage colour is a plausible mid-green, close to the Bethpage spring photo, but it should also be darkened and desaturated slightly toward aronimink-322/327. Also fix the floating cards along the silhouette edges (threequarter at the left and top-left) and the jagged alpha-clip edges.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r20b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r21c",
+    "file": "assets/models/raw/rejected/tree-oak-r21c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r29.json",
+      "notes": "Front view reads as an open-grown parkland oak: wide, lumpy, irregular crown with gaps and a stout trunk forking into spreading limbs, close to the big hardwoods framing the green in commons-bethpage-golf-course.jpg and the right-hand trees in aronimink-327. Clear trunk is short (about a quarter of the height); the Bethpage 2009 tree line and aronimink-151 show more bare trunk under a higher crown, so raise the crown base by about 15-20%. Foliage is a slightly cool, saturated green with near-black cavities between clumps; the photos read as softer olive to mid green, so warm the hue a little and lift the shadow floor. Detail is the weak point: hard-edged leaf-card clusters show clearly at the crown rim, thin stray branch slivers poke out of the canopy on the three-quarter view at right-centre, and the bark is flat untextured grey. Add bark normal/albedo variation, feather the card alpha edges and trim the orphan branch cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r21c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r21a",
+    "file": "assets/models/raw/rejected/tree-maple-r21a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0d3-7962-728d-aa5b-5858f8b73d98",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r29.json",
+      "notes": "The colour works: the brighter yellow-green foliage matches the sunlit deciduous canopy in commons-bethpage-golf-course.jpg better than the oak does. The form is a dense, symmetric egg or lollipop with an isolated foliage tuft sticking up at the apex in front.jpg. Mature parkland maples like the rounded tree at right in aronimink-327 have a broader, flatter-topped dome with a fuller lower skirt, so widen the crown about 15%, flatten the top and remove the apex tuft. top.jpg shows a doughnut: the crown centre is empty and shows bare branches and the grey background, which will look like a hole from elevated golf cameras, so fill the inner shell with foliage cards. The trunk is too thin for a 14 m tree and is visibly low-poly, with a flat triangular facet and a sharp wedge at the base in threequarter.jpg; thicken it by about 30%, add root flare, smooth the normals and add bark texture. Thin, straight stick branches show through the canopy gaps; taper them and give them proper bark material.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r21a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r22a",
+    "file": "assets/models/raw/rejected/tree-oak-r22a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r30.json",
+      "notes": "The front view gets the parkland-oak shape broadly right. It has a short clear trunk forking low into several scaffold limbs under a broad rounded crown, much like the open-grown oak in commons-bmw-aronimink-tournament-151. But the crown has a large notch bitten out of the upper right in the front view and an obvious see-through hole in the three-quarter view. Stray leaf cards also float detached below the crown on the left, so it does not have the dense, layered mass of the oaks in commons-bethpage-golf-course and in the Bethpage 2009 US Open tree line. The foliage cards are far too large: each leaf reads at roughly half a metre, with jagged pixelated alpha edges. The canopy looks like lettuce or ivy rather than fine oak foliage, and this makes the tree read closer to 6-8 m than 16 m. The colour is plausible but too saturated and yellow-green on the highlights next to the deeper, more muted olive canopies in the Aronimink photos. The bark is flat grey with little furrowing, and the trunk is thin for a mature oak. Fixes: shrink the leaf cards about 3-4x and increase their count, clean the alpha edges (use alpha-to-coverage or a premultiplied mipmap), fill the crown gaps and remove the detached cards, thicken the trunk with root flare, add deeply furrowed dark grey-brown bark, and shift the foliage toward a darker olive green (around #4a5d32) with less yellow in the highlights.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r22a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r22c",
+    "file": "assets/models/raw/rejected/tree-oak-r22c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r31.json",
+      "notes": "Front view's broad, lumpy, irregular dome crown on a short thick trunk with low spreading scaffold limbs, plus the round, gappy top view, reads like the open-grown parkland oaks in the Aronimink 151 and 327 photos and the Bethpage 2009 US Open tree line. In the three-quarter view the lower crown hangs down almost to the trunk base and hides the trunk, so it loses the 4-5 m clear bole the reference oaks show. Raise the lowest foliage clusters about 15-20% or prune the lower skirt on that side. Foliage colour is plausible but slightly cool and blue-saturated compared with the warmer yellow-green of commons-bethpage-golf-course.jpg, and the bark is a flat grey-brown with no visible furrowing. Detail is the main defect: the foliage reads as obvious jagged flat leaf-card clumps with near-black seams between them, and in the three-quarter view a bare grey branch spike pokes out of the crown at centre, and there are stray card slivers at the right edge (around x 400, y 420). Fixes: remove or leaf the exposed bare branch tips, soften card alpha edges and lift the darkest in-crown shading, add more but smaller leaf clusters so individual cards stop reading, and give the trunk a furrowed bark normal or texture.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r22c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   }
 ]
