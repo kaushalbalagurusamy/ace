@@ -153,6 +153,9 @@ export function turfMasks(hole: number): [THREE.DataTexture, THREE.DataTexture] 
 const TILES = `float[6](${TURF_LAYERS.map(l => l.tile.toFixed(2)).join(', ')})`;
 const TURF_COMMON = /* glsl */`
 uniform sampler2D uDetail; varying vec2 vWxz;
+#ifdef HAS_FINE
+uniform sampler2D uFine; uniform vec4 uGridF; varying float vFine; varying vec2 vBunk;
+#endif
 #ifdef HAS_SEA
 uniform sampler2D uSea; uniform vec4 uGrid;
 #endif
@@ -170,6 +173,10 @@ float tNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
 // Blend the surfaces by the lie masks (edges jittered so they are not grid-straight), two samplings per surface for anti-tiling
 // (the second rotated, larger and offset, chosen by world noise), macro colour variation, and mowing stripes across the tee-pin axis.
 const TURF_MAP = /* glsl */`
+#ifdef HAS_FINE
+{ ivec2 fs = textureSize(uFine, 0); vec2 fu = (vec2(-vWxz.x, vWxz.y) - uGridF.xy) * uGridF.zw;
+  if (vFine < 0.5 && texelFetch(uFine, clamp(ivec2(floor(fu * vec2(fs))), ivec2(0), fs - 1), 0).r > 0.5) discard; }   // a fine tile is drawn here
+#endif
 #ifdef HAS_SEA
 if (textureLod(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw, 0.0).r > 0.55) discard;   // the ocean (ocean.ts) and the cliffs (coast.ts) show through
 #endif
@@ -185,6 +192,11 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
   vec4 wa = texture2D(uMaskA, muv); vec2 wb = texture2D(uMaskB, muv).rg;
   float wt[6] = float[6](wa.r, wa.g, wa.b, wa.a, wb.r, wb.g);
   float sum = wa.r + wa.g + wa.b + wa.a + wb.r + wb.g;
+#ifdef HAS_FINE
+  // on a sculpted bunker the sand ends crisply at the foot of the grass face (the geometry's own edge), not along the blurred mask
+  bool bowl = vFine > 0.5 && vBunk.x >= 0.0;
+  if (bowl) { float rest = sum - wt[5], s = clamp(vBunk.x, 0.0, 1.0); for (int i = 0; i < 5; i++) wt[i] = rest > 0.01 ? wt[i] / rest * (1.0 - s) : (i == 2 ? 1.0 - s : 0.0); wt[5] = s; sum = 1.0; }
+#endif
   if (sum > 0.004) {
     const mat2 ROT = mat2(0.8085, 0.5885, -0.5885, 0.8085);
     float k = smoothstep(0.3, 0.7, tNoise(vWxz * 0.11));
@@ -202,13 +214,26 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
     alb *= (0.9 + 0.2 * tNoise(vWxz * 0.021)) * (0.95 + 0.1 * tNoise(vWxz * 0.19 + 5.1));
     // Pebble's bunker lips: a ragged ring of longer, darker, straw-tipped fescue where the turf meets the white sand
     float ws = wt[5] / sum, lip = smoothstep(0.04, 0.3, ws) * (1.0 - smoothstep(0.42, 0.75, ws)) * (1.0 - wt[4] / sum) * (0.6 + 0.6 * tNoise(vWxz * 2.3));
+  #ifdef HAS_FINE
+    if (bowl) lip = 0.0;
+  #endif
     alb = mix(alb, mix(vec3(0.17, 0.2, 0.08), vec3(0.42, 0.38, 0.2), tNoise(vWxz * 5.0)), clamp(lip, 0.0, 0.85));
     // the flat ground has no bunker bowl, so fake its face: the lip toward the sun shades the sand behind it (sun from environment.ts SUN_DIR)
+  #ifdef HAS_FINE
+    // real bowls here (fineTiles): the light does the face; the sand is raked in lines that fade before they alias
+    float rph = dot(sim, vec2(0.6, 0.8)) * 19.0 + tNoise(vWxz * 0.35) * 7.0, rfw = fwidth(rph);
+    alb *= 1.0 + ws * (0.1 * sin(rph) * (1.0 - smoothstep(0.6, 2.2, rfw)) + 0.06);
+    if (bowl) alb *= mix(1.0, 0.72 + 0.2 * tNoise(vWxz * 3.0), vBunk.y);   // the dense, darker grass collar down the face
+  #else
     float wsSun = texture2D(uMaskB, muv + vec2(-0.507, -0.862) * 1.6 * uGrid.zw).g;
     alb *= 1.0 - 0.45 * ws * clamp(1.0 - wsSun * 1.4, 0.0, 1.0);
+  #endif
   #ifdef HAS_SEA
     // traced sand on the cliff tops and shore reads as native scrub and fescue in the photos (h08-chasm, h06-cliffs), not white bunker sand
     float coast = smoothstep(0.02, 0.12, textureLod(uSea, muv, 4.0).r) * ws;
+  #ifdef HAS_FINE
+    if (bowl) coast = 0.0;
+  #endif
     alb = mix(alb, mix(vec3(0.075, 0.1, 0.03), vec3(0.16, 0.14, 0.07), tNoise(vWxz * 0.6)) * (0.8 + 0.4 * tNoise(vWxz * 4.0)), coast);
   #endif
     float sp = dot(sim, uStripe);
@@ -228,20 +253,20 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
 }
 #endif`;
 
-type TerrainU = { uSea: { value: THREE.Texture | null }; uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 } };
+type TerrainU = { uFine: { value: THREE.Texture | null }; uSea: { value: THREE.Texture | null }; uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 }; uGridF: { value: THREE.Vector4 } };
 /** Ground mesh for a hole in three space (x mirrored, as everywhere in the client). Starts with the lie grid's canvas colours;
  *  the HD turf replaces them once `turf` resolves (if it resolves to null, a generated grass texture is multiplied in as detail instead). */
 export function terrainMesh(h: Pick<HoleInfo, 'course' | 'index' | 'tee' | 'pin'>, turf: Promise<Turf | null>, detail: boolean): THREE.Mesh {
   const hole = keyOf(h), g = gridOf(hole), tex = new THREE.CanvasTexture(gridCanvas(hole, 4, true, false));
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const ax = h.pin.x - h.tee.x, az = h.pin.z - h.tee.z, al = Math.hypot(ax, az) || 1;
-  const u: TerrainU = { uSea: { value: seaField(hole).tex }, uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
-    uGrid: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) }, uStripe: { value: new THREE.Vector2(-az / al, ax / al) } };
+  const u: TerrainU = { uFine: { value: null }, uSea: { value: seaField(hole).tex }, uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
+    uGrid: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) }, uStripe: { value: new THREE.Vector2(-az / al, ax / al) }, uGridF: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) } };
   const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, metalness: 0 });
   mat.userData.turf = u;
   mat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, u);
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;');
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;\n#ifdef HAS_FINE\nattribute float aFine; varying float vFine; attribute vec2 aBunk; varying vec2 vBunk;\n#endif').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;\n#ifdef HAS_FINE\nvFine = aFine; vBunk = aBunk;\n#endif');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>\n${TURF_COMMON}`)
       .replace('#include <map_fragment>', `#include <map_fragment>\n${TURF_MAP}`)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n#ifdef HAS_TURF\nroughnessFactor = mix(roughnessFactor, turfN.z, turfW);\n#endif')
@@ -256,6 +281,12 @@ export function terrainMesh(h: Pick<HoleInfo, 'course' | 'index' | 'tee' | 'pin'
   geo.computeVertexNormals();
   const m = new THREE.Mesh(geo, mat);
   m.position.set(cx, 0, cz); m.receiveShadow = true; m.userData.hole = hole;
+  const fine = fineTiles(hole, geo, hh.nx - 1, hh.nz - 1, cx, cz);
+  if (fine) {   // the sculpted bunkers and mounds: same material, the coarse ground is discarded under them
+    geo.setAttribute('aFine', new THREE.Float32BufferAttribute(new Float32Array(pos.count), 1));
+    const f = new THREE.Mesh(fine, mat); f.receiveShadow = true; m.add(f);
+    u.uFine.value = micro(hole).mask;
+  }
   void turf.then(t => setTurf(m, t, detail));
   return m;
 }
@@ -268,8 +299,126 @@ export function setTurf(m: THREE.Mesh, t: Turf | null, detail: boolean) {
   } else void loadTexture('tex-rough').then(d => { if (d && !u.uAlb.value) { u.uDetail.value = d; mat.defines = { ...seaDefs(m.userData.hole as number), HAS_DETAIL: '' }; mat.needsUpdate = true; } });
 }
 export const isCoastal = (hole: number) => gridOf(hole).coastal;
-/** Coastal holes cut the sea out of the terrain so the ocean and cliffs below show through. */
-const seaDefs = (hole: number): Record<string, string> => (gridOf(hole).coastal && seaField(hole).any ? { HAS_SEA: '' } : {});
+/** Coastal holes cut the sea out of the terrain so the ocean and cliffs below show through; holes with sculpted bunkers hide the coarse ground under the fine tiles. */
+const seaDefs = (hole: number): Record<string, string> => ({ ...(gridOf(hole).coastal && seaField(hole).any ? { HAS_SEA: '' } : {}), ...(micro(hole).tiles.length ? { HAS_FINE: '' } : {}) });
+
+// ---- Visual micro-terrain (Pebble only): bunker bowls with steep grass faces and a lip, and mounds around the 17th and 18th greens.
+// Client-side drawing only: the server's lie and physics keep the shared height field; the ball, golfers, cart and grass are drawn
+// on visualGround so they sit in the bowl rather than float over it.
+const SAND = 115, GREEN_C = 103, FAIRWAY = 102, TILE_CELLS = 8, FINE_SEGS = 24;
+interface Micro { sd: Float32Array; green: Float32Array; fair: Float32Array; seaD: Float32Array; mounds: boolean; tiles: number[]; mask: THREE.DataTexture | null }
+const micros = new Map<number, Micro>();
+/** Chamfer distance (m) from each cell to the nearest cell where `src` is true (0 on those cells). */
+function distTo(g: HoleGrid, src: (i: number) => boolean): Float32Array {
+  const n = g.nx * g.nz, d = new Float32Array(n);
+  for (let i = 0; i < n; i++) d[i] = src(i) ? 0 : 1e9;
+  const D = (i: number, j: number, w: number) => { if (d[j]! + w < d[i]!) d[i] = d[j]! + w; }, c1 = g.cell, c2 = g.cell * 1.414;
+  for (let z = 0; z < g.nz; z++) for (let x = 0; x < g.nx; x++) { const i = z * g.nx + x; if (x) D(i, i - 1, c1); if (z) { D(i, i - g.nx, c1); if (x) D(i, i - g.nx - 1, c2); if (x < g.nx - 1) D(i, i - g.nx + 1, c2); } }
+  for (let z = g.nz - 1; z >= 0; z--) for (let x = g.nx - 1; x >= 0; x--) { const i = z * g.nx + x; if (x < g.nx - 1) D(i, i + 1, c1); if (z < g.nz - 1) { D(i, i + g.nx, c1); if (x < g.nx - 1) D(i, i + g.nx + 1, c2); if (x) D(i, i + g.nx - 1, c2); } }
+  return d;
+}
+function micro(hole: number): Micro {
+  const hit = micros.get(hole); if (hit) return hit;
+  const g = gridOf(hole), n = g.nx * g.nz, none: Micro = { sd: new Float32Array(0), green: new Float32Array(0), fair: new Float32Array(0), seaD: new Float32Array(0), mounds: false, tiles: [], mask: null };
+  if (courseOf(hole) !== 'pebble') { micros.set(hole, none); return none; }   // parkland courses keep their flat bunkers
+  const cells = decoded(hole), sea = seaField(hole).sea, sand = new Uint8Array(n);
+  // bunkers only: traced sand within reach of the sea is native scrub on the cliff tops (terrain shader), not a bowl
+  const seaD = distTo(g, i => !!sea[i]), seen = new Uint8Array(n);
+  for (let s = 0; s < n; s++) if (cells[s] === SAND && !seen[s]) {
+    const comp = [s]; seen[s] = 1; let near = 0;
+    for (let k = 0; k < comp.length; k++) { const i = comp[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && cells[j] === SAND && !seen[j]) { seen[j] = 1; comp.push(j); } }
+    for (const i of comp) near += seaD[i]! < 8 ? 1 : 0;
+    if (near < comp.length * 0.2) for (const i of comp) sand[i] = 1;
+  }
+  // signed distance to the bunker edge, metres, positive in the sand; the edge sits half a cell from the cell centres
+  const din = distTo(g, i => !sand[i]), dout = distTo(g, i => !!sand[i]), sd = new Float32Array(n);
+  for (let i = 0; i < n; i++) sd[i] = sand[i] ? din[i]! - g.cell / 2 : -(dout[i]! - g.cell / 2);
+  // a 3x3 box pass (plus a little back for the shrink) rounds off the 2 m cell staircase, so the lips curve instead of zigzagging
+  for (let pass = 0; pass < 1; pass++) { const src = sd.slice(); for (let z = 1; z < g.nz - 1; z++) for (let x = 1; x < g.nx - 1; x++) { let a = 0; for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) a += Math.max(-8, src[(z + dz) * g.nx + x + dx]!); sd[z * g.nx + x] = a / 9 + 0.35; } }
+  const k = hole % HOLES_PER_COURSE, mounds = k === 16 || k === 17;
+  const m: Micro = { sd, mounds, tiles: [], mask: null,
+    green: mounds ? distTo(g, i => cells[i] === GREEN_C) : new Float32Array(0), fair: mounds ? distTo(g, i => cells[i] === FAIRWAY) : new Float32Array(0), seaD };
+  micros.set(hole, m);
+  // 16 m tiles where the offset is non-zero anywhere on their fine vertices get a fine mesh; the coarse ground is hidden there
+  const tx = Math.ceil(g.nx / TILE_CELLS), tz = Math.ceil(g.nz / TILE_CELLS), T = TILE_CELLS * g.cell, step = T / FINE_SEGS, px = new Uint8Array(n);
+  for (let j = 0; j < tz; j++) for (let i = 0; i < tx; i++) {
+    let hit = false; const x0 = g.x0 + i * T, z0 = g.z0 + j * T;
+    for (let b = 0; b <= FINE_SEGS && !hit; b++) for (let a = 0; a <= FINE_SEGS && !hit; a++) if (dip(hole, x0 + a * step, z0 + b * step) !== 0) hit = true;
+    if (!hit) continue;
+    m.tiles.push(j * tx + i);
+    for (let cz = j * TILE_CELLS; cz < Math.min(g.nz, (j + 1) * TILE_CELLS); cz++) px.fill(255, cz * g.nx + i * TILE_CELLS, cz * g.nx + Math.min(g.nx, (i + 1) * TILE_CELLS));
+  }
+  if (m.tiles.length) { m.mask = new THREE.DataTexture(px, g.nx, g.nz, THREE.RedFormat); m.mask.unpackAlignment = 1; m.mask.needsUpdate = true; }
+  return m;
+}
+/** Bilinear sample of a per-cell field at sim (x, z) (cell centres). */
+function cellLerp(g: HoleGrid, f: Float32Array, x: number, z: number): number {
+  const fx = Math.min(g.nx - 1, Math.max(0, (x - g.x0) / g.cell - 0.5)), fz = Math.min(g.nz - 1, Math.max(0, (z - g.z0) / g.cell - 0.5));
+  const i = Math.min(g.nx - 2, Math.floor(fx)), j = Math.min(g.nz - 2, Math.floor(fz)), u = fx - i, v = fz - j, k = j * g.nx + i;
+  return (1 - v) * ((1 - u) * f[k]! + u * f[k + 1]!) + v * ((1 - u) * f[k + g.nx]! + u * f[k + g.nx + 1]!);
+}
+const sstep = (a: number, b: number, t: number) => { const x = Math.min(1, Math.max(0, (t - a) / (b - a))); return x * x * (3 - 2 * x); };
+/** Bunker cross-section by signed distance to the traced edge (m, + in the sand): a rounded grass lip about 0.4 m proud a few metres
+ *  out, a steep grass face down to the edge, then a sand floor 0.75 m down that dishes a little more toward the middle. */
+export function bunkerProfile(sd: number): number {
+  if (sd >= 0) return -0.75 - 0.25 * sstep(0, 5, sd);
+  if (sd > -1.4) return 0.4 - 1.15 * sstep(-1.4, 0, sd);
+  return 0.4 * sstep(-4.5, -1.4, sd);
+}
+/** How far the drawn ground departs from the physics ground at sim (x, z) (metres, 0 off Pebble and away from bunkers and mounds). */
+export function dip(hole: number, x: number, z: number): number {
+  const m = micro(hole); if (!m.sd.length) return 0;
+  const g = gridOf(hole), sd = cellLerp(g, m.sd, x, z);
+  let off = sd > -4.5 ? bunkerProfile(sd) : 0;
+  if (m.mounds) {
+    const gd = cellLerp(g, m.green, x, z);
+    if (gd > 2.5 && gd < 18) {
+      const w = Math.sin(Math.PI * (gd - 2.5) / 15.5) * sstep(1, 6, cellLerp(g, m.fair, x, z)) * sstep(3, 8, cellLerp(g, m.seaD, x, z));
+      if (w > 0) off += 1.1 * w * (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.23 + Math.sin(z * 0.17) * 2.1) * Math.cos(z * 0.21 - x * 0.07)));
+    }
+  }
+  return Math.abs(off) < 1e-4 ? 0 : off;
+}
+/** The drawn ground: the physics height plus the visual bunker bowls and green mounds. For the ball, golfers, cart, grass and camera. */
+export const visualGround = (hole: number, x: number, z: number) => ground(hole, x, z) + dip(hole, x, z);
+
+/** Fine 16 m tiles over the bunkers and mounds (2/3 m spacing), in the terrain mesh's local frame, for `coarse` (the 4 m plane, before its
+ *  position is set). Each tile follows the coarse triangles exactly plus the offset, with a skirt so no crack shows where it meets them. */
+function fineTiles(hole: number, coarse: THREE.BufferGeometry, segX: number, segZ: number, cx: number, cz: number): THREE.BufferGeometry | null {
+  const m = micro(hole); if (!m.tiles.length) return null;
+  const g = gridOf(hole), w = g.nx * g.cell, d = g.nz * g.cell, sw = w / segX, sh = d / segZ, P = coarse.attributes.position!, N = coarse.attributes.normal!;
+  const node = (i: number, j: number) => j * (segX + 1) + i;
+  /** coarse triangle interpolation (PlaneGeometry splits each quad along (i, j+1)-(i+1, j)) of height and normal at sim (x, z) */
+  const coarseAt = (x: number, z: number, n: THREE.Vector3) => {
+    const u = Math.min(segX - 1e-6, Math.max(0, (g.x0 + w - x) / sw)), v = Math.min(segZ - 1e-6, Math.max(0, (z - g.z0) / sh)), i = Math.floor(u), j = Math.floor(v), fu = u - i, fv = v - j;
+    const [A, Bn, C, wa, wb, wc] = fu + fv <= 1 ? [node(i, j), node(i, j + 1), node(i + 1, j), 1 - fu - fv, fv, fu] : [node(i + 1, j + 1), node(i, j + 1), node(i + 1, j), fu + fv - 1, 1 - fu, 1 - fv];
+    n.set(N.getX(A) * wa + N.getX(Bn) * wb + N.getX(C) * wc, N.getY(A) * wa + N.getY(Bn) * wb + N.getY(C) * wc, N.getZ(A) * wa + N.getZ(Bn) * wb + N.getZ(C) * wc);
+    return P.getY(A) * wa + P.getY(Bn) * wb + P.getY(C) * wc;
+  };
+  const tx = Math.ceil(g.nx / TILE_CELLS), T = TILE_CELLS * g.cell, st = T / FINE_SEGS, R = FINE_SEGS + 1;
+  const pos: number[] = [], nrm: number[] = [], bunk: number[] = [], idx: number[] = [], n = new THREE.Vector3(), e = 0.25;
+  for (const t of m.tiles) {
+    const x0 = g.x0 + (t % tx) * T, z0 = g.z0 + Math.floor(t / tx) * T, base = pos.length / 3;
+    for (let b = 0; b < R; b++) for (let a = 0; a < R; a++) {
+      const x = x0 + a * st, z = z0 + b * st, y = coarseAt(x, z, n) + dip(hole, x, z);
+      // offset slope tilts the coarse normal (three x is mirrored sim x)
+      const fx = -(dip(hole, x + e, z) - dip(hole, x - e, z)) / (2 * e), fz = (dip(hole, x, z + e) - dip(hole, x, z - e)) / (2 * e);
+      n.divideScalar(Math.max(0.2, n.y)).add({ x: -fx, y: 0, z: -fz } as THREE.Vector3).normalize();
+      pos.push(-x - cx, y, z - cz); nrm.push(n.x, n.y, n.z);
+      const sd = cellLerp(g, m.sd, x, z); bunk.push(sd > -4.5 ? sstep(-0.2, 0.2, sd) : -1, sstep(-1.9, -1.2, sd) * (1 - sstep(-0.1, 0.1, sd)));   // sand weight (-1: leave the mask), grass face
+    }
+    for (let b = 0; b < FINE_SEGS; b++) for (let a = 0; a < FINE_SEGS; a++) { const p = base + b * R + a; idx.push(p, p + 1, p + R, p + 1, p + R + 1, p + R); }   // sim x runs to three -x, so this winding faces up
+    // skirt: each edge vertex again 0.4 m lower
+    const ring = [...Array.from({ length: R }, (_, a) => a), ...Array.from({ length: R - 1 }, (_, b) => (b + 1) * R + FINE_SEGS), ...Array.from({ length: R - 1 }, (_, a) => FINE_SEGS * R + FINE_SEGS - 1 - a), ...Array.from({ length: R - 2 }, (_, b) => (FINE_SEGS - 1 - b) * R)];
+    const s0 = pos.length / 3;
+    for (const r of ring) { const k = (base + r) * 3; pos.push(pos[k]!, pos[k + 1]! - 0.4, pos[k + 2]!); nrm.push(nrm[k]!, nrm[k + 1]!, nrm[k + 2]!); bunk.push(bunk[(base + r) * 2]!, bunk[(base + r) * 2 + 1]!); }
+    for (let q = 0; q < ring.length; q++) { const a = base + ring[q]!, b2 = base + ring[(q + 1) % ring.length]!, a1 = s0 + q, b1 = s0 + (q + 1) % ring.length; idx.push(a, b2, a1, b2, b1, a1, a, a1, b2, b2, a1, b1); }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+  geo.setAttribute('aFine', new THREE.Float32BufferAttribute(new Float32Array(pos.length / 3).fill(1), 1)); geo.setAttribute('aBunk', new THREE.Float32BufferAttribute(bunk, 2)); geo.setIndex(idx); geo.computeBoundingSphere();
+  return geo;
+}
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
 export const themeOf = (hole: number) => COURSES[COURSE_IDS[Math.floor(hole / HOLES_PER_COURSE)]!].theme;

@@ -4,7 +4,7 @@ import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } fro
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { DEFAULT_COURSE, gridKey, keyOf, type CourseId } from '../shared/courses';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { baseY, ground, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh, themeOf } from './terrain';
+import { baseY, dip, visualGround, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh, themeOf } from './terrain';
 import { gridOf } from '../shared/courses';
 import { hole as courseHole } from '../server/course';
 const holeInfo = (i: number) => courseHole(i).info;
@@ -83,7 +83,7 @@ export class World {
   private turf: Promise<Turf | null>;
   private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3(); private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion();
   /** Ground height at sim (x, z) on a hole (default: the one I am on). */
-  groundAt(x: number, z: number, hole = this.myHole) { return ground(gridKey(this.courseId, hole), x, z); }
+  groundAt(x: number, z: number, hole = this.myHole) { return visualGround(gridKey(this.courseId, hole), x, z); }
   /** A three-space point standing on the ground of `hole` at sim (x, z), lifted by `dy`. */
   private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, this.groundAt(x, z, hole) + dy, z); }
   constructor(canvas: HTMLCanvasElement, tier: Tier) {
@@ -334,7 +334,7 @@ export class World {
       const a = Math.atan2(m.ball.x - prev.x, m.ball.z - prev.z) - Math.atan2(last.x, last.z), c = Math.cos(a), s = Math.sin(a);
       pts = pts.map(p => ({ x: prev.x + p.x * c + p.z * s, y: p.y, z: prev.z - p.x * s + p.z * c }));
     }
-    const vs = pts.map(p => V(p.x, p.y + 0.22, p.z));
+    const k = gridKey(this.courseId, m.hole), vs = pts.map(p => V(p.x, p.y + 0.22 + dip(k, p.x, p.z), p.z));   // into the drawn bunker bowls too
     if (e.tracer) this.scene.remove(e.tracer);
     e.tracer = new THREE.Line(new THREE.BufferGeometry().setFromPoints(vs), new THREE.LineBasicMaterial({ color: e.shade }));
     e.tracer.geometry.setDrawRange(0, 1); e.tracer.frustumCulled = false; this.scene.add(e.tracer);
@@ -389,7 +389,7 @@ export class World {
     const i = Math.max(0, Math.min(17, (v[0] ?? 1) - 1)), hl = holeInfo(i);
     this.buildCourse(hl); this.myHole = i;
     const ex = v[1] ?? 0, ez = v[3] ?? 0, tx = v[4] ?? 0, tz = v[6] ?? 100;
-    this.cam.position.copy(V(ex, ground(i, ex, ez) + (v[2] ?? 1.6), ez)); this.cam.lookAt(V(tx, ground(i, tx, tz) + (v[5] ?? 1), tz));
+    this.cam.position.copy(V(ex, visualGround(i, ex, ez) + (v[2] ?? 1.6), ez)); this.cam.lookAt(V(tx, visualGround(i, tx, tz) + (v[5] ?? 1), tz));
     if (v[7]) { this.cam.fov = v[7]; this.cam.updateProjectionMatrix(); }
     this.qaTarget = this.tmpA.clone().copy(this.onGround(i, tx, tz));
   }

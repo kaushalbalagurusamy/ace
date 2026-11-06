@@ -2,7 +2,7 @@
 // straw-tipped grass). Code-generated: one InstancedMesh of blade clumps on every turf cell that borders sand.
 import * as THREE from 'three';
 import { gridOf } from '../shared/courses';
-import { cellCode, ground, seaField } from './terrain';
+import { cellCode, seaField, visualGround } from './terrain';
 
 const SAND = 115, GREEN = 103;
 const hash = (x: number, z: number, k: number) => { const s = Math.sin(x * 127.1 + z * 311.7 + k * 74.7) * 43758.5453; return s - Math.floor(s); };
@@ -31,10 +31,13 @@ export function makeFescue(hole: number, perCell: number): THREE.InstancedMesh |
     const x = g.x0 + (ix + 0.5) * g.cell, z = g.z0 + (iz + 0.5) * g.cell, c = cellCode(hole, x, z);
     if (c === SAND || c === GREEN || c === 111 || c === 119 || sea[iz * g.nx + ix]) continue;   // not on stray land specks drawn as sea
     if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => cellCode(hole, x + dx! * g.cell, z + dz! * g.cell) === SAND)) continue;
-    for (let k = 0; k < perCell; k++) spots.push([x + (hash(x, z, k) - 0.5) * g.cell, z + (hash(z, x, k + 7) - 0.5) * g.cell]);
+    for (let k = 0; k < perCell; k++) {
+      const sx = x + (hash(x, z, k) - 0.5) * g.cell, sz = z + (hash(z, x, k + 7) - 0.5) * g.cell;
+      if (![[0, 0], [1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]].some(([dx, dz]) => cellCode(hole, sx + dx!, sz + dz!) === SAND)) spots.push([sx, sz]);   // never in the sand
+    }
   }
   if (!spots.length) return null;
   const im = new THREE.InstancedMesh(geo ??= tuftGeometry(), mat, spots.length), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), s = new THREE.Vector3(), p = new THREE.Vector3();
-  spots.forEach(([x, z], i) => im.setMatrixAt(i, m.compose(p.set(-x, ground(hole, x, z) - 0.03, z), q.setFromAxisAngle(up, hash(x, z, 3) * 6.28), s.setScalar(0.8 + 0.7 * hash(z, x, 5)))));
+  spots.forEach(([x, z], i) => im.setMatrixAt(i, m.compose(p.set(-x, visualGround(hole, x, z) - 0.03, z), q.setFromAxisAngle(up, hash(x, z, 3) * 6.28), s.setScalar(0.8 + 0.7 * hash(z, x, 5)))));
   im.receiveShadow = true; im.computeBoundingSphere(); im.name = 'fescue'; return im;
 }
