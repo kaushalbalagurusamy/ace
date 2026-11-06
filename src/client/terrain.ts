@@ -152,12 +152,12 @@ export function turfMasks(hole: number): [THREE.DataTexture, THREE.DataTexture] 
 
 const TILES = `float[6](${TURF_LAYERS.map(l => l.tile.toFixed(2)).join(', ')})`;
 const TURF_COMMON = /* glsl */`
-uniform sampler2D uDetail; varying vec2 vWxz;
+uniform sampler2D uDetail; varying vec2 vWxz; varying float vUpY; varying float vWy;
 #ifdef HAS_FINE
 uniform sampler2D uFine; uniform vec4 uGridF; varying float vFine; varying vec2 vBunk;
 #endif
 #ifdef HAS_SEA
-uniform sampler2D uSea; uniform vec4 uGrid;
+uniform sampler2D uSea; uniform vec4 uGrid; uniform float uSeaY;
 #endif
 #ifdef HAS_TURF
 uniform highp sampler2DArray uAlb; uniform highp sampler2DArray uNrm;
@@ -250,23 +250,33 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
     diffuseColor.rgb = mix(diffuseColor.rgb, alb, turfW);
     turfN = nr.xyz;
   }
+#ifdef HAS_SEA
+  // steep ground by the sea is bare cliff (h08-chasm, h06-cliffs): tawny-ochre sandstone in bands, greying toward the water, dark and wet at it
+  float rock = smoothstep(0.9, 0.74, vUpY) * smoothstep(0.0, 0.03, textureLod(uSea, (sim - uGrid.xy) * uGrid.zw, 3.0).r);
+  if (rock > 0.0) {
+    float hs = vWy - uSeaY, band = tNoise(vec2((vWxz.x + vWxz.y) * 0.08, vWy * 1.1)), grain = tNoise(vWxz * 1.7 + vWy);
+    vec3 ochre = mix(vec3(0.36, 0.21, 0.09), vec3(0.55, 0.36, 0.17), band) * (0.8 + 0.4 * grain);
+    vec3 rc = mix(vec3(0.36, 0.35, 0.33) * (0.8 + 0.4 * grain), ochre, smoothstep(1.5, 7.0, hs)) * mix(0.55, 1.0, smoothstep(0.2, 1.6, hs));
+    diffuseColor.rgb = mix(diffuseColor.rgb, rc, rock); turfW *= 1.0 - rock;
+  }
+#endif
 }
 #endif`;
 
-type TerrainU = { uFine: { value: THREE.Texture | null }; uSea: { value: THREE.Texture | null }; uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 }; uGridF: { value: THREE.Vector4 } };
+type TerrainU = { uSeaY: { value: number }; uFine: { value: THREE.Texture | null }; uSea: { value: THREE.Texture | null }; uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 }; uGridF: { value: THREE.Vector4 } };
 /** Ground mesh for a hole in three space (x mirrored, as everywhere in the client). Starts with the lie grid's canvas colours;
  *  the HD turf replaces them once `turf` resolves (if it resolves to null, a generated grass texture is multiplied in as detail instead). */
 export function terrainMesh(h: Pick<HoleInfo, 'course' | 'index' | 'tee' | 'pin'>, turf: Promise<Turf | null>, detail: boolean): THREE.Mesh {
   const hole = keyOf(h), g = gridOf(hole), tex = new THREE.CanvasTexture(gridCanvas(hole, 4, true, false));
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const ax = h.pin.x - h.tee.x, az = h.pin.z - h.tee.z, al = Math.hypot(ax, az) || 1;
-  const u: TerrainU = { uFine: { value: null }, uSea: { value: seaField(hole).tex }, uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
+  const u: TerrainU = { uSeaY: { value: seaY(hole) }, uFine: { value: null }, uSea: { value: seaField(hole).tex }, uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
     uGrid: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) }, uStripe: { value: new THREE.Vector2(-az / al, ax / al) }, uGridF: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) } };
   const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, metalness: 0 });
   mat.userData.turf = u;
   mat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, u);
-    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;\n#ifdef HAS_FINE\nattribute float aFine; varying float vFine; attribute vec2 aBunk; varying vec2 vBunk;\n#endif').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;\n#ifdef HAS_FINE\nvFine = aFine; vBunk = aBunk;\n#endif');
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz; varying float vUpY; varying float vWy;\n#ifdef HAS_FINE\nattribute float aFine; varying float vFine; attribute vec2 aBunk; varying vec2 vBunk;\n#endif').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz; vWy = (modelMatrix * vec4(position, 1.0)).y; vUpY = normalize(mat3(modelMatrix) * objectNormal).y;\n#ifdef HAS_FINE\nvFine = aFine; vBunk = aBunk;\n#endif');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>\n${TURF_COMMON}`)
       .replace('#include <map_fragment>', `#include <map_fragment>\n${TURF_MAP}`)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n#ifdef HAS_TURF\nroughnessFactor = mix(roughnessFactor, turfN.z, turfW);\n#endif')
