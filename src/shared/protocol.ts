@@ -29,7 +29,8 @@ export interface Mover { id: string; hole: number; x: number; z: number; yaw: nu
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
 export interface HoleInfo { course: CourseId; index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
-export interface PlayerRace { id: string; name: string; hole: number; ball: BallState; finishedAtS?: number }
+/** byHole: strokes per hole so far (penalties included; the current hole is in progress until ball.holedOut). */
+export interface PlayerRace { id: string; name: string; hole: number; ball: BallState; byHole: number[]; finishedAtS?: number }
 
 export type ServerMsg =
   | { t: 'welcome'; sessionId: string; name: string; /** secret, sent only to this socket, never broadcast */ token: string }
@@ -42,6 +43,8 @@ export type ServerMsg =
   | { t: 'holedOut'; playerId: string; hole: number; strokes: number; splitS: number; /** true after hole 18 */ finished: boolean }
   /** Sent to the whole lobby 2 s after a hole-out: that player is now on the tee of `hole`. Strokes in `ball` are cumulative. */
   | { t: 'nextHole'; playerId: string; hole: HoleInfo; ball: BallState }
+  /** To the lobby after every shot and hole change: the live scorecard of every racer. */
+  | { t: 'progress'; players: PlayerRace[] }
   /** About 10 Hz to the lobby: every racer's golfer and cart. */
   | { t: 'movers'; players: Mover[] }
   /** To one player: a bump to apply now (add dx, dz to the position; dvx, dvz to the cart's velocity). strength 0..1 for the sound and shake. */
