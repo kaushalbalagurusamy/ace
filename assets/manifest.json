@@ -4883,5 +4883,505 @@
       "date": "2026-11-06"
     },
     "not_committed": "failed the critic; shipped-format GLB kept locally in assets/models/raw/rejected/ (gitignored)"
+  },
+  {
+    "id": "concept-rock-r4",
+    "file": "assets/images/concept-rock-r4.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Images 1 and 2 are real photos of the weathered granite boulders on the coast at Pebble Beach and Point Lobos; image 3 is an earlier concept. Create a photoreal reference image of ONE coastal granite boulder, about 1.4 m tall and 2 m long, seen from a three-quarter view slightly above. Shape: an irregular angular block whose edges have been rounded by weather, with several distinct FLAT FRACTURE PLANES meeting at blunt ridges, one sloping broken joint face, a deep crack splitting one side, chipped corners and a small overhang. NOT an egg, NOT a river cobble, NOT a smooth pebble. The bottom is irregular and narrower, as if half-buried, not flat. Surface: crisp coarse-grained granite with sharp salt-and-pepper speckle (white feldspar, black biotite grains, grey quartz), pitted and rough, fine hairline fissures, patches of crusty pale grey-green and orange lichen on the top surfaces, slight darker weathering streaks below edges. Colour: pale warm grey #B8B2A6 overall. Sharp focus everywhere, high detail, even soft daylight, no strong cast shadows. Isolated single object, whole rock in frame and centred, plain pure white background, no ground, no grass, no text.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 2718,
+      "input_tokens_details": {
+        "image_tokens": 2432,
+        "text_tokens": 286
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 9742
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/coast-rocks-fescue.png",
+      "refs/pebble-photos/seeds/point-lobos-cypress.png",
+      "assets/images/concept-rock-granite-r2.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "concept-pine-r4",
+    "file": "assets/images/concept-pine-r4.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1536",
+    "prompt": "Images 1 and 2 are real photos of mature Monterey pines (Pinus radiata) in the Del Monte Forest at Pebble Beach; image 3 is an earlier concept whose crown was too symmetric. Create a photoreal reference image of ONE mature Monterey pine, about 22 m tall, side view. Trunk: straight, thick, with deeply furrowed, plated dark reddish-brown to grey-brown bark (#5E4436, #7A5541), clear of branches in the lower 40 percent with a few broken branch stubs; above that a few thick, crooked, upward-angled limbs. Crown: broad, IRREGULAR and ASYMMETRIC, flattish rounded top, wider on one side, built from distinct separate dense clumps of needles held at the ends of the limbs, with clear sky gaps between clumps where branches show through. Foliage: dense tufts of long dark green needles (#2C3B26 to #3F5232), visibly needle-textured and spiky at the clump edges, not leafy, not puffy cotton balls. Sharp focus, even soft daylight. Isolated single tree, whole tree in frame and centred, plain pure white background, no ground, no grass, no text.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 3278,
+      "input_tokens_details": {
+        "image_tokens": 3008,
+        "text_tokens": 270
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 8766
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-view-back.png",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "assets/images/concept-pine-r2.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "pine-needle-sheet",
+    "file": "assets/images/pine-needle-sheet.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of Monterey pines at Pebble Beach; image 2 is a concept of the tree. Create a photoreal foliage texture sheet for a game: a 4 by 4 grid of SIXTEEN separate Monterey pine branch-tip needle clusters, each one a dense starburst tuft of long straight dark green needles (#2C3B26 to #4A5E38) radiating from a short brown twig, seen from various angles, each tuft filling its grid cell with a ragged spiky outline. Tufts do not touch each other. Sharp focus, fine needle detail, soft even light, no shadows. Plain pure white background, no text, no labels, no grid lines.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 2458,
+      "input_tokens_details": {
+        "image_tokens": 2304,
+        "text_tokens": 154
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 9482
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-view-back.png",
+      "assets/images/concept-pine-r2.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "rock-r17",
+    "file": "assets/models/raw/rejected/rock-r17.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "rock-r17",
+    "seed_images": [
+      "concept-rock-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 1.4,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#ABA598\" --sat 0.8 --rough 1",
+      "node scripts/bake_detail.mjs assets/images/concept-rock-r4.png --crop 300,480,260 --height 1.4 --tile 0.75 --blur 2 --nblur 3 --bump 2",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-rock-a.json",
+      "notes": "The massing reads as a quarried block or a bar of soap, not a weathered coastal boulder. It has flat planar faces, near-right-angle edges and a squared outline in top.jpg, whereas the granite in coast-rocks-fescue.jpg and cypress-silhouette-sea.jpg is rounded and exfoliated. The long curved crease across the top (threequarter.jpg, top.jpg) and the offset slab step in front.jpg look like a folded-cloth or pinch artefact rather than a joint. The colour is close to the cool pale grey of point-lobos-cypress.jpg, and the orange lichen is plausible, but the dark smeared blotches on the side faces look like baked shadow. Fix: round off all the edges, break up the box outline, and replace the crease with a real joint crack that has depth, or remove it.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/rock-r17/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "rock-r18",
+    "file": "assets/models/raw/rejected/rock-r18.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "rock-r18",
+    "seed_images": [
+      "concept-rock-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 1.4,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#ABA598\" --sat 0.8 --rough 1",
+      "node scripts/bake_detail.mjs assets/images/concept-rock-r4.png --crop 300,480,260 --height 1.4 --tile 0.75 --blur 2 --nblur 3 --bump 2",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify true --simplify-ratio 0.85 --simplify-error 0.002 --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-rock-a.json",
+      "notes": "The rounded, weathered loaf shape and warm grey-beige speckle closely match the boulders in coast-rocks-fescue.jpg and cypress-silhouette-sea.jpg; it is much closer to the real thing than r17. In front.jpg the left end has a thin detached lip or flap that looks like a hollow shell, which is a mesh artefact. The single ruler-straight crack runs cleanly across the whole top (top.jpg, threequarter.jpg) and reads as a mesh seam or split, not a natural joint. In top.jpg the dark speckle clusters form evenly spaced rosettes that hint at a repeating pattern. Fix: fill or remove the flap on the left end, make the crack irregular and let it fade out partway across, and break up the rosette periodicity; with those fixes it should pass.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/rock-r18/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r7",
+    "file": "assets/models/raw/rejected/tree-pine-r7.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r7",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#34472A\" --rest \"#6A4C3C\" --sat 0.7 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.55 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#34472A\" --cards 2300 --cell 200 --flat 0.15 --size 2.7 --min-island 0.002",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.5,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-b.json",
+      "notes": "The front view shows separate flat tiered pads on bare horizontal limbs, which is the bonsai or wind-swept Monterey cypress look (point-lobos-cypress.jpg, the lone tree in h06-cliffs.jpg) that a pine must not have. The pines in the h06-cliffs.jpg and h18-across-bay.jpg tree line have one dense, rounded, irregular dark dome. The top view is an H shape: two lobes with an empty gap and visible branch through the middle. The foliage is a bluish mid-green made of leafy cards with black-edged artefacts, and it reads as broadleaf clumps, not needle tufts. The trunk is smooth and pinkish-mauve where Monterey pine bark is dark grey-brown and deeply furrowed. Fix by merging the pads into one continuous rounded crown, darkening and desaturating the foliage toward the near-black green of the reference tree line, using needle-cluster cards, and darkening and roughening the bark.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r7/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r8",
+    "file": "assets/models/raw/rejected/tree-pine-r8.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#34472A\" --rest \"#6A4C3C\" --sat 0.7 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.7 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#34472A\" --cards 3200 --cell 200 --flat 0.15 --size 1.7 --min-island 0.002",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-b.json",
+      "notes": "This is closer to a Monterey pine than r7: the crown is a more continuous, irregular rounded mass on a tall straight bole, like the tree-line pines in h06-cliffs.jpg and h18-across-bay.jpg. The crown is still lopsided, with a heavy left lobe hanging low, and the top view shows a detached floating foliage clump at the upper right. Up close the foliage cards are leaf-shaped, like oak or ivy, with dark card edges and no needle tufts. Their colour is a lighter bluish green than the dark, dense crowns in the references. The trunk is too smooth and pink-brown, where the bark should be dark grey-brown and furrowed. Fix by removing or reattaching the floating clump, filling and densifying the crown into a fuller dome, switching to needle-tuft textures with a darker, less blue green, and retexturing the bark.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r8/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "rock-r19",
+    "file": "assets/models/raw/rejected/rock-r19.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "rock-r18",
+    "seed_images": [
+      "concept-rock-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 1.4,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#ABA598\" --sat 0.8 --rough 1 --cut x:-0.16",
+      "node scripts/bake_detail.mjs assets/images/concept-rock-r4.png --crop 300,480,260 --height 1.4 --tile 0.8 --blur 2 --nblur 3 --bump 2.5 --mix 1.5",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify true --simplify-ratio 0.85 --simplify-error 0.002 --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-b.json",
+      "notes": "The rounded, flat-bottomed mass and pale speckled grey granite with faint warm flecks match the boulders in coast-rocks-fescue.jpg and the foreground rocks in cypress-silhouette-sea.jpg. The threequarter and top views are convincing, and the single joint crack across the top reads as a real granite fracture. The front view fails on texture: the right flank and lower band show smeared, fur-like directional streaks (stretched UVs or projection blur) instead of crisp grain, so it reads as suede. Fix by re-projecting or re-baking the side texture, or adding a tiling granite detail map on the steep faces. Optionally add slightly darker lichen and weathering near the base, as in point-lobos-cypress.jpg.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/rock-r19/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "rock-r20",
+    "file": "assets/models/rock-r20.glb",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "rock-r18",
+    "seed_images": [
+      "concept-rock-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 1.4,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#ABA598\" --sat 0.8 --rough 1 --cut x:-0.16",
+      "node scripts/bake_detail.mjs assets/images/concept-rock-r4.png --crop 300,480,260 --height 1.4 --tile 0.8 --blur 16 --nblur -1 --bump 0.6 --mix 1.6",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify true --simplify-ratio 0.85 --simplify-error 0.002 --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "PASS",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 4.0,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-c.json",
+      "notes": "The rounded, blocky, weathered boulder with a flat-ish base matches the grey granite boulders in coast-rocks-fescue.jpg. Its pale speckled grey with faint warm flecks sits between those and the lighter, warmer granite in point-lobos-cypress.jpg. The main defect is the single straight fissure running front to back across the top (top.jpg, threequarter.jpg). It reads as one clean seam rather than natural jointing, and it ends in a sharp notch on the back edge; soften or break it into a less regular crack. The front view has a few thin white scratch-like streaks near the lower right and some smeared, blurrier texture on the underside. Granite grain size reads right for a 2 m boulder.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/rock-r20/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": true
+    }
+  },
+  {
+    "id": "tree-pine-r9",
+    "file": "assets/models/raw/rejected/tree-pine-r9.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2A3521\" --rest \"#4E3E34\" --sat 0.7 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#2A3521\" --cards 5000 --cell 200 --flat 0.1 --size 2.2 --min-island 0.003 --sprite 1 --drop-crown 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-c.json",
+      "notes": "The tall bare trunk and rounded, irregular, dark crown do avoid the flat wind-swept cypress pads seen in h18-fairway-bay.jpg and point-lobos-cypress.jpg. The problem is the foliage: it is built from broadleaf leaf-card clusters, so up close it reads as an oak or other deciduous tree, not as needle tufts. The hard black gaps between the cards add to that (threequarter.jpg, front.jpg). The canopy pines in h18-across-bay.jpg and h06-cliffs.jpg show dense, billowy, slightly bluish crowns that are broader relative to height. Here the crown is a narrow, lopsided lollipop on a very slender, uniform pole. A mature 22 m Monterey pine should have a much thicker, slightly tapering trunk with dark grey-brown, deeply furrowed bark, not this smooth purplish-brown. Fixes: replace the leaf cards with needle-tuft cards, thicken and taper the trunk and grey the bark, and widen and fill the crown so the top view (currently two separate lobes) reads as one irregular mass.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r9/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r11",
+    "file": "assets/models/raw/rejected/tree-pine-r11.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2B3824\" --rest \"#4A4239\" --sat 0.7 --rough 1 --thicken 1.8:0.33 --squash 0.88",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.3 --size 2048",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#2B3824\" --cards 3000 --flat 0.1 --size 3.2 --cell 200 --min-island 0.003 --sprite 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-d.json",
+      "notes": "Reads as a pine, not a cypress: the tall clean trunk and rounded, irregular, lopsided dome match the forest-line pines in h06-cliffs.jpg and h18-across-bay.jpg, and nothing has the flat wind-swept pads of the cypress in h18-fairway-bay.jpg. But the crown is one solid continuous blob, both from the side and from above (top.jpg looks like a dense shrub). The real pines, like the left-hand tree in h18-view-back.jpg, show separate tufted clumps with sky gaps and a broader umbrella top; fix by splitting the foliage into 4-7 distinct clusters on visible limbs. Colour is the main failure: the trunk is a pinkish-mauve grey, while real Monterey pine bark is dark grey-brown and deeply furrowed, and the foliage leans cool blue-green where the photos show dark olive-green in sun. Shift the bark toward brown-grey (about #4a4038) and warm the needles slightly. Minor artefacts: small flat fin-like branch stubs stick out of the trunk at mid-height (threequarter.jpg, front.jpg), and a few foliage cards show hard black edges. Remove the stubs and soften the card alpha.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r11/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r12",
+    "file": "assets/models/raw/rejected/tree-pine-r12.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#333D22\" --rest \"#4A4038\" --sat 0.55 --rough 1 --thicken 1.8:0.33 --squash 0.88",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.0 --size 2048",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#333D22\" --cards 3000 --flat 0.1 --size 3.2 --cell 200 --min-island 0.003 --sprite 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-e.json",
+      "notes": "It does not read as a cypress, which is correct, but the solid, cauliflower-like dome with one drooping lobe on the left (front.jpg, threequarter.jpg) reads as a broadleaf oak or elm. The Monterey pines in h18-across-bay.jpg and h06-cliffs.jpg, and the left tree in h18-view-back.jpg, have open crowns made of separate dark clumps, with sky gaps and visible upswept limbs between the clumps. In the side views the foliage cards look like leafy fronds rather than needle tufts. Only top.jpg shows the starburst needle clusters, and the side views should show them too. The trunk base is a hard faceted octagon flare, and there are small floating stub plates on the trunk around mid-height in front.jpg and threequarter.jpg. The colour is a plausible muted dark green, though slightly grey compared with the darker, richer green of the pines in h18-view-back.jpg. Fixes: break the crown into 3-5 separated clumps on visible upswept branches with gaps between them, use needle-tuft cards that face outward, remove the trunk stubs, smooth the base flare, and darken the green slightly.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r12/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-pine-r13",
+    "file": "assets/models/raw/rejected/tree-pine-r13.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2E3A1F\" --rest \"#4A4038\" --sat 0.6 --rough 1 --thicken 1.5:0.33 --squash 0.88",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.0 --size 2048",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#2E3A1F\" --cards 4300 --flat 0 --size 2.8 --drop-crown 1 --cell 200 --min-island 0.003 --sprite 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 4 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (render + matching real photos + rubric only), scratchpad/critic-r4-f.json",
+      "notes": "The silhouette reads correctly as a pine, not a cypress: a tall bare trunk carries a rounded, irregular, lumpy crown with no flat wind-swept pads, which matches the background pines in h18-across-bay.jpg and h06-cliffs.jpg. Two defects in the silhouette: small triangular flap cards stick out of the trunk below the crown (threequarter.jpg, around y=365 and y=395), and the trunk base is visibly faceted. The foliage texture reads as broadleaf leaf clusters, like an oak or a generic deciduous tree, not as Monterey pine needle tufts, and it has many black see-through holes. The crown is also too narrow and columnar for a mature 22 m radiata: compare the broad, wide-spreading dome on the left of h18-view-back.jpg, where the crown is roughly as wide as it is tall. The trunk is smooth and purple-grey, but it should be dark grey-brown with deeply furrowed bark. Fixes: swap in needle-tuft foliage cards with a darker, slightly bluer green; widen the crown about 1.4x and give it a flatter top with a few thick spreading limbs; retexture the bark in dark brown with furrows; delete the stray trunk cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r13/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   }
 ]
