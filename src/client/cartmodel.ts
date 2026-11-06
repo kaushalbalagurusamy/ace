@@ -104,10 +104,10 @@ export function makeCart(shade: string, load = true): CartView {
 
 /** How a generated body sits (assets/manifest.json row cart-body, in the raw model's units): its turn, the radius of the wheels it
  *  was generated with (cut out by scripts/cut_cart_wheels.mjs) and its tyre-bottom height. */
-export interface BodyFit { orient_deg?: number[]; wheel_r?: number; ground_y?: number; stretch_y?: number }
+export interface BodyFit { orient_deg?: number[]; wheel_r?: number; ground_y?: number; stretch_y?: number; seat?: number[]; steer_wheel?: number[] }
 /** Swaps the code shell for a generated body: turned, scaled so its own wheels match the code wheels (WHEEL_R), stretched in height
  *  where the generator squashed the photos' canopy, centred, its tyre bottoms on the ground so the code wheels fill its arches; the
- *  player's roof stripe moves onto its roof. */
+ *  player's roof stripe moves onto its roof; the driver's seat and steering wheel move to the body's own (cart metres) when given. */
 export function fitBody(v: CartView, gen: THREE.Object3D, fit: BodyFit = {}) {
   const g = new THREE.Group(); g.add(gen); gen.rotation.set(...((fit.orient_deg ?? [0, 0, 0]).map(d => (d * Math.PI) / 180) as [number, number, number]));
   const k = WHEEL_R / (fit.wheel_r ?? WHEEL_R), ky = k * (fit.stretch_y ?? 1); gen.scale.set(k, ky, k); gen.updateMatrixWorld(true);
@@ -115,6 +115,8 @@ export function fitBody(v: CartView, gen: THREE.Object3D, fit: BodyFit = {}) {
   gen.position.set(-c.x, -(fit.ground_y ?? b.min.y / ky) * ky, -c.z);  // rotation is about y only, so raw heights scale straight across
   v.shell.visible = false; v.shell.parent!.add(g);
   const stripe = v.body.getObjectByName('stripe'); if (stripe) stripe.position.y = gen.position.y + b.max.y + 0.01;
+  if (fit.seat) v.seat.position.fromArray(fit.seat);
+  if (fit.steer_wheel) v.wheel.position.fromArray(fit.steer_wheel);
   return g;
 }
 
