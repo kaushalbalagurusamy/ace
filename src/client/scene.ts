@@ -16,7 +16,7 @@ import { toMarker, type Marker } from './overlay';
 import { fogDensity, makeEnvironment, SUN_DIR } from './environment';
 import { makeOcean } from './ocean';
 import { makeFescue } from './fescue';
-import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, shorePieces, shoreRockSpots } from './coast';
+import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, seaWallMeshes, shorePieces, shoreRockSpots } from './coast';
 import { GolferRig, hasRig, smoothShading } from './golferrig';
 import { addressPoint, backswingPose, gaitCadence, gaitPose, idlePose, lerpPose, puttPose, releasePose, seatedPose, type Pose } from './golferanim';
 import { CLUBS, clubMatrix, loadClub, makeCodeClub } from './clubs';
@@ -181,7 +181,8 @@ export class World {
     cup.position.set(pin.x, pin.y + 0.012, pin.z); rim.position.set(pin.x, pin.y + 0.013, pin.z);
     this.course.add(pole, flag, cup, rim);
     void this.placeShorePieces(h.index);
-    this.spots = [...propSpots(h.index), ...buildingTrees(h.index, h.pin.z), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
+    // 18: the sea wall stands on the traced rock strip, so no rocks there (they would poke through its face)
+    this.spots = [...propSpots(h.index).filter(s => !(h.index === 17 && s.kind === 'rock')), ...buildingTrees(h.index, h.pin.z), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
     this.propHole = h.index;
     void this.setProps(this.spots);
   }
@@ -215,17 +216,18 @@ export class World {
   /** Generated coast pieces (shown once their rows pass QA): sea-wall sections along 18, cliff blocks at the foot of the tall cliffs. */
   private async placeShorePieces(hole: number) {
     const wall = hole === 17, y = seaY(hole); if (!isCoastal(hole)) return;
-    const token = this.courseToken, course = this.course, id = wall ? 'seawall-r1' : 'cliff-r1', model = await loadModel(id);
+    const token = this.courseToken, course = this.course, id = wall ? 'seawall-r3' : 'cliff-r1', model = await loadModel(id);
     if (!model || token !== this.courseToken) return;   // a newer hole was built meanwhile
+    if (wall) { course.add(...seaWallMeshes(hole, model)); return; }
     // cliff blocks only where the real cliff is over 8 m
-    const spots = wall ? shorePieces(hole, 7, 0.6) : shorePieces(hole, 26, 2.5).filter(s => s.top - y > 8), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+    const spots = shorePieces(hole, 26, 2.5).filter(s => s.top - y > 8), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
     if (!spots.length) return;
     model.updateMatrixWorld(true);
     model.traverse(o => {
       const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
       const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, spots.length);
-      // the wall section's top sits at the turf beside it; cliff blocks stand in the water, scaled to the local cliff height, tops just below the turf
-      spots.forEach((s, j) => { const sc = wall ? 1 : (s.top - y + 2) / 12; im.setMatrixAt(j, m.compose(V(s.x, wall ? s.top - 3 : y - 2, s.z), q.setFromAxisAngle(up, -s.yaw + (wall ? 0 : j * 1.3)), new THREE.Vector3(sc * (wall ? 1.1 : 1), sc, sc)).multiply(mesh.matrixWorld)); });
+      // cliff blocks stand in the water, scaled to the local cliff height, tops just below the turf
+      spots.forEach((s, j) => { const sc = (s.top - y + 2) / 12; im.setMatrixAt(j, m.compose(V(s.x, y - 2, s.z), q.setFromAxisAngle(up, -s.yaw + j * 1.3), new THREE.Vector3(sc, sc, sc)).multiply(mesh.matrixWorld)); });
       im.receiveShadow = true; im.computeBoundingSphere(); course.add(im);
     });
   }

@@ -118,10 +118,10 @@ diffuseColor.rgb *= mix(0.45, 1.0, smoothstep(uWater - 0.3, uWater + 2.2, vWp.y)
 /** Cliff faces (or the 18th-hole sea wall) for a coastal hole; null when the hole has no sea. */
 export function makeCliffs(hole: number): THREE.Mesh | null {
   const segs = shoreSegments(hole); if (!segs.length) return null;
-  // from the real turf edge down past the real sea level, so the water always meets rock; hole 18: the stone sea wall (pebble-look.md), a sloped wall of stacked rounded stones
+  // from the real turf edge down past the real sea level, so the water always meets rock; hole 18: the stone sea wall (pebble-look.md), a plain vertical backing behind the generated wall sections (seaWallMeshes)
   const y = seaY(hole), wall = hole === 17, top = (x: number, z: number) => ground(hole, x, z);
   let tall = 0; for (const s of segs) tall = Math.max(tall, top(s[0]!, s[1]!) - y);
-  const geo = extrudeShore(segs, wall ? { top, bottom: y - 1.5, batter: 0.45, rough: 0.25, rows: 3 } : { top, bottom: y - 3, batter: 0.12, rough: 1.4, rows: Math.max(3, Math.round(tall / 2.5)) });
+  const geo = extrudeShore(segs, wall ? { top, bottom: y - 1.5, batter: 0, rough: 0, rows: 3 } : { top, bottom: y - 3, batter: 0.12, rough: 1.4, rows: Math.max(3, Math.round(tall / 2.5)) });
   const m = new THREE.Mesh(geo, rockMaterial(wall ? 'tex-seawall' : 'tex-cliff', wall ? 3 : 9, y));
   m.receiveShadow = true; m.castShadow = false; m.name = 'cliffs'; return m;
 }
@@ -220,6 +220,84 @@ export function makeBackdrop(hole: number, farM: number): THREE.Group {
     grp.add(band(cx, cz, R * 0.75, seaA + span, seaA + Math.PI * 2 - span, y, a => inland(a) * Math.min(1, Math.min(a - seaA - span, seaA + Math.PI * 2 - span - a) / 0.3), '#1f2a1f', '#2c3a2b', 0.3));
   } else grp.add(band(cx, cz, R * 0.75, 0, Math.PI * 2, y, inland, '#1f2a1f', '#2c3a2b', 0.3));
   grp.name = 'backdrop'; return grp;
+}
+
+/** The 18th's sea wall as sections butted end to end (sim space): the main course land's seaward edge on the bay (left) side, found row by
+ *  row (so offshore rocks, the far right and the beach interior are never used), smoothed, and cut into chords of `ratio` times the local
+ *  wall height (turf at the edge down to `bottom`), so a section keeps the model's proportions. [ax, az] -> [bx, bz] runs with the sea on the left. */
+export function seaWallSections(hole: number, ratio: number, bottom: number): { ax: number; az: number; bx: number; bz: number; topA: number; topB: number }[] {
+  const g = GRIDS[hole]!, sea = seaField(hole).sea, n = g.nx * g.nz, comp = new Int32Array(n).fill(-1);
+  let main = -1, mainN = 0;
+  for (let s = 0, id = 0; s < n; s++) if (!sea[s] && comp[s]! < 0) {
+    const q = [s]; comp[s] = id;
+    for (let k = 0; k < q.length; k++) { const i = q[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && !sea[j] && comp[j]! < 0) { comp[j] = id; q.push(j); } }
+    if (q.length > mainN) { mainN = q.length; main = id; } id++;
+  }
+  // per row: the first main-land cell scanning from the left, if open sea lies just left of it; keep the longest run without jumps
+  let run: [number, number][] = [], cur: [number, number][] = [];
+  for (let z = 0; z < g.nz; z++) {
+    let xs = -1; for (let x = 1; x < g.nx; x++) if (comp[z * g.nx + x] === main) { if (sea[z * g.nx + x - 1]) xs = x; break; }
+    const p: [number, number] = [g.x0 + xs * g.cell, g.z0 + (z + 0.5) * g.cell];
+    if (xs < 0 || (cur.length && Math.abs(p[0] - cur[cur.length - 1]![0]) > 6 * g.cell)) { if (cur.length > run.length) run = cur; cur = xs < 0 ? [] : [p]; } else cur.push(p);
+  }
+  if (cur.length > run.length) run = cur;
+  if (run.length < 8) return [];
+  const smooth = (v: number[], r: number) => v.map((_, i) => { let s = 0, c = 0; for (let k = Math.max(0, i - r); k <= Math.min(v.length - 1, i + r); k++) { s += v[k]!; c++; } return s / c; });
+  // the median edge over 14 m drops one-row fingers (the tee box), then the most seaward over 2 m, eased: the face stays on or just
+  // off the land, so no terrain sliver shows in front of it
+  const win = (v: number[], i: number, r: number) => v.slice(Math.max(0, i - r), i + r + 1);
+  const med = run.map((_, i) => { const w = win(run.map(p => p[0]), i, 3).sort((a, b) => a - b); return w[w.length >> 1]!; });
+  const xs = smooth(smooth(med.map((_, i) => Math.min(...win(med, i, 1))), 4), 4), zs = run.map(p => p[1]);
+  // turf height 2 m inland (the 4 m height grid smears the wall drop over the last cell), eased so the wall top runs smoothly
+  const tops = smooth(smooth(run.map(([x, z]) => ground(hole, x + 2, z) + 0.1), 5), 5);
+  const out: { ax: number; az: number; bx: number; bz: number; topA: number; topB: number }[] = [];
+  // where the eased line would stand over 4 m out in the water (rock knobs by the tee) the wall breaks; each stretch is cut on its own
+  const out4 = run.map(([x], i) => x - xs[i]! > 4), len3 = (i: number) => i >= 0 && out4.slice(i, i + 3).length === 3 && out4.slice(i, i + 3).every(Boolean);
+  const bad = out4.map((b, i) => b && (len3(i - 2) || len3(i - 1) || len3(i)));   // a 1-2 row jog is no break
+  for (let i0 = 0; i0 < run.length;) {
+    let i1 = i0; while (i1 < run.length && !bad[i1]) i1++;
+    if (i1 - i0 >= 10) {   // 20 m or more
+      const X = xs.slice(i0, i1), Z = zs.slice(i0, i1), T = tops.slice(i0, i1);
+      const acc = [0]; for (let i = 1; i < X.length; i++) acc.push(acc[i - 1]! + Math.hypot(X[i]! - X[i - 1]!, Z[i]! - Z[i - 1]!));
+      const at = (a: number) => { let i = 1; while (i < acc.length - 1 && acc[i]! < a) i++; const t = Math.min(1, Math.max(0, (a - acc[i - 1]!) / (acc[i]! - acc[i - 1]! || 1)));
+        return { x: X[i - 1]! + (X[i]! - X[i - 1]!) * t, z: Z[i - 1]! + (Z[i]! - Z[i - 1]!) * t, top: T[i - 1]! + (T[i]! - T[i - 1]!) * t }; };
+      const total = acc[acc.length - 1]!;
+      for (let a = 0; a < total - 1;) {
+        const p = at(a), L = Math.min(total - a, Math.max(2, ratio * (p.top - bottom))), b = at(a + L);
+        out.push({ ax: p.x, az: p.z, bx: b.x, bz: b.z, topA: p.top, topB: b.top }); a += L;
+      }
+    }
+    i0 = Math.max(i1, i0 + 1);
+  }
+  return out;
+}
+
+/** Depth stretch of the wall section: the generated face is near vertical, the real 18th wall is a battered revetment seen from above (h18-green-bunkers). */
+const BATTER = 2.5;
+/** The generated sea-wall section (face toward its local +z, length along x, base at y = 0) instanced along seaWallSections: each section
+ *  stretched along x to its chord, scaled uniformly in height so its top meets the turf at the edge and its foot is under the sea,
+ *  its face-top line on the shore line so the terrain edge meets the wall top. Three space out. */
+export function seaWallMeshes(hole: number, model: THREE.Object3D): THREE.InstancedMesh[] {
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model), size = box.getSize(new THREE.Vector3()), cx = (box.min.x + box.max.x) / 2;
+  const faceZ = box.min.z + 0.19 * size.z;   // seawall-r3: cap back at min z, face top 19 % of the depth in front of it, sand apron beyond the foot
+  const bottom = seaY(hole) - 0.6, secs = seaWallSections(hole, size.x / size.y, bottom), out: THREE.InstancedMesh[] = [];
+  const m = new THREE.Matrix4(), sh = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), off = new THREE.Vector3();
+  model.traverse(o => {
+    const mesh = o as THREE.Mesh; if (!mesh.isMesh || !secs.length) return;
+    const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, secs.length);
+    secs.forEach((s, j) => {
+      const dx = s.bx - s.ax, dz = s.bz - s.az, l = Math.hypot(dx, dz) || 1, sc = ((s.topA + s.topB) / 2 - bottom) / size.y, sx = (l / size.x) * 1.03;   // 3 % overlap hides the joints on curves
+      q.setFromAxisAngle(up, Math.atan2(dz / l, dx / l));   // local +z to the seaward normal: sim (-tz, tx), three (tz, tx)
+      off.set(cx * sx, 0, faceZ * sc * BATTER).applyQuaternion(q);
+      const c = new THREE.Vector3(-(s.ax + s.bx) / 2, bottom, (s.az + s.bz) / 2), k = (s.topB - s.topA) / l, t3x = -dx / l, t3z = dz / l;
+      // shear the section's height along the shore so its top runs from topA to topB and neighbours meet without a step
+      sh.set(1, 0, 0, 0, k * t3x, 1, k * t3z, -k * (t3x * c.x + t3z * c.z), 0, 0, 1, 0, 0, 0, 0, 1);
+      im.setMatrixAt(j, sh.clone().multiply(m.compose(c.clone().sub(off), q, new THREE.Vector3(sx, sc, sc * BATTER))).multiply(mesh.matrixWorld));
+    });
+    im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); out.push(im);
+  });
+  return out;
 }
 
 /** Evenly spaced placements along the shore contour (sim space): every `step` m, pushed `out` m seaward, yaw along the shore;
