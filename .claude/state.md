@@ -80,3 +80,9 @@ The owner has said development may start ("now you can make the MVP").
 - Commit 94303ee says "31 findings"; the count was 33. Not amended.
 - The minesweeper ran on Sonnet, not the Opus its config names.
 - In this session, I (Claude) recommended 2D Phaser. That's withdrawn: golf needs 3D.
+
+## Asset round 2 artifacts (2026-11-06, visual realism worktree)
+
+- **Committed:** `assets/models/tree-cypress-r13.glb` and `assets/models/seawall-r3.glb` (both PASS the independent critic), plus turntable renders under `assets/qa/<id>/` for every scored round-2 candidate.
+- **Kept local, gitignored:** the 32 round-2 GLBs that failed the critic (cliff-r2..r5, rock-r5..r15, seawall-r2, tree-cypress-r5..r12/r14..r16, tree-pine-r2..r6) were moved to `assets/models/raw/rejected/`, so `copy-assets.mjs` no longer ships them. Generator raws stay in `assets/models/raw/`. Manifest rows record each one's critic scores with `file: null`.
+- **Delete** `assets/models/raw/rejected/` once a later round supersedes these; nothing loads from it.
