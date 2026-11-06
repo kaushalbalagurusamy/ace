@@ -3,7 +3,8 @@ import { gridCanvas, rfView } from './terrain';
 import { edgePoint, mapArrowRotation, type Marker } from './overlay';
 import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
 import { TIERS, TIER_LABEL, type Pref, type Tier } from './graphics';
-import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
+import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/protocol';
+import { parText, toPar } from '../shared/scorecard';
 import { BALL_STEPS, shotShape } from '../sim/delivery';
 import type { LobbyView } from '../server/lobby-types';
 import { Backdrop } from './backdrop';
@@ -39,6 +40,7 @@ const HELP_GROUPS: [string, [string, string][]][] = [
   ['Putting', [[k('P'), 'The putter'], [`${k('Space')} hold, release`, 'Stance, draw back, strike: the longer the hold, the harder the putt']]],
   ['Cart', [[k('E'), 'Get in or out of the Genesis cart (within 3 m)'], [k('W', 'A', 'S', 'D'), 'Drive. The mouse swings the chase camera']]],
   ['Rangefinder', [[k('M'), 'Open or close the hole map'], ['Hover', 'Distance from your ball, to the pin and a club suggestion'], ['Click', 'Set a target and auto-pick the club']]],
+  ['Race', [[k('Tab'), 'Scorecard: every racer\'s strokes on every hole'], ['Top left', 'Live standings: hole, strokes and score to par']]],
   ['Settings', [[`${k('Esc')} or ${k('⚙')}`, 'Camera sensitivity and graphics'], [k(',', '.'), 'Look speed down or up'], [k('N'), 'Mute'], [k('F3'), 'Frame rate']]],
 ];
 const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" class="htp-head"><h2 id="htp-t">How to play</h2><button class="x" aria-label="Close">&times;</button></form>
@@ -46,7 +48,24 @@ const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" cla
   <div class="htp-grid">${HELP_GROUPS.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>
   <p class="foot">The red flag marks the pin, the yellow beacon your ball; white lines are out of bounds. After every shot a card shows carry, total, offline, ball position and effort.</p></dialog>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
-export interface Row { id: string; name: string; hole: number; strokes: number; done: boolean }
+/** Standings order: finished racers by time, then the furthest along, then the fewest strokes. */
+const standings = (ps: PlayerRace[]) => [...ps].sort((a, b) => (a.finishedAtS ?? Infinity) - (b.finishedAtS ?? Infinity) || b.hole - a.hole || +b.ball.holedOut - +a.ball.holedOut || a.ball.strokes - b.ball.strokes);
+const clock = (s: number) => { s = Math.max(0, s); return `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`; };
+const total = (a: readonly (number | undefined)[], from = 0, n = 18) => a.slice(from, from + n).reduce<number>((t, v) => t + (v ?? 0), 0);
+/** The full card: players by 18 holes with the par row, out, in, total and score to par. */
+export function scorecard(ps: PlayerRace[], pars: readonly number[], self: string): string {
+  const nine = (f: (i: number) => string) => Array.from({ length: 9 }, (_, i) => f(i)).join('');
+  const cell = (p: PlayerRace, i: number) => {
+    const v = p.byHole[i];
+    if (v === undefined) return '<td></td>';
+    const d = v - pars[i]!, live = i === p.hole && !p.ball.holedOut;
+    return `<td class="${live ? 'live' : d < 0 ? 'un' : d > 0 ? 'ov' : ''}">${v}</td>`;
+  };
+  const row = (p: PlayerRace) => `<tr class="${p.id === self ? 'me' : ''}"><td>${esc(p.name)}</td>${nine(i => cell(p, i))}<th>${total(p.byHole, 0, 9) || ''}</th>${nine(i => cell(p, i + 9))}<th>${total(p.byHole, 9, 9) || ''}</th><th>${p.ball.strokes}</th><th>${parText(toPar(p.byHole, pars, p.hole, p.ball.holedOut))}</th></tr>`;
+  return `<div class="sctw"><table class="sct"><tr><th>Hole</th>${nine(i => `<th>${i + 1}</th>`)}<th>Out</th>${nine(i => `<th>${i + 10}</th>`)}<th>In</th><th>Tot</th><th>&plusmn;</th></tr>
+    <tr class="par"><td>Par</td>${nine(i => `<td>${pars[i]}</td>`)}<th>${total(pars, 0, 9)}</th>${nine(i => `<td>${pars[i + 9]}</td>`)}<th>${total(pars, 9, 9)}</th><th>${total(pars)}</th><th></th></tr>
+    ${standings(ps).map(row).join('')}</table></div>`;
+}
 
 const CSS = `
 #ui{position:fixed;inset:0;z-index:1;pointer-events:none;font:14px system-ui;color:#eee}
@@ -109,7 +128,11 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
 #bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px}
 .slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
-#info{left:10px;bottom:10px;line-height:1.5}#lb{left:10px;top:10px}#mini{right:10px;top:10px;padding:0}
+#info{left:10px;bottom:10px;line-height:1.5}
+#lb{left:52px;top:56px;font-size:12px;line-height:1.5;display:grid;grid-template-columns:minmax(0,74px) auto auto auto;column-gap:8px;max-width:180px;box-sizing:border-box}
+#lb>div{display:contents}#lb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}#lb span:first-child{text-align:left}
+#lb .me span{color:#ffe14d;font-weight:700}#lb .lbh{grid-column:1/-1;display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+#sc{left:50%;top:50%;transform:translate(-50%,-50%);display:none;max-width:calc(100% - 20px);box-sizing:border-box;background:rgba(14,22,18,.94);padding:10px 12px}#sc h3{margin:0 0 6px;font-size:14px}#mini{right:10px;top:10px;padding:0}
 #card{right:10px;bottom:10px;min-width:210px;display:none}#prompt{left:50%;bottom:90px;transform:translateX(-50%);display:none}
 #meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
@@ -118,13 +141,17 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 #bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
 #pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
-#gear{left:10px;top:84px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
+#gear{left:10px;top:56px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
 #settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(18,24,22,.96);border:1px solid #567}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}#settings select{margin-left:8px;font:inherit}
 #fps{right:10px;top:236px;display:none;font:12px/1.4 ui-monospace,monospace;white-space:pre}
 #banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
 #arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
 #keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
 #rf{position:absolute;inset:6% 12%;display:none;background:rgba(12,20,16,.94);border:2px solid #678;pointer-events:auto;padding:0}#rf canvas{width:100%;height:100%;display:block;cursor:crosshair}
+.sctw{overflow-x:auto;max-width:100%}.sct{border-collapse:collapse;font:12px/1.3 system-ui;white-space:nowrap;width:auto}
+.sct td,.sct th,.scr .sct td,.scr .sct th{padding:3px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.12);font-size:12px;letter-spacing:0;text-transform:none;color:inherit}
+.sct td:first-child{text-align:left;max-width:110px;overflow:hidden;text-overflow:ellipsis}.sct th{font-weight:700}.sct .par td,.sct .par th{opacity:.6}
+.sct .me td,.sct .me th{background:rgba(255,225,77,.16);color:#ffe14d}.sct .un{color:#7fd0ff;font-weight:700}.sct .ov{color:#ffb4a8}.sct .live{font-style:italic;opacity:.7}
 #rftip{position:absolute;pointer-events:none;background:rgba(0,0,0,.85);padding:6px 10px;border-radius:3px;display:none;white-space:pre;line-height:1.4}
 `;
 
@@ -144,10 +171,10 @@ export class UI {
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div><div class="hud" id="lie"><canvas width="54" height="54"></canvas><div></div></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
+      <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · Tab scorecard · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
-      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
+      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div class="hud" id="sc"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.home.id = 'home';
     this.home.append(new Backdrop().el, this.scr);
     this.home.insertAdjacentHTML('beforeend', `<button class="htp-btn" aria-haspopup="dialog"><i>?</i><span>How to play</span></button><div class="spons">Callaway · Genesis</div>${HELP}`);
@@ -211,21 +238,26 @@ export class UI {
     }).join('') || '<div class="empty">No lobbies yet. Create one and invite your friends.</div>'}</div>${err}
       ${full ? '' : this.courses(m.pick, true)}<button class="pri wide" data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button></div>`);
   }
-  showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[], course: string) {
+  showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[], course: string, card = '') {
     this.screen(`${this.wm()}<div class="glass"><h2>Results</h2><p class="sub">${esc(course)}</p><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
       `<tr><td>${r.place}</td><td>${esc(r.name)}</td><td>${r.timeS === undefined ? 'DNF' : this.clock(r.timeS)}</td><td>${r.strokes}</td></tr>`).join('')}</table>
+      ${card ? `<h2 style="margin-top:18px">Scorecard</h2>${card}` : ''}
       <button class="pri wide" data-act="back" style="margin-top:18px">Back to waiting room</button></div>`);
   }
-  clock(s: number) { s = Math.max(0, s); return `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`; }
+  clock(s: number) { return clock(s); }
 
   // --- HUD ---
   setClub(i: number) { this.hud.querySelectorAll('.slot').forEach((e, j) => e.classList.toggle('on', i === j)); }
   info(hole: HoleInfo, yards: number, lie: string, clock: string, strokes: number) {
     this.$('info').innerHTML = `Hole ${hole.index + 1} &middot; Par ${hole.par} &middot; Strokes ${strokes}<br>Pin ${Math.round(yards)} yd &middot; Lie: ${esc(lie)}<br>Clock ${clock}`;
   }
-  board(rows: Row[], self: string) {
-    this.$('lb').innerHTML = rows.map(r => `<div style="${r.id === self ? 'font-weight:bold' : ''}">${esc(r.name)} &nbsp; H${r.hole + 1} &nbsp; ${r.strokes}${r.done ? ' &check;' : ''}</div>`).join('');
+  /** Live standings strip (name, hole or finish time, strokes, to par) and, while open, the Tab scorecard. */
+  board(ps: PlayerRace[], pars: readonly number[], self: string) {
+    this.$('lb').innerHTML = `<div class="lbh">Standings · Tab card</div>${standings(ps).map(p => `<div class="${p.id === self ? 'me' : ''}"><span>${esc(p.name)}</span><span>${p.finishedAtS !== undefined ? `&check; ${clock(p.finishedAtS)}` : `H${p.hole + 1}${p.ball.holedOut ? '&check;' : ''}`}</span><span>${p.ball.strokes}</span><span>${parText(toPar(p.byHole, pars, p.hole, p.ball.holedOut))}</span></div>`).join('')}`;
+    if (this.scOpen()) this.$('sc').innerHTML = `<h3>Scorecard</h3>${scorecard(ps, pars, self)}`;
   }
+  scOpen = () => this.$('sc').style.display === 'block';
+  toggleScorecard(open = !this.scOpen()) { this.$('sc').style.display = open ? 'block' : 'none'; }
   /** Small grid showing where the ball sits against the feet in the stance (fb: up = forward, io: right = away from the body). */
   ballPosGrid(p: { fb: number; io: number } | null) {
     const e = this.$('bpos'); e.style.display = p ? 'block' : 'none'; if (!p) return;
