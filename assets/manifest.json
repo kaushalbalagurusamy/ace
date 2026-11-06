@@ -5383,5 +5383,297 @@
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": false
     }
+  },
+  {
+    "id": "concept-oak-r5",
+    "file": "assets/images/concept-oak-r5.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1536",
+    "prompt": "Use the reference photos of the mature oaks lining Bethpage Black golf course (Farmingdale, New York) for species, leaf colour and crown form. Show one single isolated mature northern red oak, about 18 m tall, with a broad, full, dense rounded crown slightly wider than tall, built from many distinct leafy clumps with a few small sky gaps at the ragged edges. A short thick dark grey-brown furrowed trunk forks into a few heavy limbs at about a quarter of the height; the crown hangs low. Summer mid green foliage, lighter yellow-green on sunlit tops and darker olive green in the shaded undersides, exactly as in the photos. The entire tree is in frame from the root flare to the very top of the crown, centred, side view at eye level, on a plain flat pure white background: no ground, no grass, no shadow, no people, no other trees, no text. Photorealistic photograph style, soft even daylight.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 3808,
+      "input_tokens_details": {
+        "image_tokens": 3600,
+        "text_tokens": 208
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 9296
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "/private/tmp/claude-501/-Users-kaushal-Projects/694df944-9979-5ea7-91df-b0034c09d85b/scratchpad/r5/oak2.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "concept-maple-r5",
+    "file": "assets/images/concept-maple-r5.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1536",
+    "prompt": "Use the reference photos of the parkland trees at Aronimink Golf Club (Newtown Square, Pennsylvania) for leaf colour and crown form. Show one single isolated mature sugar maple, about 15 m tall, with a full, dense ovoid crown taller than it is wide, built from many layered leafy clumps with a few small sky gaps at the edges. A straight grey-brown trunk with shallow furrowed bark is visible for the lowest fifth before it divides into several upswept limbs. Summer deep green foliage with lighter sunlit edges and darker shaded hollows, matching the photos' late-summer greens. The entire tree is in frame from the root flare to the very top of the crown, centred, side view at eye level, on a plain flat pure white background: no ground, no grass, no shadow, no people, no other trees, no text. Photorealistic photograph style, soft even daylight.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 1692,
+      "input_tokens_details": {
+        "image_tokens": 1496,
+        "text_tokens": 196
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 7180
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "/private/tmp/claude-501/-Users-kaushal-Projects/694df944-9979-5ea7-91df-b0034c09d85b/scratchpad/r5/map1.png",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-322-43884326724.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "concept-cypress-tall-r5",
+    "file": "assets/images/concept-cypress-tall-r5.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1536",
+    "prompt": "Use the reference photos of the lone fairway cypress on the 18th hole at Pebble Beach for species, colour and form. Show that single isolated tall mature Monterey cypress, about 20 m tall: one straight, slightly leaning grey-brown trunk bare for the lowest third, then a tall, dense, full crown with a conical-ovoid outline, narrowing to a rounded point at the top. The crown is built from many stacked, near-horizontal tiers of dark green scale-leaf sprays, densely packed, with small sky gaps between tiers at the edges, exactly like the photos. Deep dark green foliage, slightly olive. The entire tree is in frame from the root flare to the very top of the crown, centred, side view at eye level, on a plain flat pure white background: no ground, no grass, no shadow, no people, no other trees, no text. Photorealistic photograph style, soft even daylight.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 982,
+      "input_tokens_details": {
+        "image_tokens": 782,
+        "text_tokens": 200
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 6470
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "/private/tmp/claude-501/-Users-kaushal-Projects/694df944-9979-5ea7-91df-b0034c09d85b/scratchpad/r5/cy1.png",
+      "/private/tmp/claude-501/-Users-kaushal-Projects/694df944-9979-5ea7-91df-b0034c09d85b/scratchpad/r5/cy2.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "tree-cypress-r17",
+    "file": "assets/models/raw/rejected/tree-cypress-r17.glb (local, not shipped)",
+    "tool": "Meshy image-to-3d",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "assets/images/concept-cypress-tall-r5.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg"
+    ],
+    "task_id": "01a1afec-db2b-7238-98db-9a6e198c2f65",
+    "target_polycount": 10000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 185,
+    "balance_after": 95,
+    "target_height_m": 18.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#36452C\" --rest \"#5E564C\" --sat 0.85 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.6 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-tall-r5.png --cards 2500 --flat 0.7 --size 1.2 --green \"#36452C\" --min-island 0.002 --aspect 1.8",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true",
+      "far version (lod): same graded mesh, simplify --ratio 0.03, a tenth of the cards at 1.6x size, textures 512"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 5 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r5.json",
+      "notes": "Compared to h18-fairway-bay.jpg, h18-green-cypress.jpg and h18-view-back.jpg. The tall, straight, clear trunk and the dark blue-green, loosely tiered foliage are right, and the proportions suit an 18 m lone tree. The crown, though, is a smooth symmetric egg or cone. The real tree has a ragged, asymmetric outline of flat horizontal sprays that reach out in separate clumps, and a narrower, broken top. Some foliage cards render as near-black holes.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-cypress-r17/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    },
+    "note": "Tall conical-ovoid Monterey cypress after the lone fairway cypress on Pebble 18th; second cypress variant beside tree-cypress-r13.",
+    "lod_file": "assets/models/raw/rejected/tree-cypress-r17-far.glb (local)"
+  },
+  {
+    "id": "tree-maple-r1",
+    "file": "assets/models/raw/rejected/tree-maple-r1.glb (local, not shipped)",
+    "tool": "Meshy image-to-3d",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "assets/images/concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-322-43884326724.jpg"
+    ],
+    "task_id": "01a1afec-db2f-7293-b256-721d7934c12c",
+    "target_polycount": 10000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 185,
+    "balance_after": 95,
+    "target_height_m": 15.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#42512F\" --rest \"#6A645A\" --sat 0.85 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.7 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-maple-r5.png --cards 4000 --flat 0.25 --size 1.3 --green \"#42512F\" --min-island 0.002 --volume 1 --drop-crown 1 --clumps 26",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true",
+      "far version (lod): same graded mesh, simplify --ratio 0.03, a tenth of the cards at 1.6x size, textures 512"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 5 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 2
+      },
+      "mean": 2.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r5.json",
+      "notes": "Compared to the Aronimink BMW photos 151, 322 and 327. The real hardwoods have broad, spreading, irregular crowns on heavy forked limbs, often as wide as they are tall. The model is a narrow pear-shaped column (crown width about 0.45 of height) on a pencil-thin trunk, which reads as a young street tree or poplar, not a mature 15 m maple. The foliage is a dull, slightly grey olive, darker and flatter than the mid-greens in the photos, and the top view is a small tight disc.",
+      "in_scene": {
+        "score": 2,
+        "notes": "In the Bethpage hole 1 tee shot the camera starts inside a tree canopy. Huge pixelated leaf cards and a floating trunk hide the hole, which is a blocking defect. In the Bethpage fairway shot only trunk bases at the top edge and a shadow are visible, so no tree line reads at all. The Aronimink tee shot is the best: trees on both sides frame the fairway the way the real parkland does. Even there the trees are uniform umbrella crowns on thin, short trunks, nothing like the tall, varied, layered hardwood walls in the Aronimink and Bethpage photos. The Aronimink fairway shot shows almost no trees."
+      },
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r1/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    },
+    "note": "Meshy returned a bare branch skeleton; crown is the concept silhouette revolved about the trunk, filled with concept-cut cards. Swatch from the Aronimink ground photos.",
+    "lod_file": "assets/models/raw/rejected/tree-maple-r1-far.glb (local)"
+  },
+  {
+    "id": "tree-oak-r1",
+    "file": "assets/models/raw/rejected/tree-oak-r1.glb (local, not shipped)",
+    "tool": "Meshy image-to-3d",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "assets/images/concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg"
+    ],
+    "task_id": "01a1afec-db2d-7780-a995-aecf9d233e4e",
+    "target_polycount": 10000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 185,
+    "balance_after": 95,
+    "target_height_m": 17.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#47582A\" --rest \"#5A5246\" --sat 0.85 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.7 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-oak-r5.png --cards 4000 --flat 0.25 --size 1.3 --green \"#47582A\" --min-island 0.002 --volume 1 --drop-crown 1 --clumps 30",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true",
+      "far version (lod): same graded mesh, simplify --ratio 0.03, a tenth of the cards at 1.6x size, textures 512"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 5 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 2
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r5.json",
+      "notes": "Compared to commons-bethpage-golf-course.jpg, the 2009 US Open tree line and the large tree in p20250926jb-0956/-1089. The real oaks have tall clear boles carrying broad, lobed, open crowns that are wider than they are deep, with sky gaps between limb masses. The model is a dense, symmetric ball on a stub trunk (clear trunk about 12% of height against about 35-45% in the photos), so it reads as a shrub or lollipop rather than a 17 m oak. The colour is a believable summer green, but stray leaf cards stick out at the crown edge.",
+      "in_scene": {
+        "score": 2,
+        "notes": "In the Bethpage hole 1 tee shot the camera starts inside a tree canopy. Huge pixelated leaf cards and a floating trunk hide the hole, which is a blocking defect. In the Bethpage fairway shot only trunk bases at the top edge and a shadow are visible, so no tree line reads at all. The Aronimink tee shot is the best: trees on both sides frame the fairway the way the real parkland does. Even there the trees are uniform umbrella crowns on thin, short trunks, nothing like the tall, varied, layered hardwood walls in the Aronimink and Bethpage photos. The Aronimink fairway shot shows almost no trees."
+      },
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r1/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    },
+    "note": "Meshy returned a bare branch skeleton with a few leaf shards; the shards are dropped and the crown is the concept silhouette revolved about the trunk, filled with cards cut from the concept. Swatch #47582A measured from the Bethpage ground photos.",
+    "lod_file": "assets/models/raw/rejected/tree-oak-r1-far.glb (local)"
+  },
+  {
+    "id": "tree-pine-r14",
+    "file": "assets/models/raw/rejected/tree-pine-r14.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r8",
+    "seed_images": [
+      "concept-pine-r4.png",
+      "pine-needle-sheet.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#3C4322\" --rest \"#4F4231\" --sat 0.6 --rough 1 --thicken 1.8:0.33 --squash 0.88",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.0 --size 2048",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#3C4322\" --cards 3000 --flat 0.1 --size 3.2 --cell 200 --min-island 0.003 --sprite 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "note": "tree-pine-r11's recipe with the r11 critic's colour fixes: browner bark, warmer olive needles, lower detail mix",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "model generation round 5 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r5.json",
+      "notes": "Compared to the left-hand pines in h18-view-back.jpg, the forest skyline in h18-across-bay.jpg and h06-cliffs.jpg. The long bare trunk under a lopsided, rounded, irregular crown matches the Monterey pine form well, and the trunk-to-crown ratio fits 22 m. The foliage is a warm olive, where the photos show a darker, cooler blue-green. The base flare is overly thick and conical, and a few flat stub-branch cards on the trunk are visible as artefacts.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r14/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   }
 ]

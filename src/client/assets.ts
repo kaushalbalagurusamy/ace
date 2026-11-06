@@ -6,7 +6,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
-interface Row { id: string; target_height_m?: number; height_m?: number; orient_deg?: number[]; qa?: { verdict?: string }; grade?: string; post_process?: string | string[] }
+interface Row { id: string; target_height_m?: number; height_m?: number; orient_deg?: number[]; qa?: { verdict?: string }; grade?: string; lod?: string; post_process?: string | string[] }
 let manifest: Promise<Row[]> | null = null;
 /** QA renders only (?assets=pending): also draw models still awaiting their fidelity verdict, so the critic can judge them in place. Never set in play. */
 const PREVIEW_PENDING = typeof location !== 'undefined' && new URLSearchParams(location.search).get('assets') === 'pending';
@@ -64,6 +64,25 @@ export async function loadModel(id: string): Promise<THREE.Object3D | null> {
   }
   const m = await models.get(id)!;
   return m ? cloneSkinned(m) : null;
+}
+
+const lods = new Map<string, Promise<THREE.Object3D | null>>();
+/** The far-distance version of a shipped model (row.lod: a lighter GLB cut from the same model), placed with the near model's
+ *  normalisation so both levels line up exactly. null when the row has none. */
+export async function loadLod(id: string): Promise<THREE.Object3D | null> {
+  if (!lods.has(id)) {
+    lods.set(id, (async () => {
+      try {
+        const r = await loadRaw(id), near = await loadModel(id), inner = near?.children[0];
+        if (!r?.row.lod || !inner) return null;
+        const far = (await gltf().loadAsync(`/assets/models/${r.row.lod}`)).scene, root = new THREE.Group();
+        far.scale.copy(inner.scale); far.position.copy(inner.position); root.add(far);
+        return root;
+      } catch { return null; }
+    })());
+  }
+  const m = await lods.get(id)!;
+  return m ? m.clone() : null;
 }
 
 const textures = new Map<string, Promise<THREE.Texture | null>>();
