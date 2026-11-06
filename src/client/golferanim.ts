@@ -43,21 +43,21 @@ const BASE: Pose = {
 /** Key poses for the full swing (right-handed). grip/shaft at address and impact are replaced per club by addressShaft(). */
 export const POSES = {
   idle: P({ free: { l: [0.24, 0.86, 0.04], r: [-0.24, 0.86, 0.04] }, shaft: [0, -0.62, 0.78], face: [0, 0, 1], lPole: [0, 0, -1], rPole: [0, 0, -1] }),
-  address: P({ pelvis: [0.38, 0, 0], shift: [0, -0.05, -0.06], torso: [0.22, 0, 0], head: [0.1, 0, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
+  address: P({ pelvis: [0.38, 0, 0], shift: [0, -0.1, -0.09], torso: [0.22, 0, 0], head: [0.1, 0, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
     grip: [0.05, 0.8, 0.36] }),
-  hipHigh: P({ pelvis: [0.38, -0.25, 0], shift: [-0.02, -0.05, -0.06], torso: [0.22, -0.5, -0.05], head: [0.1, 0.35, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
+  hipHigh: P({ pelvis: [0.38, -0.25, 0], shift: [-0.02, -0.1, -0.09], torso: [0.22, -0.5, -0.05], head: [0.1, 0.35, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
     grip: [-0.38, 0.9, 0.34], shaft: [-1, 0.12, 0.05], face: [0, 0.2, 1], lPole: [0, -1, -0.3], rPole: [0, -1, -0.2] }),
-  top: P({ pelvis: [0.36, -0.75, 0], shift: [-0.04, -0.05, -0.06], torso: [0.22, -0.85, -0.1], head: [0.1, 0.9, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0], lHeel: 0.15,
-    grip: [-0.42, 1.58, 0.02], shaft: [1, -0.1, -0.25], face: [0, -0.4, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.3] }),
-  delivery: P({ pelvis: [0.38, 0.2, 0], shift: [0.05, -0.06, -0.06], torso: [0.22, -0.55, 0.05], head: [0.1, 0.3, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
+  top: P({ pelvis: [0.36, -0.75, 0], shift: [-0.04, -0.1, -0.09], torso: [0.22, -0.85, -0.1], head: [0.1, 0.9, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0], lHeel: 0.15,
+    grip: [-0.3, 1.5, 0.04], shaft: [1, -0.04, -0.12], face: [0, -0.3, 1], lPole: [0, -1, 0.2], rPole: [0, -1, -0.2] }),
+  delivery: P({ pelvis: [0.38, 0.2, 0], shift: [0.05, -0.1, -0.09], torso: [0.22, -0.55, 0.05], head: [0.1, 0.3, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
     grip: [-0.25, 0.92, 0.36], shaft: [-0.7, 0.65, 0.1], face: [0, 0.3, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.3] }),
-  impact: P({ pelvis: [0.34, 0.55, 0], shift: [0.08, -0.06, -0.06], torso: [0.22, -0.25, 0.08], head: [0.1, 0.1, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0.02, 0], rHeel: 0.25,
+  impact: P({ pelvis: [0.34, 0.55, 0], shift: [0.08, -0.09, -0.08], torso: [0.22, -0.25, 0.08], head: [0.1, 0.1, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0.02, 0], rHeel: 0.25,
     grip: [0.1, 0.84, 0.36] }),
   through: P({ pelvis: [0.3, 1.0, 0], shift: [0.1, -0.05, -0.04], torso: [0.2, 0.35, 0.1], head: [0.05, -0.3, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0.04, 0.04], rHeel: 0.6,
     grip: [0.45, 0.98, 0.3], shaft: [1, 0.15, 0.1], face: [0, 0.2, 1], lPole: [0, -1, 0.2], rPole: [0, -1, -0.2] }),
   finish: P({ pelvis: [0.08, 1.45, 0], shift: [0.12, -0.02, 0], torso: [-0.1, 0.35, 0.05], head: [0, -0.5, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.02, 0.08, 0.08], rHeel: 1.1,
     grip: [-0.08, 1.58, -0.14], shaft: [-0.7, -0.35, -0.55], face: [0, 0, -1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),
-  puttAddress: P({ pelvis: [0.42, 0, 0], shift: [0, -0.04, -0.06], torso: [0.3, 0, 0], head: [0.25, 0, 0], lAnkle: [0.02, 0, 0], rAnkle: [-0.02, 0, 0],
+  puttAddress: P({ pelvis: [0.42, 0, 0], shift: [0, -0.07, -0.08], torso: [0.3, 0, 0], head: [0.25, 0, 0], lAnkle: [0.02, 0, 0], rAnkle: [-0.02, 0, 0],
     grip: [0.0, 0.8, 0.32], shaft: [0.02, -0.97, 0.25], face: [1, 0, 0], lPole: [0.2, 0, -1], rPole: [-0.2, 0, -1] }),
 } satisfies Record<string, Pose>;
 

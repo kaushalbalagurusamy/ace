@@ -108,23 +108,30 @@ export class GolferRig {
   }
 }
 
-/** Gives one golfer its player colour on the polo: near-white texels between the belt and the collar (bind-pose height) are
- *  multiplied by the colour; skin, trousers, shoes and the gold embroidery keep their texture. Materials are cloned per golfer. */
+/** Dresses one golfer: the polo in the player's colour (near-white texels between the belt and the collar, by bind-pose height,
+ *  are multiplied by it; skin, trousers, shoes and the gold embroidery keep their texture; '#ffffff' leaves it white) and the
+ *  signature glowing violet eyes (bluish texels on the head become emissive #7a5cff). Materials are cloned per golfer. */
+export const EYE = '#7a5cff';
 export function tintPolo(model: THREE.Object3D, colour: string) {
   model.traverse(o => {
     const m = o as THREE.SkinnedMesh; if (!m.isMesh) return;
     m.geometry.computeBoundingBox(); const bb = m.geometry.boundingBox!;
-    const mat = (m.material as THREE.MeshStandardMaterial).clone(), tint = new THREE.Color(colour);
+    const mat = (m.material as THREE.MeshStandardMaterial).clone(), tint = new THREE.Color(colour), eye = new THREE.Color(EYE);
     mat.onBeforeCompile = s => {
-      s.uniforms.uTint = { value: tint }; s.uniforms.uMinY = { value: bb.min.y }; s.uniforms.uSpanY = { value: bb.max.y - bb.min.y };
+      s.uniforms.uTint = { value: tint }; s.uniforms.uEye = { value: eye }; s.uniforms.uMinY = { value: bb.min.y }; s.uniforms.uSpanY = { value: bb.max.y - bb.min.y };
       s.vertexShader = s.vertexShader.replace('#include <common>', '#include <common>\nuniform float uMinY; uniform float uSpanY; varying float vBindH;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvBindH = (position.y - uMinY) / uSpanY;');
-      s.fragmentShader = s.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uTint; varying float vBindH;')
+      s.fragmentShader = s.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uTint; uniform vec3 uEye; varying float vBindH; float eyeMask;')
         .replace('#include <map_fragment>', `#include <map_fragment>
   { float mx = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)), mn = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
     float white = smoothstep(0.30, 0.45, mx) * (1.0 - smoothstep(0.10, 0.2, (mx - mn) / max(mx, 1e-3)));
     float band = smoothstep(0.555, 0.575, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
-    diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * uTint, white * band); }`);
+    diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * uTint, white * band);
+    // eyes: on the head, texels bluer than they are red or green (skin and hair are warm, so nothing else matches)
+    float blue = diffuseColor.b - max(diffuseColor.r, diffuseColor.g * 1.05);
+    eyeMask = smoothstep(0.905, 0.915, vBindH) * (1.0 - smoothstep(0.94, 0.945, vBindH)) * smoothstep(-0.015, 0.01, blue) * smoothstep(0.12, 0.2, mx);   // bright: not the dark hair
+    diffuseColor.rgb = mix(diffuseColor.rgb, uEye, eyeMask); }`)
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uEye * eyeMask * 3.0;');
     };
     m.material = mat;
   });
