@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BACK_KEYS, DOWNSWING_MS, P_FRAMES, P_POS, POSES, SWING_CURVE, TEMPO, backswingFrame, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, walkPose } from '../src/client/golferanim';
+import { BACK_KEYS, DOWNSWING_MS, P_FRAMES, P_POS, POSES, SWING_CURVE, TEMPO, backswingFrame, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, GAITS, MAX_CADENCE, gaitCadence, gaitMix, gaitPose, idlePose, seatedPose } from '../src/client/golferanim';
 
 const L = 0.94; // 7-iron
 const hyp = (v: readonly number[]) => Math.hypot(v[0]!, v[1]!, v[2]!);
@@ -114,9 +114,49 @@ describe('pose blending', () => {
     near(lerpPose(a, b, 1).grip, b.grip);
     expect(hyp(lerpPose(a, b, 0.5).shaft)).toBeCloseTo(1, 9);
   });
-  it('walk swings the feet in opposition and is idle at zero amount', () => {
-    const w = walkPose(Math.PI / 2, 1);
-    expect(Math.sign(w.lAnkle[2])).toBe(-Math.sign(w.rAnkle[2]));
-    expect(walkPose(1, 0).lAnkle).toEqual([0, 0, 0]);
+});
+
+// Walking and running are captured cycles (src/client/motion/gaitcapture.ts) replacing the hand-authored sine walk.
+describe('captured gait: foot locking', () => {
+  /** Runs at a steady `speed` and returns, for each stance of each foot, how far the planted foot moved over the ground (m). */
+  function drift(speed: number) {
+    const { a } = gaitMix(speed), out: number[] = [], dt = 1 / 480, edge = 1 / 96;   // stance ends fall between samples: skip half a sample
+    for (const [foot, on, off] of [['lAnkle', a.stance[0], a.stance[1]], ['rAnkle', a.stance[2], a.stance[3]]] as const) {
+      for (let cyc = 0; cyc < 3; cyc++) {
+        let phase = cyc + on + edge, root = 0, lo = Infinity, hi = -Infinity, yMax = 0;
+        while (phase <= cyc + off - edge) {   // the planted foot over the ground while the golfer moves at `speed`
+          const p = gaitPose(phase, speed)[foot]; lo = Math.min(lo, root + p[2]); hi = Math.max(hi, root + p[2]); yMax = Math.max(yMax, p[1]);
+          phase += gaitCadence(speed) * dt; root += speed * dt;
+        }
+        out.push(hi - lo); expect(yMax, `${foot} lifts in stance at ${speed} m/s`).toBeLessThan(0.005);
+      }
+    }
+    return out;
+  }
+  for (const v of [1.4, 5, 15]) it(`the planted foot drifts under 2 cm per stance at ${v} m/s`, () => {
+    for (const d of drift(v)) expect(d).toBeLessThan(0.02);
+  });
+  it('cadence rises with speed but never past 5 steps a second; the stride makes up the rest', () => {
+    let last = 0;
+    for (let v = 0.5; v <= 15; v += 0.5) { const c = gaitCadence(v); expect(c).toBeLessThanOrEqual(MAX_CADENCE + 1e-9); expect(c).toBeGreaterThanOrEqual(last - 0.25); last = c; }
+    expect(gaitCadence(15)).toBe(MAX_CADENCE);
+    expect(gaitMix(1.4).a).toBe(GAITS[0]); expect(gaitMix(5).a).toBe(GAITS[1]); expect(gaitMix(15).a).toBe(GAITS[2]);
+  });
+  it('the cycles are left-right alternating: the feet are half a cycle apart', () => {
+    for (const g of GAITS) expect(Math.abs(((g.stance[2] - g.stance[0] + 1) % 1) - 0.5)).toBeLessThan(0.05);
+  });
+});
+
+describe('idle and seated', () => {
+  it('standing still is the idle (breathing and weight shift), feet planted', () => {
+    const a = gaitPose(0.3, 0, 2), b = idlePose(2);
+    near(a.shift, b.shift); expect(a.lAnkle).toEqual([0, 0, 0]);
+    expect(Math.abs(idlePose(3).shift[0] - idlePose(9).shift[0])).toBeGreaterThan(0.01);   // weight moves foot to foot
+  });
+  it('seated hands sit on the rim and turn with the wheel', () => {
+    const p = seatedPose(0), q = seatedPose(1), c = [0, 1.311, 0.432];
+    for (const h of [p.free!.l, p.free!.r]) expect(Math.hypot(h[0] - c[0]!, h[1] - c[1]!, h[2] - c[2]!)).toBeCloseTo(0.15, 6);
+    expect(p.free!.l[0]).toBeGreaterThan(p.free!.r[0]);
+    expect(q.free!.l[1]).not.toBeCloseTo(p.free!.l[1], 3);
   });
 });

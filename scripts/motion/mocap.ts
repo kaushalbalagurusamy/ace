@@ -13,9 +13,21 @@ export const load = (path: string): Capture => JSON.parse(readFileSync(path, 'ut
 /** Fills missing frames by holding the nearest detection, so every frame has 33 landmarks. */
 export function fill(c: Capture, key: 'world' | 'image', a: number, b: number): number[][][] {
   const out: number[][][] = []; let last: number[][] | null = null;
-  for (let i = a; i <= b; i++) { const f = c.frames[i]?.[key] ?? null; if (f) last = f; out.push(last ?? []); }
+  for (let i = a; i <= b; i++) { const f = c.frames[i]?.[key] ?? null; if (f) last = f; out.push((last ?? []).map(p => [...p])); }
   const first = out.findIndex(f => f.length); for (let i = 0; i < first; i++) out[i] = out[first]!;
   return out;
+}
+
+/** Side-view label fix: when the legs (or arms) cross, MediaPipe often swaps left and right for a few frames. Each frame's pair is
+ *  assigned to the limb it continues from (least image-space movement from the previous frame), in both image and world landmarks. */
+export function deswap(img: number[][][], world: number[][][]) {
+  const limbs = [[[25, 26], [27, 28], [29, 30], [31, 32]], [[13, 14], [15, 16], [17, 18], [19, 20], [21, 22]]];
+  for (let i = 1; i < img.length; i++) for (const limb of limbs) {
+    const d = (a: number[], b: number[]) => Math.hypot(a[0]! - b[0]!, a[1]! - b[1]!);
+    let keep = 0, swap = 0;
+    for (const [l, r] of limb) { const p = img[i - 1]!, c = img[i]!; keep += d(c[l!]!, p[l!]!) + d(c[r!]!, p[r!]!); swap += d(c[l!]!, p[r!]!) + d(c[r!]!, p[l!]!); }
+    if (swap < keep * 0.7) for (const f of [img[i]!, world[i]!]) for (const [l, r] of limb) { const t = f[l!]!; f[l!] = f[r!]!; f[r!] = t; }
+  }
 }
 
 /** Running median (removes single-frame depth flips) then a 5-tap Savitzky-Golay (quadratic) smoother, edges clamped. */

@@ -6,6 +6,7 @@
 import { FULL_TURN_MS } from '../sim/length';
 import { BASE, P_KEYED, POSES } from './swingprior';
 import { SWING_CAPTURE } from './motion/swingcapture';
+import { GAIT_CAPTURE } from './motion/gaitcapture';
 
 export type V3 = readonly [number, number, number];
 export interface Pose {
@@ -148,19 +149,66 @@ export function releasePose(depth: number, ms: number, length: number, putt = fa
   return { pose: lerpPose(fin, POSES.idle, smooth((u - T.follow - T.hold) / T.back)), done: ms >= end, impact };
 }
 
-/** Walk cycle at `phase` radians; `amount` 0..1 blends from idle (speed / walk speed). */
-export function walkPose(phase: number, amount: number): Pose {
-  const s = Math.sin(phase), c = Math.cos(phase), a = clamp01(amount), st = 0.32 * a;
-  const lift = (x: number) => Math.max(0, x) * 0.1 * a;
-  const i = POSES.idle;
-  return {
-    ...i, pelvis: [0.05 * a, 0.12 * s * a, 0], shift: [0, -0.02 * a + 0.015 * Math.abs(c) * a, 0], torso: [0.04 * a, -0.18 * s * a, 0],
-    lAnkle: [0, lift(c), st * s], rAnkle: [0, lift(-c), -st * s],
-    free: { l: [i.free!.l[0], i.free!.l[1], i.free!.l[2] - 0.22 * s * a], r: [i.free!.r[0], i.free!.r[1], i.free!.r[2] + 0.22 * s * a] },
-  };
+// ---- walking and running: captured gait cycles (src/client/motion/gaitcapture.ts), foot-locked ----
+type Cycle = (typeof GAIT_CAPTURE)[keyof typeof GAIT_CAPTURE];
+/** The captured cycles by their capture speed: Muybridge's walk (~1.4 m/s), a 3 m/s treadmill jog and a 9 m/s treadmill sprint. */
+export const GAITS: readonly Cycle[] = [GAIT_CAPTURE.walk, GAIT_CAPTURE.jog, GAIT_CAPTURE.sprint];
+/** Fastest believable cadence, cycles per second: 5 steps a second, an elite sprinter's. */
+export const MAX_CADENCE = 2.5;
+/** Which captured cycles play at `speed` (m/s) and how much of the second: pure walk up to 2 m/s, pure jog from 2.6 to 6 (the
+ *  5 m/s Shift pace; no human walks at 5 m/s, so it is a jog), pure sprint from 8 (the 15 m/s default run). */
+export function gaitMix(speed: number): { a: Cycle; b: Cycle; k: number } {
+  const [w, j, s] = GAITS as [Cycle, Cycle, Cycle];
+  if (speed < 2) return { a: w, b: w, k: 0 };
+  if (speed < 2.6) return { a: w, b: j, k: smooth((speed - 2) / 0.6) };
+  if (speed < 6) return { a: j, b: j, k: 0 };
+  if (speed < 8) return { a: j, b: s, k: smooth((speed - 6) / 2) };
+  return { a: s, b: s, k: 0 };
 }
-/** Walk phase advance: one stride (half cycle) per ~1.1 m. */
-export const strideRate = (speed: number) => (speed / 1.1) * Math.PI;
+/** A cycle's cadence at `speed`: the capture's, time-scaled by (speed / capture speed)^0.4 (people lengthen the stride more than
+ *  they quicken it) and capped at MAX_CADENCE; the stride makes up the rest. */
+const cycleRate = (c: Cycle, speed: number) => Math.min(MAX_CADENCE, Math.max(0.6 * c.cadence, c.cadence * (Math.max(0.3, speed) / c.speed) ** 0.4));
+/** Gait phase advance, cycles per second (one cycle = two steps, from left-foot strike). */
+export function gaitCadence(speed: number): number { const m = gaitMix(speed); return lerp(cycleRate(m.a, speed), cycleRate(m.b, speed), m.k); }
+/** Stride scale for a cycle at `speed`: the planted foot moves back at exactly `speed` (stride x scale x cadence = speed). */
+export const strideScale = (c: Cycle, speed: number) => Math.max(0.3, speed) / (c.stride * gaitCadence(speed));
+function cyclePose(c: Cycle, phase: number, s: number): Pose {
+  const n = c.samples.length, x = (((phase % 1) + 1) % 1) * n, i = Math.floor(x) % n, j = (i + 1) % n, t = x - Math.floor(x);
+  const q = c.samples[i]!.map((v, k) => lerp(v, c.samples[j]![k]!, t)), v3 = (k: number, sz = 1): V3 => [q[k]!, q[k + 1]!, q[k + 2]! * sz];
+  const lean = q[0]!, py = q[1]!, ty = q[3]!, idle = POSES.idle;
+  return { ...idle, pelvis: [0.3 * lean, py, q[2]!], torso: [0.7 * lean, ty, 0], head: [-0.8 * lean, -0.6 * (py + ty), 0], shift: [0, q[4]!, 0],
+    lAnkle: v3(5, s), rAnkle: v3(8, s), lHeel: q[11]!, rHeel: q[12]!, free: { l: v3(13), r: v3(16) }, lPole: v3(19), rPole: v3(22) };
+}
+/** Walking or running at `speed` m/s, `phase` in cycles (advance it by gaitCadence(speed) per second); below 0.8 m/s it blends
+ *  into the idle at time `t` seconds, and at 0.3 m/s and under it is the idle. */
+export function gaitPose(phase: number, speed: number, t = 0): Pose {
+  const m = gaitMix(speed), a = cyclePose(m.a, phase, strideScale(m.a, speed));
+  const g = m.k > 0 ? lerpPose(a, cyclePose(m.b, phase, strideScale(m.b, speed)), m.k) : a;
+  const k = smooth((speed - 0.3) / 0.5);
+  return k >= 1 ? g : lerpPose(idlePose(t), g, k);
+}
+
+/** Standing idle at time `t` seconds, authored: breathing (15 a minute: chest and arms rise a little) and a slow weight shift from
+ *  foot to foot (every ~12 s: the hips slide over the loaded foot and its hip rises), feet planted. */
+export function idlePose(t: number): Pose {
+  const i = POSES.idle, b = Math.sin(t * Math.PI * 2 * 0.25), w = Math.sin(t * Math.PI * 2 * 0.083);
+  const arm = (p: V3): V3 => [p[0] + 0.02 * w, p[1] + 0.006 * b, p[2]];
+  return { ...i, shift: [0.025 * w, -0.004 + 0.003 * b, 0], pelvis: [0, 0, 0.04 * w], torso: [-0.012 * b, 0, -0.03 * w], head: [0.01 * b, 0, 0.01 * w],
+    free: { l: arm(i.free!.l), r: arm(i.free!.r) } };
+}
+
+/** Driver's seat (the cart's seat seam is the hip point; this model space has the hips at the origin's height of the rig, so the
+ *  caller lowers the model by the rest hip height): sitting upright, feet on the floor ahead, both hands on the rim at ten and two,
+ *  turned with the wheel by `steer` (-1 left .. 1 right). Wheel centre and column axis are the cart's (cartmodel.ts seat/wheel). */
+export function seatedPose(steer = 0, wheel: V3 = SEATED_WHEEL, axis: V3 = [0, 0.34, -0.94]): Pose {
+  const n = norm(axis), u = norm([0, -n[2], n[1]]), a = -steer * 0.9, R = 0.15;   // u: "up" in the rim's plane
+  const rim = (ang: number): V3 => { const c = Math.cos(ang), s = Math.sin(ang); return [wheel[0] + R * c, wheel[1] + R * s * u[1], wheel[2] + R * s * u[2]]; };
+  return { ...POSES.idle, pelvis: [-0.12, 0, 0], torso: [0.16, 0, 0], head: [-0.04, 0, 0], shift: [0, 0, 0],
+    lAnkle: [-0.03, 0.42, 0.48], rAnkle: [0.03, 0.42, 0.48], free: { l: rim(0.6 + a), r: rim(Math.PI - 0.6 + a) }, lPole: [0.6, -1, -0.2], rPole: [-0.6, -1, -0.2] };
+}
+/** The steering wheel centre relative to the seated golfer's model space (seat (0.38, 1.15, 0.2) -> wheel (0.38, 1.45, 0.66) in the
+ *  cart, hips at the rig's rest height 1.011). */
+const SEATED_WHEEL: V3 = [0, 1.011 + 0.3, -0.028 + 0.46];
 
 const ease2 = (x: number) => clamp01(x) ** 2;
 const easeOut = (x: number) => 1 - (1 - clamp01(x)) ** 2;
