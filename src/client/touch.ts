@@ -19,7 +19,7 @@ export function pullToHoldMs(pullPx: number, screenH: number, capped: boolean): 
 
 /** The keyboard prompts, reworded for the touch buttons. */
 const TEXT: [string | RegExp, string][] = [
-  ['Space: take your stance', 'Tap Swing to take your stance'], [/E: get (in|out)/g, 'Cart: get $1'], ['WASD drive', 'Pull to drive'],
+  ['Space: take your stance', 'Swing: stance'], [/E: get (in|out)/g, 'Cart: get $1'], ['WASD drive', 'Pull to drive'],
   ['Close the rangefinder (M) to swing', 'Close the map to swing'], ['Hold Space, release to putt', 'Pull down, release to putt'],
   ['Hold Space, release to hit · Shift: chip', 'Pull down, release to hit · Chip button'], ['hold Space, release · Shift: full swing', 'pull down, release · Chip: full swing'],
   ['hold on for MAX effort', 'pull further for MAX effort'],
@@ -33,26 +33,23 @@ const tap = (code: string) => { key(code, true); key(code, false); };
 const CSS = `
 #touch{display:none}body.touch #touch{display:block}body.touch #keys{display:none}
 #touch,#touch *{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-.tb{position:absolute;pointer-events:auto;min-width:52px;height:52px;border-radius:26px;border:1px solid rgba(255,255,255,.35);background:rgba(20,28,24,.72);color:#fff;font:600 13px system-ui;padding:0 10px;display:none;align-items:center;justify-content:center}
+.tb{position:absolute;pointer-events:auto;min-width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(10,24,19,.6);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 4px 14px rgba(0,0,0,.3);color:#f5f0e4;font:600 12px Inter,system-ui,sans-serif;padding:0 8px;display:none;align-items:center;justify-content:center}
 .tb.on{display:flex}.tb.lit{background:#d6b45a;color:#14231b;border-color:#d6b45a}.tb:active{filter:brightness(1.4)}
-#tc{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,56px);grid-auto-rows:52px;gap:8px;grid-template-areas:"shift map cart" "swing swing swing"}
-#tc.st{grid-template-areas:"bl bu br" "aiml bd aimr" "chip . x"}#tc .tb{position:static;min-width:0;padding:0 4px;font-size:12px}
-#tc .big{background:rgba(214,180,90,.9);color:#14231b;font-size:17px;height:60px}
-${['shift','map','cart','swing','bl','bu','br','aiml','bd','aimr','chip','x'].map(a => `#t${a}{grid-area:${a}}`).join('')}
-#tmute{left:max(10px,env(safe-area-inset-left));top:max(104px,calc(env(safe-area-inset-top) + 94px))}
+#tc{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,44px);grid-auto-rows:44px;gap:6px;grid-template-areas:"shift map cart" "swing swing swing"}
+#tc.st{grid-template-columns:repeat(5,36px);grid-auto-rows:36px;gap:4px;grid-template-areas:". bu . . x" "bl bc br aiml aimr" ". bd . . chip"}#tc .tb{position:static;min-width:0;padding:0 2px;font-size:11px}#tc.st .tb{height:36px}#tbc{border-radius:10px;font-size:10px}
+#tc .big{background:rgba(214,180,90,.82);color:#14231b;border-color:#d6b45a;font-size:16px;height:48px}
+${['shift','map','cart','swing','bl','bu','br','bc','aiml','bd','aimr','chip','x'].map(a => `#t${a}{grid-area:${a}}`).join('')}
+#tmute{display:none!important}body.touch #bpos{display:none!important}
 #stick{position:absolute;width:${STICK_PX * 2}px;height:${STICK_PX * 2}px;margin:-${STICK_PX}px 0 0 -${STICK_PX}px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.06);display:none}
 #stick i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;background:rgba(255,255,255,.55)}
-body.touch #bag{pointer-events:auto;touch-action:pan-x;overflow-x:auto;max-width:calc(100vw - 280px);top:max(6px,env(safe-area-inset-top))}
-body.touch .slot{flex:none;width:46px;padding:6px 0}
-body.touch #mini{right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top))}body.touch #mini canvas{width:112px;height:157px;display:block}
-body.touch #lb,body.touch #gear{pointer-events:auto;top:max(56px,calc(env(safe-area-inset-top) + 46px))}body.touch #gear{font-size:26px;padding:6px 12px}
+body.touch #mini canvas{width:67px;height:94px}body.touch #meter{width:min(170px,50vw);padding:3px 8px;font-size:11px}body.touch #prompt{font-size:11px;padding:3px 10px}body.touch #info{font-size:11px;padding:3px 8px}
+body.touch #lb,body.touch #gear{pointer-events:auto;top:max(56px,calc(env(safe-area-inset-top) + 46px))}body.touch #gear{font-size:20px;padding:4px 10px}body.touch #lb .lbh{display:none}body.touch .slot{width:30px;height:30px;font-size:10px}body.touch .slot.on{width:48px;height:48px;font-size:13px}body.touch #meter #mlabel{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (orientation:portrait){body.touch #info{bottom:auto;top:max(104px,calc(env(safe-area-inset-top) + 96px))}}
 body.touch #lb{left:max(64px,calc(env(safe-area-inset-left) + 54px))}
-body.touch #info{left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom))}
-body.touch #meter{bottom:auto;top:max(116px,26%);width:min(300px,72vw)}body.touch #prompt{bottom:auto;top:calc(max(116px,26%) + 48px);max-width:80vw;text-align:center}
+body.touch #meter{bottom:auto;top:max(116px,26%)}body.touch #prompt{bottom:auto;top:calc(max(116px,26%) + 48px);max-width:80vw;text-align:center}
 body.touch #rf{inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 150px max(10px,env(safe-area-inset-left));touch-action:none}
-@media (orientation:portrait){body.touch #bag{left:max(10px,env(safe-area-inset-left));transform:none;max-width:calc(100vw - 150px)}
-  body.touch #card{bottom:250px;right:10px;font-size:12px;min-width:0}}
-@media (orientation:landscape){body.touch #card{right:210px;font-size:12px;min-width:0}body.touch #lie{left:220px;bottom:10px}body.touch #rf{bottom:max(10px,env(safe-area-inset-bottom));right:210px}}
+body.touch #card{min-width:0;font-size:10px;line-height:1.3;padding:4px 8px;bottom:auto;top:max(150px,calc(env(safe-area-inset-top) + 140px))}
+@media (orientation:landscape){body.touch #rf{bottom:max(10px,env(safe-area-inset-bottom));right:210px}body.touch #card{top:auto;bottom:max(10px,env(safe-area-inset-bottom));right:calc(max(10px,env(safe-area-inset-right)) + 160px)}}
 `;
 
 /** Floating joystick on the view (walk, turn, drive) and, in the stance, the pull-down swing; buttons for everything else. */
@@ -75,7 +72,7 @@ export class TouchControls {
     this.el.id = 'touch';
     const btn = (id: string, label: string, cls = '') => `<button class="tb ${cls}" id="t${id}">${label}</button>`;
     this.el.innerHTML = `<div id="stick"><i></i></div>${btn('mute', '&#128264;')}<div id="tc">${btn('swing', 'Swing', 'big')}${btn('cart', 'Cart')}${btn('map', 'Map')}${btn('shift', 'Shift')}
-      ${btn('x', '&#10005;')}${btn('chip', 'Chip')}${btn('aimr', 'Aim &#9654;')}${btn('aiml', '&#9664; Aim')}${btn('bd', 'Ball &#9660;')}${btn('bu', 'Ball &#9650;')}${btn('br', 'Ball &#9654;')}${btn('bl', '&#9664; Ball')}</div>`;
+      ${btn('x', '&#10005;')}${btn('chip', 'Chip')}${btn('aimr', 'Aim &#9654;')}${btn('aiml', '&#9664; Aim')}${btn('bd', '&#9660;')}${btn('bu', '&#9650;')}${btn('br', '&#9654;')}${btn('bl', '&#9664;')}${btn('bc', '0 0')}</div>`;
     hud.append(this.el);
     this.knob = this.el.querySelector('#stick i')!;
     for (const e of this.el.querySelectorAll<HTMLElement>('.tb')) this.b[e.id.slice(1)] = e;
@@ -127,7 +124,7 @@ export class TouchControls {
     const show = (id: string, v: boolean) => this.b[id]!.classList.toggle('on', v && c.race);
     show('swing', !c.stance && !c.driving); show('cart', !c.stance && (c.driving || c.nearCart)); show('map', !c.stance); show('shift', !c.stance && !c.driving); show('mute', !c.map);
     for (const id of ['x', 'aiml', 'aimr']) show(id, c.stance);
-    for (const id of ['chip', 'bu', 'bd', 'bl', 'br']) show(id, c.stance && !c.putt);
+    for (const id of ['chip', 'bu', 'bd', 'bl', 'br', 'bc']) show(id, c.stance && !c.putt);
     this.b.map!.classList.toggle('lit', c.map); this.b.shift!.classList.toggle('lit', this.shift); this.b.chip!.classList.toggle('lit', c.chip);
     this.el.querySelector('#tc')!.classList.toggle('st', c.stance);
     if (!c.stance) { this.aimHold = 0; if (this.mode !== 'stick') this.pull = null; }

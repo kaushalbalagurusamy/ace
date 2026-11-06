@@ -141,7 +141,7 @@ export class World {
     const rot = Math.atan2(-(h.pin.x - h.tee.x), h.pin.z - h.tee.z);
     players.forEach((p, i) => {
       const shade = SHADES[i % 4]!;
-      const look = this.makeGolfer(shade, p.name);
+      const look = this.makeGolfer(shade, p.id === this.selfId ? '' : p.name);   // no tag over your own golfer (owner: declutter)
       const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(BALL_VISUAL_RADIUS_M, 12, 8), this.mat('#ffffff')),
         cart: makeCart(shade), cs: cartSpawn(gridKey(h.course, p.hole), i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
@@ -258,7 +258,7 @@ export class World {
     part(0.22, 0.85, 0.25, -0.13, 0.43, '#333'); part(0.22, 0.85, 0.25, 0.13, 0.43, '#333'); part(0.55, 0.7, 0.3, 0, 1.2); part(0.15, 0.65, 0.2, -0.36, 1.15); part(0.15, 0.65, 0.2, 0.36, 1.15); part(0.28, 0.28, 0.28, 0, 1.75, '#ddd');
     const c = document.createElement('canvas'); c.width = 256; c.height = 64; const x = c.getContext('2d')!;
     x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(0, 0, 256, 64); x.fillStyle = '#fff'; x.font = '36px system-ui'; x.textAlign = 'center'; x.fillText(name, 128, 44);
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(2, 0.5, 1); s.position.y = 2.4;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(2, 0.5, 1); s.position.y = 2.4; s.visible = !!name;
     g.add(box, s);
     const look: Look = { box, clubIdx: -1, clubToken: 0, walk: 0, last: new THREE.Vector3(NaN, 0, 0), speed: 0 };
     this.setClubOn(look, DEFAULT_CLUB);

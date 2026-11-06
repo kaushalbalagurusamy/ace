@@ -107,8 +107,9 @@ function onMsg(m: ServerMsg) {
     case 'lobby': lobby = m.lobby; if (!lobby) count = null; menu(); break;
     case 'countdown': count = m.seconds; if (m.seconds === 4) void audio.play('vo-countdown', 0.9); menu(); break;
     case 'raceStart': {
-      count = null; hole = m.hole; racers = m.players; ui.toggleScorecard(false); goAt = m.goAtMs; endAt = 0; swing = null; world.load(m.hole, m.players);
+      count = null; hole = m.hole; racers = m.players; ui.toggleScorecard(false); goAt = m.goAtMs; endAt = 0; swing = null;
       selfId = (m.players.find(p => p.id === sessionId) ?? m.players.find(p => p.name === name))?.id ?? '';
+      world.selfId = selfId; world.load(m.hole, m.players);   // selfId first: load leaves the name tag off your own golfer
       const me = world.ents.get(selfId);
       pos = me ? { x: me.ball.x + 1, z: me.ball.z - 0.5 } : { ...m.hole.tee };
       yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z);
@@ -207,6 +208,7 @@ addEventListener('keydown', e => {
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === 'KeyN') { audio.toggleMute(); return; }
+  if (e.code === 'KeyI') { ui.toggleLie(); return; }
   if (e.code === 'Tab') { ui.toggleScorecard(); board(); return; }
   if (e.code === 'Comma' || e.code === 'Period') { setLook(stepMult(lookMult, e.code === 'Period' ? 1 : -1)); ui.toast(lookLabel(lookMult)); return; }
   if (e.code === 'Escape' && !swing) { ui.toggleSettings(); return; }          // Esc opens the settings menu; in a stance it cancels the stance instead
