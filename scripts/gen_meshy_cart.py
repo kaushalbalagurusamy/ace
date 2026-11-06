@@ -28,12 +28,14 @@ ap = argparse.ArgumentParser(); ap.add_argument("id"); ap.add_argument("images",
 ap.add_argument("--polycount", type=int, default=50000); ap.add_argument("--prompt", default=PROMPT); ap.add_argument("--no-texture-prompt", action="store_true")
 ap.add_argument("--geometry", default="standard", choices=["standard", "2k"])   # 2k = Ultra geometry, +5 credits
 ap.add_argument("--retexture", metavar="TASK_ID", help="re-texture that task's mesh from the photos instead (multiview, its UVs kept)")
+ap.add_argument("--style-image", action="store_true", help="with --retexture: first image as the style image plus --prompt as text style")
 a = ap.parse_args()
 b0 = call("GET", "/v1/balance")["balance"]; print("balance before:", b0)
 kind = "retexture" if a.retexture else "multi-image-to-3d"
 if a.retexture:
-    body = {"input_task_id": a.retexture, "multiview_image_urls": [uri(p) for p in a.images], "ai_model": "meshy-7", "enable_original_uv": True,
-            "enable_pbr": True, "texture_resolution": "2k", "target_formats": ["glb"]}
+    body = {"input_task_id": a.retexture, "ai_model": "meshy-7", "enable_original_uv": True, "enable_pbr": True, "texture_resolution": "2k", "target_formats": ["glb"]}
+    if a.style_image: body.update(image_style_url=uri(a.images[0]), text_style_prompt=a.prompt[:600])   # one photo as style + the text
+    else: body["multiview_image_urls"] = [uri(p) for p in a.images]
 else:
     body = {"image_urls": [uri(p) for p in a.images], "ai_model": "latest", "should_texture": True, "enable_pbr": True, "texture_resolution": "2k",
             "geometry_resolution": a.geometry, "should_remesh": True, "topology": "triangle", "target_polycount": a.polycount, "target_formats": ["glb"]}
