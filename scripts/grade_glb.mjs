@@ -1,7 +1,7 @@
 // Colour-grades a generated GLB's base-colour textures toward photo swatches (docs/research/pebble-look.md), keeping the generated detail.
 // Pixels are split by hue into foliage (green) and the rest (bark, rock); each group's mean colour is moved to its target by a per-channel gain,
 // so the texture's own variation (cracks, lichen, tufts) survives. Also scales roughness up (Rodin/Meshy rock reads too glossy).
-// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6]
+// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6] [--grain 1]
 // Libraries come from the gltf-transform npx cache (same one the gen scripts call); set GT_MODULES to override.
 import { createRequire } from 'node:module';
 const req = createRequire((process.env.GT_MODULES ?? '/Users/kaushal/.npm/_npx/a6797f7ff67bb1f2/node_modules') + '/x.js');
@@ -31,6 +31,11 @@ for (const mat of doc.getRoot().listMaterials()) {
     }
     console.log(mat.getName() || 'material', 'means before', Object.fromEntries(Object.entries(sum).map(([g, s]) => [g, s[3] ? s.slice(0, 3).map(v => Math.round(v / s[3])) : null])), 'share green', (sum.green[3] / cls.length).toFixed(2));
     let img = sharp(data, { raw: info }); if (opt.blur) img = img.blur(+opt.blur);   // --blur softens over-sharpened generator noise
+    if (opt.grain) {   // --grain A: granite's salt-and-pepper crystals (dark biotite, pale feldspar specks) over the blurred albedo, per texel
+      const { data: d } = await img.raw().toBuffer({ resolveWithObject: true }), A = +opt.grain;
+      for (let p = 0; p < d.length; p += 4) { const r = Math.random(), f = r < 0.09 ? 1 - 0.5 * A : r > 0.94 ? 1 + 0.3 * A : 1 + A * 0.12 * (Math.random() - 0.5); for (let c = 0; c < 3; c++) d[p + c] = Math.min(255, d[p + c] * f); }
+      img = sharp(d, { raw: info });
+    }
     tex.setImage(new Uint8Array(await img.png().toBuffer())).setMimeType('image/png');
     mat.setBaseColorFactor([1, 1, 1, mat.getBaseColorFactor()[3]]);
   }
