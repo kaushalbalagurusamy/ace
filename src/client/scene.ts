@@ -111,7 +111,7 @@ export class World {
       sh.uniforms.uSea = { value: f.tex }; sh.uniforms.uGrid = { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) };
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz; uniform sampler2D uSea; uniform vec4 uGrid;')
-        .replace('#include <map_fragment>', '#include <map_fragment>\nif (texture2D(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw).r > 0.5) discard;');
+        .replace('#include <map_fragment>', '#include <map_fragment>\nif (textureLod(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw, 0.0).r > 0.5) discard;');
     };
     return m;
   }

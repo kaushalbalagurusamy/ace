@@ -56,7 +56,7 @@ export function seaField(hole: number): SeaField {
   for (let z = g.nz - 1; z >= 0; z--) for (let x = g.nx - 1; x >= 0; x--) { const i = z * g.nx + x; if (x < g.nx - 1) D(i, i + 1, c1); if (z < g.nz - 1) { D(i, i + g.nx, c1); if (x < g.nx - 1) D(i, i + g.nx + 1, c2); if (x) D(i, i + g.nx - 1, c2); } }
   const px = new Uint8Array(n * 4);
   for (let i = 0; i < n; i++) { dist[i] = Math.min(80, dist[i]!); px[i * 4] = sea[i]! * 255; px[i * 4 + 1] = Math.round((dist[i]! / 80) * 255); px[i * 4 + 3] = 255; }
-  const tex = new THREE.DataTexture(px, g.nx, g.nz); tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.needsUpdate = true;
+  const tex = new THREE.DataTexture(px, g.nx, g.nz); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.generateMipmaps = true; tex.needsUpdate = true;   // mips: the terrain asks 'near the sea?' from a blurred level
   const f = { sea, dist, tex, any }; seaFields.set(hole, f); return f;
 }
 const decoded = (hole: number) => grids.get(hole) ?? (grids.set(hole, decodeGrid(GRIDS[hole]!)), grids.get(hole)!);
@@ -150,7 +150,7 @@ float tNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
 // (the second rotated, larger and offset, chosen by world noise), macro colour variation, and mowing stripes across the tee-pin axis.
 const TURF_MAP = /* glsl */`
 #ifdef HAS_SEA
-if (texture2D(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw).r > 0.55) discard;   // the ocean (ocean.ts) and the cliffs (coast.ts) show through
+if (textureLod(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw, 0.0).r > 0.55) discard;   // the ocean (ocean.ts) and the cliffs (coast.ts) show through
 #endif
 vec3 turfN = vec3(0.5, 0.5, 1.0); float turfW = 0.0;
 #ifdef HAS_DETAIL
@@ -185,6 +185,11 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
     // the flat ground has no bunker bowl, so fake its face: the lip toward the sun shades the sand behind it (sun from environment.ts SUN_DIR)
     float wsSun = texture2D(uMaskB, muv + vec2(-0.507, -0.862) * 1.6 * uGrid.zw).g;
     alb *= 1.0 - 0.45 * ws * clamp(1.0 - wsSun * 1.4, 0.0, 1.0);
+  #ifdef HAS_SEA
+    // traced sand on the cliff tops and shore reads as native scrub and fescue in the photos (h08-chasm, h06-cliffs), not white bunker sand
+    float coast = smoothstep(0.02, 0.12, textureLod(uSea, muv, 4.0).r) * ws;
+    alb = mix(alb, mix(vec3(0.075, 0.1, 0.03), vec3(0.16, 0.14, 0.07), tNoise(vWxz * 0.6)) * (0.8 + 0.4 * tNoise(vWxz * 4.0)), coast);
+  #endif
     float sp = dot(sim, uStripe);
     alb *= 1.0 + 0.18 * (wt[0] / sum) * (smoothstep(-0.25, 0.25, sin(sp * 0.5236)) - 0.5) + 0.06 * (wt[4] / sum) * (smoothstep(-0.3, 0.3, sin(sp * 3.1416)) - 0.5);
   #ifdef TURF_DETAIL

@@ -57,7 +57,8 @@ uniform vec3 uSun; uniform vec3 uSunCol; uniform vec3 uZenith; uniform vec3 uHaz
 varying vec3 vW;
 void main() {
   vec2 muv = (vec2(-vW.x, vW.z) - uGrid.xy) * uGrid.zw;
-  float d = texture2D(uField, muv).g * 80.0;                         // metres from land
+  float d = textureLod(uField, muv, 0.0).g * 80.0;                         // metres from land
+  vec2 out2 = max(-muv, muv - 1.0); d = mix(d, 80.0, smoothstep(0.0, 0.02, max(out2.x, out2.y)));   // beyond the traced map: open water, no clamped shore stripes
   vec2 p = vW.xz;
   vec4 w1 = texture2D(uWave, p * 0.021 + vec2(uTime * 0.006, uTime * 0.004));
   vec4 w2 = texture2D(uWave, p * 0.067 + vec2(-uTime * 0.011, uTime * 0.009));
