@@ -18,7 +18,7 @@ describe('SS-1 perfect centre delivery', () => {
 });
 
 describe('SS-2 ball position (D-plane: loft from forward/back, path from closer/away, face square)', () => {
-  it('constants: 1.5 degrees of loft per forward step, 2 degrees of path per away step', () => { expect(LOFT_PER_FB_DEG).toBe(1.5); expect(PATH_PER_IO_DEG).toBe(2); });
+  it('constants: 1.5 degrees of loft per forward step, 1 degree of path per away step', () => { expect(LOFT_PER_FB_DEG).toBe(1.5); expect(PATH_PER_IO_DEG).toBe(1); });
   for (const key of ['1', '7', 'O']) {
     it(`${club(key).label}: forward raises launch and spin step by step, back lowers them`, () => {
       let prev: { launch: number; spin: number } | null = null;
@@ -99,3 +99,12 @@ describe('SS-6 lie and turf (PRD/03 section 4) and the tee', () => {
 });
 
 it('a ball position that is not centre never changes a putt (the putter ignores it)', () => { const p: BallPos = { fb: 2, io: 2 }; expect(launchFor(club('P'), { ballPos: p }).spinAxisDeg).toBe(launchFor(club('P')).spinAxisDeg); });
+
+describe('ball-position curve size (owner playtest, 2026-11-05)', () => {
+  it('Away +2 with the driver off the tee draws about 20-30 yd, and the 7-iron less', () => {
+    const off = (key: string, io: number) => simulateShot(launchFor(BAG.find(c => c.key === key)!, { ballPos: { fb: 0, io }, lie: 'tee' })).offlineM * 1.0936;
+    const d2 = off('1', 2), i2 = off('7', 2);
+    expect(-d2).toBeGreaterThanOrEqual(20); expect(-d2).toBeLessThanOrEqual(30);
+    expect(Math.abs(i2)).toBeLessThan(Math.abs(d2));
+  });
+});
