@@ -178,7 +178,7 @@ export class UI {
   }
   /** Course cards: a radio group the host picks from, or (for everyone else) the lobby's course on its own. */
   private courses(cur: CourseId, pick: boolean) {
-    const card = (id: CourseId) => { const c = COURSES[id], t = totals(id); return `<b>${esc(c.name)}</b><small>${esc(c.place)}</small><small>Par ${t.par} · ${t.yards.toLocaleString('en-US')} yd · ${esc(c.look)}</small>`; };
+    const card = (id: CourseId) => { const c = COURSES[id], t = totals(id); return `<b>${esc(pick ? c.short : c.name)}</b><small>${esc(c.place)}</small><small>Par ${t.par} · ${t.yards.toLocaleString('en-US')} yd</small>${pick ? '' : `<small>${esc(c.look)}</small>`}`; };
     return pick ? `<label id="crs-l">Course</label><div class="crs" role="radiogroup" aria-labelledby="crs-l">${COURSE_IDS.map(id => `<button role="radio" aria-checked="${id === cur}" data-act="course" data-v="${id}">${card(id)}</button>`).join('')}</div>`
       : `<label>Course</label><div class="crs solo"><div class="one">${card(cur)}</div></div>`;
   }
