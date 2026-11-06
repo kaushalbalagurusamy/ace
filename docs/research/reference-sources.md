@@ -29,6 +29,45 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 
 **Total:** 6864 yd, par 72. This replaces the pars I recalled from memory in PRD/06 §2 (they matched apart from the yardage gap).
 
+## Bethpage Black and Aronimink hole layouts: `refs/bethpage-black/`, `refs/aronimink/` (owner, 2026-11-05: partner agreements signed)
+
+- **Source (owner's instruction):** BlueGolf course database hole maps, retrieved 2026-11-05.
+  - Bethpage Black: https://course.bluegolf.com/bluegolf/course/course/bethpageblack/holemap.htm
+  - Aronimink: https://course.bluegolf.com/bluegolf/course/course/aronimink/holemap.htm?next=overview.htm (owner-confirmed)
+- **What the maps are:** Google satellite views with BlueGolf's tee, dogleg and green markers. The page loads `aerial.json`, which holds every tee set (par and yards per hole) and the tee, dogleg and green coordinates of each hole. BlueGolf's tee point matches the back tees (play line within a few percent of the back yardage).
+- **How they were fetched:** plain HTTP gets HTTP 405, so through headless Chrome for Testing with Playwright. Per hole: `hole-NN.png` (the page as shown) and `hole-NN-clean.png` with `hole-NN-clean.json` (the same imagery north-up at zoom 18 without overlays, plus its Web Mercator reference). `sources.json` in each folder lists the URLs and date.
+- **Supplementary OpenStreetMap data (ODbL, © OpenStreetMap contributors):** `boundary.json` (the club's `leisure=golf_course` outline) and `osm-features.json` (golf features, woods, water, paths, roads, buildings). The tracer uses them to calibrate its colour classifier per image, and to place out of bounds at the boundary, buildings and roads. The lie classes themselves come from the BlueGolf imagery.
+- **Imagery credit:** shown by BlueGolf through Google Maps: Airbus, Maxar Technologies, Vexcel Imaging US.
+- **Use:** `scripts/trace_bluegolf.py` traces them into `src/shared/course-grid-bethpage-black.ts` and `course-grid-aronimink.ts`. QA overlays are in `refs/<course>/qa/` (not committed). The `bg-bethpage-*` and `bg-aronimink-*` backdrops were generated as image edits seeded with the clean maps. The maps themselves never ship.
+
+### Cards for the game (back tees, from BlueGolf)
+
+**Bethpage Black, Blue tees: par 71, 7,486 yd**
+
+| Hole | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | Out |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Par | 4 | 4 | 3 | 5 | 4 | 4 | 5 | 3 | 4 | 36 |
+| Yards | 430 | 389 | 230 | 517 | 478 | 408 | 553 | 210 | 460 | 3675 |
+
+| Hole | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | In |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Par | 4 | 4 | 4 | 5 | 3 | 4 | 4 | 3 | 4 | 35 |
+| Yards | 502 | 435 | 516 | 608 | 158 | 484 | 490 | 207 | 411 | 3811 |
+
+**Aronimink, Black tees: par 70, 7,313 yd**
+
+| Hole | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | Out |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Par | 4 | 4 | 4 | 4 | 3 | 4 | 4 | 3 | 5 | 35 |
+| Yards | 434 | 413 | 442 | 457 | 171 | 391 | 419 | 242 | 605 | 3574 |
+
+| Hole | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | In |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Par | 4 | 4 | 4 | 4 | 3 | 4 | 5 | 3 | 4 | 35 |
+| Yards | 444 | 425 | 466 | 385 | 210 | 546 | 544 | 229 | 490 | 3739 |
+
+**Geometry:** the grids are true scale. The card yardage is measured along BlueGolf's play line (tee, dogleg, green), so each tee is slid along the first leg until the play line equals the card. The largest moves are Aronimink 18 (45 m back), 15 (35 m back) and Bethpage 10 (29 m forward). The pin sits on +z at the straight-line distance, so on a dogleg the rangefinder shows less than the card yardage. Each grid records the tee's latitude and longitude and the bearing of +z, for the elevation work.
+
 ## Swing reference: `refs/swing/dunaway-dtl-sybervision.mp4`
 
 - **Source:** "Mike Dunaway Driver Swings DTL (Sybervision)", WAX Golf, uploaded 2020-04-28. https://www.youtube.com/watch?v=zJpTTF4wr7s. 56 s, 1280×720, 30 fps.
