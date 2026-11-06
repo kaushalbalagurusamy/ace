@@ -25,3 +25,4 @@ Architecture and decisions: `docs/decisions/`. Spec: `PRD/`.
 
 ## Credits
 All art and sound are generated for this game, with a provenance row for each file in `assets/manifest.json`: audio with ElevenLabs, 3D models with Meshy (seeded by our own images from OpenAI `gpt-image-2-2026-04-21` where noted), ground textures with OpenAI images, and the rest built in code. Three.js and `ws` are used as libraries. Course: Pebble Beach Golf Links.
+Elevation: USGS 3D Elevation Program (3DEP) 1 m DEM, public domain. Hole tee and green positions: © OpenStreetMap contributors, available under the Open Database License (ODbL); see `docs/research/elevation.md`.
