@@ -54,3 +54,10 @@ The game **Ace** is submitted (portal + Google Form, before midnight). The game 
 - **Committed:** `assets/models/rock-r20.glb` (critic PASS 4/4/4/4, wired as the only rock in `scene.ts`), QA renders for rock-r17..r20 and tree-pine-r7..r13, manifest rows with scores.
 - **Kept local, gitignored:** failing GLBs rock-r17..r19 and tree-pine-r7..r13 in `assets/models/raw/rejected/`; concepts in `assets/images/`.
 - **Not committed:** `node_modules` in this worktree is a symlink to the main checkout's `node_modules` for tsc/vitest/build. `.gitignore`'s `node_modules/` only matches directories, so it shows as untracked. Delete the symlink with the worktree; never commit it.
+
+## Final model round artifacts (2026-11-06, final-model-round worktree)
+
+- **Committed:** `assets/models/tree-pine-r19b.glb` (critic PASS 4/4/4/4, wired as the pine in `scene.ts`), plus QA renders and manifest rows for every critic-scored candidate (pine r16e..r19b, oak r16b..r22c, maple r16a..r21a).
+- **Deleted:** `assets/qa/` renders of candidates that never went to a critic: the raw Meshy and Rodin outputs (`*-r15*`) and intermediate tries (pine r16a..d, r16f..h, r18a, r18c; oak r16a, r17b..d, r18a..c, r19a, r19b, r20a, r21a, r21b, r22b, r23a; maple r16b, r20a). They support no verdict and can be re-rendered from the GLBs.
+- **Kept local, gitignored:** all failing and unscored GLBs in `assets/models/raw/rejected/`; the raw Meshy sources and staged `*.row.json` files in `assets/models/raw/`; the concepts in `assets/images/`.
+- **Not committed:** the `node_modules` and `refs/*` symlinks into the main checkout.
