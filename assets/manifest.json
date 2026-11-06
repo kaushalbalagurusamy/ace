@@ -617,29 +617,39 @@
     },
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/golfer-v6/",
+      "renders": "assets/qa/golfer-v7/",
       "compare_against": "refs/golfer/character-reference.png; swing: refs/swing/dunaway-dtl-sybervision.mp4",
       "views": [
         "p1-faceon",
         "p1-dtl",
+        "p1-topdown",
         "p2-faceon",
         "p2-dtl",
+        "p2-topdown",
         "p3-faceon",
         "p3-dtl",
+        "p3-topdown",
         "p4-faceon",
         "p4-dtl",
+        "p4-topdown",
         "p5-faceon",
         "p5-dtl",
+        "p5-topdown",
         "p6-faceon",
         "p6-dtl",
+        "p6-topdown",
         "p7-faceon",
         "p7-dtl",
+        "p7-topdown",
         "p8-faceon",
         "p8-dtl",
+        "p8-topdown",
         "p9-faceon",
         "p9-dtl",
+        "p9-topdown",
         "p10-faceon",
         "p10-dtl",
+        "p10-topdown",
         "front",
         "side",
         "back",
@@ -647,19 +657,77 @@
         "face-side",
         "swing-strip.mp4"
       ],
-      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v6/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
+      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v7/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": true,
       "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
       "previous": {
-        "v5": "supervisor review (not the critic): P9/P10 floating, P10 club out to the left, P4 hands against the head",
-        "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
+        "v6": "FAIL 3.0, swing positions 2 (golf-expert critic)",
+        "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it",
         "earlier": {
-          "v4": "FAIL 3.33, swing 2 (third critic)",
-          "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
+          "v5": "supervisor review (not the critic): P9/P10 floating, P10 club out to the left, P4 hands against the head",
+          "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
+          "earlier": {
+            "v4": "FAIL 3.33, swing 2 (third critic)",
+            "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
+          }
         }
       },
-      "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it"
+      "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it",
+      "measured_topdown_deg": {
+        "P1": {
+          "shoulders_closed": 3.4,
+          "hips_closed": -0.1,
+          "pelvis_x_m": 0.004
+        },
+        "P2": {
+          "shoulders_closed": 40.5,
+          "hips_closed": 13.4,
+          "pelvis_x_m": -0.016
+        },
+        "P3": {
+          "shoulders_closed": 72.4,
+          "hips_closed": 28.8,
+          "pelvis_x_m": -0.026
+        },
+        "P4": {
+          "shoulders_closed": 90.5,
+          "hips_closed": 38.2,
+          "pelvis_x_m": -0.036
+        },
+        "P5": {
+          "shoulders_closed": 43.1,
+          "hips_closed": -20.4,
+          "pelvis_x_m": 0.094
+        },
+        "P6": {
+          "shoulders_closed": 22.3,
+          "hips_closed": -33.7,
+          "pelvis_x_m": 0.114
+        },
+        "P7": {
+          "shoulders_closed": -13.9,
+          "hips_closed": -36.4,
+          "pelvis_x_m": 0.134
+        },
+        "P8": {
+          "shoulders_closed": -45.2,
+          "hips_closed": -57.8,
+          "pelvis_x_m": 0.104
+        },
+        "P9": {
+          "shoulders_closed": -91.8,
+          "hips_closed": -77.6,
+          "pelvis_x_m": 0.114
+        },
+        "P10": {
+          "shoulders_closed": -104.1,
+          "hips_closed": -92,
+          "pelvis_x_m": 0.124
+        }
+      },
+      "measured_note": "from the posed joints (lead/trail arm and hip joints) in the QA page; closed > 0, open < 0",
+      "v7_changes": "golf-expert critic: torso turn weighted to the lower spine (0.55/0.30/0.15) so the chest skin turns with the shoulders; P5-P7 distinct from P3-P1 (hips opening 20->34->36 deg, pelvis 9-13 cm toward the target, shoulders opening, hands 13 cm ahead at impact, trail heel up, head held back); P4 shaft along the target line; P1 hinge about 42 deg, narrower stance, more shaft lean; trouser streaks and shirt blotches cleaned in the shader; top-down renders per position"
     },
     "edit_inputs": [
       "refs/golfer/character-reference.png",
