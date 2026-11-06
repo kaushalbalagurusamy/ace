@@ -2,13 +2,19 @@ import * as THREE from 'three';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { isCoastal, propSpots, setTurf, terrainMesh } from './terrain';
+import { isCoastal, propSpots, seaField, setTurf, terrainMesh } from './terrain';
+import { GRIDS } from '../shared/course-grid';
+import { hole as courseHole } from '../server/course';
+const holeInfo = (i: number) => courseHole(i).info;
 import { SPEC, type Tier } from './graphics';
 import { dropTurf, loadTurf, type Turf } from './turf';
 import { Grass } from './grass';
 import { loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
+import { fogDensity, makeEnvironment, SUN_DIR } from './environment';
+import { makeOcean, seaY } from './ocean';
+import { makeBackdrop, makeBuildings, makeCliffs, shorePieces, shoreRockSpots } from './coast';
 import { GolferRig, hasRig, smoothShading } from './golferrig';
 import { POSES, addressPoint, backswingPose, lerpPose, puttPose, releasePose, strideRate, walkPose, type Pose } from './golferanim';
 import { CLUBS, clubMatrix, loadClub, makeCodeClub } from './clubs';
@@ -57,8 +63,8 @@ export class World {
   })();
   private propToken = 0;
   private pinTop = new THREE.Vector3();
-  private fog = new THREE.Fog('#cfe6f4', 220, 900);
-  private sun = new THREE.DirectionalLight('#ffffff', 1.5);
+  private fog: THREE.FogExp2;
+  private sun: THREE.DirectionalLight;
   private grass = new Grass(this.scene);
   private terrain: THREE.Mesh | null = null;
   private spots: PropSpot[] = [];
@@ -70,12 +76,11 @@ export class World {
     this.tier = tier; this.turf = loadTurf(tier);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFShadowMap;
-    this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = this.fog;
-    this.scene.add(new THREE.HemisphereLight('#ffffff', '#6b7b6b', 1.9), this.course, this.props, this.beacon);
+    const env = makeEnvironment(this.renderer, this.scene); this.sun = env.sun; this.fog = env.fog;   // sky, sun, haze, ACES (environment.ts)
+    this.scene.add(this.course, this.props, this.beacon);
     // the sun's shadow box (90 m) follows the player; sun.position/target are moved in render()
     const sc = this.sun.shadow.camera; sc.left = sc.bottom = -45; sc.right = sc.top = 45; sc.near = 1; sc.far = 320;
     this.sun.shadow.bias = -0.0004; this.sun.shadow.normalBias = 0.04;
-    this.scene.add(this.sun, this.sun.target);
     const resize = () => { this.renderer.setSize(innerWidth, innerHeight); this.cam.aspect = innerWidth / innerHeight; this.cam.updateProjectionMatrix(); };
     addEventListener('resize', resize); resize();
     this.applyTier(tier, true);
@@ -87,7 +92,7 @@ export class World {
     this.sun.castShadow = s.shadow > 0;
     if (s.shadow && this.sun.shadow.mapSize.x !== s.shadow) { this.sun.shadow.mapSize.set(s.shadow, s.shadow); this.sun.shadow.map?.dispose(); this.sun.shadow.map = null; }
     this.sun.shadow.radius = t === 'ultra' ? 3 : 1;
-    this.fog.near = s.fogNear; this.fog.far = s.fogFar; this.cam.far = s.far; this.cam.updateProjectionMatrix();
+    this.fog.density = fogDensity(s.fogFar); this.cam.far = s.far; this.cam.updateProjectionMatrix();
     this.grass.configure(s.grassM, s.grassSpacing);
     if (first) return;
     if (s.tex !== prev.tex) {
@@ -97,6 +102,18 @@ export class World {
     if (s.foliage !== prev.foliage) void this.setProps(this.spots);
   }
   private mat = (c: string) => new THREE.MeshLambertMaterial({ color: c });
+  /** Ground beyond the traced map: dark rough-and-pine green, cut away over the sea (same field as the terrain) so the ocean shows. */
+  private landBeyond(hole: number) {
+    const m = new THREE.MeshLambertMaterial({ color: '#33422a' }), f = seaField(hole); if (!isCoastal(hole) || !f.any) return m;
+    const g = GRIDS[hole]!;
+    m.onBeforeCompile = sh => {
+      sh.uniforms.uSea = { value: f.tex }; sh.uniforms.uGrid = { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) };
+      sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz; uniform sampler2D uSea; uniform vec4 uGrid;')
+        .replace('#include <map_fragment>', '#include <map_fragment>\nif (texture2D(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw).r > 0.5) discard;');
+    };
+    return m;
+  }
   private band(w: number, l: number, cx: number, cz: number, rotY: number, y: number, c: string) {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, l).rotateX(-Math.PI / 2), this.mat(c));
     m.position.set(cx, y, cz); m.rotation.y = rotY; this.course.add(m); return m;
@@ -132,34 +149,63 @@ export class World {
   /** Another player's latest report; tick() eases their golfer and cart toward it. */
   remote(m: Mover) { const e = this.ents.get(m.id); if (e && m.id !== this.selfId && m.hole === e.hole) { e.remote = m; e.driving = m.driving; } }
   /** Rebuilds the terrain for a hole without touching the players. */
+  private courseToken = 0;
   buildCourse(h: HoleInfo) {
-    this.course.clear();
-    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
+    this.course.clear(); this.courseToken++;
+    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.landBeyond(h.index));
     base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
+    // the coast (ocean.ts, coast.ts): water at sea level, cliffs or the 18th sea wall down to it, the far shore and the buildings behind 18
+    for (const o of [makeOcean(h.index), makeCliffs(h.index), makeBackdrop(h.index, SPEC[this.tier].far), makeBuildings(h.index, h.pin.z)]) if (o) this.course.add(o);
     const pin = V(h.pin.x, 0, h.pin.z); this.pinTop.set(pin.x, 2.6, pin.z);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     pole.castShadow = flag.castShadow = true;
     this.course.add(pole, flag);
-    this.spots = propSpots(h.index);
+    void this.placeShorePieces(h.index);
+    this.spots = [...propSpots(h.index), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
     void this.setProps(this.spots);
   }
 
-  /** Places generated trees and rocks (cheap clones of cached models); kinds that fail to load are skipped. */
+  /** Places the trees and rocks as one InstancedMesh per model part (a generated model if its row passed QA, else the code-built prop),
+   *  plus boulders along the shore at sea level. Kinds that fail to load fall back to the code props. */
   async setProps(spots: PropSpot[]) {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
-    this.props.clear();
-    const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
-    let i = 0;
-    for (const s of spots.slice(0, 180)) {
-      const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
-      i++;
+    const ids = { cypress: ['tree-cypress-r1', 'tree-cypress-r2', 'tree-cypress-r3'], pine: ['tree-pine-r1'], rock: ['rock-r1', 'rock-r2', 'rock-r3', 'rock-r4'] } as const;
+    const groups = new Map<string, { kind: PropSpot['kind']; v: number; list: PropSpot[] }>();
+    spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, k = l[v]!; (groups.get(k) ?? groups.set(k, { kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
+    const built: THREE.Object3D[] = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+    for (const [id, gr] of groups) {
+      const tpl = (await loadModel(id)) ?? makeProp(gr.kind, gr.v);
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
+      tpl.updateMatrixWorld(true);
+      // grade generated textures toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
+      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#7d8774' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; } });
+      tpl.traverse(o => {
+        const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
+        const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
+        gr.list.forEach((s, j) => im.setMatrixAt(j, m.compose(p.copy(V(s.x, s.y ?? 0, s.z)), q.setFromAxisAngle(up, s.rotY), sc.setScalar(s.scale)).multiply(mesh.matrixWorld)));
+        im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); built.push(im);
+      });
     }
+    this.props.clear(); this.props.add(...built);
+  }
+  /** Generated coast pieces (shown once their rows pass QA): sea-wall sections along 18, cliff blocks at the foot of the tall cliffs. */
+  private async placeShorePieces(hole: number) {
+    const wall = hole === 17, y = seaY(hole); if (!isCoastal(hole) || (!wall && y > -8)) return;
+    const token = this.courseToken, course = this.course, id = wall ? 'seawall-r1' : 'cliff-r1', model = await loadModel(id);
+    if (!model || token !== this.courseToken) return;   // a newer hole was built meanwhile
+    const spots = wall ? shorePieces(hole, 7, 0.6) : shorePieces(hole, 26, 2.5), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+    model.updateMatrixWorld(true);
+    model.traverse(o => {
+      const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
+      const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, spots.length);
+      // the wall section's top sits at the turf (y 0); cliff blocks stand in the water, scaled to the cliff height, tops just below the turf
+      spots.forEach((s, j) => { const sc = wall ? 1 : (-y + 2) / 12; im.setMatrixAt(j, m.compose(V(s.x, wall ? -3 : y - 2, s.z), q.setFromAxisAngle(up, -s.yaw + (wall ? 0 : j * 1.3)), new THREE.Vector3(sc * (wall ? 1.1 : 1), sc, sc)).multiply(mesh.matrixWorld)); });
+      im.receiveShadow = true; im.computeBoundingSphere(); course.add(im);
+    });
   }
   private makeGolfer(shade: string, name: string) {
     const g = new THREE.Group(), box = new THREE.Group(), part = (w: number, h: number, d: number, x: number, y: number, c = shade) => {
@@ -290,6 +336,21 @@ export class World {
       if (e.golfer.visible) this.animate(e, now, dt);   // shortcut: the driver is hidden in the cart rather than seated; add a seated pose if it matters
     }
   }
+  /** QA camera (main.ts ?view=): builds hole `v[0]` (1-based) and looks from sim (v1, v2, v3) at (v4, v5, v6) with field of view v7. */
+  qaView(v: number[]) {
+    const i = Math.max(0, Math.min(17, (v[0] ?? 1) - 1)), hl = holeInfo(i);
+    this.buildCourse(hl); this.myHole = i;
+    this.cam.position.copy(V(v[1] ?? 0, v[2] ?? 1.6, v[3] ?? 0)); this.cam.lookAt(V(v[4] ?? 0, v[5] ?? 1, v[6] ?? 100));
+    if (v[7]) { this.cam.fov = v[7]; this.cam.updateProjectionMatrix(); }
+    this.qaTarget = this.tmpA.clone().copy(V(v[4] ?? 0, 0, v[6] ?? 100));
+  }
+  private qaTarget = new THREE.Vector3();
+  qaRender() {
+    const c = this.qaTarget, mid = this.tmpB.copy(this.cam.position).lerp(c, 0.4).setY(0);
+    if (this.sun.castShadow) { this.sun.target.position.copy(mid); this.sun.position.copy(mid).addScaledVector(SUN_DIR, 150); this.sun.target.updateMatrixWorld(); }
+    this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
+    this.renderer.render(this.scene, this.cam);
+  }
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
     const fx = Math.sin(yaw), fz = Math.cos(yaw);
     const target = this.tmpA.set(-x, y, z);
@@ -297,7 +358,7 @@ export class World {
     this.cam.lookAt(target);
     if (this.sun.castShadow) {   // shadow box centred on the player, snapped to whole texels so edges do not shimmer
       const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, 0, Math.round(target.z / snap) * snap);
-      this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, 100, c.z + 30); this.sun.target.updateMatrixWorld();
+      this.sun.target.position.copy(c); this.sun.position.copy(c).addScaledVector(SUN_DIR, 150); this.sun.target.updateMatrixWorld();
     }
     this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
     this.renderer.render(this.scene, this.cam);
