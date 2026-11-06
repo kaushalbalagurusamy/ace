@@ -21,71 +21,40 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 
 ## 2. Moving and aiming
 
-1. [GIVEN] WASD moves the golfer.
+*Revised 2026-11-05 (owner decision Q13: the one-button swing; `docs/slices/simple-swing/spec.md`). Supersedes the earlier WASD movement, the Z/X/C timed downswing and "Space locks the aim".*
+
+1. [GIVEN] **Movement is the arrow keys**, on foot and later in the cart. WASD is no longer movement; in the stance it sets the ball position (section 3).
 2. [ASSUMED] Movement is relative to the camera. The mouse orbits a third-person camera.
-3. [GIVEN, owner playtest 2026-11-05] Walking speed is **13 m/s**, and holding **Shift** sprints at **18 m/s** (config in `src/client/rules.ts`; 9 m/s felt slow). A 300-yard walk takes about 20 seconds. This speed is the main lever on race length (see 05).
-4. [ASSUMED] Players can't walk into water or past out-of-bounds stakes. Trees block movement. Golfers pass through each other.
-5. [GIVEN] The first Space press within 2.5 m of the ball [ASSUMED distance] takes the **stance**: swing mode starts, the aim locks and WASD is disabled. A prompt shows "Space: take your stance" when in range.
-6. [GIVEN, owner playtest] **Look speed:** the owner prefers the feel of a macOS three-finger drag, so the default look sensitivity is 2.5 times the original 0.003 rad per pixel, adjustable live with `,` and `.` in 10% steps (toast "Look 2.5×", saved in localStorage), and pointer lock asks for unadjusted movement first so a mouse and a trackpad scale the same (`src/client/sensitivity.ts`).
-7. [GIVEN, owner playtest] **Your ball is never lost:** a yellow beacon stands over your ball, an edge arrow with the distance in yards shows when it is off screen, and a "Walk to your ball" hint shows until you are in range. After a penalty (water relief or out of bounds) a large banner says what happened and the golfer is moved to where the ball now is. Out of bounds is drawn with a white boundary line and a hatched area beyond it, starting about 12 m beyond the traced land.
-8. [GIVEN] **Aiming:** the mouse sets the aim direction, the way the camera faces. **No aim line or landing marker is drawn.** Pressing Space locks the aim. A shot planned on the rangefinder (§7) isn't guaranteed to match where the golfer faces. Lining up is part of the skill.
+3. [GIVEN, owner playtest] On-foot speed is **15 m/s**. Holding **Shift** is the **precise walk at 5 m/s** and also halves the look sensitivity (x0.5 on top of the saved setting) on foot and in the stance, for putting lines and fine aim. The arrow keys, Shift and the mouse combine; Shift is released on key-up or on losing focus. Config in `src/client/rules.ts`.
+4. [GIVEN, owner playtest] **Look speed:** the default is **1.75 times** the original 0.003 rad per pixel (the owner found 2.5 times too fast). A settings menu (gear icon, or Esc when not in a stance) has a "Camera sensitivity" slider from 0.5 to 4.0 in 0.05 steps with "Reset to default (1.75x)"; `,` and `.` step it by 10% with a toast and write the same saved setting (localStorage). A saved 2.5 that the player never adjusted moves to 1.75. Pointer lock asks for unadjusted movement first so a mouse and a trackpad scale the same (`src/client/sensitivity.ts`).
+5. [ASSUMED] Players can't walk into water or past out-of-bounds stakes. Trees block movement. Golfers pass through each other.
+6. [GIVEN, owner playtest] **Your ball is never lost:** a yellow beacon over your ball, an edge arrow with the distance in yards when it is off screen, a "Walk to your ball" hint, and after a penalty a large banner and the golfer moved to the ball. Out of bounds has a white boundary line and starts about 12 m beyond the traced land. A **pin indicator** (a red flag over the pin with "Pin N yd" from your ball, or an edge arrow of a different shape and colour when the pin is off screen) shows on foot and in the stance, hidden during ball flight and fading within about 30 yd of the pin.
+7. [GIVEN] **Stance:** the first Space press within 2.5 m of the ball takes the stance: the golfer fixes to the ball and movement turns off. **The mouse stays live**: it keeps rotating the camera, and the aim and the golfer pivot around the ball (the ball does not move) until the backswing starts. **Club changes stay allowed** (keys 1 to 0, `-`, `=`, `O`, `P`) until the backswing starts; aim and ball position are kept, and switching to or from the putter swaps between putt and full-swing mode in place. Once Space is pressed and held, aim and club are locked until the shot resolves. **No aim line or landing marker is drawn** (owner decision). Esc in the stance, before the release, cancels with no penalty.
+8. [GIVEN] A **heading arrow with a soft view cone** on the mini map and the rangefinder shows where the camera faces on foot and the **aim** in the stance (the same direction the shot uses); other players are small dots in their colours.
 
-## 3. Swing mode
+## 3. Swing mode (hold and release Space)
 
-*Revised 2026-11-05 (owner design change, `docs/slices/space-hold-swing/spec.md`): the owner sets the backswing length by holding Space. This replaces the automatic backswing and the earlier wheel / `[` `]` step selector.*
-
-1. **First Space press** near the ball: take the stance and lock the aim (WASD off).
-2. **Second Space press, held:** the backswing turns at a fixed tempo, a full turn in 750 ms (`FULL_TURN_MS`, config). A length meter fills on the HUD.
-3. **Release Space = the top of the swing.** Holding past a full turn pauses at the top. **Length** is the fraction reached, continuous, clamped to 0.05 to 1.0.
-4. **Z, X, C** are timed **relative to the Space release** (it replaces "the top"), each pressed and held to impact. Their ideal offsets and the 120 ms error window scale with length (a shorter swing has a shorter downswing), so good tempo gives a straight shot at any length.
-5. **Club speed** = the club's full speed x f(length), interpolated through 0.25 -> 0.5, 0.5 -> 0.68, 0.75 -> 0.86, 1 -> 1 (and 0.05 -> 0.18) [ASSUMED, tunable config]. A perfect 25% swing with the 62 degree wedge carries about 47 yd; a full swing is unchanged.
-6. **Impact, follow-through, ball launch** are automatic (0.8 s).
-
-Pressing Space, Z, X and C in any overlapping order loses no key: presses made before the release are scored as early (negative offsets). Implementation: the pure `SwingFSM` in `src/client/swingfsm.ts`.
-
-- **Model** [GIVEN]: the swing is based on MCS (Wax Nation). A full hip turn and shoulder turn go to the top. On the downswing, the hips lead and pull the shoulders, and the wrists release once the arms drop into the slot.
-- **Ideal timing:** the target offsets are parameters fitted to the reference clip once we have it [OPEN Q7]. The starting values below follow the general kinematic-sequence ordering of hips, then torso, then arms, then club [UNVERIFIED as exact numbers].
-  - At full length, relative to the Space release: Z at t = 0, X at 60 ms, C at 150 ms, about 100 ms before impact.
-  - At shorter lengths X and C offsets and the error window are multiplied by `durationScale(length)` (0.6 at 25%, 0.75 at 50%, 0.9 at 75%).
-- **Hold:** all three keys must stay held until impact. Letting go early counts as "bailing out" and is scored as if the key had never been pressed.
-- **Missed key:** if a key isn't pressed by impact, the swing still finishes. It counts as a mishit with that key's maximum error. The ball always goes somewhere and there is never a whiff [ASSUMED].
-- **Cancel:** Esc after the stance and before the Space release cancels with no penalty [ASSUMED]. After the release it does nothing.
-
-### Scoring the timing [ASSUMED, all constants to calibrate]
-
-Each key's error e (ms) is its press time minus the ideal time, normalised as n = clamp(|e| / 120 ms, 0, 1). The errors drive the strike:
-
-| Input | Error mainly affects | Early | Late |
-|---|---|---|---|
-| Z (hips) | club speed: lost sequencing | arms take over: speed −, path out-to-in | stuck: speed − |
-| X (shoulders) | swing path | over the top: path left, pull or slice | stuck: path right, push or hook |
-| C (release) | face angle and contact | flip: face closed, dynamic loft −, hook | held off: face open, push or slice |
-
-- `E = 0.4·nZ + 0.3·nX + 0.3·nC`
-- club speed = speed_max × (1 − 0.25·E)
-- smash = smash_max × (1 − 0.10·E)
-- path = ±6° × nX (sign from early or late)
-- face-to-path = ±5° × nC (sign from early or late)
-
-A perfect sequence (E = 0) gives full speed, a square face and path, and therefore maximum distance with a straight flight [GIVEN].
-
-**Timing measurement** [ASSUMED]: timing uses `event.timeStamp` and `performance.now`, not frame counts, so a slow frame rate doesn't change the result. The client sends the raw press and release times. The server re-scores them and rejects impossible input, such as presses before swing mode started.
+1. **Hold Space** (the second press, after the stance): the backswing turns at a fixed tempo; the meter fills and reaches **100% at 0.75 s** (`FULL_TURN_MS`). **Release** to hit. Releasing earlier is a partial shot; the length is continuous, 5% to 100%.
+2. **Every shot has perfect delivery:** square face, neutral path, the club's normalised speed times the length curve (0.05 -> 0.18, 0.25 -> 0.5, 0.5 -> 0.68, 0.75 -> 0.86, 1 -> 1, interpolated) [ASSUMED, tunable]. Z, X and C are gone, with their timing and scoring.
+3. **Ball position (stance only, resets to centre every shot):** `W`/`S` move the ball forward/back and `A`/`D` move it closer to/further from the body, **5 steps per axis (-2..+2)**, shown on a small HUD grid against the feet. Through the D-plane model (`docs/research/trackman-physics.md` section 2) [ASSUMED starting values, to tune]:
+   - **Forward/back:** +1.5 degrees of dynamic loft per step: forward = higher launch, more spin loft and spin; back = lower, de-lofted, a penetrating flight.
+   - **Away/closer:** +/-2 degrees of club path per step with the face square to the target, so face-to-path drives the curve: further from the body (`D`, +) = in-to-out = a **draw**; closer (`A`, -) = out-to-in = a **fade**. Start direction = (1 - kappa)*face + kappa*path with kappa 0.15 for woods and 0.25 for irons; spin axis tilt = 3 x (face - path).
+4. **Max effort:** keep holding past full: the meter enters a red MAX zone. At **1.10 s** the swing **auto-releases** as a max-effort shot: club speed scaled so carry is **+20%** (solved through the sim per club), at **70% accuracy**: random face and path errors (sigma 1.2 degrees each) from a **server-side RNG seeded per shot**, so a max-effort shot's offline spread is about 3 times the reference (sigma/3). Releasing between 0.75 s and 1.10 s is a normal 100% shot.
+5. **Lie and turf** (PRD/03 section 4) apply in the sim: first cut x0.97 speed, x0.85 spin, +0.5 degrees; rough x0.85, x0.55 spin (flyer), +1.5 degrees and a seeded +/-1.5 degree face noise; bunker x0.75 (x0.55 for non-wedges), x0.60 spin, +2 degrees; fringe/green with a non-putter x0.9. Off the ground the driver has a -1 degree attack angle instead of +5 (3-wood -2.9 instead of +2).
+6. **Wire:** `shot {clubKey, aimDeg, holdMs, fb, io}`; the server derives length (`holdMs / 750`, clamped) and max effort (`holdMs >= 1100`), validates every range and rejects anything else.
+7. **Cancel:** Esc in the stance or before the release cancels with no penalty; blur, a hidden tab or losing pointer lock cancels too, so a lost key-up can never fire a shot.
 
 ## 4. After the swing
 
 - [ASSUMED] The camera follows the ball, then returns to the golfer.
 - [ASSUMED] Movement unlocks once the ball comes to rest. The player can start walking while the ball is still rolling.
-- [GIVEN] **Shot card:** after each shot, TrackMan-style stats show briefly: **carry, total and offline** (yards left or right of the aim line).
-  - [ASSUMED] The card also shows club speed, ball speed, launch, spin and the swing timing grade for Z, X and C.
-  - [ASSUMED] It fades after 4 s.
-- [GIVEN] Every ball's tracer is visible to every player.
-  - [ASSUMED] Each tracer stays until that player's next shot.
+- [GIVEN] **Shot card:** after each shot, TrackMan-style stats show for 10 s: **carry, total and offline** (yards left or right of the aim line), club speed, ball speed, then **Ball: Fwd +n / Away +n** and **Effort: Normal or MAX**.
+- [GIVEN] Every ball's tracer is visible to every player; each stays until that player's next shot.
 
-## 5. Putting [GIVEN: simple stroke; revised 2026-11-05 to hold Space]
+## 5. Putting
 
-- With the putter equipped: first Space press takes the stance (aim locks); **hold Space** to draw the putter back (a meter fills over 750 ms for a full draw); **releasing Space strikes the ball.** Hold-Z putting is removed.
-- Ball speed = 15 m/s x length (length 0.05 to 1), the old `drawMs / 1500 x 15` curve. Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
-- Z, X and C do nothing with the putter. Esc after the stance and before the release cancels.
+- With the putter equipped: first Space press takes the stance; **hold Space** to draw the putter back; **release strikes**. Speed = 15 m/s x length (length 0.05 to 1 from the hold, as for full swings). **No max effort:** holding past full caps at the maximum putt. Ball position does not apply. Esc before the release cancels.
+- Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
 - A green slope overlay (arrows on a grid) shows within 10 m of the ball [ASSUMED].
 
 ## 6. Golfer animation
@@ -114,10 +83,10 @@ A perfect sequence (E = 0) gives full speed, a square face and path, and therefo
 ## Acceptance criteria
 
 - **AC-S1:** All 14 keys select the matching club, and the HUD highlight updates within one frame.
-- **AC-S2:** In swing mode WASD has no effect. Esc before the Space release cancels the swing.
-- **AC-S3:** A perfect sequence played by script gives E = 0 and the club's maximum carry with under 1% curvature.
-- **AC-S4:** The same press timings give the same ball result on the client and the server, because the server scores them.
-- **AC-S5:** At 30 fps and 144 fps, identical key timings give an identical E.
+- **AC-S2:** On foot only the arrow keys move; in the stance WASD sets the ball position and moves nothing. Esc before the release cancels the swing.
+- **AC-S3:** A centre full swing is straight (under 1% curvature) and deterministic for every club.
+- **AC-S4:** The server decides length and max effort from the reported hold time; the client never computes an outcome.
+- **AC-S5:** Max-effort dispersion is seeded: the same seed gives the same shot, and over 500 seeded shots the offline spread is about 3 times the reference.
 - **AC-S6:** A perfect release at 25% with the 62 degree wedge carries 40 to 75 yd; a full swing is unchanged.
-- **AC-S7:** Holding Space together with Z, X and C in any overlapping order loses no key (state-machine key-event tests).
+- **AC-S7:** The swing state machine passes its key-event tests: stance steps and clamps, club and aim changes until the backswing, auto-release at 1100 ms, putter cap, Esc and abort.
 - **AC-S8:** A putt released at length L has the speed of the old draw L x 1500 ms.

@@ -8,11 +8,11 @@ Course: **Pebble Beach Golf Links** (name approved by the course). Hole 1 is pla
 
 ## How to play
 - Open the link, enter a name, create or join a lobby (up to 3 lobbies, 4 players each), mark ready, and the host presses Start. A lone host can start a solo time trial.
-- **Move** with WASD. **Look and aim** with the mouse. There is **no aim line**: line up by eye, and use the mini map and its rangefinder to choose a club.
-- **Clubs:** keys 1 to 0, `-`, `=`, `O` (14-club bag); `P` is the putter.
-- **Swing:** stand by your ball and press **Space** to take your stance (the aim locks). Then **press and hold Space**: the club swings back and a meter fills. **Release Space** at the length you want, since a short hold is a short shot, and press **Z** (hips), **X** (shoulders) and **C** (release) in order right after the release. Good timing gives a long, straight shot; early or late keys cost distance and send the ball left or right. **Esc** cancels before the release.
-- **Putt:** equip the putter (P), press Space for the stance, hold **Space** to draw the putter back, and release it to strike: the longer the hold, the harder the putt.
-- **Shot card:** after every shot you see carry, total distance, how far offline, club and ball speed, and how well you timed Z, X and C.
+- **Move** with the **arrow keys**; hold **Shift** to walk slowly and aim finely. **Look and aim** with the mouse (`,` and `.` change the look speed, or use the gear menu). There is **no aim line**: line up by eye, and press **M** for the rangefinder.
+- **Clubs:** keys 1 to 0, `-`, `=`, `O` (14-club bag); `P` is the putter. You can change club until you start the backswing.
+- **Swing:** walk to your ball and press **Space** to take your stance. The mouse still turns your aim, and **W S A D** set the ball position (forward/back for launch, away/closer for a draw or a fade). Then **press and hold Space** and **release to hit**: the meter fills in 0.75 s, a shorter hold is a shorter shot. Keep holding into the red zone for a **MAX effort** shot (20% further, 70% accurate). **Esc** cancels before you release.
+- **Putt:** equip the putter (P), press Space for the stance, hold **Space** to draw the putter back, release it to strike: the longer the hold, the harder the putt.
+- **Shot card:** after every shot you see carry, total distance, how far offline, club and ball speed, the ball position you used and whether it was a normal or MAX effort shot.
 - **Winning:** first to hole out wins; fewer strokes only decides finishes within one second of each other. A room lasts at most 20 minutes, and once someone finishes the others have one minute.
 - A keyboard is required (touch screens see a notice).
 

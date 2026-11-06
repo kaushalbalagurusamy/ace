@@ -42,6 +42,7 @@ Up to four players race through 18 holes of golf in a browser. Players join from
 | Q9 | Club names | Generic HUD labels. The Callaway and Odyssey model names are for generating the club assets, because Callaway is the sponsor (06). |
 | Q10 | Scope | Everything ships tonight. Build the MVP first with greyscale polygons to prove the physics. Asset generation runs in parallel through subagents. |
 | Q11 | First map | Pebble Beach Golf Links (06). |
+| Q13 | Swing complexity (2026-11-05) | Z/X/C is too complex for casual players. **One-button swing:** arrow keys move; Space takes the stance (mouse still aims, clubs still change); hold and release Space swings (full at 0.75 s); every shot has perfect delivery; W/S and A/D set the ball position (forward-back launch, closer-away draw or fade); holding to 1.10 s auto-releases a MAX-effort shot (+20% carry, 70% accuracy). Look speed default 1.75x with a settings slider; walk 15 m/s, Shift 5 m/s walk and 0.5x look. Title stays "Ace". See PRD/02 sections 2 to 5. |
 
 **Still open:**
 - **Keys:** a Meshy Pro key and an OpenAI image key.
