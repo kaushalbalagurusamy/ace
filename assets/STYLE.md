@@ -14,6 +14,9 @@ One cohesive look across every asset: **stylised low-poly, clean flat-shaded fac
 | Player colourways | red #D64545, blue #3F6FD6, yellow #E8C23A, white #EDEDED |
 | Metal club heads | #C9CDD2 steel, #2B2E33 black PVD, #D6B45A gold accent |
 
+## Exception: turf
+The ground turf (`turf-*` in the manifest) is photographic by owner request (2026-11-05): seamless top-down photos, colour-pulled toward the terrain palette in code so the lies stay readable.
+
 ## Rules
 - Units: **1 unit = 1 metre**, Y up, origin at the base centre (feet / trunk base / club sole). Face +Z.
 - Triangle budgets (final shipped .glb): tree <= 3,000; rock <= 2,000; golfer <= 15,000; club head <= 4,000.

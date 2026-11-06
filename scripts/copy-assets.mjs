@@ -5,7 +5,7 @@ const out = 'public';
 rmSync(out, { recursive: true, force: true });
 const copyDir = (from, to, keep = () => true) => { if (!existsSync(from)) return; mkdirSync(to, { recursive: true }); for (const f of readdirSync(from, { withFileTypes: true })) if (f.isFile() && keep(f.name)) cpSync(join(from, f.name), join(to, f.name)); };
 copyDir('assets/models', join(out, 'assets/models'), n => n.endsWith('.glb'));
-copyDir('assets/textures', join(out, 'assets/textures'));
+if (existsSync('assets/textures')) cpSync('assets/textures', join(out, 'assets/textures'), { recursive: true });   // includes turf/<512|1024|2048>/
 copyDir('assets/audio', join(out, 'assets/audio'));
 if (existsSync('assets/manifest.json')) { mkdirSync(join(out, 'assets'), { recursive: true }); cpSync('assets/manifest.json', join(out, 'assets/manifest.json')); }
 copyDir('node_modules/three/examples/jsm/libs/draco/gltf', join(out, 'draco'));
