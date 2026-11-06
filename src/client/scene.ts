@@ -243,7 +243,8 @@ export class World {
     // swap the box stand-in for the rigged golfer once its manifest row is PASS (the stand-in is the fallback), polo in the player's colour
     void loadModel('golfer').then(model => {
       if (!model || !hasRig(model)) return;
-      smoothShading(model);   // polo stays the reference's white and gold (owner: fidelity to the character); players are told apart by name tag and map colour model.traverse(o => { o.castShadow = true; o.frustumCulled = false; });   // skinned: the bind-pose box does not follow the swing
+      smoothShading(model);   // polo stays the reference's white and gold (owner: fidelity to the character); players are told apart by name tag and map colour
+      model.traverse(o => { o.castShadow = true; o.frustumCulled = false; });   // skinned: the bind-pose box does not follow the swing
       const holder = new THREE.Group(); holder.add(model);
       look.rig = new GolferRig(model); look.model = model; look.holder = holder;
       g.remove(box); g.add(holder);
