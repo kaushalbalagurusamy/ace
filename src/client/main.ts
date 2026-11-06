@@ -16,6 +16,7 @@ import { BAG as SIM_BAG, suggestClub } from '../sim';
 import { asLie, lieInfo } from './lieinfo';
 import { stanceSlope } from '../shared/height';
 import { groundNormal } from './terrain';
+import { COURSES, DEFAULT_COURSE, isCourseId, keyOf, type CourseId } from '../shared/courses';
 import { CART, canEnter, cartGround, cartSpawn, exitSpot, forwardSpeed, stepCart } from '../shared/cart';
 import type { CartState } from '../shared/protocol';
 /** The Box Buggy (PRD/07): my cart's state, whether I am in it, and the chase camera (mouse orbit offset, smoothed yaw, bump shake). */
@@ -31,6 +32,8 @@ let token = sessionStorage.getItem('ace.tok') ?? undefined;
 let name = localStorage.getItem('ace.name') ?? '';
 let welcomed = false, lobbies: LobbyView[] = [], lobby: LobbyView | null = null, error = '', count: number | null = null;
 let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
+/** The course for the next lobby I create (remembered); inside a lobby the host changes the lobby's course instead. */
+let pick: CourseId = (() => { try { const v = localStorage.getItem('ace.course'); return isCourseId(v) ? v : DEFAULT_COURSE; } catch { return DEFAULT_COURSE; } })();
 
 let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
 let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.55, club = 0; // higher default camera so the golfer and ball both read at address
@@ -67,7 +70,11 @@ const ui = new UI((a, d, form) => {
     const v = form.querySelector<HTMLInputElement>('#nm')!.value.trim();
     if (!validName(v)) return ui.showName(v, 'Name must be 2 to 16 characters.');
     name = v; localStorage.setItem('ace.name', v); net.send({ t: 'hello', sessionId, name, token });
-  } else if (a === 'create') net.send({ t: 'createLobby' });
+  } else if (a === 'create') net.send({ t: 'createLobby', course: pick });
+  else if (a === 'course' && isCourseId(d.v)) {
+    if (lobby) net.send({ t: 'setCourse', course: d.v });
+    else { pick = d.v; try { localStorage.setItem('ace.course', pick); } catch { /* private mode: not remembered */ } menu(); }
+  }
   else if (a === 'join') net.send({ t: 'joinLobby', lobbyId: d.id! });
   else if (a === 'leave') net.send({ t: 'leaveLobby' });
   else if (a === 'ready') net.send({ t: 'ready', ready: !!d.v });
@@ -75,7 +82,7 @@ const ui = new UI((a, d, form) => {
   else if (a === 'solo') net.send({ t: 'startSolo' });
   else if (a === 'back') { net.send({ t: 'leaveLobby' }); lobby = null; phase = 'menu'; menu(); }
 });
-const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbies, lobby, error, count }); };
+const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbies, lobby, error, count, pick }); };
 ui.setClub(0);
 
 const net = new Net(onMsg, () => {
@@ -104,8 +111,8 @@ function onMsg(m: ServerMsg) {
       const me = world.ents.get(selfId);
       pos = me ? { x: me.ball.x + 1, z: me.ball.z - 0.5 } : { ...m.hole.tee };
       yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z);
-      holeStartStrokes = 0; startAmbience(m.hole.index); world.selfId = selfId;
-      mySlot = Math.max(0, m.players.findIndex(p => p.id === selfId)); cart = cartSpawn(m.hole.index, mySlot); driving = false; camYaw = yaw;
+      holeStartStrokes = 0; startAmbience(keyOf(m.hole)); world.selfId = selfId;
+      mySlot = Math.max(0, m.players.findIndex(p => p.id === selfId)); cart = cartSpawn(keyOf(m.hole), mySlot); driving = false; camYaw = yaw;
       phase = 'race'; ui.screen(null); board(); break;
     }
     case 'shotResult': {
@@ -131,8 +138,8 @@ function onMsg(m: ServerMsg) {
       if (m.playerId === selfId) {
         hole = m.hole; world.myHole = m.hole.index; world.buildCourse(m.hole); world.moveTo(m.playerId, m.ball, m.hole.index);
         pos = { x: m.ball.x + 1, z: m.ball.z - 0.5 }; yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z); swing = null;
-        holeStartStrokes = m.ball.strokes; startAmbience(m.hole.index);
-        cart = cartSpawn(m.hole.index, mySlot); driving = false; camYaw = yaw;          // the cart came along to the new tee
+        holeStartStrokes = m.ball.strokes; startAmbience(keyOf(m.hole));
+        cart = cartSpawn(keyOf(m.hole), mySlot); driving = false; camYaw = yaw;          // the cart came along to the new tee
         ui.toast(`Hole ${m.hole.index + 1}: par ${m.hole.par}, ${Math.round(m.hole.lengthM * YD)} yd`);
       } else world.moveTo(m.playerId, m.ball, m.hole.index);
       board(); break;
@@ -145,13 +152,13 @@ function onMsg(m: ServerMsg) {
     case 'snap': pos = { x: m.x, z: m.z }; driving = m.driving; cart = { ...m.cart }; break;
     case 'raceEnd':
       endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops(); audio.whir(0);
-      ui.showResults([...m.results].sort((a, b) => a.place - b.place)); break;
+      ui.showResults([...m.results].sort((a, b) => a.place - b.place), COURSES[m.course]?.name ?? ''); break;
   }
 }
 /** Quiet ambience under the effects: surf and gulls on the ocean holes, wind in the cypress elsewhere. */
-function startAmbience(holeIndex: number) {
+function startAmbience(key: number) {
   audio.stopLoops();
-  if (isCoastal(holeIndex)) { void audio.loop('amb-surf', 0.22); void audio.loop('amb-gulls-sealions', 0.12); } else void audio.loop('amb-wind-cypress', 0.18);
+  if (isCoastal(key)) { void audio.loop('amb-surf', 0.22); void audio.loop('amb-gulls-sealions', 0.12); } else void audio.loop('amb-wind-cypress', 0.18);
 }
 /** Impact on strike, landing sound when the ball comes down (from the replay samples), on the right surface. */
 function shotSounds(m: Extract<ServerMsg, { t: 'shotResult' }>) {
@@ -249,7 +256,7 @@ function frame(now: number) {
     pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * speed * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * speed * dt;
   }
   // the cart always steps (a bumped, parked cart still rolls to a stop); arrows drive it only from the seat
-  const drive = driving && go && !ui.settingsOpen() ? moveAxis(keys) : { f: 0, r: 0 }, ground = (x: number, z: number) => cartGround(hole!.index, x, z);
+  const drive = driving && go && !ui.settingsOpen() ? moveAxis(keys) : { f: 0, r: 0 }, ground = (x: number, z: number) => cartGround(keyOf(hole!), x, z);
   for (let i = 0, n = Math.ceil(dt * 120); i < n; i++) {                     // small fixed sub-steps so a fast cart cannot skip a thin bunker lip
     const st = stepCart(cart, { throttle: drive.f, steer: drive.r }, dt / n, ground); cart = st.s;
     if (st.bumped > 1.5 && driving) { audio.bump(Math.min(1, st.bumped / CART.TOP) * 0.6); shake = Math.max(shake, 0.25); }
@@ -278,7 +285,7 @@ function frame(now: number) {
   if (!swing) { ui.meterShow(null); ui.ballPosGrid(null); }
   const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving });
   if (me && (canStance || (swing && swing.sentAt === undefined))) {         // the lie panel at the ball: penalties and stance angles for this aim and club
-    const n = groundNormal(hole.index, me.ball.x, me.ball.z), aim = swing ? swing.fsm.aim() : aimDeg(yaw), slope = stanceSlope(n, aim);
+    const n = groundNormal(keyOf(hole), me.ball.x, me.ball.z), aim = swing ? swing.fsm.aim() : aimDeg(yaw), slope = stanceSlope(n, aim);
     const onTee = Math.hypot(me.ball.x - hole.tee.x, me.ball.z - hole.tee.z) <= 3;                     // the server's tee rule (race.ts TEE_RADIUS_M)
     ui.liePanel(lieInfo(onTee ? 'tee' : me.ball.surface, SIM_BAG.find(c => c.key === BAG[club]!.key)!, slope, n), slope);
   } else ui.liePanel(null);
@@ -321,7 +328,7 @@ requestAnimationFrame(frame);
 
 // ---- rangefinder (PRD/02 section 7): M toggles; hover shows distances and a club suggestion; click sets a target shown on the maps only ----
 const rfCanvas = ui.rfCanvas();
-const rfWorld = (e: MouseEvent) => { const r = rfCanvas.getBoundingClientRect(); return { p: rfView(hole!.index, rfCanvas.width, rfCanvas.height).toWorld(((e.clientX - r.left) / r.width) * rfCanvas.width, ((e.clientY - r.top) / r.height) * rfCanvas.height), cx: e.clientX - r.left, cy: e.clientY - r.top }; };
+const rfWorld = (e: MouseEvent) => { const r = rfCanvas.getBoundingClientRect(); return { p: rfView(keyOf(hole!), rfCanvas.width, rfCanvas.height).toWorld(((e.clientX - r.left) / r.width) * rfCanvas.width, ((e.clientY - r.top) / r.height) * rfCanvas.height), cx: e.clientX - r.left, cy: e.clientY - r.top }; };
 rfCanvas.addEventListener('mousemove', e => {
   const me = own(); if (!rfOpen || !hole || !me) return;
   const { p, cx, cy } = rfWorld(e); rfHover = p;

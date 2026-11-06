@@ -1,7 +1,7 @@
 // Fescue tufts on the bunker lips (docs/research/pebble-look.md "Turf": steep faces with a ragged lip of longer, darker,
 // straw-tipped grass). Code-generated: one InstancedMesh of blade clumps on every turf cell that borders sand.
 import * as THREE from 'three';
-import { GRIDS } from '../shared/course-grid';
+import { gridOf } from '../shared/courses';
 import { cellCode, ground, seaField } from './terrain';
 
 const SAND = 115, GREEN = 103;
@@ -26,7 +26,7 @@ const mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.Doub
 /** Lip tufts for one hole (three space); `perCell` tufts on each 2 m turf cell next to sand (not on the green). */
 export function makeFescue(hole: number, perCell: number): THREE.InstancedMesh | null {
   if (perCell <= 0) return null;
-  const g = GRIDS[hole]!, sea = seaField(hole).sea, spots: [number, number][] = [];
+  const g = gridOf(hole), sea = seaField(hole).sea, spots: [number, number][] = [];
   for (let iz = 0; iz < g.nz; iz++) for (let ix = 0; ix < g.nx; ix++) {
     const x = g.x0 + (ix + 0.5) * g.cell, z = g.z0 + (iz + 0.5) * g.cell, c = cellCode(hole, x, z);
     if (c === SAND || c === GREEN || c === 111 || c === 119 || sea[iz * g.nx + ix]) continue;   // not on stray land specks drawn as sea

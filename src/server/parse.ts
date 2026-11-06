@@ -1,6 +1,7 @@
 // Untrusted wire input: every incoming ws message passes through here and leaves as a clean, bounded ClientMsg or null.
 import type { CartState, ClientMsg } from '../shared/protocol';
 import { isValidBallPos } from '../sim';
+import { isCourseId } from '../shared/courses';
 
 const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 const str = (v: unknown, min: number, max: number): v is string => typeof v === 'string' && v.length >= min && v.length <= max;
@@ -25,7 +26,11 @@ export function parseClientMsg(raw: string): ClientMsg | null {
     case 'hello':
       if (!str(m.sessionId, 1, 64) || !str(m.name, 0, 64) || (m.token !== undefined && typeof m.token !== 'string')) return null;
       return { t: 'hello', sessionId: m.sessionId, name: m.name, ...(m.token !== undefined && { token: m.token as string }) };
-    case 'createLobby': case 'leaveLobby': case 'start': case 'startSolo': return { t: m.t };
+    case 'createLobby':
+      if (m.course === undefined) return { t: 'createLobby' };
+      return isCourseId(m.course) ? { t: 'createLobby', course: m.course } : null;
+    case 'setCourse': return isCourseId(m.course) ? { t: 'setCourse', course: m.course } : null;
+    case 'leaveLobby': case 'start': case 'startSolo': return { t: m.t };
     case 'joinLobby': return str(m.lobbyId, 1, 64) ? { t: 'joinLobby', lobbyId: m.lobbyId } : null;
     case 'ready': return typeof m.ready === 'boolean' ? { t: 'ready', ready: m.ready } : null;
     case 'shot': {

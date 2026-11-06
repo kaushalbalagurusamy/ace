@@ -1,4 +1,5 @@
 // Contract for the in-memory lobby manager (PRD/01). Pure logic, no sockets, no timers.
+import type { CourseId } from '../shared/courses';
 // The ws layer maps messages onto these calls; every rule here is enforced server-side (AC-L1, AC-L2).
 
 export type ErrorCode =
@@ -14,7 +15,8 @@ export type ErrorCode =
   | 'LOBBY_NOT_OPEN'    // state is not 'open'
   | 'NOT_HOST'
   | 'NEED_PLAYERS'      // start needs >= 2 players
-  | 'NOT_READY';        // start needs every player ready
+  | 'NOT_READY'         // start needs every player ready
+  | 'COURSE_INVALID';   // not one of courses.COURSE_IDS
 
 export type Result<T> = { ok: true; value: T } | { ok: false; error: ErrorCode };
 export type LobbyState = 'open' | 'starting' | 'in_race' | 'results';
@@ -25,6 +27,7 @@ export interface LobbyView {
   /** default "<host>'s lobby" */ name: string;
   hostSessionId: string;
   state: LobbyState;
+  /** the course the race is played on; the host picks it */ course: CourseId;
   /** join order, oldest first */ players: LobbyPlayerView[];
 }
 
@@ -33,7 +36,8 @@ export interface LobbyView {
 //   connect(sessionId: string, name: string): Result<{ sessionId: string; name: string }>;
 //   /** Removes the player from any lobby (promoting a new host = longest-present player; empty lobby closes). */
 //   disconnect(sessionId: string): void;
-//   createLobby(sessionId: string): Result<LobbyView>;   // creator becomes host and is placed in it
+//   createLobby(sessionId: string, course?: CourseId): Result<LobbyView>;   // creator becomes host and is placed in it; course defaults to Pebble Beach
+//   setCourse(sessionId: string, course: CourseId): Result<LobbyView>; // host only, while open; unknown id -> COURSE_INVALID
 //   joinLobby(sessionId: string, lobbyId: string): Result<LobbyView>;
 //   leaveLobby(sessionId: string): Result<null>;
 //   setReady(sessionId: string, ready: boolean): Result<LobbyView>;

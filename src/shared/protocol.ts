@@ -1,11 +1,14 @@
 // Typed wire contract, JSON over WebSocket at /ws. Shared by client and server; no logic here.
 import type { ErrorCode, LobbyView } from '../server/lobby-types';
 import type { TrajectoryPoint } from '../sim/types';
+import type { CourseId } from './courses';
 
 export type ClientMsg =
   /** token = the secret from the last `welcome`; required to take over an existing session (reload/reconnect). */
   | { t: 'hello'; sessionId: string; name: string; token?: string }
-  | { t: 'createLobby' }
+  | { t: 'createLobby'; course?: CourseId }
+  /** Host only, while the lobby is open. */
+  | { t: 'setCourse'; course: CourseId }
   | { t: 'joinLobby'; lobbyId: string }
   | { t: 'leaveLobby' }
   | { t: 'ready'; ready: boolean }
@@ -25,7 +28,7 @@ export interface CartState { x: number; z: number; yaw: number; vx: number; vz: 
 export interface Mover { id: string; hole: number; x: number; z: number; yaw: number; driving: boolean; cart: CartState }
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
-export interface HoleInfo { index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
+export interface HoleInfo { course: CourseId; index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
 export interface PlayerRace { id: string; name: string; hole: number; ball: BallState; finishedAtS?: number }
 
 export type ServerMsg =
@@ -45,4 +48,4 @@ export type ServerMsg =
   | { t: 'bump'; target: 'cart' | 'golfer'; dx: number; dz: number; dvx: number; dvz: number; strength: number }
   /** To one player whose `move` was refused (a teleport or entering from too far): the server's last accepted state. */
   | { t: 'snap'; x: number; z: number; driving: boolean; cart: CartState }
-  | { t: 'raceEnd';results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };
+  | { t: 'raceEnd'; course: CourseId; results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };

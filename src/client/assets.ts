@@ -71,4 +71,4 @@ export function loadTexture(id: string): Promise<THREE.Texture | null> {
   return textures.get(id)!;
 }
 
-export interface PropSpot { kind: 'cypress' | 'pine' | 'rock'; x: number; z: number; scale: number; rotY: number; /** ground height, default 0 (shore boulders sit at sea level) */ y?: number }
+export interface PropSpot { kind: 'cypress' | 'pine' | 'rock' | 'oak' | 'maple'; x: number; z: number; scale: number; rotY: number; /** ground height, default 0 (shore boulders sit at sea level) */ y?: number }

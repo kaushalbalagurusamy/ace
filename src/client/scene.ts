@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import { BALL_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M } from '../sim/physics';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
+import { DEFAULT_COURSE, gridKey, keyOf, type CourseId } from '../shared/courses';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { ground, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh } from './terrain';
-import { GRIDS } from '../shared/course-grid';
+import { baseY, ground, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh, themeOf } from './terrain';
+import { gridOf } from '../shared/courses';
 import { hole as courseHole } from '../server/course';
 const holeInfo = (i: number) => courseHole(i).info;
 import { SPEC, type Tier } from './graphics';
@@ -33,7 +34,8 @@ interface Look {
   /** a released swing playing out: started at t0 (ms), from `depth`, standing at the ball spot `at` facing `rotY` */
   rel?: { t0: number; depth: number; putt: boolean; at: THREE.Vector3; rotY: number };
 }
-const DEFAULT_CLUB = 6;   // 7-iron in other players' hands (their club choice is not sent)
+const DEFAULT_CLUB = 6;
+const MAX_PROPS = 320;   // parkland tree lines; coastal holes place at most 180 (terrain.propSpots)   // 7-iron in other players' hands (their club choice is not sent)
 const BOX_GRIP = clubMatrix([-0.36, 0.83, 0.12], [0, -0.62, 0.78], [0, 0, 1]);   // the box stand-in's right hand
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
@@ -59,6 +61,7 @@ export class World {
   ents = new Map<string, Ent>();
   /** hole (0-based) the local player is on: other players' balls, golfers and tracers on other holes are hidden */
   myHole = 0;
+  courseId: CourseId = DEFAULT_COURSE;
   private course = new THREE.Group();
   private props = new THREE.Group();
   /** id of the local player: their ball gets a yellow beacon and a screen marker */
@@ -80,9 +83,9 @@ export class World {
   private turf: Promise<Turf | null>;
   private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3(); private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion();
   /** Ground height at sim (x, z) on a hole (default: the one I am on). */
-  groundAt(x: number, z: number, hole = this.myHole) { return ground(hole, x, z); }
+  groundAt(x: number, z: number, hole = this.myHole) { return ground(gridKey(this.courseId, hole), x, z); }
   /** A three-space point standing on the ground of `hole` at sim (x, z), lifted by `dy`. */
-  private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, ground(hole, x, z) + dy, z); }
+  private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, this.groundAt(x, z, hole) + dy, z); }
   constructor(canvas: HTMLCanvasElement, tier: Tier) {
     this.tier = tier; this.turf = loadTurf(tier);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
@@ -116,7 +119,7 @@ export class World {
   /** Ground beyond the traced map: dark rough-and-pine green, cut away over the sea (same field as the terrain) so the ocean shows. */
   private landBeyond(hole: number) {
     const m = new THREE.MeshLambertMaterial({ color: '#33422a' }), f = seaField(hole); if (!isCoastal(hole) || !f.any) return m;
-    const g = GRIDS[hole]!;
+    const g = gridOf(hole);
     m.onBeforeCompile = sh => {
       sh.uniforms.uSea = { value: f.tex }; sh.uniforms.uGrid = { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) };
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vWxz;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWxz = (modelMatrix * vec4(position, 1.0)).xz;');
@@ -137,7 +140,7 @@ export class World {
       const shade = SHADES[i % 4]!;
       const look = this.makeGolfer(shade, p.name);
       const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(BALL_VISUAL_RADIUS_M, 12, 8), this.mat('#ffffff')),
-        cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
+        cart: makeCart(shade), cs: cartSpawn(gridKey(h.course, p.hole), i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
       e.golfer.position.copy(this.onGround(p.hole, p.ball.x + 1, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
@@ -150,12 +153,12 @@ export class World {
     if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
     this.setBall(e, ball);
     e.golfer.position.copy(this.onGround(hole, ball.x + 1, ball.z - 0.5));
-    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(hole, e.slot), 0, 0);   // the cart comes to the new tee too
+    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(gridKey(this.courseId, hole), e.slot), 0, 0);   // the cart comes to the new tee too
   }
   /** Draws a cart state: position, heading, wheel spin and front-wheel lock. */
   placeCart(e: Ent, s: CartState, steer: number, dt: number) {
     e.cs = s; e.steer = steer; e.cart.root.position.copy(this.onGround(e.hole, s.x, s.z));
-    const n = groundNormal(e.hole, s.x, s.z), q = this.tmpQ.setFromUnitVectors(UP, this.tmpA.set(-n.x, n.y, n.z));   // the cart follows the ground's tilt
+    const n = groundNormal(gridKey(this.courseId, e.hole), s.x, s.z), q = this.tmpQ.setFromUnitVectors(UP, this.tmpA.set(-n.x, n.y, n.z));   // the cart follows the ground's tilt
     e.cart.root.quaternion.copy(q).multiply(this.tmpQ2.setFromAxisAngle(UP, -s.yaw));
     poseCart(e.cart, forwardSpeed(s), steer, dt);
   }
@@ -164,13 +167,14 @@ export class World {
   /** Rebuilds the terrain for a hole without touching the players. */
   private courseToken = 0;
   buildCourse(h: HoleInfo) {
-    this.course.clear(); this.courseToken++;
-    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.landBeyond(h.index));
-    base.position.y = seaY(h.index) - 0.6; // just under sea level (the ocean covers it on coastal holes): shallow depth buffers z-fight at a few centimetres
+    this.course.clear(); this.courseToken++; this.courseId = h.course;
+    const k = keyOf(h), coast = themeOf(k) === 'coastal';   // parkland courses have no sea: no ocean, cliffs, far shore or shore pieces
+    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.landBeyond(k));
+    base.position.y = baseY(k) - 0.6; // just under sea level (the ocean covers it on coastal holes), inland under the lowest ground: shallow depth buffers z-fight at a few centimetres
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
     // the coast (ocean.ts, coast.ts): water at the real sea level, cliffs or the 18th sea wall from the turf edge down to it, the far shore and the buildings behind 18
-    for (const o of [makeOcean(h.index), makeCliffs(h.index), makeBackdrop(h.index, SPEC[this.tier].far), makeBuildings(h.index, h.pin.z), makeFescue(h.index, this.tier === 'low' ? 0 : this.tier === 'medium' ? 3 : 6)]) if (o) this.course.add(o);
+    for (const o of [...(coast ? [makeOcean(k), makeCliffs(k), makeBackdrop(k, SPEC[this.tier].far), makeBuildings(k, h.pin.z)] : []), makeFescue(k, this.tier === 'low' ? 0 : this.tier === 'medium' ? 3 : 6)]) if (o) this.course.add(o);
     const pin = this.onGround(h.index, h.pin.x, h.pin.z); this.pinTop.set(pin.x, pin.y + 2.6, pin.z);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, pin.y + 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, pin.y + 2.1, pin.z);
@@ -180,8 +184,8 @@ export class World {
     const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M * 1.06, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#f2f2ee', polygonOffset: true, polygonOffsetFactor: -2 }));
     cup.position.set(pin.x, pin.y + 0.012, pin.z); rim.position.set(pin.x, pin.y + 0.013, pin.z);
     this.course.add(pole, flag, cup, rim);
-    void this.placeShorePieces(h.index);
-    this.spots = [...propSpots(h.index), ...buildingTrees(h.index, h.pin.z), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
+    if (coast) void this.placeShorePieces(k);
+    this.spots = [...propSpots(k), ...(coast ? buildingTrees(k, h.pin.z) : []), ...(coast && isCoastal(k) ? shoreRockSpots(k).map(r => ({ kind: 'rock' as const, ...r, y: seaY(k) - 0.6 })) : [])];
     this.propHole = h.index;
     void this.setProps(this.spots);
   }
@@ -191,7 +195,7 @@ export class World {
   async setProps(spots: PropSpot[]) {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
-    const ids = { cypress: ['tree-cypress-r13'], pine: ['tree-pine-r1'], rock: ['rock-r1', 'rock-r2', 'rock-r3', 'rock-r4'] } as const;
+    const ids = { cypress: ['tree-cypress-r13'], pine: ['tree-pine-r1'], rock: ['rock-r1', 'rock-r2', 'rock-r3', 'rock-r4'], oak: ['tree-oak-a', 'tree-oak-b'], maple: ['tree-maple-a', 'tree-maple-b'] } as const;
     // one batch per model and 80 m tile, so the camera and the 90 m shadow box cull the far batches (an M1 Air keeps 60 fps on Medium)
     const groups = new Map<string, { id: string; kind: PropSpot['kind']; v: number; list: PropSpot[] }>();
     spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
@@ -206,7 +210,7 @@ export class World {
         const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
         const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
         // on the real ground, sunk a little so trunks on a slope do not float; shore boulders carry their own y (sea level)
-        gr.list.forEach((s, j) => im.setMatrixAt(j, m.compose(p.copy(V(s.x, s.y ?? ground(this.propHole, s.x, s.z) - 0.15, s.z)), q.setFromAxisAngle(up, s.rotY), sc.setScalar(s.scale)).multiply(mesh.matrixWorld)));
+        gr.list.forEach((s, j) => im.setMatrixAt(j, m.compose(p.copy(V(s.x, s.y ?? this.groundAt(s.x, s.z, this.propHole) - 0.15, s.z)), q.setFromAxisAngle(up, s.rotY), sc.setScalar(s.scale)).multiply(mesh.matrixWorld)));
         im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); built.push(im);
       });
     }
@@ -354,7 +358,7 @@ export class World {
       const r = e.remote; if (!r) continue;
       const c = e.cs, dyaw = Math.atan2(Math.sin(r.cart.yaw - c.yaw), Math.cos(r.cart.yaw - c.yaw));
       this.placeCart(e, { x: c.x + (r.cart.x - c.x) * k, z: c.z + (r.cart.z - c.z) * k, yaw: c.yaw + dyaw * k, vx: r.cart.vx, vz: r.cart.vz }, Math.max(-1, Math.min(1, dyaw * 4)), dt);
-      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; g.y = ground(e.hole, -g.x, g.z); e.golfer.rotation.y = -r.yaw;
+      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; g.y = this.groundAt(-g.x, g.z, e.hole); e.golfer.rotation.y = -r.yaw;
     }
     const own = this.ents.get(this.selfId);
     // Hidden once you're at your ball: up close the tall beacon read as an aim line, which the owner ruled out.
@@ -396,16 +400,16 @@ export class World {
   }
   /** Camera looking at sim (x, z) from `dist` behind along `yaw`; `y` is the eye height above the ground there. */
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
-    const fx = Math.sin(yaw), fz = Math.cos(yaw), gy = ground(this.myHole, x, z);
+    const fx = Math.sin(yaw), fz = Math.cos(yaw), gy = this.groundAt(x, z);
     const target = this.tmpA.set(-x, gy + y, z);
     const cx = x - fx * dist * Math.cos(pitch), cz = z - fz * dist * Math.cos(pitch);
-    this.cam.position.set(-cx, Math.max(gy + y + dist * Math.sin(pitch), ground(this.myHole, cx, cz) + 1), cz);   // never inside a hill behind the player
+    this.cam.position.set(-cx, Math.max(gy + y + dist * Math.sin(pitch), this.groundAt(cx, cz) + 1), cz);   // never inside a hill behind the player
     this.cam.lookAt(target);
     if (this.sun.castShadow) {   // shadow box centred on the player, snapped to whole texels so edges do not shimmer
       const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, Math.round(gy), Math.round(target.z / snap) * snap);
       this.sun.target.position.copy(c); this.sun.position.copy(c).addScaledVector(SUN_DIR, 150); this.sun.target.updateMatrixWorld();
     }
-    this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
+    this.grass.update(gridKey(this.courseId, this.myHole), this.cam.position.x, this.cam.position.z, performance.now() / 1000);
     this.renderer.render(this.scene, this.cam);
   }
 }
