@@ -3178,5 +3178,1354 @@
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
     "subagent": "build session (script)"
+  },
+  {
+    "id": "cliff-r2",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "section of coastal headland cliff, sloped eroded tawny-ochre layered sandstone face tapering to dark grey rock and talus boulders at the base, thin green turf cap",
+    "seed_images": [
+      "concept-cliff-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg",
+      "refs/pebble-photos/h08-chasm.jpg"
+    ],
+    "task_id": "530ba22e-e501-43a7-b686-3a4be32b090e",
+    "faces_requested": 8000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 26.5,
+    "balance_after": 26,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 8000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "notes": "The tan-orange face over a grey base and grass cap echoes h08-chasm.jpg and h08-fairway.jpg. The face is a smooth, smeared sloped embankment, like a quarry or dirt cut, without the vertical fluting, jointed columns and dark rock buttresses of h06-cliffs.jpg. The grey base is mushy rubble. The grass cap is a thin flat skin, and the top view shows it covering only half the top with a smeared transition. The wedge form is wider than tall and not steep enough for a 20 m sea cliff.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --sat 0.8 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "cliff-r3",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "steep coastal sea cliff section, tawny-ochre layered sandstone with sharp vertical joints and fluting, dark grey rock buttresses and boulders at the base, thin turf cap",
+    "seed_images": [
+      "concept-cliff.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "task_id": "cf8999cc-447d-47cc-a105-83cfffb43174",
+    "faces_requested": 8000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 25.5,
+    "balance_after": 25,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 8000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "notes": "Colour bands match h06-cliffs.jpg and h08-chasm.jpg well: ochre/tan upper face with vertical jointing over a dark grey rocky base. But the form is a free-standing box/sea-stack with cliff faces on several sides and a flat top, not a headland edge section. Half the top is bare brown dirt sloping off; real cliff tops are turf right to the lip with scrubby brush hanging on the face. The grass cap texture is low-res and blotchy (visible pixel blocks in top view). The face lacks the overhangs, caves and deep recesses seen in h06.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#55603A\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "cliff-r4",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "coastal headland cliff edge section: one irregular eroded cliff face of ochre and grey layered rock with caves, recesses and vertical joints, flat turf top right to the lip, back side blending into ground",
+    "seed_images": [
+      "seed-h06-cliff-crop.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "task_id": "7c43dece-0db2-49bc-b398-89b57dcdb1d3",
+    "faces_requested": 8000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 24,
+    "balance_after": 23,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 8000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "notes": "Generated from a crop of the real h06 photo; came out as a flat slab. Discarded on sight, not sent to the critic.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "cliff-r5",
+    "file": null,
+    "tool": "Meshy image-to-3d",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "concept-cliff-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg",
+      "refs/pebble-photos/h08-chasm.jpg"
+    ],
+    "task_id": "01a1af8a-e877-770d-8177-4c98f3da68a6",
+    "target_polycount": 8000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 275,
+    "balance_after": 245,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "notes": "The palette is broadly right for h06-cliffs and h08-chasm (an ochre/tan upper face, darker grey rock below, a grass cap). Defects: in plan it is a domed half-loaf, a curved lump with a rounded top that is obvious in the three-quarter and top views, where the real headland is a long, flat-topped, straight-edged bluff. The face is smoothly creased with soft wrinkles, missing the strong vertical jointing, deep shadowed gullies and buttress columns that dominate the photos. The grey lower part is a pile of rubble cobbles instead of vertical dark rock ledges rising out of the water. The tan is too uniform and slightly too saturated orange. The ochre stops abruptly at the grass, with no scrub or brush band.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r11",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "low jagged coastal rock ledge at the waterline, irregular eroded tilted bedding, rough dark grey-brown granodiorite, wet algae-stained lower half",
+    "seed_images": [
+      "concept-rock-sea.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "task_id": "25a403c8-43b6-4b06-a1f6-9ff2175481bd",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 24,
+    "balance_after": 23,
+    "target_height_m": 1.2,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "The dark grey-brown tone and low, elongated, stepped form match the shore ledges in h07-green and h17-green, and the proportions fit 0.8 m by 2 m. Defects: the top view shows two near-symmetric lobes joined at a central seam, which looks mirrored or duplicated. The surface carries a uniform crinkled-foil, leathery displacement repeated everywhere, with no sharp fractured edges, so it looks lumpy rather than jagged. The base is cut flat. There is no wet darkening or barnacle/algae band near the bottom to sell it as a waterline rock.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --rest \"#5C564D\" --sat 0.8 --blur 0.6 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r5",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "weathered pale grey-tan granite boulder, irregular asymmetric, granular texture, cracks, orange and white lichen",
+    "seed_images": [
+      "concept-rock-granite-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "5bd2ba1e-cf92-487e-84b8-ecae1ddce0c4",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 27.5,
+    "balance_after": 27,
+    "target_height_m": 1.8,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "notes": "Good pale granite colour with realistic orange/white lichen and joint cracks. But the form is a block: top view is an almost perfect rectangle with straight parallel edges, and front view shows near-vertical walls and a flat, tombstone-like slab face. Pebble/Monterey granite boulders (coast-rocks-fescue.jpg, cypress-silhouette-sea.jpg) are rounded, exfoliated domes. Base is flat-cut. Reads as a quarried block, not a field boulder.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --blur 0.8 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r6",
+    "file": null,
+    "tool": "Meshy image-to-3D",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "concept-rock-granite-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "01a1af77-9c26-773b-b6af-90e3cb28bef2",
+    "target_polycount": 6000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 355,
+    "balance_after": 325,
+    "target_height_m": 1.8,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "notes": "The blocky-rounded boulder shape is plausible from all three views. The surface is a uniform warm greige suede with almost no granular speckle, mineral grain or lichen, so it reads as sandstone or clay rather than the speckled pale granite in coast-rocks-fescue.jpg and h17-green.jpg. The base is flat.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r7",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "low layered coastal granodiorite ledge outcrop, stepped jointed blocks, light grey-tan with lichen on top, darker wet band near the base",
+    "seed_images": [
+      "concept-rock-ledge-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "cbc505e6-7aed-4123-9482-9978f239938c",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 27,
+    "balance_after": 26.5,
+    "target_height_m": 1.5,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "notes": "This is the closest of the rocks: a pale lichen-stained top with a dark, wet-looking lower band suits a tidal ledge. The layers, though, look like stacked masonry blocks with regular rectangular step edges. The top surface carries the same over-sharpened crackle noise. From the front it reads as a compact cube rather than a low, elongated shelf. The real ledges in h07-green.jpg and h17-green.jpg are lower and flatter, darker overall, and have more fractured, sloping planes.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r8",
+    "file": null,
+    "tool": "Meshy retexture",
+    "retexture_of": "01a1af77-9c26-773b-b6af-90e3cb28bef2",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "concept-rock-granite-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "01a1af7f-ceee-73f6-a96d-6563d2e2e1e3",
+    "target_polycount": 6000,
+    "pbr": true,
+    "credits_used": 10,
+    "balance_before": 315,
+    "balance_after": 305,
+    "target_height_m": 1.8,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 3.0,
+      "notes": "Faceted, cube-cornered lump with a smooth, matte, suede/clay-like surface. No visible granite grain, crystal speckle or weathering pits, and only a few tiny lichen dots. Colour is a flat warm beige-grey rather than the speckled pale grey of local granite. Flat base. Top view rounded-rectangular. From a distance it reads as a plaster prop.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r9",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "rounded weathered exfoliating pale granite boulder, irregular asymmetric, soft rounded edges, coarse granular grey-tan surface with cracks and orange and white lichen, uneven base",
+    "seed_images": [
+      "concept-rock-granite-r2.png",
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "20483847-444c-4f09-94d2-1fe9381696f4",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 24.5,
+    "balance_after": 24,
+    "target_height_m": 1.6,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "notes": "Closest to the real thing: a rounded, low, loaf-like grey boulder, much like the boulders in coast-rocks-fescue.jpg, and it reads correctly from all three views. Defects: the surface has a regular knitted/crosshatch micro-pattern (generated-texture artefact) instead of granular crystal speckle; dark smudgy blotches read as stains rather than lichen; the texture is stretched and smeared along the top edge in the front view; slightly cool blue-grey versus the warmer pale grey in the refs; flat-cut base.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --blur 0.8 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "seawall-r2",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "section of sloped sea wall of large rounded grey granite boulders set in mortar, grass strip on top, sand and loose rocks at the foot",
+    "seed_images": [
+      "concept-seawall-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-moreira.jpg",
+      "refs/pebble-photos/h18-green-bunkers.jpg"
+    ],
+    "task_id": "984181c5-a0d1-4f55-b087-2d792b6c6e04",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 26,
+    "balance_after": 25.5,
+    "target_height_m": 3.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 2,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "notes": "Wrong wall type. The 18th-hole sea wall (h18-green-bunkers.jpg, h18-moreira.jpg) is a battered, sloping wall of light tan, roughly squared cut blocks in regular courses. This model is a vertical garden wall of rounded blue-grey fieldstones in mortar with a grass-turf cap, which is closer to the Lone Cypress planter wall. The sand-and-pebble apron is reasonable. The stones are clean but the mortar is smudgy.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "seawall-r3",
+    "file": "assets/models/seawall-r3.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "sloping sea wall revetment of pale tan squared cut stone blocks in regular courses, turf strip on top, sand and loose rocks at the foot",
+    "seed_images": [
+      "concept-seawall-r2b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-green-bunkers.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "task_id": "961c1fca-b490-46ba-8668-c1dae5e98074",
+    "faces_requested": 6000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 25,
+    "balance_after": 24.5,
+    "target_height_m": 3.5,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "PASS",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 4.0,
+      "notes": "Matches the pale tan coursed cut-block wall behind the 18th green (h18-green-bunkers.jpg) well: regular block courses, sandy-beige stone with a darker wet base course, turf cap and a beach/sand apron with scattered cobbles. Minor defects: the face is almost vertical where the real wall is visibly battered/sloped; blocks are slightly too uniform and clean; the sand apron has a ragged cutout edge that will need to sit under terrain or water. Reads correctly from all views.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --rough 1"
+  },
+  {
+    "id": "tree-cypress-r14",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "tall Monterey cypress, long clear grey-brown trunk for the lower third, dense dark tiered crown of horizontal foliage masses with gaps, ragged tapered top",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "task_id": "49d468e0-e5ca-453a-ab96-12e79159cdfb",
+    "faces_requested": 10000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 23,
+    "balance_after": 22.5,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 10000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "notes": "Generator output used only as the base of tree-cypress-r15, r16.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#26341F\" --rest \"#6F665B\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r5",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "wind-swept Monterey cypress tree, thick twisted silver-grey multi-stem trunk, limbs swept to one side, a few separate dense ragged clumps of very dark blue-green foliage with gaps between them",
+    "seed_images": [
+      "concept-cypress-swept.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/cypress-silhouette-sea.jpg"
+    ],
+    "task_id": "a010c123-6156-4035-84f9-6804332717de",
+    "faces_requested": 14000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 29,
+    "balance_after": 28.5,
+    "target_height_m": 9.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 14000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "notes": "The three-quarter view reads as a tiered bonsai, but the front view shows a straight vertical pole carrying stacked flat plates with dark undersides. The trunk base is a bulbous, faceted lump that looks like a rock and has no root flare. Foliage pads are solid suede/moss-carpet slabs with no feathery sprays and no sky gaps, unlike the airy, ragged sprays in lone-cypress.jpg and point-lobos-cypress.jpg. Foliage is olive/khaki rather than the deep blue-green of cypress. The top view is a solid rectangular mat.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r6",
+    "file": null,
+    "tool": "Meshy image-to-3D",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "concept-cypress-swept.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/cypress-silhouette-sea.jpg"
+    ],
+    "task_id": "01a1af74-1bc1-76f5-897e-c2a6d96ac997",
+    "target_polycount": 12000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 420,
+    "balance_after": 325,
+    "target_height_m": 9.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "notes": "The trunk is good: a silver-grey, multi-stemmed, wind-swept lean and a one-sided flag canopy that matches the lone-cypress and coast-headland cypress well. The foliage is made of crumpled-paper triangle shards that read as low-poly origami, not dense scale-leaf sprays, and the green is slightly teal. Several loose leaf shards float off branch tips (mid-right in the three-quarter and front views). The top view is one solid blob with no lumpy clump structure. The canopy pads are thin and lack the dense, dark, flat-topped mass of real cypress.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#30442A\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r7",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "tall dense full Monterey cypress tree, conical-ovoid crown of many overlapping ragged dark blue-green foliage clumps, short grey-brown trunk",
+    "seed_images": [
+      "concept-cypress-18.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg"
+    ],
+    "task_id": "3f5d0bb7-a13a-41d5-92fe-68a9af4b26d3",
+    "faces_requested": 14000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 28.5,
+    "balance_after": 28,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 14000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 2
+      },
+      "mean": 2.25,
+      "notes": "This reads as a generic dense conical broadleaf or juniper blob. The real 18th-green cypress (h18-green-cypress.jpg, h18-moreira.jpg, h18-view-back.jpg) has a tall exposed trunk over roughly the lower third, irregular horizontal tiered sprays with sky showing between them, and a ragged, asymmetric crown. In this model the trunk is a short, thin stub (about 10% of the height) under a solid cone. The surface is crinkled lettuce/cabbage with a repeating diamond texture pattern. The top view is a round ball.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#2E4630\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r9",
+    "file": null,
+    "tool": "Meshy image-to-3d",
+    "model": "latest",
+    "tier": "Pro",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "task_id": "01a1af81-d0f5-70b4-b0bc-51c5b3283595",
+    "target_polycount": 11000,
+    "pbr": true,
+    "credits_used": 30,
+    "balance_before": 305,
+    "balance_after": 275,
+    "target_height_m": 20.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "notes": "Generator output used only as the base of tree-cypress-r10, r11.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#30442A\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-pine-r2",
+    "file": null,
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "mature Monterey pine tree, tall straight trunk with furrowed reddish-brown bark, rounded clumpy irregular crown of tufted pine needle clusters",
+    "seed_images": [
+      "concept-pine-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "task_id": "70454faf-93b9-4ccb-8867-9b40d9876c2b",
+    "faces_requested": 14000,
+    "texture_mode": "high",
+    "credits_used": 0.5,
+    "balance_before": 28,
+    "balance_after": 27.5,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 14000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2a (scratchpad critic-r2a.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.0,
+      "notes": "A tall straight trunk with a rounded crown is plausible for the background Monterey pines. However, the crown is built from rubbery cloud-puff 'broccoli' clumps that read as stylised bonsai, not needle tufts. The trunk is smooth orange-brown like a Scots pine; Monterey pine bark is dark grey-brown and deeply furrowed. The crown occupies only the top half on a bare pole, while background pines in h18-view-back.jpg and h18-across-bay.jpg look denser, fuller and darker. Foliage is a mid green, too bright.",
+      "date": "2026-11-06"
+    },
+    "grade": "node scripts/grade_glb.mjs --green \"#3B5030\" --sat 0.85 --rough 1",
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r8",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r6",
+    "source_tool": "Meshy image-to-3D",
+    "source_task_id": "01a1af74-1bc1-76f5-897e-c2a6d96ac997",
+    "seed_images": [
+      "concept-cypress-swept.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/cypress-silhouette-sea.jpg"
+    ],
+    "target_height_m": 9.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#30442A\" --sat 0.85 --rough 1",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-swept.png --cards 1500 --min-island 0.002 --flat 0.6 --green \"#30442A\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "Strong wind-swept read: leaning multi-stem trunk, flat foliage pads streaming to leeward, holds in all three views (top shows the elongated leeward mass). Defects: trunk and limbs are near-white cool grey, reading as bleached driftwood / dead snag rather than the grey-brown living trunks in lone-cypress.jpg and cypress-silhouette-sea.jpg; foliage cards are broad leaf-shaped blobs (oak/laurel look) with black see-through holes, not the dense dark scale-leaf sprays of Monterey cypress; foliage a touch grey-green versus the deep green in the refs. Pads are thin and widely separated, so the crown looks sparser and less massed than real cypress.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r10",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r9",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1af81-d0f5-70b4-b0bc-51c5b3283595",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "target_height_m": 20.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#30442A\" --sat 0.85 --rough 1",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-18b.png --cards 3500 --min-island 0.001 --flat 0.5 --size 1.1 --green \"#30442A\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "notes": "Right family (single trunk, tiered horizontal pads, ~20 m) but it reads as a generic symmetric conifer or broadleaf. Against h18-moreira.jpg, h18-green-cypress.jpg, h18-fairway-bay.jpg the real tree has one stout clear trunk to about a third of its height, then distinct, asymmetric, very dark (near-black green) horizontal tiers with sky gaps between and a ragged flat-ish top. Model: crown starts too low and is a tidy cone/teardrop, trunk splits into several thin pale leaders, foliage is pale grey-green and patchy with pale specks (exposed card edges/branches) and broadleaf-shaped cards. A small odd lump sits on the top right of the crown (front/threequarter). Top view is a round disc with no asymmetry.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r11",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r9",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1af81-d0f5-70b4-b0bc-51c5b3283595",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "target_height_m": 20.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#26341F\" --rest \"#6F665B\" --sat 0.85 --rough 1",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-18b.png --cards 3500 --min-island 0.001 --flat 0.65 --size 1.8 --green \"#26341F\" --min-y 0.3 --tiers 3",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "notes": "Reads as a generic broadleaf park tree, not the 18th-hole cypress. In h18-green-cypress, h18-fairway-bay and h18-view-back the tree has a tall clean bole, then a narrow, ragged, near-black crown of dense tiered foliage masses with a tapered top. The model's crown is a rounded oval of loose, sparse, flat-shaded leaf cards. The trunk is a smooth, untextured, low-poly pinkish-grey cylinder with visible faceting. The top view shows grey untextured or back-facing triangles in the crown centre, and leaf cards stick out at the crown edges. The canopy is too open and too light, and it lacks the heavy, dark, layered mass of the real tree.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r12",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r6",
+    "source_tool": "Meshy image-to-3D",
+    "source_task_id": "01a1af74-1bc1-76f5-897e-c2a6d96ac997",
+    "seed_images": [
+      "concept-cypress-swept.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/cypress-silhouette-sea.jpg"
+    ],
+    "target_height_m": 9.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2A3D26\" --rest \"#7A7064\" --sat 0.9 --rough 1",
+      "gltf-transform simplify --ratio 0.6 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-swept.png --cards 2200 --min-island 0.002 --flat 0.7 --size 1.4 --green \"#2A3D26\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "notes": "Strongest of the set. Front and three-quarter views show a convincing lean with leeward flagging that matches point-lobos-cypress and cypress-silhouette-sea, and the canopy is a good dark green. Defects: the foliage is broad ivy- or lettuce-shaped leaf cards, not cypress scale-leaf sprays. The pads are rounded puffballs, where the photos show flat, tabular, horizontally layered plates with sky gaps between them. The trunk is a braided rope of over-twisted strands that looks like a strangler fig, not the furrowed silver-grey bole of a cypress. The top view is an uninterrupted dense mat, and the trunk pokes out at the edge as a pale smear.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r13",
+    "file": "assets/models/tree-cypress-r13.glb",
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r6",
+    "source_tool": "Meshy image-to-3D",
+    "source_task_id": "01a1af74-1bc1-76f5-897e-c2a6d96ac997",
+    "seed_images": [
+      "concept-cypress-swept.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/cypress-silhouette-sea.jpg"
+    ],
+    "target_height_m": 9.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2A3D26\" --rest \"#7A7064\" --sat 0.9 --rough 1",
+      "gltf-transform simplify --ratio 0.6 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-swept.png --cards 2200 --min-island 0.002 --flat 0.92 --size 1.4 --aspect 2.4 --wind x --green \"#2A3D26\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "PASS",
+      "critic": "independent photo-fidelity critic, round 2d (scratchpad critic-r2d.json)",
+      "scores": {
+        "silhouette": 5,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 4.0,
+      "notes": "Strong wind-flagged Monterey cypress: leaning, multi-stemmed pale silver-grey trunk, branches swept one way, flat tabletop foliage pads held downwind. Matches point-lobos-cypress and cypress-silhouette-sea from front and three-quarter views, and the top view is a flat elongated plate as expected. Defects: the foliage cards read as crumpled broadleaf/lettuce chunks, not dense scale-leaf cypress sprays. The pad edges show horizontal stair-step slicing and black voids underneath. The braided rope-twist at the trunk base looks procedural. The foliage is slightly too dark and dull next to the photos' fresher dark green. Passes only just.",
+      "date": "2026-11-06"
+    }
+  },
+  {
+    "id": "tree-cypress-r15",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r14",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "49d468e0-e5ca-453a-ab96-12e79159cdfb",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "target_height_m": 20.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#26341F\" --sat 0.8 --rough 1",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-18b.png --cards 2600 --min-island 0.001 --flat 0.8 --size 1.3 --aspect 1.8 --green \"#26341F\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2d (scratchpad critic-r2d.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "The 18th-hole cypress in h18-green-cypress, h18-view-back and h18-fairway-bay has a bare lower trunk and an irregular, asymmetric crown. The crown is built from distinct horizontal tiers with sky showing between them and comes to a ragged, slightly lopsided spire. The front view gets partway there, with some tiers and visible limbs. The three-quarter view, however, is a dense symmetric egg/column that reads as a generic broadleaf tree, and the top view is a round blob. So the identity depends on the angle. The foliage uses the same crumpled leaf cards with black interior voids. Colour is acceptable dark green. Height/width and trunk thickness are plausible for 20 m.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-cypress-r16",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-cypress-r14",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "49d468e0-e5ca-453a-ab96-12e79159cdfb",
+    "seed_images": [
+      "concept-cypress-18b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "target_height_m": 20.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#26341F\" --sat 0.8 --rough 1",
+      "node scripts/foliage_cards.mjs assets/images/concept-cypress-18b.png --cards 2800 --min-island 0.001 --flat 0.85 --size 1.4 --aspect 1.8 --green \"#26341F\" --tiers 4.5 --min-y 0.3 --seed 7",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2e (scratchpad critic-r2e.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.0,
+      "notes": "The crown is layered into tiers, which is right, but it is too narrow and columnar. Its width is about 0.45 of the height; the real 18th cypress (h18-green-cypress, h18-fairway-bay, h18-view-back) has a broad, ragged, wind-shaped crown about 0.55-0.65 of its height, with flat shelved pads that stick out sideways and visible sky gaps between them. The clear bole is too short: it is bare for about 30-35% of the height, where the real trunk is bare for about 45-50% before the first big limbs. The trunk is pale whitish-grey, while the real one is dark grey-brown and reads almost black against the sky. The foliage shows as many loose card shards, with stray triangles floating off the pads in the front and three-quarter views. The top view is a dense round blob with no lobes and no asymmetry. From the three-quarter view it reads more like a generic conifer or cedar than the Pebble cypress.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-pine-r3",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-pine-r2",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "70454faf-93b9-4ccb-8867-9b40d9876c2b",
+    "seed_images": [
+      "concept-pine-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "target_height_m": 22.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#34472C\" --sat 0.7 --rough 1",
+      "gltf-transform simplify --ratio 0.7 --error 0.005",
+      "node scripts/foliage_cards.mjs assets/images/concept-pine-r2.png --cards 1300 --flat 0.2 --green \"#34472C\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "Tall clear trunk with a rounded domed crown roughly matches the Monterey pines in the background tree line (h18-view-back.jpg, h18-across-bay.jpg, h06-cliffs.jpg), and proportions suit 22 m. Defects: foliage is lumpy moss/broccoli clumps with a bright mottled green speckle, with no needle-tuft or clustered-pine texture, so up close it reads as a deciduous tree; crown too symmetric and solid compared with the irregular, gappy dark crowns in the refs; trunk is light tan/orange-brown, whereas Monterey pine bark is dark grey-brown and deeply furrowed; a looped or curled branch shows through the crown in the threequarter view.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-pine-r4",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-pine-r2",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "70454faf-93b9-4ccb-8867-9b40d9876c2b",
+    "seed_images": [
+      "concept-pine-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "target_height_m": 22.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2F4027\" --sat 0.5 --rough 1",
+      "gltf-transform simplify --ratio 0.5 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-pine-r2.png --cards 2600 --flat 0.25 --size 1.2 --green \"#2F4027\" --tiers 2.5",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "notes": "The overall form is right for a Monterey pine: a long clear bole with a rounded, umbrella-ish crown in the top third, plausible for the background tree line in h06-cliffs. Defects: the foliage is broadleaf leaf cards (it reads as oak or holly) instead of needle tufts. Many small floating, detached leaf triangles sit around the crown edges in the front and top views. A greenish smear runs down one side of the trunk, which looks like a UV or texture bleed. Under the crown the cards are dark, flat, untextured shards. The bark colour (warm brown) is acceptable.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-pine-r5",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-pine-r2",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "70454faf-93b9-4ccb-8867-9b40d9876c2b",
+    "seed_images": [
+      "concept-pine-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "target_height_m": 22.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2E4430\" --sat 0.5 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.5 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-pine-r2.png --cards 2000 --min-island 0.003 --flat 0.15 --size 1.0 --green \"#2E4430\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2d (scratchpad critic-r2d.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "Tall straight bare trunk under a broad, irregular domed crown. This is a reasonable match for the background Monterey pines (left tree in h18-view-back), though the crown is a little too umbrella-like (stone-pine). The symmetric Y fork just below the crown looks artificial. The foliage clumps are lumpy rounded blobs with bright cyan-green speckle, so they read as broadleaf/oak clusters with no needle-tuft structure. Monterey pine is a deeper, more uniform dark green. The lower trunk has a dark green vertical stripe that looks like a texture seam or UV artifact. The bark is plain brown, without the dark grey, deeply furrowed plates of the real tree.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "tree-pine-r6",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "tree-pine-r2",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "70454faf-93b9-4ccb-8867-9b40d9876c2b",
+    "seed_images": [
+      "concept-pine-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "target_height_m": 22.0,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2A3B28\" --sat 0.5 --rough 1",
+      "gltf-transform weld; simplify --ratio 0.5 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/concept-pine-r2.png --cards 2000 --min-island 0.003 --flat 0.15 --size 1.0 --cell 80 --green \"#2A3B28\"",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2e (scratchpad critic-r2e.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "The overall form is plausible for a Monterey pine in the background tree line (h06-cliffs, h18-view-back): a tall bare trunk and a rounded dome crown, with good proportions for 22 m. The crown is too symmetric and lollipop-like, though, and nearly round in the top view; the real pines have irregular, flattish, lumpy crowns with uneven clumps and gaps. The foliage is built from rounded cauliflower blobs that read as a broadleaf oak or holm oak rather than needle tufts; it lacks the spiky tufted edge texture of pine. The colour is acceptable dark green, a little blue-black in the shadows where the real trees are more olive. The trunk is a reasonable reddish-grey-brown. The visible branch fork under the crown looks fine.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r10",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r7",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "cbc505e6-7aed-4123-9482-9978f239938c",
+    "seed_images": [
+      "concept-rock-ledge-r2.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "target_height_m": 1.5,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#615A50\" --blur 0.7 --rough 1 --squash 0.6",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2b (scratchpad critic-r2b.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.25,
+      "notes": "Low, elongated, layered ledge with a dark wet lower band, so the brief is roughly met. But the layers are rectilinear stacked flagstones with straight edges and right-angle steps, so it reads as a ruined dry-stone wall or paving stack; the top view is a grid of rectangular slabs. The upper surface is pale sandy tan with orange lichen, much paler and warmer than the dark grey-brown, rough, kelp/barnacle-stained shoreline ledges at the waterline in h07-green.jpg, h17-green.jpg and h06-cliffs.jpg. Proportions (about 3.5:1 long) are fine.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r12",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r9",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "20483847-444c-4f09-94d2-1fe9381696f4",
+    "seed_images": [
+      "concept-rock-granite-r2.png",
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "target_height_m": 1.6,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#9C968A\" --blur 4 --rough 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2c (scratchpad critic-r2c.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "notes": "A good match for the rounded pale granite boulders in coast-rocks-fescue: a rounded, weathered, light warm-grey mass at a believable size. Defects: the surface is soft and smooth like a potato or pebble, with no facets, joints or chipped edges. The mottling is large blurry blotches, not the fine salt-and-pepper crystal grain of granite. The top view shows a pinched seam or lobe at one corner, which looks like a mesh fold. The base is rounded and floats instead of sitting in the ground.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r13",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r9",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "20483847-444c-4f09-94d2-1fe9381696f4",
+    "seed_images": [
+      "concept-rock-granite-r2.png",
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "target_height_m": 1.6,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#A39D91\" --blur 2.2 --nblur 5 --rough 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2d (scratchpad critic-r2d.json)",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.5,
+      "notes": "Pale grey rounded boulder. The colour fits the granite boulders in coast-rocks-fescue and the pale Point Lobos granite. The shape, though, is a smooth, almost symmetric potato/river-pebble with no jointing planes, facets or broken edges, so it reads as an oversized pebble rather than weathered granite. The surface is a blurry, smeared stipple that looks like suede or felt, with no crisp granular feldspar/mica speckle, and the dark blotches are soft and painterly. The top view shows a folded crease/step artifact at one corner. The base looks acceptably seated. Proportions are fine for 1.6 m.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r14",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r11",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "25a403c8-43b6-4b06-a1f6-9ff2175481bd",
+    "seed_images": [
+      "concept-rock-sea.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "target_height_m": 1.2,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#6A6359\" --sat 0.8 --blur 0.6 --rough 1 --wet 0.4",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2d (scratchpad critic-r2d.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "notes": "A low, elongated, layered shoreline ledge. The dark grey-brown colour matches the waterline rocks in h07-green and coast-rocks-fescue, and proportions are right (about 0.8 m tall over 2 m). However, the top slabs are puffy, rounded pillows instead of sharp, jagged, fractured edges. The top view is a two-lobed peanut/turtle-shell outline. The whole surface carries a uniform, repetitive crinkled-tinfoil normal pattern that looks synthetic and does not match wave-worn, pitted shore rock.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r15",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r11",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "25a403c8-43b6-4b06-a1f6-9ff2175481bd",
+    "seed_images": [
+      "concept-rock-sea.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "target_height_m": 1.2,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#6A6359\" --sat 0.8 --blur 0.6 --nblur 6 --rough 1 --wet 0.4",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "note": "foliage cards are cut from the tree's own generated concept image; grading moves albedo toward docs/research/pebble-look.md swatches",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism round 2 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 2e (scratchpad critic-r2e.json)",
+      "scores": {
+        "silhouette": 2,
+        "colourMaterial": 2,
+        "detailTexture": 2,
+        "scale": 4
+      },
+      "mean": 2.5,
+      "notes": "The height-to-length ratio (about 0.38) matches the brief of 0.8 m by 2 m. Everything else misses. Pebble's waterline ledges (h07-green, h17-green, coast-rocks-fescue background, point-lobos) are low, dark, angular, tilted slabs with sharp fractured edges and broken bedding planes. This model is a pile of rounded, pillowy lobes, more a stacked-boulder cairn than a jagged ledge, and the top view is a soft two-lobed peanut shape. The colour is a warm light greige-tan with bright highlights; the real shore rock is dark charcoal to near-black, especially the wet lower band, with a little ochre lichen higher up. The surface texture is a uniform scaly or crocodile-skin crackle that reads as reptile hide rather than weathered rock. It has no wet or dark waterline band and no algae.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; GLB kept locally in assets/models (untracked), raw in assets/models/raw"
   }
 ]
