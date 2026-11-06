@@ -66,6 +66,8 @@ export const canEnter = (golfer: Pt, cart: CartState) => Math.hypot(golfer.x - c
 export const exitSpot = (c: CartState): Pt => ({ x: c.x - Math.cos(c.yaw) * 1.8, z: c.z + Math.sin(c.yaw) * 1.8 });
 
 const spawns = new Map<number, CartState[]>();
+/** Minimum sideways distance of a parked cart from the golfer's address spot, metres. */
+export const CART_SIDE_M = 2.4;
 /** Parked carts beside the tee, facing the pin: slot k takes the k-th nearest drivable spot to the golfer, 2 radii clear of the earlier slots. */
 export function cartSpawn(holeIndex: number, slot: number): CartState {
   let list = spawns.get(holeIndex);
@@ -74,10 +76,14 @@ export function cartSpawn(holeIndex: number, slot: number): CartState {
     for (let x = -12; x <= 12; x += 0.4) for (let z = -12; z <= 12; z += 0.4) cand.push({ x: g.x + x, z: g.z + z });
     cand.sort((a, b) => Math.hypot(a.x - g.x, a.z - g.z) - Math.hypot(b.x - g.x, b.z - g.z));
     const free = (p: Pt) => [-1, 0, 1].every(dx => [-1, 0, 1].every(dz => cartGround(holeIndex, p.x + dx * 0.8, p.z + dz * 0.8) !== 'blocked'));
+    // Park to the side, never behind the golfer: the address camera sits behind the ball looking down +z (owner playtest).
+    const beside = (p: Pt) => Math.abs(p.x - g.x) >= CART_SIDE_M && p.z - g.z > -1.5;
     list = [];
-    for (const p of cand) {
-      if (list.length === 4) break;
-      if (free(p) && list.every(c => Math.hypot(c.x - p.x, c.z - p.z) >= 2 * CART.RADIUS + 0.4)) list.push({ x: p.x, z: p.z, yaw: 0, vx: 0, vz: 0 });
+    for (const pass of [beside, (_: Pt) => true]) {
+      for (const p of cand) {
+        if (list.length === 4) break;
+        if (pass(p) && free(p) && list.every(c => Math.hypot(c.x - p.x, c.z - p.z) >= 2 * CART.RADIUS + 0.4)) list.push({ x: p.x, z: p.z, yaw: 0, vx: 0, vz: 0 });
+      }
     }
     spawns.set(holeIndex, list);
   }

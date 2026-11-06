@@ -94,3 +94,16 @@ describe('enter / exit and the tee spawn', () => {
     }
   });
 });
+
+describe('parked cart stays out of the address camera (owner playtest, 2026-11-05)', () => {
+  it('slot 0 on every hole is beside the golfer, not behind the ball', async () => {
+    const { cartSpawn, CART_SIDE_M } = await import('../src/shared/cart');
+    const { golferSpot } = await import('../src/client/rules');
+    const g = golferSpot({ x: 0, z: 0 });
+    for (let h = 0; h < 18; h++) {
+      const c = cartSpawn(h, 0);
+      expect(Math.abs(c.x - g.x), `hole ${h + 1}`).toBeGreaterThanOrEqual(CART_SIDE_M);
+      expect(c.z - g.z, `hole ${h + 1}`).toBeGreaterThan(-1.5);
+    }
+  });
+});
