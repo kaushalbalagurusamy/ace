@@ -44,7 +44,9 @@ const pocket = (i: number) => v(p1, LM.lWr) - 0.3 * (v(p1, LM.lWr) - v(i, LM.lSh
 const first = (a: number, b: number, ok: (i: number) => boolean, dflt: number) => { for (let i = a; i <= b; i++) if (ok(i)) return i; return dflt; };
 const p3 = first(p1 + 1, top, i => v(i, LM.lWr) <= v(i, LM.lSh), Math.round(p1 + (top - p1) * 0.6));   // lead arm parallel
 const p2 = first(p1 + 1, p3 - 1, i => v(i, LM.lWr) <= pocket(i), Math.round(p1 + (p3 - p1) * 0.45));
-const p5 = first(top + 1, impact - 2, i => v(i, LM.lWr) >= v(i, LM.lSh), Math.round(top + (impact - top) * 0.45));
+// lead arm parallel on the way down: the wrist halfway between shoulder and pocket height in the image (at the shoulder line the
+// arm still points up the slope; critic round 2 put P5 three frames later, at belt height)
+const p5 = first(top + 1, impact - 2, i => v(i, LM.lWr) >= (v(i, LM.lSh) + pocket(i)) / 2, Math.round(top + (impact - top) * 0.6));
 const p6 = first(p5 + 1, impact - 1, i => v(i, LM.lWr) >= pocket(i), Math.round(p5 + (impact - p5) * 0.5));
 const p8 = first(impact + 1, N - 1, i => v(i, LM.lWr) <= pocket(i), impact + 3);
 const p9 = first(p8 + 1, N - 1, i => v(i, LM.rWr) <= v(i, LM.rSh), p8 + 4);                            // trail arm parallel
@@ -88,15 +90,15 @@ const r = (k: number, val: number, tol: number) => ({ f: KEYS[k]!, lo: val - tol
 const keysFor = (get: (p: Pose) => number, tol: (k: number) => number) => KEYS.map((_, k) => r(k, get(P_KEYED[k]!), tol(k)));
 // Critic round 2 (P3, P4, P7, P8 scored 2/5: the top too low and the arm bent, impact like address, the P3 shaft and P8 hands wrong):
 // at these keys the single camera's depth is weakest, so the prior holds them exactly (STRICT); the capture still shapes the frames between.
-const STRICT = new Set([2, 3, 6, 7]);
-const turnTol = (k: number) => (k === 3 ? 0 : k <= 6 ? deg(4) : k === 9 ? deg(12) : deg(15));
+const STRICT = new Set([2, 3, 4, 6, 7]);   // round 3 adds P5 (hands were still at the face)
+const turnTol = (k: number) => (k === 3 ? 0 : k <= 7 ? deg(4) : k === 9 ? deg(12) : deg(15));   // P8 too: the capture over-turned the chest
 const pelY = fuse(capPelY, keysFor(p => p.pelvis[1], turnTol));
 const shY = fuse(capShY, keysFor(p => p.pelvis[1] + p.torso[1], turnTol));
 // P1-P8 keep the address spine angle (no standing up; critic round 2: at P8 too): those keys are held within 0.02 rad of the prior's P1 tilt
 const tilt0 = P_KEYED[0]!.pelvis[0] + P_KEYED[0]!.torso[0];
 const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 7 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], 0.15))));
 const headW = fuse(capHeadWorld.map((h, i) => clamp(h, shY[i]! - deg(100), shY[i]! + deg(100))), keysFor(p => p.pelvis[1] + p.torso[1] + p.head[1], k => (k <= 6 ? deg(12) : deg(25))));
-const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], () => 0.03));
+const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], k => (k <= 7 ? 0.01 : 0.03)));
 const shiftZ = fuse(capShift.map(s => clamp(s[2] * S, -0.12, 0.2)), keysFor(p => p.shift[2] - P_KEYED[0]!.shift[2], k => (STRICT.has(k) ? 0.01 : 0.04)));
 const heelKeys = (side: 'l' | 'r') => keysFor(p => (side === 'l' ? p.lHeel : p.rHeel), k => (k === 0 ? 0 : k === 6 ? 0.05 : k >= 6 ? 0.2 : 0.1));
 const lHeel = fuse(capLHeel, heelKeys('l')).map(x => clamp(x, 0, 1.3)), rHeel = fuse(capRHeel, heelKeys('r')).map(x => clamp(x, 0, 1.3));
