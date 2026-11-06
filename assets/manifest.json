@@ -3115,5 +3115,68 @@
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
     "subagent": "build session (script)"
+  },
+  {
+    "id": "concept-cypress-18b",
+    "file": "assets/images/concept-cypress-18b.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1536",
+    "prompt": "Images 1, 2 and 3 are real photos of the lone Monterey cypress beside the 18th green at Pebble Beach. Create a reference image of exactly that tree, about 20 m tall, seen from the side. A thick grey-brown trunk is clearly exposed for the lower third of the height, forking into a few thick grey limbs. Above it the crown is full and dense but built from distinct, irregular, roughly horizontal tiers and clumps of very dark blue-green cypress foliage (around #2E4630, low saturation, near-black in the recesses), fine scale-leaf sprays with feathery ragged edges, with small patches of sky showing between the tiers and some limbs visible; overall outline a tall, slightly asymmetric ovoid that is broadest in the lower crown and rounded at the top. Not a cone of lettuce, not a juniper, not a pine. Isolated single object, the whole object in frame and centred with margin, on a plain pure white background, no ground plane, no sky, no cast shadow, photorealistic, soft even overcast daylight so the colours are true, matte, no text, no watermark.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 3178,
+      "input_tokens_details": {
+        "image_tokens": 2928,
+        "text_tokens": 250
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 8666
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-fairway-bay.png",
+      "refs/pebble-photos/h18-green-cypress.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
+  },
+  {
+    "id": "concept-seawall-r2b",
+    "file": "assets/images/concept-seawall-r2b.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1536x1024",
+    "prompt": "Images 1 and 2 are real photos of the sea wall along the left side of the 18th hole at Pebble Beach. Create a reference image of ONE straight section of that sea wall, about 8 m long and 3.5 m tall: a battered, SLOPING revetment (face leaning back at about 60 degrees, not vertical) built of pale tan to light grey-beige, roughly squared cut stone blocks laid in regular horizontal courses (#C2B49A, #A89C86), weathered, slightly darker and damp in the lowest course, a strip of green turf at the top edge, and pale sand with a few loose rounded rocks at the foot. Three-quarter view from the sea side. Isolated single object, the whole object in frame and centred with margin, on a plain pure white background, no ground plane, no sky, no cast shadow, photorealistic, soft even overcast daylight so the colours are true, matte, no text, no watermark.",
+    "date": "2026-11-06",
+    "usage": {
+      "input_tokens": 2007,
+      "input_tokens_details": {
+        "image_tokens": 1792,
+        "text_tokens": 215
+      },
+      "output_tokens": 5488,
+      "output_tokens_details": {
+        "image_tokens": 5488,
+        "text_tokens": 0
+      },
+      "total_tokens": 7495
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-green-bunkers.png",
+      "refs/pebble-photos/seeds/h18-moreira.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)"
   }
 ]
