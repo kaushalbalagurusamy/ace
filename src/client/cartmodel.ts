@@ -7,7 +7,7 @@ export interface CartView { root: THREE.Group; spinners: THREE.Object3D[]; steer
 
 const WHEEL_R = 0.45;
 const mat = (color: string, extra: THREE.MeshLambertMaterialParameters = {}) => new THREE.MeshLambertMaterial({ color, flatShading: true, ...extra });
-const BLUE = mat('#2E4570'), DARK = mat('#1E2430'), TAN = mat('#C9A77C'), PLAID = mat('#8E6B4A'), CHROME = mat('#E4E8EE'), STEEL = mat('#7A8088');
+const BLUE = mat('#3B5785'), DARK = mat('#1E2430'), TAN = mat('#C9A77C'), PLAID = mat('#8E6B4A'), CHROME = mat('#E4E8EE'), STEEL = mat('#7A8088');
 const TYRE = mat('#24262A'), HUB = mat('#B9BEC5'), LIGHT = mat('#E0463C');
 const GLASS = new THREE.MeshLambertMaterial({ color: '#3A5A8C', transparent: true, opacity: 0.35, depthWrite: false });
 
