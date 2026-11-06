@@ -35,8 +35,18 @@ for (const mat of doc.getRoot().listMaterials()) {
     mat.setBaseColorFactor([1, 1, 1, mat.getBaseColorFactor()[3]]);
   }
   const nt = mat.getNormalTexture();   // the generator's crosshatch noise lives in the normal map too
-  if (opt.blur && nt) nt.setImage(new Uint8Array(await sharp(Buffer.from(nt.getImage())).blur(+opt.blur).png().toBuffer())).setMimeType('image/png');
+  const nb = +(opt.nblur ?? opt.blur ?? 0);   // --nblur: normal-map blur on its own (keep albedo grain, drop the crosshatch relief)
+  if (nb && nt) nt.setImage(new Uint8Array(await sharp(Buffer.from(nt.getImage())).blur(nb).png().toBuffer())).setMimeType('image/png');
   if (opt.rough) mat.setRoughnessFactor(+opt.rough).setMetallicFactor(0);
+}
+// --wet F: darken the lowest F of the height through vertex colours (wet tide band at the waterline), soft 15% edge
+if (opt.wet) {
+  const prims = [], ys = []; let lo = Infinity, hi = -Infinity;
+  for (const n of doc.getRoot().listNodes()) { const M = n.getWorldMatrix(); for (const p of n.getMesh()?.listPrimitives() ?? []) { const pos = p.getAttribute('POSITION'), y = []; for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []), w = M[1] * v[0] + M[5] * v[1] + M[9] * v[2] + M[13]; y.push(w); lo = Math.min(lo, w); hi = Math.max(hi, w); } prims.push(p); ys.push(y); } }
+  prims.forEach((p, k) => {
+    const col = new Float32Array(ys[k].length * 3); ys[k].forEach((y, i) => { const t = Math.min(1, Math.max(0, ((y - lo) / (hi - lo) - +opt.wet) / 0.15 + 0.5)), f = 0.5 + 0.5 * t; col.set([f, f * 0.98, f * 0.95], i * 3); });
+    p.setAttribute('COLOR_0', doc.createAccessor().setArray(col).setType('VEC3').setBuffer(p.getAttribute('POSITION').getBuffer()));
+  });
 }
 // --squash Y: scale the model vertically (e.g. 0.6 turns a block into a low shelf); applied to the scene's top-level nodes
 if (opt.squash) for (const n of doc.getRoot().listScenes()[0].listChildren()) { const s = n.getScale(); n.setScale([s[0], s[1] * +opt.squash, s[2]]); }
