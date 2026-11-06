@@ -11,6 +11,8 @@ describe('flat-fairway pick is the shortest club that reaches', () => {
     it(`${t} yd`, () => {
       const r = suggestClub(t, 'fairway'), i = idx(r.club);
       expect(i).toBeGreaterThanOrEqual(0);
+      // Spec (PRD/02 §7): inside the 62° full-swing total the pick is the 62° with a suggested partial hold.
+      if (t < yd('O')) { expect(r.club).toBe('O'); expect(r.holdPct).toBeGreaterThan(0); return; }
       expect(yd(r.club)).toBeGreaterThanOrEqual(t);
       for (let j = i + 1; j < FULL.length; j++) expect(yd(FULL[j].key), FULL[j].label).toBeLessThan(t);
       expect(r.holdPct).toBeUndefined();
