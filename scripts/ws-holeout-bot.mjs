@@ -5,17 +5,28 @@ import WebSocket from 'ws';
 import { BAG, PUTT_MAX_MS, launchFor, simulateShot } from '../src/sim/index.ts';
 const url = process.argv[2] ?? 'ws://localhost:3170/ws', HOLES = Number(process.argv[3] ?? 18), COURSE = process.argv[4];   // course id; omitted = the server default
 const w = new WebSocket(url), got = [];
-w.on('message', d => got.push(JSON.parse(d)));
+let mySid = null;   // shotResult / nextHole are broadcast to the lobby: keep only this bot's own
+w.on('message', d => { const m = JSON.parse(d); if (m.t === 'welcome') mySid = m.sessionId; if ((m.t === 'shotResult' || m.t === 'nextHole') && m.playerId !== mySid) return; got.push(m); });
 const send = o => w.send(JSON.stringify(o)), sleep = ms => new Promise(r => setTimeout(r, ms));
 await new Promise(r => w.on('open', r));
 // a unique name: two bots may share a server
-send({ t: 'hello', sessionId: 'bot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), name: 'HoleBot' + Math.random().toString(36).slice(2, 6) }); await sleep(200);
-send({ t: 'createLobby', ...(COURSE && { course: COURSE }) }); await sleep(200); send({ t: 'startSolo' });
+const myName = 'HoleBot' + Math.random().toString(36).slice(2, 6);
+send({ t: 'hello', sessionId: 'bot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), name: myName }); await sleep(200);
+// Multiplayer: HOST=<n> creates a lobby and starts once n players are in and ready; JOIN=1 joins the first open lobby and readies up.
+if (process.env.JOIN) {
+  let l; while (!(l = got.filter(m => m.t === 'lobbies').at(-1)?.lobbies.find(x => x.state === 'open'))) await sleep(200);
+  send({ t: 'joinLobby', lobbyId: l.id }); await sleep(300); send({ t: 'ready', ready: true });
+} else if (process.env.HOST) {
+  send({ t: 'createLobby', ...(COURSE && { course: COURSE }) }); await sleep(300); send({ t: 'ready', ready: true });
+  const n = Number(process.env.HOST); let l;
+  while (!((l = got.filter(m => m.t === 'lobbies').at(-1)?.lobbies.find(x => x.players.some(p => p.name === myName))) && l.players.length >= n && l.players.every(p => p.ready))) await sleep(200);
+  send({ t: 'start' });
+} else { send({ t: 'createLobby', ...(COURSE && { course: COURSE }) }); await sleep(200); send({ t: 'startSolo' }); }
 let start; while (!(start = got.find(m => m.t === 'raceStart'))) await sleep(200);
 if (COURSE && start.hole.course !== COURSE) { console.log(`HOLE-OUT FAIL: asked for ${COURSE}, raced on ${start.hole.course}`); process.exit(1); }
 console.log('course:', start.hole.course);
 const YD = 1.0936133;
-let hole = start.hole, ball = { x: start.players[0].ball.x, z: start.players[0].ball.z }, shots = 0, holesDone = 0, seen = 0, surface = start.players[0].ball.surface;
+let hole = start.hole, ball = { x: (start.players.find(p => p.id === mySid) ?? start.players[0]).ball.x, z: (start.players.find(p => p.id === mySid) ?? start.players[0]).ball.z }, shots = 0, holesDone = 0, seen = 0, surface = start.players[0].ball.surface;
 const log = []; let tries = 0, lastPenalty = false; const OFFSETS = [0, -12, 12, -25, 25, -40, 40, -60, 60];
 const dist = () => Math.hypot(hole.pin.x - ball.x, hole.pin.z - ball.z);
 const aim = () => ((Math.atan2(hole.pin.x - ball.x, hole.pin.z - ball.z) * 180 / Math.PI) + (lastPenalty ? OFFSETS[tries % OFFSETS.length] : 0) + 360) % 360; // after a water/OOB penalty try other lines
@@ -54,7 +65,7 @@ while (!finished() && shots < 14 * HOLES) {
 }
 await sleep(1500);
 console.log(log.join('\n'));
-const end = got.find(m => m.t === 'raceEnd'), me = end?.results?.[0];
+const end = got.find(m => m.t === 'raceEnd'), me = end?.results?.find(x => x.id === mySid) ?? end?.results?.[0];
 console.log('raceEnd:', JSON.stringify(me));
 console.log('raceEnd course:', end?.course);
 const pass = (HOLES === 18 ? (!!me && me.holes === 18 && me.place === 1 && me.timeS > 0) : holesDone >= HOLES) && (!COURSE || end?.course === COURSE || HOLES < 18);
