@@ -7,7 +7,9 @@ import { createRequire } from 'node:module'; import { join, resolve } from 'node
 const [dir, inp, out] = process.argv.slice(2);
 const req = createRequire(join(resolve(dir), 'x.js')), { NodeIO } = req('@gltf-transform/core'), sharp = req('sharp');
 // measured on cart-meshy-2 (side render and vertex histograms): wheel centres (±WX, WY), radius WR, tyres outboard of |z| > WZ
-const WX = 0.75, WY = -0.3, WR = 0.25, WZ = 0.28, BELT = -0.06;
+// env CUT="WX,WY,WR,WZ" re-measures them for another mesh; CUT_ONLY=1 keeps its own canopy and paint (only tyres cut, interior tint)
+const [WX, WY, WR, WZ] = (process.env.CUT ?? '0.75,-0.3,0.25,0.28').split(',').map(Number), BELT = -0.06, CUT_ONLY = process.env.CUT_ONLY === '1';
+const DROP = process.env.DROP?.split(',').map(Number);   // "x0,x1,y0,y1,z0,z1" raw box (CUT_ONLY mode)
 const io = new NodeIO(), doc = await io.read(inp), root = doc.getRoot();
 const prim = root.listMeshes()[0].listPrimitives()[0], mat = prim.getMaterial();
 const pos = prim.getAttribute('POSITION').getArray(), uv = prim.getAttribute('TEXCOORD_0').getArray(), ia = prim.getIndices().getArray();
@@ -22,6 +24,11 @@ const body = [], glass = [], frames = [], navySum = [0, 0, 0]; let cut = 0, navy
 for (let t = 0; t < ia.length; t += 3) {
   const v = [ia[t], ia[t + 1], ia[t + 2]], c = [0, 1, 2].map(k => (P(v[0], k) + P(v[1], k) + P(v[2], k)) / 3);
   if (Math.abs(c[2]) > WZ && Math.hypot(Math.abs(c[0]) - WX, c[1] - WY) < WR) { cut++; continue; }   // tyre
+  if (CUT_ONLY) {   // DROP: the generated steering wheel's dark triangles, so the code wheel (which turns with steer) shows instead
+    const tc = at((uv[2 * v[0]] + uv[2 * v[1]] + uv[2 * v[2]]) / 3, (uv[2 * v[0] + 1] + uv[2 * v[1] + 1] + uv[2 * v[2] + 1]) / 3);
+    if (DROP && c.every((x, k) => x > DROP[2 * k] && x < DROP[2 * k + 1]) && Math.max(...tc) - Math.min(...tc) < 0.08) { cut++; continue; }   // its black rim and grey face (cream dash kept)
+    body.push(...v); continue;
+  }
   // the triangle's colour from its centroid texel (vertex texels sit on atlas seams and can belong to the neighbouring chart)
   const col = at((uv[2 * v[0]] + uv[2 * v[1]] + uv[2 * v[2]]) / 3, (uv[2 * v[0] + 1] + uv[2 * v[1] + 1] + uv[2 * v[2] + 1]) / 3), luma = 0.3 * col[0] + 0.59 * col[1] + 0.11 * col[2];
   // glass: the canopy shell above the belt line (sides, roof, end windows), except its navy frame and the end-panel stripes / light bar
@@ -54,10 +61,12 @@ const paintTris = (tris, paint) => {   // paint(k): colour for a texel at height
       }
   }
 };
-paintTris(ends.filter(v => P(v[0], 0) < 0), k => (k > 0.66 && k < 0.71) || (k > 0.76 && k < 0.81) ? [0.93, 0.93, 0.91] : NAVY);
-paintTris(ends.filter(v => P(v[0], 0) > 0), k => k > 0.7 && k < 0.82 ? [0.86, 0.12, 0.1] : NAVY);
-paintTris(frames, () => NAVY);
-img.setImage(await sharp(px, { raw: info }).png().toBuffer()).setMimeType('image/png');
+if (!CUT_ONLY) {
+  paintTris(ends.filter(v => P(v[0], 0) < 0), k => (k > 0.66 && k < 0.71) || (k > 0.76 && k < 0.81) ? [0.93, 0.93, 0.91] : NAVY);
+  paintTris(ends.filter(v => P(v[0], 0) > 0), k => k > 0.7 && k < 0.82 ? [0.86, 0.12, 0.1] : NAVY);
+  paintTris(frames, () => NAVY);
+}
+if (!CUT_ONLY) img.setImage(await sharp(px, { raw: info }).png().toBuffer()).setMimeType('image/png');
 // vertex tint (COLOR_0 multiplies the base colour): the grey-white interior below the canopy toward the photos' cream tan
 const n = pos.length / 3, col = new Float32Array(n * 4).fill(1);
 for (let v = 0; v < n; v++) {
@@ -66,9 +75,9 @@ for (let v = 0; v < n; v++) {
 }
 prim.setAttribute('COLOR_0', doc.createAccessor().setType('VEC4').setArray(col).setBuffer(prim.getAttribute('POSITION').getBuffer()));
 prim.getIndices().setArray(new Uint32Array(body));
-const glassMat = doc.createMaterial('glass').setBaseColorFactor([0.1, 0.13, 0.2, 0.5]).setAlphaMode('BLEND').setMetallicFactor(0).setRoughnessFactor(0.08).setDoubleSided(true);
+const glassMat = doc.createMaterial('glass').setBaseColorFactor([0.8, 0.88, 0.95, 0.12]).setAlphaMode('BLEND').setMetallicFactor(0).setRoughnessFactor(0.08).setDoubleSided(true);
 const gp = doc.createPrimitive().setMaterial(glassMat).setIndices(doc.createAccessor().setType('SCALAR').setArray(new Uint32Array(glass)).setBuffer(prim.getIndices().getBuffer()));
 for (const s of prim.listSemantics()) if (s !== 'COLOR_0') gp.setAttribute(s, prim.getAttribute(s));
-root.listMeshes()[0].addPrimitive(gp);
+if (glass.length) root.listMeshes()[0].addPrimitive(gp);
 await io.write(out, doc);
 console.log(`triangles ${ia.length / 3}: tyres cut ${cut}, glass ${glass.length / 3}, body ${body.length / 3}`);
