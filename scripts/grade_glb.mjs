@@ -1,7 +1,7 @@
 // Colour-grades a generated GLB's base-colour textures toward photo swatches (docs/research/pebble-look.md), keeping the generated detail.
 // Pixels are split by hue into foliage (green) and the rest (bark, rock); each group's mean colour is moved to its target by a per-channel gain,
 // so the texture's own variation (cracks, lichen, tufts) survives. Also scales roughness up (Rodin/Meshy rock reads too glossy).
-// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6] [--grain 1] [--thicken 1.6:0.45] [--destub 0.1:0.45:1.8]
+// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6] [--grain 1] [--thicken 1.6:0.45] [--destub 0.1:0.45:1.8] [--widen 1.3]
 // Libraries come from the gltf-transform npx cache (same one the gen scripts call); set GT_MODULES to override.
 import { createRequire } from 'node:module';
 const req = createRequire((process.env.GT_MODULES ?? '/Users/kaushal/.npm/_npx/a6797f7ff67bb1f2/node_modules') + '/x.js');
@@ -98,4 +98,6 @@ if (opt.destub) {
 }
 // --squash Y: scale the model vertically (e.g. 0.6 turns a block into a low shelf); applied to the scene's top-level nodes
 if (opt.squash) for (const n of doc.getRoot().listScenes()[0].listChildren()) { const s = n.getScale(); n.setScale([s[0], s[1] * +opt.squash, s[2]]); }
+// --widen XZ: scale the model horizontally (a crown too narrow for its height; the trunk thickens by the same factor)
+if (opt.widen) for (const n of doc.getRoot().listScenes()[0].listChildren()) { const s = n.getScale(); n.setScale([s[0] * +opt.widen, s[1], s[2] * +opt.widen]); }
 await io.write(out, doc);
