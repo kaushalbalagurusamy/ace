@@ -4690,5 +4690,42 @@
       "date": "2026-11-06"
     },
     "not_committed": "failed the critic; shipped-format GLB kept locally in assets/models/raw/rejected/ (gitignored), generator raw in assets/models/raw"
+  },
+  {
+    "id": "rock-r16",
+    "file": null,
+    "tool": "post-process of a generated model (no new generation)",
+    "derived_from": "rock-r9",
+    "source_tool": "Hyper3D Rodin image-to-3D",
+    "source_task_id": "20483847-444c-4f09-94d2-1fe9381696f4",
+    "seed_images": [
+      "concept-rock-granite-r2.png",
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "target_height_m": 1.2,
+    "credits_used": 0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --rest \"#A39C90\" --sat 0.7 --blur 2 --nblur 8 --grain 1 --rough 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 1024 --simplify false --flatten true --join true"
+    ],
+    "subagent": "visual realism round 3 (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "critic": "independent photo-fidelity critic, round 3 (scratchpad critic-r3-rock.json)",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.5,
+      "notes": "Rounded loaf massing matches coast-rocks-fescue, colour close but slightly cool and white; surface reads fuzzy and smeared like felt with no crisp crystal grain, pits or fissures; smooth egg form reads as an enlarged river cobble; pinched fold at one corner of the top view.",
+      "date": "2026-11-06"
+    },
+    "not_committed": "failed the critic; shipped-format GLB kept locally in assets/models/raw/rejected/ (gitignored)"
   }
 ]
