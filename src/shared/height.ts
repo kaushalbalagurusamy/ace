@@ -1,19 +1,29 @@
-// Shared height field (server physics and client visuals): real Pebble Beach elevation per hole (course-height.ts, docs/research/elevation.md).
+// Shared height field (server physics and client visuals): real elevation per course and hole (courses/<id>-height.ts, docs/research/elevation.md).
 // Heights are metres above the hole's tee; x right, z toward the pin. Bilinear on the 4 m grid, clamped at the edges; pure and deterministic.
-import { HEIGHTS } from './course-height';
+// Add a course: run scripts/build-course.mjs --course <id>, then register its HEIGHTS below.
+import type { HoleHeight } from './height-types';
+import { HEIGHTS as PEBBLE } from './courses/pebble-height';
+
+export type { HoleHeight };
+export const COURSE_HEIGHTS: Record<string, HoleHeight[]> = { pebble: PEBBLE };
+/** The course the game plays today. */
+export const DEFAULT_COURSE = 'pebble';
 
 export interface Vec3 { x: number; y: number; z: number }
-const grids: (Int16Array | undefined)[] = [];
-function grid(hole: number): Int16Array {
-  let g = grids[hole]; if (g) return g;
-  const bin = atob(HEIGHTS[hole]!.data), dv = new DataView(new ArrayBuffer(bin.length));
+const grids = new Map<HoleHeight, Int16Array>();
+function field(course: string, hole: number): HoleHeight {
+  const f = COURSE_HEIGHTS[course]?.[hole]; if (!f) throw new RangeError(`no height field for ${course} hole ${hole + 1}`); return f;
+}
+function grid(H: HoleHeight): Int16Array {
+  let g = grids.get(H); if (g) return g;
+  const bin = atob(H.data), dv = new DataView(new ArrayBuffer(bin.length));
   for (let i = 0; i < bin.length; i++) dv.setUint8(i, bin.charCodeAt(i));
   g = new Int16Array(bin.length / 2); for (let i = 0; i < g.length; i++) g[i] = dv.getInt16(i * 2, true);
-  return (grids[hole] = g);
+  grids.set(H, g); return g;
 }
 
-export function heightAt(hole: number, x: number, z: number): number {
-  const H = HEIGHTS[hole]!, g = grid(hole);
+export function heightAt(course: string, hole: number, x: number, z: number): number {
+  const H = field(course, hole), g = grid(H);
   const fx = Math.min(H.nx - 1, Math.max(0, (x - H.x0) / H.cell)), fz = Math.min(H.nz - 1, Math.max(0, (z - H.z0) / H.cell));
   const i = Math.min(H.nx - 2, Math.floor(fx)), j = Math.min(H.nz - 2, Math.floor(fz)), u = fx - i, v = fz - j, k = j * H.nx + i;
   return ((1 - v) * ((1 - u) * g[k]! + u * g[k + 1]!) + v * ((1 - u) * g[k + H.nx]! + u * g[k + H.nx + 1]!)) / 100;
@@ -24,9 +34,9 @@ export function normalFrom(height: (x: number, z: number) => number, x: number, 
   const hx = (height(x + d, z) - height(x - d, z)) / (2 * d), hz = (height(x, z + d) - height(x, z - d)) / (2 * d), n = Math.hypot(hx, 1, hz);
   return { x: -hx / n, y: 1 / n, z: -hz / n };
 }
-export const normalAt = (hole: number, x: number, z: number): Vec3 => normalFrom((a, b) => heightAt(hole, a, b), x, z, HEIGHTS[hole]!.cell / 2);
+export const normalAt = (course: string, hole: number, x: number, z: number): Vec3 => normalFrom((a, b) => heightAt(course, hole, a, b), x, z, field(course, hole).cell / 2);
 /** Sea level on this hole, metres relative to its tee. */
-export const seaLevel = (hole: number) => -HEIGHTS[hole]!.teeElevM;
+export const seaLevel = (course: string, hole: number) => -field(course, hole).teeElevM;
 
 export interface StanceSlope {
   /** + = uphill along the aim line (degrees) */ alongDeg: number;
