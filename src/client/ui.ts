@@ -35,12 +35,13 @@ const HELP_GROUPS: [string, [string, string][]][] = [
   ['Move', [[k('W', 'A', 'S', 'D'), 'Walk'], [k('Shift'), 'Walk at 5 m/s and halve the look speed for fine aim'], [k('Mouse'), 'Look and aim. Click the course to lock the mouse']]],
   ['Swing', [[k('Space'), 'Take your stance at the ball; the mouse still aims'], [`Hold ${k('Space')}`, 'Backswing fills the meter. Release to hit; a short hold is a short shot'],
     [`${k('Shift')} in stance`, '<b>Chip</b>: feet together, shoulders only; the whole meter is 0-25% power for fine touch'],
-    ['Hold into red', '<b>MAX effort</b>: +10% club speed, 25% less accurate'], [`${k('1')}–${k('0')} ${k('-', '=', 'O')}`, 'Pick a club, up until the backswing'], [k('Esc'), 'Cancel before you release']]],
+    ['Hold into red', '<b>MAX effort</b>: +10% club speed, 25% less accurate'], [`${k('1')}–${k('0')} ${k('-', '=', 'O')}`, 'Pick a club, up until the backswing; or scroll on the club bubble'], [k('Esc'), 'Cancel before you release']]],
   ['Ball position (7x7)', [[k('↑', '↓'), 'Forward for a higher flight, back for a lower one; 3 back is a stinger'], [k('→', '←'), 'Away from you for a draw, closer for a fade; 3 steps is a hook or slice']]],
   ['Putting', [[k('P'), 'The putter'], [`${k('Space')} hold, release`, 'Stance, draw back, strike: the longer the hold, the harder the putt']]],
   ['Cart', [[k('E'), 'Get in or out of the Genesis cart (within 3 m)'], [k('W', 'A', 'S', 'D'), 'Drive. The mouse swings the chase camera']]],
   ['Rangefinder', [[k('M'), 'Open or close the hole map'], ['Hover', 'Distance from your ball, to the pin and a club suggestion'], ['Click', 'Set a target and auto-pick the club']]],
   ['Race', [[k('Tab'), 'Scorecard: every racer\'s strokes on every hole'], ['Top left', 'Live standings: hole, strokes and score to par']]],
+  ['Lie', [[`${k('I')} or ${k('ⓘ')}`, 'Show or hide the lie and stance panel']]],
   ['Settings', [[`${k('Esc')} or ${k('⚙')}`, 'Camera sensitivity and graphics'], [k(',', '.'), 'Look speed down or up'], [k('N'), 'Mute'], [k('F3'), 'Frame rate']]],
 ];
 /** The same, for touch screens (touch.ts). */
@@ -51,7 +52,7 @@ const TOUCH_HELP: [string, [string, string][]][] = [
     ['Pull far', '<b>MAX effort</b> past the full meter'], ['Drag sideways', `Aim (or hold ${b('◀ Aim')} ${b('Aim ▶')})`], [b('Chip'), 'Shoulders-only chip, 0-25% power'],
     [b('Ball ▲▼◀▶'), 'Ball position: height and curve'], [b('✕'), 'Cancel the stance'], ['Tap the bag', 'Pick a club; the putter putts with the same pull']]],
   ['Cart', [[b('Cart'), 'Get in or out (within 3 m)'], ['Pull', 'Up to drive, down to brake and reverse, sideways to steer']]],
-  ['Race', [[b('Map'), 'Hole map; tap it to set a target and pick the club'], ['Tap standings', 'Scorecard'], [`${b('🔈')} ${b('⚙')}`, 'Mute; settings and look speed']]],
+  ['Race', [[b('Map'), 'Hole map; tap it to set a target and pick the club'], ['Tap standings', 'Scorecard'], [b('⚙'), 'Settings: mute and look speed'], [b('ⓘ'), 'Lie and stance panel'], ['Swipe the club', 'Change club; tap a side bubble for the next one']]],
 ];
 const grid = (g: typeof HELP_GROUPS, cls: string) => `<div class="htp-grid ${cls}">${g.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>`;
 const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" class="htp-head"><h2 id="htp-t">How to play</h2><button class="x" aria-label="Close">&times;</button></form>
@@ -136,28 +137,36 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 @media (max-width:520px){.crs{grid-template-columns:1fr}}
 .scr table{border-collapse:collapse;width:100%}.scr td,.scr th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}.scr th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 @media (max-width:520px){.tag{letter-spacing:.14em}.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
-.hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
-#bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px;pointer-events:auto}#lb,.slot{cursor:pointer}#lb{pointer-events:auto}
-.slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
-#info{left:10px;bottom:10px;line-height:1.5}
-#lb{left:52px;top:56px;font-size:12px;line-height:1.5;display:grid;grid-template-columns:minmax(0,74px) auto auto auto;column-gap:8px;max-width:180px;box-sizing:border-box}
+.hud{position:absolute;padding:5px 10px;border-radius:14px;font:500 13px/1.4 Inter,system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;color:#f5f0e4;
+  background:rgba(10,24,19,.62);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 20px rgba(0,0,0,.28)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hud,.slot,.gb,.tb{background:rgba(10,24,19,.88)!important}}
+#pin,#arrow,#cd,#keys,#bag,#lie{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border:0}
+#bag{top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:0;background:none;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}#lb,.slot{cursor:pointer}#lb{pointer-events:auto}
+.slot,.gb{display:grid;place-items:center;border-radius:50%;box-sizing:border-box;background:rgba(10,24,19,.62);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 4px 14px rgba(0,0,0,.3);color:#f5f0e4}
+.slot{width:36px;height:36px;font:600 11px Inter,system-ui,sans-serif;opacity:.65;transition:transform .2s}.slot:empty{visibility:hidden}
+.slot.on{width:56px;height:56px;font-size:15px;opacity:1;border-color:#d6b45a;color:#f0d690}.slot.pop{transform:scale(1.15)}
+#info{left:max(10px,env(safe-area-inset-left));bottom:max(10px,env(safe-area-inset-bottom));white-space:nowrap;font-size:12px}
+#lb{left:max(52px,calc(env(safe-area-inset-left) + 46px));top:max(56px,calc(env(safe-area-inset-top) + 48px));font-size:11px;line-height:1.35;display:grid;grid-template-columns:minmax(0,64px) auto auto auto;column-gap:6px;max-width:160px;box-sizing:border-box;padding:4px 8px}
 #lb>div{display:contents}#lb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}#lb span:first-child{text-align:left}
-#lb .me span{color:#ffe14d;font-weight:700}#lb .lbh{grid-column:1/-1;display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
-#sc{left:50%;top:50%;transform:translate(-50%,-50%);display:none;max-width:calc(100% - 20px);box-sizing:border-box;background:rgba(14,22,18,.94);padding:10px 12px}#sc h3{margin:0 0 6px;font-size:14px}#mini{right:10px;top:10px;padding:0}
-#card{right:10px;bottom:10px;min-width:210px;display:none}#prompt{left:50%;bottom:90px;transform:translateX(-50%);display:none}
-#meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
+#lb .me span{color:#f0d690;font-weight:700}#lb>div:nth-child(n+6){display:none}#lb .lbh{grid-column:1/-1;display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+#sc{left:50%;top:50%;transform:translate(-50%,-50%);display:none;max-width:calc(100% - 20px);box-sizing:border-box;background:rgba(14,22,18,.94);padding:10px 12px}#sc h3{margin:0 0 6px;font-size:14px}#mini{right:max(10px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));padding:0;overflow:hidden}#mini canvas{display:block;width:112px;height:157px}
+#card{right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));min-width:190px;display:none;font-size:12px;pointer-events:auto;cursor:pointer}#card.mini{min-width:0;border-radius:999px}#card.mini .more{display:none}#prompt{left:50%;bottom:90px;transform:translateX(-50%);display:none;font-size:12px;border-radius:999px;padding:4px 12px}
+#meter{left:50%;bottom:44px;transform:translateX(-50%);width:260px;display:none;font-size:12px}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
-#toast{left:50%;top:70px;transform:translateX(-50%);display:none}
-#lie{left:10px;bottom:220px;display:none;font-size:12px;line-height:1.45;max-width:300px}#lie canvas{float:left;margin:2px 8px 0 0}
-#bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
+#toast{left:50%;top:max(72px,calc(env(safe-area-inset-top) + 70px));transform:translateX(-50%);display:none;font-size:12px;border-radius:999px;padding:4px 12px;max-width:80vw;text-align:center}
+#lie{left:max(10px,env(safe-area-inset-left));bottom:max(44px,calc(env(safe-area-inset-bottom) + 36px));display:none;padding:0;background:none;font-size:12px;line-height:1.45;pointer-events:auto}
+#liei{display:flex;align-items:center;gap:6px;background:none;border:0;padding:0;color:#f5f0e4;font:600 12px Inter,system-ui,sans-serif;cursor:pointer;text-shadow:0 1px 3px #000}#liei .gb{width:36px;height:36px;font-size:18px}
+#lie.pulse .gb{animation:pulse .5s 3}@keyframes pulse{50%{transform:scale(1.25);border-color:#d6b45a}}
+#lie .lp{display:none}#lie.open .lp{display:block;position:absolute;bottom:42px;left:0;width:280px;background:rgba(10,24,19,.82);padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.16)}#lie canvas{float:left;margin:2px 8px 0 0}
+#bpos{left:max(10px,env(safe-area-inset-left));bottom:100px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
 #pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
-#gear{left:10px;top:56px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
-#settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(18,24,22,.96);border:1px solid #567}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}#settings select{margin-left:8px;font:inherit}
+#gear{left:max(10px,env(safe-area-inset-left));top:max(56px,calc(env(safe-area-inset-top) + 48px));cursor:pointer;font-size:16px;padding:2px 8px;border-radius:999px;pointer-events:auto;user-select:none}
+#settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(10,22,17,.92);border-radius:18px}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}#settings select{margin-left:8px;font:inherit}
 #fps{right:10px;top:236px;display:none;font:12px/1.4 ui-monospace,monospace;white-space:pre}
 #banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
 #arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
-#keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
+#keys{left:50%;bottom:4px;transform:translateX(-50%);font-size:10px;opacity:.6;background:none;padding:0;white-space:nowrap;text-shadow:0 1px 2px #000}
 #rf{position:absolute;inset:6% 12%;display:none;background:rgba(12,20,16,.94);border:2px solid #678;pointer-events:auto;padding:0}#rf canvas{width:100%;height:100%;display:block;cursor:crosshair}
 .sctw{overflow-x:auto;max-width:100%}.sct{border-collapse:collapse;font:12px/1.3 system-ui;white-space:nowrap;width:auto}
 .sct td,.sct th,.scr .sct td,.scr .sct th{padding:3px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.12);font-size:12px;letter-spacing:0;text-transform:none;color:inherit}
@@ -177,15 +186,15 @@ export class UI {
   constructor(public act: (a: string, d: DOMStringMap, form: HTMLElement) => void) {
     document.head.insertAdjacentHTML('beforeend', `<style>${CSS}</style>`);
     this.root.id = 'ui'; this.hud.style.display = 'none';
-    this.hud.innerHTML = `<div class="hud" id="bag">${BAG.map(b => `<div class="slot"><b>${b.key}</b>${b.label}</div>`).join('')}</div>
+    this.hud.innerHTML = `<div class="hud" id="bag" title="Club: swipe, scroll or tap a neighbour; number keys"><div class="slot" data-d="-1"></div><div class="slot on" data-d="0"></div><div class="slot" data-d="1"></div></div>
       <div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
-      <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div><div class="hud" id="lie"><canvas width="54" height="54"></canvas><div></div></div>
+      <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div><div class="hud" id="lie"><div class="lp"><canvas width="54" height="54"></canvas><div></div></div><button id="liei" title="Lie and stance (I)"><span class="gb">&#9432;</span><span></span></button></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · Tab scorecard · N mute · , . look speed · F3 FPS</div>
+      <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · Tab scorecard · I lie · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
-      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div class="hud" id="sc"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
+      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="smute">Mute / unmute (N)</button> <button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div class="hud" id="sc"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.home.id = 'home';
     this.home.append(new Backdrop().el, this.scr);
     this.home.insertAdjacentHTML('beforeend', `<button class="htp-btn" aria-haspopup="dialog"><i>?</i><span>How to play</span></button><div class="spons">Callaway · Genesis</div>${HELP}`);
@@ -196,7 +205,17 @@ export class UI {
     this.mini = this.hud.querySelector('canvas')!;
     // the bag and the standings are buttons too (touch and mouse): they replay the club key and Tab
     const key = (code: string) => { for (const t of ['keydown', 'keyup']) dispatchEvent(new KeyboardEvent(t, { code })); };
-    this.hud.querySelectorAll<HTMLElement>('.slot').forEach((e, i) => e.addEventListener('click', () => key(BAG[i]!.code)));
+    // club bubble: tap a neighbour, swipe (about 28 px a club, left = next) or scroll; every change replays the number key so the stance rules apply; clamps at the ends
+    const bag = this.$('bag'), step = (n: number) => { const j = Math.max(0, Math.min(BAG.length - 1, this.club + n)); if (j !== this.club) key(BAG[j]!.code); };
+    let sx: number | null = null, swiped = false;
+    bag.addEventListener('pointerdown', e => { sx = e.clientX; swiped = false; e.stopPropagation(); });
+    addEventListener('pointerup', e => { if (sx === null) return; const dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 14) { swiped = true; step(-Math.round(dx / 28) || -Math.sign(dx)); } });
+    bag.addEventListener('click', e => { const d = Number((e.target as HTMLElement).closest<HTMLElement>('.slot')?.dataset.d ?? 0); if (!swiped && d) step(d); });
+    bag.addEventListener('wheel', e => { e.preventDefault(); step(Math.sign(e.deltaY)); }, { passive: false });
+    this.$('liei').addEventListener('click', () => this.toggleLie());
+    addEventListener('pointerdown', e => { if (this.lieOpen && !this.$('lie').contains(e.target as Node)) this.toggleLie(false); });
+    this.$('card').addEventListener('click', () => this.$('card').classList.toggle('mini'));
+    this.$('smute').addEventListener('click', () => key('KeyN'));
     this.$('lb').addEventListener('click', () => key('Tab'));
     this.scr.addEventListener('click', e => {
       const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
@@ -261,10 +280,19 @@ export class UI {
   clock(s: number) { return clock(s); }
 
   // --- HUD ---
-  setClub(i: number) { this.hud.querySelectorAll('.slot').forEach((e, j) => e.classList.toggle('on', i === j)); }
-  info(hole: HoleInfo, yards: number, lie: string, clock: string, strokes: number) {
-    this.$('info').innerHTML = `Hole ${hole.index + 1} &middot; Par ${hole.par} &middot; Strokes ${strokes}<br>Pin ${Math.round(yards)} yd &middot; Lie: ${esc(lie)}<br>Clock ${clock}`;
+  club = 0;
+  setClub(i: number) {
+    const was = this.club; this.club = i;
+    this.hud.querySelectorAll<HTMLElement>('#bag .slot').forEach(e => { e.textContent = BAG[i + Number(e.dataset.d)]?.label ?? ''; });
+    if (was !== i) { const c = this.$('bag').children[1]!; c.classList.add('pop'); setTimeout(() => c.classList.remove('pop'), 200); }
   }
+  info(hole: HoleInfo, yards: number, _lie: string, clock: string, strokes: number) {
+    this.$('info').textContent = `H${hole.index + 1} · Par ${hole.par} · ${strokes} stroke${strokes === 1 ? '' : 's'} · ${Math.round(yards)} yd · ${clock.replace(/\.\d$/, '')}`;
+  }
+  /** Lie panel open state, remembered per device. */
+  lieOpen = (() => { try { return localStorage.getItem('ace.lieOpen') === '1'; } catch { return false; } })();
+  private lieName = '';
+  toggleLie(open = !this.lieOpen) { this.lieOpen = open; this.$('lie').classList.toggle('open', open); try { localStorage.setItem('ace.lieOpen', open ? '1' : '0'); } catch { /* storage blocked */ } }
   /** Live standings strip (name, hole or finish time, strokes, to par) and, while open, the Tab scorecard. */
   board(ps: PlayerRace[], pars: readonly number[], self: string) {
     this.$('lb').innerHTML = `<div class="lbh">Standings · Tab card</div>${standings(ps).map(p => `<div class="${p.id === self ? 'me' : ''}"><span>${esc(p.name)}</span><span>${p.finishedAtS !== undefined ? `&check; ${clock(p.finishedAtS)}` : `H${p.hole + 1}${p.ball.holedOut ? '&check;' : ''}`}</span><span>${p.ball.strokes}</span><span>${parText(toPar(p.byHole, pars, p.hole, p.ball.holedOut))}</span></div>`).join('')}`;
@@ -275,6 +303,7 @@ export class UI {
   /** Small grid showing where the ball sits against the feet in the stance (fb: up = forward, io: right = away from the body). */
   ballPosGrid(p: { fb: number; io: number } | null) {
     const e = this.$('bpos'); e.style.display = p ? 'block' : 'none'; if (!p) return;
+    const dc = document.getElementById('tbc'); if (dc) dc.textContent = `${p.fb >= 0 ? '+' : ''}${p.fb} ${p.io >= 0 ? '+' : ''}${p.io}`;   // the touch d-pad centre shows the position
     const n = BALL_STEPS, cell = 80 / (2 * n), at = (k: number) => 10 + (k + n) * cell;          // 7x7 grid: -3..+3 on each axis
     const c = e.querySelector('canvas')!, x = c.getContext('2d')!; x.clearRect(0, 0, 100, 100); x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 0, 100, 100);
     x.strokeStyle = 'rgba(255,255,255,.18)'; for (let i = 0; i <= 2 * n; i++) { x.beginPath(); x.moveTo(10 + i * cell, 10); x.lineTo(10 + i * cell, 90); x.moveTo(10, 10 + i * cell); x.lineTo(90, 10 + i * cell); x.stroke(); }
@@ -287,7 +316,10 @@ export class UI {
    *  No curve number on purpose: the player reads the angles and judges the curve (owner). */
   liePanel(info: { lines: string[] } | null, slope?: { alongDeg: number; sideDeg: number }) {
     const e = this.$('lie'); e.style.display = info ? 'block' : 'none'; if (!info || !slope) return;
-    e.querySelector('div')!.innerHTML = info.lines.map((l, i) => (i ? esc(l) : `<b>${esc(l)}</b>`)).join('<br>');
+    e.classList.toggle('open', this.lieOpen);
+    const nm = info.lines[0]!.split(':')[0]!;   // collapsed: the lie word by the icon; it pulses when the lie changes
+    if (nm !== this.lieName) { this.lieName = nm; e.querySelector('#liei span:last-child')!.textContent = nm; e.classList.remove('pulse'); void e.offsetWidth; e.classList.add('pulse'); }
+    e.querySelector('.lp div')!.innerHTML = info.lines.map((l, i) => (i ? esc(l) : `<b>${esc(l)}</b>`)).join('<br>');
     const c = e.querySelector('canvas')!, x = c.getContext('2d')!, m = 27; x.clearRect(0, 0, 54, 54);
     x.strokeStyle = 'rgba(255,255,255,.5)'; x.beginPath(); x.arc(m, m, 24, 0, 7); x.stroke();
     x.fillStyle = '#ffe14d'; x.beginPath(); x.moveTo(m, 4); x.lineTo(m - 4, 11); x.lineTo(m + 4, 11); x.fill();          // the target is up
@@ -371,9 +403,10 @@ export class UI {
   card(m: Extract<ServerMsg, { t: 'shotResult' }>) {
     const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), fx = (n: number) => (n === 0 ? '0' : n > 0 ? `+${n}` : `${n}`);
     const off = m.offlineM * YD;
-    e.innerHTML = `<b>Shot</b><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
-      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)} &middot; ${esc(shotShape(m.effort.fb, m.effort.io))}<br>Effort: ${m.effort.chip ? 'Chip' : m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
-    e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
+    e.innerHTML = `<b>Shot</b> ${y(m.totalM)} yd<span class="more"><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
+      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)} &middot; ${esc(shotShape(m.effort.fb, m.effort.io))}<br>Effort: ${m.effort.chip ? 'Chip' : m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}</span>`;
+    // full card for 4 s, then a small "Shot 212 yd" pill that opens it again on tap or click
+    e.style.display = 'block'; e.classList.remove('mini'); clearTimeout(this.cardT); this.cardT = window.setTimeout(() => e.classList.add('mini'), 4000);
   }
   /** Mini map oriented tee (bottom) to pin (top). */
   drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean; heading?: number; cart?: boolean }[]) {

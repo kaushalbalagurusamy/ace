@@ -22,6 +22,6 @@ describe('touch swing pull', () => {
     expect(pullToHoldMs(full * 2, H, true)).toBe(FULL_TURN_MS);
   });
   it('rewords the keyboard prompts', () => {
-    expect(touchText('Space: take your stance · E: get in the cart')).toBe('Tap Swing to take your stance · Cart: get in the cart');
+    expect(touchText('Space: take your stance · E: get in the cart')).toBe('Swing: stance · Cart: get in the cart');
   });
 });

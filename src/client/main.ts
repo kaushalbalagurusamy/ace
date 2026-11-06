@@ -208,6 +208,7 @@ addEventListener('keydown', e => {
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === 'KeyN') { audio.toggleMute(); return; }
+  if (e.code === 'KeyI') { ui.toggleLie(); return; }
   if (e.code === 'Tab') { ui.toggleScorecard(); board(); return; }
   if (e.code === 'Comma' || e.code === 'Period') { setLook(stepMult(lookMult, e.code === 'Period' ? 1 : -1)); ui.toast(lookLabel(lookMult)); return; }
   if (e.code === 'Escape' && !swing) { ui.toggleSettings(); return; }          // Esc opens the settings menu; in a stance it cancels the stance instead
