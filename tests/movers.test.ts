@@ -45,6 +45,24 @@ describe('server: reported moves are clamped and checked', () => {
     expect(acceptMove(prev, move(mover({ driving: true, cart: cart({ z: 90 }), x: 20, z: 90 })), 100, farBall)).toBeNull();
     expect(acceptMove(prev, move(mover({ x: 120, z: 50, cart: cart() })), 100, farBall)).toBeNull();     // a golfer jumping 100 m
   });
+  it('slack is a leaky-bucket allowance, not per message: 100 reports 1 ms apart cannot add 3 m each', () => {
+    let s = mover({ driving: true, x: 20, z: 50 }), t = 0, accepted = 0;
+    for (let i = 0; i < 100; i++) {
+      t += 1; const z = s.cart.z + 3, next = acceptMove(s, move(mover({ driving: true, cart: cart({ z, vz: 18 }), x: 20, z })), t, farBall);
+      if (next) { s = next; accepted++; }
+    }
+    expect(s.cart.z - 50).toBeLessThanOrEqual(CART.SERVER_MAX * (t / 1000) + 3 + 1e-9);
+    expect(accepted).toBeLessThan(5);
+    let w = mover({ x: 22, z: 50 }), wz = 50;                                      // the same on foot
+    for (let i = 1; i <= 100; i++) { wz += 3; w = acceptMove(w, move(mover({ x: 22, z: wz })), i, farBall) ?? w; }
+    expect(w.z - 50).toBeLessThanOrEqual(16 * 0.1 + 3 + 1e-9);
+  });
+  it('a normal 20 Hz stream at top speed, and 10 Hz walking at full pace, stay accepted', () => {
+    let s = mover({ driving: true, x: 20, z: 50 });
+    for (let i = 1; i <= 200; i++) { const z = 50 + 18 * 0.05 * i; s = acceptMove(s, move(mover({ driving: true, cart: cart({ z, vz: 18 }), x: 20, z })), i * 50, farBall)!; expect(s, `step ${i}`).not.toBeNull(); }
+    let w = mover({ x: 22, z: 50 });
+    for (let i = 1; i <= 100; i++) { w = acceptMove(w, move(mover({ x: 22, z: 50 + 15 * 0.1 * i })), i * 100, farBall)!; expect(w, `walk ${i}`).not.toBeNull(); }
+  });
   it('while driving the golfer is where the cart is, whatever the report says', () => {
     const next = acceptMove(mover({ driving: true, x: 20, z: 50 }), move(mover({ driving: true, x: 21, z: 49 })), 100, farBall)!;
     expect([next.x, next.z]).toEqual([20, 50]);

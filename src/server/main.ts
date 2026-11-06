@@ -48,7 +48,7 @@ const COUNTDOWN_S = 5, RACE_LIMIT_MS = 20 * 60_000, AFTER_FIRST_MS = 60_000;
 
 interface RPlayer { name: string; hole: number; holesDone: number; ball: BallState; nextAtMs: number; finishS?: number; /** cart spawn slot */ slot: number; mv: MoverState }
 interface Race { lobbyId: string; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean; /** pair key -> last bump (ms) */ bumpAt: Map<string, number> }
-const MOVERS_MS = 100, BUMP_COOLDOWN_MS = 250;
+const MOVERS_MS = 100, BUMP_COOLDOWN_MS = 250, MOVES_PER_S = 30;
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
 const tokens = new Map<string, string>(); // sessionId -> secret resume token (never broadcast)
@@ -264,9 +264,9 @@ wss.on('connection', ws => {
   // A socket that never says hello would otherwise hold a connection (and a waiting-room slot) forever.
   const helloTimer = setTimeout(() => { if (!sid) ws.terminate(); }, 10_000);
   ws.on('close', () => clearTimeout(helloTimer));
-  let windowStart = Date.now(), inWindow = 0; // per-socket rate limit: 40 messages per second
+  let windowStart = Date.now(), inWindow = 0, movesInWindow = 0; // per-socket rate limit: 40 messages per second, of which at most 30 moves
   ws.on('message', (data, isBinary) => {
-    if (Date.now() - windowStart > 1000) { windowStart = Date.now(); inWindow = 0; }
+    if (Date.now() - windowStart > 1000) { windowStart = Date.now(); inWindow = 0; movesInWindow = 0; }
     if (++inWindow > 40) { ws.terminate(); return; }
     try {
       if (isBinary) return err(ws, 'BAD_MESSAGE', 'text only');
@@ -292,6 +292,7 @@ wss.on('connection', ws => {
       }
       // A repeated hello on the same socket (double submit) is harmless: re-confirm instead of erroring.
       if (m.t === 'hello') { send(ws, { t: 'welcome', sessionId: sid, name: myName, token: tokens.get(sid)! }); return; }
+      if (m.t === 'move' && ++movesInWindow > MOVES_PER_S) return;   // extra position reports are dropped, not answered
       onMessage(ws, sid, m);
     } catch (e) { console.error(e); err(ws, 'BAD_MESSAGE', 'internal error'); }
   });

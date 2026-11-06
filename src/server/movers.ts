@@ -3,10 +3,14 @@ import { CART, cartBump, cartSpawn, golferKnock } from '../shared/cart';
 import { WALK_SPEED, golferSpot, type Pt } from '../client/rules';
 import type { CartState, ClientMsg } from '../shared/protocol';
 
-export interface MoverState { x: number; z: number; yaw: number; driving: boolean; cart: CartState; /** when this state was accepted */ atMs: number }
+export interface MoverState {
+  x: number; z: number; yaw: number; driving: boolean; cart: CartState; /** when this state was accepted */ atMs: number;
+  /** leaky-bucket travel allowance (m) for the cart and the golfer on foot: refilled at the speed cap, capped at 1 s of travel plus slack */
+  cartBudget?: number; footBudget?: number;
+}
 export interface Push { target: 'cart' | 'golfer'; dx: number; dz: number; dvx: number; dvz: number; strength: number }
 
-const SLACK_M = 3;          // network jitter (two reports arriving together) plus a bump's displacement
+const SLACK_M = 3;          // network jitter (two reports arriving together) plus a bump's displacement; granted once, through the bucket
 const BALL_JUMP_M = 4;      // the client moves the golfer to their ball after a penalty drop
 
 /** A player on the tee of `holeIndex`: on foot beside the ball, cart parked beside them. */
@@ -22,14 +26,16 @@ export function clampSpeed(c: CartState): CartState {
 
 /** The next accepted state, or null when the report is a teleport or an enter from out of range (the caller then sends `snap`). */
 export function acceptMove(prev: MoverState, m: Extract<ClientMsg, { t: 'move' }>, nowMs: number, ball: Pt): MoverState | null {
-  const dt = Math.min(1, Math.max(0, (nowMs - prev.atMs) / 1000)), d = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.z - b.z);
+  const dt = Math.max(0, (nowMs - prev.atMs) / 1000), d = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.z - b.z);
+  const refill = (b: number | undefined, speed: number) => Math.min(speed + SLACK_M, (b ?? SLACK_M) + speed * dt);
   const cart = clampSpeed(m.cart);
-  if (d(cart, prev.cart) > CART.SERVER_MAX * dt + SLACK_M) return null;
+  const cartBudget = refill(prev.cartBudget, CART.SERVER_MAX) - d(cart, prev.cart);
+  if (cartBudget < 0) return null;
   if (m.driving && !prev.driving && d(prev, prev.cart) > CART.ENTER_M + 0.5) return null;
   const golfer = m.driving ? { x: cart.x, z: cart.z } : { x: m.x, z: m.z };
-  const reach = (prev.driving ? CART.SERVER_MAX : WALK_SPEED + 1) * dt + SLACK_M;
-  if (!m.driving && d(golfer, prev) > reach && d(golfer, ball) > BALL_JUMP_M) return null;
-  return { ...golfer, yaw: m.yaw, driving: m.driving, cart, atMs: nowMs };
+  let footBudget = refill(prev.footBudget, prev.driving ? CART.SERVER_MAX : WALK_SPEED + 1);
+  if (!m.driving && d(golfer, ball) > BALL_JUMP_M) { footBudget -= d(golfer, prev); if (footBudget < 0) return null; }   // a jump to your own ball is free
+  return { ...golfer, yaw: m.yaw, driving: m.driving, cart, atMs: nowMs, cartBudget, footBudget };
 }
 
 /** Bumps between two players on the same hole: what each must apply. Cart-cart is equal and opposite; a moving cart knocks a golfer on foot. */
