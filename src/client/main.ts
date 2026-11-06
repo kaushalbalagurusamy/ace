@@ -6,6 +6,7 @@ import type { LobbyView } from '../server/lobby-types';
 import { Net } from './net';
 import { BAG, PUTTER, UI, YD, errText } from './ui';
 import { World } from './scene';
+import { backswingDepth } from './golferanim';
 
 import { canAddress, golferSpot, lookScale, moveAxis, walkSpeed } from './rules';
 import { pinOpacity } from './overlay';
@@ -41,6 +42,7 @@ const act = (a: Action | null) => {
   if (!a || !swing) return;
   if (a.type === 'cancel') { swing = null; return; }
   net.send(a.msg); swing.sentAt = performance.now();
+  world.release(selfId, backswingDepth(a.msg.holdMs), a.type === 'send-putt');   // the golfer plays the downswing and finish from this depth
   if (a.type === 'send-shot') { const L = a.msg.holdMs / 750; void audio.play(L < 0.4 ? 'sfx-swing-soft' : L < 0.85 ? 'sfx-swing-full' : 'sfx-swing-max', 0.7); }
 };
 
@@ -284,6 +286,9 @@ function frame(now: number) {
     const d = Math.hypot(hole.pin.x - dest.x, hole.pin.z - dest.z) * YD;
     ui.info(hole, d, me.ball.surface, ui.clock(go ? (Date.now() - goAt) / 1000 : 0), me.ball.strokes);
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
+    world.setClub(selfId, club);
+    const f = swing && swing.sentAt === undefined ? swing.fsm : null;   // stance and backswing pose the golfer at the ball; depth follows the hold
+    world.setStance(selfId, f ? { depth: f.phase === 'backswing' ? Math.min(1, f.meter(now)) : 0, putt: f.club().putt } : null);
   }
   world.ownBallDistM = ownDist();
   world.tick(now);

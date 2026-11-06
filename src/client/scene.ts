@@ -9,11 +9,27 @@ import { Grass } from './grass';
 import { loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
+import { GolferRig, hasRig, tintPolo } from './golferrig';
+import { POSES, addressPoint, backswingPose, lerpPose, puttPose, releasePose, strideRate, walkPose, type Pose } from './golferanim';
+import { CLUBS, clubMatrix, loadClub, makeCodeClub } from './clubs';
+
+/** How a golfer is drawn and animated: the rigged model once it passes QA (else the box stand-in), the club in hand, and the swing state. */
+interface Look {
+  rig?: GolferRig; model?: THREE.Object3D; holder?: THREE.Group; box: THREE.Group;
+  club?: THREE.Object3D; clubIdx: number; clubToken: number;
+  cur?: Pose; walk: number; last: THREE.Vector3; speed: number;
+  /** the local player's stance/backswing this frame (set by the client) */
+  stance?: { depth: number; putt: boolean };
+  /** a released swing playing out: started at t0 (ms), from `depth`, standing at the ball spot `at` facing `rotY` */
+  rel?: { t0: number; depth: number; putt: boolean; at: THREE.Vector3; rotY: number };
+}
+const DEFAULT_CLUB = 6;   // 7-iron in other players' hands (their club choice is not sent)
+const BOX_GRIP = clubMatrix([-0.36, 0.83, 0.12], [0, -0.62, 0.78], [0, 0, 1]);   // the box stand-in's right hand
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
 export interface Ent {
   id: string; name: string; shade: string; ball: BallState; hole: number; done: boolean;
-  golfer: THREE.Group; ballMesh: THREE.Mesh; tracer?: THREE.Line; hid?: boolean;
+  golfer: THREE.Group; look: Look; ballMesh: THREE.Mesh; tracer?: THREE.Line; hid?: boolean;
   anim?: { pts: THREE.Vector3[]; ts: number[]; t0: number; final: BallState };
   /** the cart (PRD/07): its view, the drawn state, the spawn slot; `driving` hides the golfer; `remote` is the last server report for others */
   cart: CartView; cs: CartState; slot: number; driving: boolean; remote?: Mover;
@@ -91,7 +107,8 @@ export class World {
     const rot = Math.atan2(-(h.pin.x - h.tee.x), h.pin.z - h.tee.z);
     players.forEach((p, i) => {
       const shade = SHADES[i % 4]!;
-      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')),
+      const look = this.makeGolfer(shade, p.name);
+      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')),
         cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
@@ -145,23 +162,70 @@ export class World {
     }
   }
   private makeGolfer(shade: string, name: string) {
-    const g = new THREE.Group(), box = (w: number, h: number, d: number, x: number, y: number, c = shade) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), this.mat(c)); m.position.set(x, y, 0); g.add(m);
+    const g = new THREE.Group(), box = new THREE.Group(), part = (w: number, h: number, d: number, x: number, y: number, c = shade) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), this.mat(c)); m.position.set(x, y, 0); box.add(m);
     };
-    box(0.22, 0.85, 0.25, -0.13, 0.43, '#333'); box(0.22, 0.85, 0.25, 0.13, 0.43, '#333'); box(0.55, 0.7, 0.3, 0, 1.2); box(0.15, 0.65, 0.2, -0.36, 1.15); box(0.15, 0.65, 0.2, 0.36, 1.15); box(0.28, 0.28, 0.28, 0, 1.75, '#ddd');
+    part(0.22, 0.85, 0.25, -0.13, 0.43, '#333'); part(0.22, 0.85, 0.25, 0.13, 0.43, '#333'); part(0.55, 0.7, 0.3, 0, 1.2); part(0.15, 0.65, 0.2, -0.36, 1.15); part(0.15, 0.65, 0.2, 0.36, 1.15); part(0.28, 0.28, 0.28, 0, 1.75, '#ddd');
     const c = document.createElement('canvas'); c.width = 256; c.height = 64; const x = c.getContext('2d')!;
     x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(0, 0, 256, 64); x.fillStyle = '#fff'; x.font = '36px system-ui'; x.textAlign = 'center'; x.fillText(name, 128, 44);
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(2, 0.5, 1); s.position.y = 2.4; g.add(s);
-    // swap the box stand-in for the generated golfer when it loads (the stand-in is the fallback); a disc in the player's colour sits under the feet
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(2, 0.5, 1); s.position.y = 2.4;
+    g.add(box, s);
+    const look: Look = { box, clubIdx: -1, clubToken: 0, walk: 0, last: new THREE.Vector3(NaN, 0, 0), speed: 0 };
+    this.setClubOn(look, DEFAULT_CLUB);
+    // swap the box stand-in for the rigged golfer once its manifest row is PASS (the stand-in is the fallback), polo in the player's colour
     void loadModel('golfer').then(model => {
-      if (!model) return;
-      for (const ch of [...g.children]) if (ch !== s) g.remove(ch);
-      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.7, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: shade })); disc.position.y = 0.03;
-      model.traverse(o => { o.castShadow = true; });
-      g.add(model, disc);
+      if (!model || !hasRig(model)) return;
+      tintPolo(model, shade); model.traverse(o => { o.castShadow = true; o.frustumCulled = false; });   // skinned: the bind-pose box does not follow the swing
+      const holder = new THREE.Group(); holder.add(model);
+      look.rig = new GolferRig(model); look.model = model; look.holder = holder;
+      g.remove(box); g.add(holder);
+      const idx = look.clubIdx; look.clubIdx = -1; this.setClubOn(look, idx);   // re-seat the club in the new hands
     });
-    g.traverse(o => { if (o instanceof THREE.Mesh) o.castShadow = true; });
-    return g;
+    box.traverse(o => { if (o instanceof THREE.Mesh) o.castShadow = true; });
+    return { g, look };
+  }
+  /** The club in a player's hands (BAG index): the code club at once, the generated one if it passes QA. */
+  setClub(id: string, idx: number) { const e = this.ents.get(id); if (e) this.setClubOn(e.look, idx); }
+  private setClubOn(look: Look, idx: number) {
+    if (look.clubIdx === idx || !CLUBS[idx]) return;
+    look.clubIdx = idx; const token = ++look.clubToken, spec = CLUBS[idx]!;
+    const seat = (club: THREE.Object3D) => {
+      look.club?.removeFromParent(); look.club = club; club.matrixAutoUpdate = false;
+      if (look.model) look.model.add(club); else { club.matrix.copy(BOX_GRIP); look.box.add(club); }
+    };
+    seat(makeCodeClub(spec));
+    void loadClub(spec).then(m => { if (m && token === look.clubToken) seat(m); });
+  }
+  /** The local player's stance this frame: backswing depth 0..1 (0 = address), or null when not in a stance. */
+  setStance(id: string, s: { depth: number; putt: boolean } | null) { const e = this.ents.get(id); if (e) e.look.stance = s ?? undefined; }
+  /** The swing was released: play the downswing, impact and finish from this depth at the ball. */
+  release(id: string, depth: number, putt: boolean) {
+    const e = this.ents.get(id); if (!e) return;
+    e.look.rel = { t0: performance.now(), depth, putt, at: V(e.ball.x, 0, e.ball.z), rotY: e.golfer.rotation.y };
+  }
+  /** Poses one golfer for this frame: release > stance > walk/idle; in a stance or swing it stands at the ball. */
+  private animate(e: Ent, now: number, dt: number) {
+    const L = e.look, pos = e.golfer.position;
+    if (Number.isFinite(L.last.x) && dt > 0) L.speed += (Math.hypot(pos.x - L.last.x, pos.z - L.last.z) / dt - L.speed) * (1 - Math.exp(-8 * dt));
+    L.last.copy(pos);
+    if (!L.rig || !L.model || !L.holder) return;
+    const spec = CLUBS[L.clubIdx] ?? CLUBS[DEFAULT_CLUB]!;
+    let target: Pose, at: THREE.Vector3 | null = null, putt = false;
+    if (L.rel) {
+      const r = releasePose(L.rel.depth, now - L.rel.t0, spec.length, L.rel.putt); target = r.pose; putt = L.rel.putt;
+      if (r.done) L.rel = undefined; else { at = L.rel.at; e.golfer.rotation.y = L.rel.rotY; }
+    } else if (L.stance) {
+      putt = L.stance.putt; target = putt ? puttPose(-L.stance.depth, spec.length) : backswingPose(L.stance.depth, spec.length); at = V(e.ball.x, 0, e.ball.z);
+    } else {
+      L.walk += strideRate(Math.min(L.speed, 6)) * dt;   // shortcut: the 15 m/s walk is drawn as a capped stride; a run cycle would suit it better
+      target = L.speed > 0.3 ? walkPose(L.walk, Math.min(1, L.speed / 3)) : POSES.idle;
+    }
+    L.cur = L.cur && !L.rel ? lerpPose(L.cur, target, 1 - Math.exp(-14 * dt)) : target;   // ease into stances and walks; the swing itself is exact
+    if (at) {   // address: target on the golfer's left, the club head at the ball
+      pos.copy(at); const h = addressPoint(spec.length, putt);
+      L.holder.rotation.y = -Math.PI / 2; L.holder.position.set(h[2], 0, -h[0]);   // Ry(-90°) takes the head point (x, z) to (-z, x); this cancels it
+    } else { L.holder.rotation.y = 0; L.holder.position.set(0, 0, 0); }
+    if (L.club) L.rig.apply(L.cur, L.club.matrix); else L.rig.apply(L.cur);
   }
   setBall(e: Ent, b: BallState) { e.ball = b; e.ballMesh.position.copy(V(b.x, 0.22, b.z)); e.ballMesh.visible = !b.holedOut; }
   placeGolfer(e: Ent, x: number, z: number, yawRad: number) { e.golfer.position.copy(V(x, 0, z)); e.golfer.rotation.y = -yawRad; }
@@ -222,7 +286,8 @@ export class World {
     for (const e of this.ents.values()) { // only players on my hole are drawn
       if (e.hole !== this.myHole) { e.hid = true; e.golfer.visible = false; e.ballMesh.visible = false; if (e.tracer) e.tracer.visible = false; }
       else if (e.hid) { e.hid = false; e.golfer.visible = true; e.ballMesh.visible = !e.ball.holedOut || !!e.anim; if (e.tracer) e.tracer.visible = true; }
-      e.cart.root.visible = !e.hid; if (!e.hid) e.golfer.visible = !e.driving;   // shortcut: the driver is hidden in the cart rather than seated; add a seated pose if it matters
+      e.cart.root.visible = !e.hid; if (!e.hid) e.golfer.visible = !e.driving;
+      if (e.golfer.visible) this.animate(e, now, dt);   // shortcut: the driver is hidden in the cart rather than seated; add a seated pose if it matters
     }
   }
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
