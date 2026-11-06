@@ -20,6 +20,8 @@ export interface Ent {
 }
 // Sim space is left-handed (x right, z forward); three is right-handed, so mirror x.
 const V = (x: number, y: number, z: number) => new THREE.Vector3(-x, y, z);
+/** Camera-to-ball distance under which your ball's beacon is hidden (address camera sits about 8 m back). */
+const BEACON_HIDE_M = 15;
 
 export class World {
   renderer: THREE.WebGLRenderer;
@@ -201,7 +203,9 @@ export class World {
       const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; e.golfer.rotation.y = -r.yaw;
     }
     const own = this.ents.get(this.selfId);
-    this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole;
+    // Hidden once you're at your ball: up close the tall beacon read as an aim line, which the owner ruled out.
+    const near = !!own && !own.anim && this.cam.position.distanceTo(own.ballMesh.position) < BEACON_HIDE_M;
+    this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole && !near;
     if (own) this.beacon.position.set(own.ballMesh.position.x, 0, own.ballMesh.position.z);
     for (const e of this.ents.values()) {
       const a = e.anim; if (!a) continue;
