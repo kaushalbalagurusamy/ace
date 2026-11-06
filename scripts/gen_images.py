@@ -22,7 +22,7 @@ if a.edit:   # multipart form: one image[] part per reference
     b = uuid.uuid4().hex; parts = []
     for k, v in fields.items(): parts.append(f'--{b}\r\nContent-Disposition: form-data; name="{k}"\r\n\r\n{v}\r\n'.encode())
     for p in a.edit:
-        parts.append(f'--{b}\r\nContent-Disposition: form-data; name="image[]"; filename="{pathlib.Path(p).name}"\r\nContent-Type: image/png\r\n\r\n'.encode() + pathlib.Path(p).read_bytes() + b"\r\n")
+        parts.append(f'--{b}\r\nContent-Disposition: form-data; name="image[]"; filename="{pathlib.Path(p).name}"\r\nContent-Type: image/{"jpeg" if p.lower().endswith((".jpg", ".jpeg")) else "png"}\r\n\r\n'.encode() + pathlib.Path(p).read_bytes() + b"\r\n")
     req = urllib.request.Request("https://api.openai.com/v1/images/edits", method="POST", data=b"".join(parts) + f"--{b}--\r\n".encode(),
           headers={"Authorization": f"Bearer {KEY}", "Content-Type": f"multipart/form-data; boundary={b}"})
 else:

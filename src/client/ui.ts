@@ -6,6 +6,7 @@ import { TIERS, TIER_LABEL, type Pref, type Tier } from './graphics';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
 import { BALL_STEPS, shotShape } from '../sim/delivery';
 import type { LobbyView } from '../server/lobby-types';
+import { Backdrop } from './backdrop';
 
 export const BAG = [
   { code: 'Digit1', key: '1', label: 'Driver' }, { code: 'Digit2', key: '2', label: '3W' }, { code: 'Digit3', key: '3', label: '18° UT' },
@@ -27,26 +28,81 @@ const ERR: Record<string, string> = {
 };
 export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ?? m.message;
 
-const HELP = `<details class="help" open><summary>How to play</summary><ul>
-<li><b>Move</b> with <b>W A S D</b> (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
-<li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
-<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. In the stance, a <b>Shift</b> tap switches to a <b>chip</b> (feet together, shoulders only: the whole meter is 0-25% power for fine touch). The <b>arrow keys</b> set the ball position on a 7x7 grid (the outer ring hits a stinger, hook, slice or towering shot) (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
-<li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
-<li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
-<li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>
-<li>First to hole out wins; fewer strokes only decides finishes within 1 second</li></ul></details>`;
+/** How to play, grouped; keep in step with the in-race key hints (#keys) and the prompts in main.ts. */
+const k = (...keys: string[]) => keys.map(x => `<kbd>${x}</kbd>`).join('');
+const HELP_GROUPS: [string, [string, string][]][] = [
+  ['Move', [[k('W', 'A', 'S', 'D'), 'Walk'], [k('Shift'), 'Walk at 5 m/s and halve the look speed for fine aim'], [k('Mouse'), 'Look and aim. Click the course to lock the mouse']]],
+  ['Swing', [[k('Space'), 'Take your stance at the ball; the mouse still aims'], [`Hold ${k('Space')}`, 'Backswing fills the meter. Release to hit; a short hold is a short shot'],
+    [`${k('Shift')} in stance`, '<b>Chip</b>: feet together, shoulders only; the whole meter is 0-25% power for fine touch'],
+    ['Hold into red', '<b>MAX effort</b>: +10% club speed, 25% less accurate'], [`${k('1')}–${k('0')} ${k('-', '=', 'O')}`, 'Pick a club, up until the backswing'], [k('Esc'), 'Cancel before you release']]],
+  ['Ball position (7x7)', [[k('↑', '↓'), 'Forward for a higher flight, back for a lower one; 3 back is a stinger'], [k('→', '←'), 'Away from you for a draw, closer for a fade; 3 steps is a hook or slice']]],
+  ['Putting', [[k('P'), 'The putter'], [`${k('Space')} hold, release`, 'Stance, draw back, strike: the longer the hold, the harder the putt']]],
+  ['Cart', [[k('E'), 'Get in or out of the Genesis cart (within 3 m)'], [k('W', 'A', 'S', 'D'), 'Drive. The mouse swings the chase camera']]],
+  ['Rangefinder', [[k('M'), 'Open or close the hole map'], ['Hover', 'Distance from your ball, to the pin and a club suggestion'], ['Click', 'Set a target and auto-pick the club']]],
+  ['Settings', [[`${k('Esc')} or ${k('⚙')}`, 'Camera sensitivity and graphics'], [k(',', '.'), 'Look speed down or up'], [k('N'), 'Mute'], [k('F3'), 'Frame rate']]],
+];
+const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" class="htp-head"><h2 id="htp-t">How to play</h2><button class="x" aria-label="Close">&times;</button></form>
+  <p class="lede">Race your friends around Pebble Beach. First to hole out wins; strokes only decide finishes within 1 second.</p>
+  <div class="htp-grid">${HELP_GROUPS.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>
+  <p class="foot">The red flag marks the pin, the yellow beacon your ball; white lines are out of bounds. After every shot a card shows carry, total, offline, ball position and effort.</p></dialog>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 export interface Row { id: string; name: string; hole: number; strokes: number; done: boolean }
 
 const CSS = `
 #ui{position:fixed;inset:0;z-index:1;pointer-events:none;font:14px system-ui;color:#eee}
-.scr{position:absolute;inset:0;background:#1c1c1c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:auto}
-.help{max-width:560px;font-size:13px;opacity:.9}.help ul{margin:4px 0 0;padding-left:18px;text-align:left}.help summary{cursor:pointer}
-.scr h1{font-size:56px;margin:0;letter-spacing:6px}
-.scr button,.scr input{font:inherit;padding:8px 14px;background:#444;color:#eee;border:1px solid #777;border-radius:3px}
-.scr button:disabled{opacity:.4}.scr button:not(:disabled){cursor:pointer}
-.box{background:#2a2a2a;padding:10px 14px;min-width:360px;border:1px solid #555}.row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0}
-.err{color:#e88;min-height:1.2em}
+#home{--ink:#f5f0e4;--mute:rgba(245,240,228,.72);--gold:#d6b45a;--green:#1f6b47;--glass:rgba(10,24,19,.58);--line:rgba(255,255,255,.16);
+  position:absolute;inset:0;pointer-events:auto;overflow:hidden;background:#0b1a14;color:var(--ink);font:400 15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.bd,.bd-l,.bd-scrim{position:absolute;inset:0}
+.bd-l{background:#0b1a14 center/cover no-repeat;opacity:0;transition:opacity 1.8s ease;will-change:opacity,transform}.bd-l.on{opacity:1}
+.bd-l.kb{animation:kb 10s linear forwards}@keyframes kb{from{transform:scale(1.04)}to{transform:scale(1.14) translate(var(--kx,2%),var(--ky,1%))}}
+.bd-scrim{background:radial-gradient(ellipse at 50% 45%,rgba(6,16,12,.15),rgba(6,16,12,.55) 75%),linear-gradient(180deg,rgba(6,16,12,.55),rgba(6,16,12,.1) 30%,rgba(6,16,12,.25) 65%,rgba(6,16,12,.8))}
+.bd-cap{position:absolute;left:max(16px,env(safe-area-inset-left));bottom:14px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-shadow:0 1px 3px #000}
+@media (prefers-reduced-motion:reduce){.bd-l{transition:none}.bd-l.kb{animation:none;transform:scale(1.04)}}
+.htp-btn{position:absolute;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));z-index:2;display:flex;align-items:center;gap:8px}
+.htp-btn i{font-style:normal;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;font-size:12px;font-weight:700}
+.scr{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:18px;padding:72px 16px 48px;box-sizing:border-box}.scr>:first-child{margin-top:auto}.scr>:last-child{margin-bottom:auto}
+.wm{font:600 clamp(64px,13vw,128px)/.9 "Playfair Display",Georgia,serif;margin:0;letter-spacing:.02em;text-shadow:0 4px 30px rgba(0,0,0,.45)}
+.wm span{color:var(--gold)}.wm.sm{font-size:clamp(40px,7vw,56px)}
+.tag{margin:-6px 0 6px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--mute);text-align:center}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);
+  padding:24px;width:min(520px,100%);box-sizing:border-box}
+.glass h2{font:600 24px/1.2 "Playfair Display",Georgia,serif;margin:0 0 4px}.glass .sub{margin:0 0 18px;color:var(--mute);font-size:14px}
+#home button{font:600 15px/1 Inter,system-ui,sans-serif;padding:12px 20px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--ink);cursor:pointer;transition:background .15s,transform .15s,box-shadow .15s}
+#home button:hover:not(:disabled){background:rgba(255,255,255,.16)}#home button:active:not(:disabled){transform:translateY(1px)}
+#home button:focus-visible,#home input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#home button:disabled{opacity:.45;cursor:not-allowed}
+#home button.pri{background:var(--gold);border-color:var(--gold);color:#14231b}#home button.pri:hover:not(:disabled){background:#e6c76d;box-shadow:0 6px 24px rgba(214,180,90,.35)}
+#home button.ghost{background:none;border-color:transparent;color:var(--mute)}#home button.ghost:hover{color:var(--ink);background:rgba(255,255,255,.06)}
+#home button.wide{width:100%}
+.scr label{display:block;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.scr input{width:100%;box-sizing:border-box;font:500 18px Inter,system-ui,sans-serif;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);color:var(--ink)}
+.scr input:focus{border-color:var(--gold)}
+.err{color:#ffb4a8;min-height:1.4em;font-size:14px;margin:8px 0}.err:empty{margin:0;min-height:0}
+.cards{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.card{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.card .meta{flex:1;min-width:0}.card b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.card small{color:var(--mute);font-size:13px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.chip{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.1);color:var(--ink)}
+.chip.ok{background:rgba(80,190,120,.22);color:#a9f0c2}.chip.warn{background:rgba(232,194,58,.2);color:#f3dc8a}.chip.live{background:rgba(214,69,69,.25);color:#ffb3b3}.chip.gold{background:rgba(214,180,90,.22);color:#f0d690}
+.empty{padding:22px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:14px}
+.av{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--green);color:#fff}
+.acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.acts .grow{flex:1}
+.count{font:600 64px/1 "Playfair Display",Georgia,serif;color:var(--gold);text-align:center;margin:0 0 12px}
+.hint{color:var(--mute);font-size:13px;margin:12px 0 0}
+.spons{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:14px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+#htp{width:min(1120px,calc(100% - 32px));max-height:calc(100% - 32px);box-sizing:border-box;padding:22px 26px;border-radius:20px;border:1px solid var(--line);background:rgba(10,22,17,.94);color:var(--ink);box-shadow:0 30px 90px rgba(0,0,0,.6)}
+#htp::backdrop{background:rgba(3,10,7,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.htp-head{display:flex;justify-content:space-between;align-items:center;margin:0}.htp-head h2{font:600 30px/1.1 "Playfair Display",Georgia,serif;margin:0}
+#home .x{width:40px;height:40px;padding:0;font-size:24px;font-weight:400}
+#htp .lede{color:var(--mute);margin:4px 0 14px}
+.htp-grid{columns:3 290px;column-gap:14px}
+.htp-grid section{break-inside:avoid;margin-bottom:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.htp-grid h3{margin:0 0 10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.kv{display:grid;grid-template-columns:124px 1fr;gap:10px;align-items:baseline;padding:4px 0;font-size:13.5px;line-height:1.4}.kv span:first-child{color:var(--mute);font-size:13px}
+kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;border-radius:6px;border:1px solid rgba(255,255,255,.25);border-bottom-width:2px;background:rgba(255,255,255,.08);font:600 12px/1.4 ui-monospace,Menlo,monospace;text-align:center;color:var(--ink)}
+#htp .foot{color:var(--mute);font-size:13px;margin:4px 0 0}
+.scr table{border-collapse:collapse;width:100%}.scr td,.scr th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}.scr th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+@media (max-width:520px){.tag{letter-spacing:.14em}.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
 #bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px}
 .slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
@@ -66,11 +122,11 @@ const CSS = `
 #keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
 #rf{position:absolute;inset:6% 12%;display:none;background:rgba(12,20,16,.94);border:2px solid #678;pointer-events:auto;padding:0}#rf canvas{width:100%;height:100%;display:block;cursor:crosshair}
 #rftip{position:absolute;pointer-events:none;background:rgba(0,0,0,.85);padding:6px 10px;border-radius:3px;display:none;white-space:pre;line-height:1.4}
-table{border-collapse:collapse;min-width:360px}td,th{padding:3px 10px;text-align:left}
 `;
 
 export class UI {
   root = document.getElementById('app')!;
+  private home = document.createElement('div');
   private scr = Object.assign(document.createElement('div'), { className: 'scr' });
   private hud = document.createElement('div');
   private mini!: HTMLCanvasElement;
@@ -88,7 +144,13 @@ export class UI {
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
       <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
-    this.root.append(this.scr, this.hud);
+    this.home.id = 'home';
+    this.home.append(new Backdrop().el, this.scr);
+    this.home.insertAdjacentHTML('beforeend', `<button class="htp-btn" aria-haspopup="dialog"><i>?</i><span>How to play</span></button><div class="spons">Callaway · Genesis</div>${HELP}`);
+    const dlg = this.home.querySelector('dialog')!;
+    this.home.querySelector<HTMLElement>('.htp-btn')!.onclick = () => dlg.showModal();
+    dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });   // a click on the dimmed area outside closes it; Esc closes natively
+    this.root.append(this.home, this.hud);
     this.mini = this.hud.querySelector('canvas')!;
     this.scr.addEventListener('click', e => {
       const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
@@ -96,39 +158,53 @@ export class UI {
     });
     this.scr.addEventListener('submit', e => e.preventDefault());
   }
-  screen(html: string | null) { this.scr.style.display = html ? '' : 'none'; if (html) this.scr.innerHTML = html; this.hud.style.display = html ? 'none' : ''; }
   /** HUD stays visible (race underneath) when html is null. */
-  showTouch() { this.screen(`<h1>Ace</h1><p>Keyboard required. Open this on a desktop or laptop.</p>`); }
-  showDown(msg: string) { this.screen(`<h1>Ace</h1><p>${esc(msg)}</p><p>Reconnecting...</p>`); }
+  screen(html: string | null) {
+    this.home.style.display = html ? '' : 'none'; if (html) this.scr.innerHTML = html; this.hud.style.display = html ? 'none' : '';
+    if (!html) this.home.querySelector('dialog')!.close();   // a modal left open in a hidden screen would make the race inert
+  }
+  private wm = (sm = true) => `<h1 class="wm${sm ? ' sm' : ''}">Ace<span>.</span></h1>`;
+  showTouch() { this.screen(`${this.wm(false)}<div class="glass"><h2>Keyboard required</h2><p class="sub">Open Ace on a desktop or laptop to play.</p></div>`); }
+  showDown(msg: string) { this.screen(`${this.wm()}<div class="glass"><h2>Reconnecting…</h2><p class="sub">${esc(msg)}</p></div>`); }
   showName(name: string, err = '') {
-    this.screen(`<h1>Ace</h1><form class="box"><div class="row"><label>Your name</label><input id="nm" value="${esc(name)}" maxlength="16" minlength="2" autofocus></div>
-      <div class="err">${esc(err)}</div><button data-act="name">Enter waiting room</button></form>`);
-    this.scr.querySelector('input')!.addEventListener('keydown', e => { if (e.key === 'Enter') this.act('name', {}, this.scr); });
+    this.screen(`${this.wm(false)}<p class="tag">A race around Pebble Beach Golf Links</p><form class="glass"><label for="nm">Your name</label>
+      <input id="nm" value="${esc(name)}" maxlength="16" minlength="2" autocomplete="nickname" placeholder="2 to 16 characters" autofocus>
+      <div class="err" role="alert">${esc(err)}</div><button class="pri wide" data-act="name" style="margin-top:16px">Enter the waiting room</button></form>`);
+    const input = this.scr.querySelector('input')!;
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') this.act('name', {}, this.scr); }); input.focus();
   }
   showMenu(m: { self: string; lobbies: LobbyView[]; lobby: LobbyView | null; error: string; count: number | null }) {
-    const err = `<div class="err">${esc(m.error)}</div>`;
+    const err = `<div class="err" role="alert">${esc(m.error)}</div>`;
+    const hostName = (l: LobbyView) => l.players.find(p => p.sessionId === l.hostSessionId)?.name ?? '—';
     if (m.lobby) {
       const l = m.lobby, host = l.hostSessionId === m.self, me = l.players.find(p => p.sessionId === m.self);
       const allReady = l.players.length >= 2 && l.players.every(p => p.ready);
-      this.screen(`<h1>Ace</h1><div class="box"><b>${esc(l.name)}</b>${l.players.map(p => `<div class="row"><span>${esc(p.name)}${p.sessionId === l.hostSessionId ? ' (host)' : ''}</span><span>${p.ready ? 'Ready' : 'Not ready'}</span></div>`).join('')}</div>
-        ${m.count !== null ? `<h2>Starting in ${m.count}</h2>` : ''}${err}
-        <div><button data-act="ready" data-v="${me?.ready ? '' : '1'}">${me?.ready ? 'Not ready' : 'Ready'}</button>
-        ${host ? `<button data-act="start" ${allReady ? '' : 'disabled'}>Start</button>` : ''}
-        ${host && l.players.length === 1 ? `<button data-act="solo">Solo time trial</button>` : ''}
-        <button data-act="leave">Leave lobby</button></div>${HELP}`);
+      this.screen(`${this.wm()}<div class="glass">${m.count !== null ? `<p class="count" aria-live="polite">${m.count}</p><p class="tag">Starting</p>` : ''}
+        <h2>${esc(l.name)}</h2><p class="sub">${l.players.length}/4 players · hosted by ${esc(hostName(l))}</p>
+        <div class="cards">${l.players.map(p => `<div class="card"><div class="av">${esc(p.name.slice(0, 1).toUpperCase())}</div><div class="meta"><b>${esc(p.name)}</b>
+          <div class="chips">${p.sessionId === l.hostSessionId ? '<span class="chip gold">Host</span>' : ''}${p.sessionId === m.self ? '<span class="chip">You</span>' : ''}</div></div>
+          <span class="chip ${p.ready ? 'ok' : ''}">${p.ready ? 'Ready' : 'Not ready'}</span></div>`).join('')}</div>${err}
+        <div class="acts"><button class="${me?.ready ? '' : 'pri'}" data-act="ready" data-v="${me?.ready ? '' : '1'}">${me?.ready ? 'Not ready' : 'Ready'}</button>
+        ${host ? `<button class="${me?.ready ? 'pri' : ''}" data-act="start" ${allReady ? '' : 'disabled'}>Start race</button>` : ''}
+        ${host && l.players.length === 1 ? `<button data-act="solo">Solo time trial</button>` : ''}<span class="grow"></span>
+        <button class="ghost" data-act="leave">Leave lobby</button></div>
+        ${host && !allReady ? `<p class="hint">${l.players.length < 2 ? 'Waiting for players. A race needs 2 to 4; or play a solo time trial.' : 'Start unlocks when everyone is ready.'}</p>` : !host ? '<p class="hint">The host starts the race once everyone is ready.</p>' : ''}</div>`);
       return;
     }
     const full = m.lobbies.length >= 3;
-    this.screen(`<h1>Ace</h1><h3>Waiting room</h3><div class="box">${m.lobbies.map(l => {
-      const can = l.state === 'open' && l.players.length < 4;
-      return `<div class="row"><span>${esc(l.name)} (${l.players.length}/4, ${l.state})</span><button data-act="join" data-id="${esc(l.id)}" ${can ? '' : 'disabled'}>Join</button></div>`;
-    }).join('') || 'No lobbies yet.'}</div>${err}
-      <button data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button>${HELP}`);
+    const status = (l: LobbyView) => l.state === 'open' ? (l.players.length >= 4 ? ['warn', 'Full'] : ['ok', 'Open']) : l.state === 'starting' ? ['warn', 'Starting'] : l.state === 'in_race' ? ['live', 'Racing'] : ['', 'Results'];
+    this.screen(`${this.wm()}<div class="glass"><h2>Waiting room</h2><p class="sub">Join a lobby or start your own. Up to 4 players race in each.</p><div class="cards">${m.lobbies.map(l => {
+      const can = l.state === 'open' && l.players.length < 4, [cls, txt] = status(l);
+      return `<div class="card"><div class="meta"><b>${esc(l.name)}</b><small>Host ${esc(hostName(l))}</small>
+        <div class="chips"><span class="chip">${l.players.length}/4 players</span><span class="chip ${cls}">${txt}</span></div></div>
+        <button data-act="join" data-id="${esc(l.id)}" ${can ? '' : 'disabled'} aria-label="Join ${esc(l.name)}">Join</button></div>`;
+    }).join('') || '<div class="empty">No lobbies yet. Create one and invite your friends.</div>'}</div>${err}
+      <button class="pri wide" data-act="create" ${full ? 'disabled' : ''}>${full ? 'All 3 lobbies in use' : 'Create lobby'}</button></div>`);
   }
   showResults(rows: { place: number; name: string; timeS?: number; strokes: number }[]) {
-    this.screen(`<h1>Results</h1><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
+    this.screen(`${this.wm()}<div class="glass"><h2>Results</h2><table><tr><th>Place</th><th>Name</th><th>Time</th><th>Strokes</th></tr>${rows.map(r =>
       `<tr><td>${r.place}</td><td>${esc(r.name)}</td><td>${r.timeS === undefined ? 'DNF' : this.clock(r.timeS)}</td><td>${r.strokes}</td></tr>`).join('')}</table>
-      <button data-act="back">Back to waiting room</button>`);
+      <button class="pri wide" data-act="back" style="margin-top:18px">Back to waiting room</button></div>`);
   }
   clock(s: number) { s = Math.max(0, s); return `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, '0')}`; }
 
