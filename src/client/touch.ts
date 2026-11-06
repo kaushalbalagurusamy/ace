@@ -21,7 +21,7 @@ export function pullToHoldMs(pullPx: number, screenH: number, capped: boolean): 
 const TEXT: [string | RegExp, string][] = [
   ['Space: take your stance', 'Swing: stance'], [/E: get (in|out)/g, 'Cart: get $1'], ['WASD drive', 'Pull to drive'],
   ['Close the rangefinder (M) to swing', 'Close the map to swing'], ['Hold Space, release to putt', 'Pull down, release to putt'],
-  ['Hold Space, release to hit · Shift: chip', 'Pull down, release to hit · Chip button'], ['hold Space, release · Shift: full swing', 'pull down, release · Chip: full swing'],
+  ['Hold Space, release to hit · Shift: chip', 'Pull down, release to hit'], ['hold Space, release · Shift: full swing', 'pull down, release · Chip: full swing'],
   ['hold on for MAX effort', 'pull further for MAX effort'],
 ];
 export const touchText = (s: string) => TEXT.reduce((t, [a, b]) => t.replace(a, b), s);
@@ -44,7 +44,7 @@ ${['shift','map','cart','swing','bl','bu','br','bc','aiml','bd','aimr','chip','x
 #stick i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;background:rgba(255,255,255,.55)}
 body.touch #mini canvas{width:67px;height:94px}body.touch #meter{width:min(170px,50vw);padding:3px 8px;font-size:11px}body.touch #prompt{font-size:11px;padding:3px 10px}body.touch #info{font-size:11px;padding:3px 8px}
 body.touch #lb,body.touch #gear{pointer-events:auto;top:max(56px,calc(env(safe-area-inset-top) + 46px))}body.touch #gear{font-size:20px;padding:4px 10px}body.touch #lb .lbh{display:none}body.touch .slot{width:30px;height:30px;font-size:10px}body.touch .slot.on{width:48px;height:48px;font-size:13px}body.touch #meter #mlabel{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (orientation:portrait){body.touch #info{bottom:auto;top:max(104px,calc(env(safe-area-inset-top) + 96px))}}
+
 body.touch #lb{left:max(64px,calc(env(safe-area-inset-left) + 54px))}
 body.touch #meter{bottom:auto;top:max(116px,26%)}body.touch #prompt{bottom:auto;top:calc(max(116px,26%) + 48px);max-width:80vw;text-align:center}
 body.touch #rf{inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 150px max(10px,env(safe-area-inset-left));touch-action:none}

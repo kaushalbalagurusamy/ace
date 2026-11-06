@@ -160,12 +160,12 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 #lie .lp{display:none}#lie.open .lp{display:block;position:absolute;bottom:42px;left:0;width:280px;background:rgba(10,24,19,.82);padding:8px 10px;border-radius:14px;border:1px solid rgba(255,255,255,.16)}#lie canvas{float:left;margin:2px 8px 0 0}
 #bpos{left:max(10px,env(safe-area-inset-left));bottom:100px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
-#pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
+#pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}#pin span,#arrow span{display:inline-block;margin-top:3px;padding:3px 10px;border-radius:999px;font:600 13px/1.25 Inter,system-ui,-apple-system,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.01em;text-shadow:none;color:#f5f0e4;background:rgba(10,24,19,.58);border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 4px 14px rgba(0,0,0,.3);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}#arrow span{color:#d6b45a}
 #gear{left:max(10px,env(safe-area-inset-left));top:max(56px,calc(env(safe-area-inset-top) + 48px));cursor:pointer;font-size:16px;padding:2px 8px;border-radius:999px;pointer-events:auto;user-select:none}
 #settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(10,22,17,.92);border-radius:18px}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}#settings select{margin-left:8px;font:inherit}
 #fps{right:10px;top:236px;display:none;font:12px/1.4 ui-monospace,monospace;white-space:pre}
 #banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
-#arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
+#arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #d6b45a}
 #keys{left:50%;bottom:4px;transform:translateX(-50%);font-size:10px;opacity:.6;background:none;padding:0;white-space:nowrap;text-shadow:0 1px 2px #000}
 #rf{position:absolute;inset:6% 12%;display:none;background:rgba(12,20,16,.94);border:2px solid #678;pointer-events:auto;padding:0}#rf canvas{width:100%;height:100%;display:block;cursor:crosshair}
 .sctw{overflow-x:auto;max-width:100%}.sct{border-collapse:collapse;font:12px/1.3 system-ui;white-space:nowrap;width:auto}
@@ -192,7 +192,7 @@ export class UI {
       <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div><div class="hud" id="lie"><div class="lp"><canvas width="54" height="54"></canvas><div></div></div><button id="liei" title="Lie and stance (I)"><span class="gb">&#9432;</span><span></span></button></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
       <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · Tab scorecard · I lie · N mute · , . look speed · F3 FPS</div>
-      <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
+      <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#f5f0e4" stroke-width="2" stroke-linecap="round"/><path d="M5 3 L24 9 L5 15 Z" fill="rgba(214,180,90,.82)" stroke="#f5f0e4" stroke-width="1.2" stroke-linejoin="round"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
       <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="smute">Mute / unmute (N)</button> <button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div class="hud" id="sc"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.home.id = 'home';
@@ -286,8 +286,8 @@ export class UI {
     this.hud.querySelectorAll<HTMLElement>('#bag .slot').forEach(e => { e.textContent = BAG[i + Number(e.dataset.d)]?.label ?? ''; });
     if (was !== i) { const c = this.$('bag').children[1]!; c.classList.add('pop'); setTimeout(() => c.classList.remove('pop'), 200); }
   }
-  info(hole: HoleInfo, yards: number, _lie: string, clock: string, strokes: number) {
-    this.$('info').textContent = `H${hole.index + 1} · Par ${hole.par} · ${strokes} stroke${strokes === 1 ? '' : 's'} · ${Math.round(yards)} yd · ${clock.replace(/\.\d$/, '')}`;
+  info(hole: HoleInfo, _yards: number, _lie: string, clock: string, strokes: number) {
+    this.$('info').textContent = `H${hole.index + 1} · Par ${hole.par} · ${strokes} stroke${strokes === 1 ? '' : 's'} · ${clock.replace(/\.\d$/, '')}`;
   }
   /** Lie panel open state, remembered per device. */
   lieOpen = (() => { try { return localStorage.getItem('ace.lieOpen') === '1'; } catch { return false; } })();
@@ -336,7 +336,7 @@ export class UI {
     const p = m.onScreen ? { x: m.x, y: m.y - 22 } : edgePoint(m.dir, innerWidth, innerHeight, 90);
     e.style.left = `${p.x - 55}px`; e.style.top = `${p.y - 15}px`;
     (e.querySelector('svg') as SVGElement).style.transform = m.onScreen ? '' : `rotate(${m.dir + Math.PI / 2}rad)`;
-    e.querySelector('span')!.textContent = `Pin ${Math.round(yards)} yd`;
+    e.querySelector('span')!.textContent = `${Math.round(yards)} yd`;
   }
   /** Settings panel (camera sensitivity slider); callbacks keep the slider, the keys and the saved setting in one place. */
   bindSettings(get: () => number, set: (v: number) => void, reset: () => void) {
@@ -373,7 +373,7 @@ export class UI {
     const e = this.$('arrow'); if (!m || m.onScreen) { e.style.display = 'none'; return; }
     const cx = innerWidth / 2, cy = innerHeight / 2, r = Math.min(cx, cy) - 70, x = cx + Math.cos(m.dir) * r * (innerWidth / innerHeight > 1 ? 1.5 : 1), y = cy + Math.sin(m.dir) * r;
     e.style.display = 'block'; e.style.left = `${Math.min(innerWidth - 100, Math.max(10, x - 45))}px`; e.style.top = `${Math.min(innerHeight - 70, Math.max(10, y - 20))}px`;
-    (e.firstElementChild as HTMLElement).style.transform = `rotate(${m.dir + Math.PI / 2}rad)`; (e.lastElementChild as HTMLElement).textContent = `ball ${Math.round(yards)} yd`;
+    (e.firstElementChild as HTMLElement).style.transform = `rotate(${m.dir + Math.PI / 2}rad)`; (e.lastElementChild as HTMLElement).textContent = `Ball ${Math.round(yards)} yd`;
   }
   /** Expanded mini map: terrain, markers, the target and the line from the ball to the hovered point (PRD/02 section 7). */
   drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null, heading = 0) {
