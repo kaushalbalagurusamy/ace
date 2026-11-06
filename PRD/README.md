@@ -18,6 +18,7 @@ Up to four players race through 18 holes of golf in a browser. Players join from
 | [04-race-rules-and-results.md](04-race-rules-and-results.md) | Race flow, timing, penalties, ranking with the 1-second rule, results |
 | [05-scope-risks-and-plan.md](05-scope-risks-and-plan.md) | What fits by tonight, risks, build order, tests |
 | [06-assets-and-pebble-beach.md](06-assets-and-pebble-beach.md) | Asset list, generation platforms for 3D and audio, the Pebble Beach map |
+| [07-cart.md](07-cart.md) | The Genesis Box Buggy golf cart: driving, where carts may go, bumps, server checks, model and sound |
 
 ## How to read the tags
 

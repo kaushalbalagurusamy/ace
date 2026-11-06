@@ -81,7 +81,7 @@ export class UI {
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">Arrows move · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed</div>
+      <div class="hud" id="keys">Arrows move / drive · E cart · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
       <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
