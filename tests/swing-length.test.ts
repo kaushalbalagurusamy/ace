@@ -37,7 +37,7 @@ describe('SS-7 effortFromHold: the server decides length and max effort from the
 
 describe('SS-3 length controls distance smoothly', () => {
   it('speed factor: anchored at the documented points, monotone, continuous, 1 at full', () => {
-    const pts: [number, number][] = [[0.05, 0.18], [0.25, 0.5], [0.5, 0.68], [0.75, 0.86], [1, 1]];
+    const pts: [number, number][] = [[0.05, 0.25], [0.25, 0.62], [0.5, 0.76], [0.75, 0.86], [1, 1]];
     for (const [L, f] of pts) expect(lengthSpeedFactor(L), `L=${L}`).toBeCloseTo(f, 10);
     let prev = lengthSpeedFactor(0.05);
     for (let L = 0.06; L <= 1.0001; L += 0.01) { const f = lengthSpeedFactor(Math.min(1, L)); expect(f).toBeGreaterThan(prev); expect(f - prev).toBeLessThan(0.02); prev = f; }
@@ -54,8 +54,8 @@ describe('SS-3 length controls distance smoothly', () => {
     expect(carryYd('O', MIN_LENGTH)).toBeGreaterThan(2); expect(carryYd('O', MIN_LENGTH)).toBeLessThan(20);
     const ys = LENGTHS.map(L => carryYd('O', L)); for (let i = 1; i < ys.length; i++) { expect(ys[i]!).toBeGreaterThan(ys[i - 1]!); expect(ys[i]! - ys[i - 1]!).toBeLessThan(45); }
   });
-  it('literal anchors: speed factor 0.5 at 25% and 0.86 at 75%; putt speeds 1.05, 7.5 and 15 m/s at 0.07, 0.5 and 1', () => {
-    expect(lengthSpeedFactor(0.25)).toBe(0.5); expect(lengthSpeedFactor(0.75)).toBe(0.86);
+  it('literal anchors: speed factor 0.62 at 25% and 0.86 at 75%; putt speeds 1.05, 7.5 and 15 m/s at 0.07, 0.5 and 1', () => {
+    expect(lengthSpeedFactor(0.25)).toBeCloseTo(0.62, 12); expect(lengthSpeedFactor(0.75)).toBe(0.86);
     expect(puttSpeedMs(0.07)).toBeCloseTo(1.05, 10); expect(puttSpeedMs(0.5)).toBe(7.5); expect(puttSpeedMs(1)).toBe(15);
     for (const drawMs of [75, 105, 183, 600, 1500]) expect(puttSpeedMs(drawMs / 1500)).toBeCloseTo((drawMs / 1500) * 15, 10);
   });

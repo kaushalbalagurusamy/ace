@@ -1,10 +1,8 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, LAND_ROLL_FRACTION, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
+import { BAG, bounceRoll, captureSpeed, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
 import type { Lie, TrajectoryPoint } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
-const CUP_RADIUS_M = 0.054;
-const HOLE_SPEED_MS = 1.6;
 const DROP_WAIT_S = 2;
 const TEE_RADIUS_M = 3; // a ball this close to the hole's tee is teed up
 const DT = 1 / 60;
@@ -19,7 +17,7 @@ export interface Played {
 }
 export interface ShotReq { clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; seed?: number }
 
-/** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Stops at the cup if it passes slow enough. */
+/** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Drops if it crosses the cup below the capture speed for its offset. */
 function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number, a: number, t0: number) {
   const pts: TrajectoryPoint[] = [];
   if (v0 <= 0 || !Number.isFinite(a)) return { pts, x, z, t: t0, holed: false };
@@ -28,7 +26,7 @@ function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number,
   const sStar = Math.min(L, Math.max(0, (pin.x - x) * dx + (pin.z - z) * dz));
   const d = Math.hypot(x + dx * sStar - pin.x, z + dz * sStar - pin.z);
   const vAt = Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sStar));
-  const holed = d <= CUP_RADIUS_M && vAt <= HOLE_SPEED_MS;
+  const holed = vAt < captureSpeed(d);
   const sEnd = holed ? sStar : L;
   const tEnd = (v0 - Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sEnd))) / a;
   const at = (s: number, t: number) => ({ t: t0 + t, p: { x: x + dx * s, y: 0, z: z + dz * s } });
@@ -88,7 +86,11 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   if (!h.outOfBounds(x, z)) {
     const hx = last.p.x - before.p.x, hz = last.p.z - before.p.z, hd = Math.hypot(hx, hz);
     if (hd > 0) {
-      const r = roll(h, x, z, hx / hd, hz / hd, LAND_ROLL_FRACTION * sim.landingSpeedMs, rollingDecel(h.surfaceAt(x, z)), last.t);
+      const dx = hx / hd, dz = hz / hd, run = bounceRoll(sim.landing, h.surfaceAt(x, z));   // bounces off the landing turf, rolls on the turf it settles on
+      for (const p of run.hops) samples.push({ t: last.t + p.t, p: { x: x + dx * p.s, y: p.y, z: z + dz * p.s } });
+      x += dx * run.hopM; z += dz * run.hopM; flightS = samples.at(-1)!.t;
+      const back = run.rollMs < 0 ? -1 : 1;                                                   // a checked wedge spins back
+      const r = roll(h, x, z, back * dx, back * dz, Math.abs(run.rollMs), rollingDecel(h.surfaceAt(x, z)), flightS);
       samples.push(...r.pts); ({ x, z, t: flightS, holed } = r);
     }
   }

@@ -7,7 +7,7 @@ FULL SWING
 1. First Space press near the ball: take the stance and lock the aim (WASD off).
 2. Second Space press and HOLD: the backswing turns at a fixed tempo, a full turn in 750 ms (`FULL_TURN_MS`, config). A length meter fills on the HUD.
 3. RELEASE Space = the top of the swing. Holding past full pauses at the top. **Length** = fraction reached, continuous, clamped to 0.05 to 1.0.
-4. Z, X, C are timed **relative to the Space release** (it replaces "top"). Their ideal offsets and the error window scale with length (`durationScale`, piecewise-linear through 0.25 -> 0.6, 0.5 -> 0.75, 0.75 -> 0.9, 1 -> 1, and 0.05 -> 0.48). Club speed = full speed x `lengthSpeedFactor(length)`, piecewise-linear through 0.25 -> 0.5, 0.5 -> 0.68, 0.75 -> 0.86, 1 -> 1, and 0.05 -> 0.18.
+4. Z, X, C are timed **relative to the Space release** (it replaces "top"). Their ideal offsets and the error window scale with length (`durationScale`, piecewise-linear through 0.25 -> 0.6, 0.5 -> 0.75, 0.75 -> 0.9, 1 -> 1, and 0.05 -> 0.48). Club speed = full speed x `lengthSpeedFactor(length)`, piecewise-linear through 0.25 -> 0.62, 0.5 -> 0.76, 0.75 -> 0.86, 1 -> 1, and 0.05 -> 0.25 (retuned for the TrackMan calibration, docs/slices/trackman-calibration; was 0.5 / 0.68 / 0.18).
 PUTTER
 - Same steps 1 and 2; **releasing Space strikes the ball**. Speed = 15 m/s x length (the old `drawMs / 1500 x 15` curve with draw = length x 1500 ms). Hold-Z putting is removed; Z, X, C do nothing with the putter.
 BOTH

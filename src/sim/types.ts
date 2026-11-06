@@ -1,5 +1,5 @@
 // Contract for the pure simulation (server-owned). Units are SI unless a name says otherwise.
-// See PRD/02 §3, PRD/03, PRD/04. Constants are placeholders until PRD/03 §8 sources are checked.
+// See PRD/02 §3, PRD/03, PRD/04. Physics constants cite docs/research/trackman-physics.md.
 
 export interface Vec3 { x: number; y: number; z: number }
 
@@ -35,19 +35,24 @@ export interface Launch {
   /** degrees, + tilts the spin axis so the ball curves right (right-hand golfer) */ spinAxisDeg: number;
 }
 export interface TrajectoryPoint { t: number; p: Vec3 }
+/** The ball as it first meets the ground: speed (m/s), descent angle (degrees below horizontal), backspin (rpm, + = backspin). */
+export interface Landing { speedMs: number; angleDeg: number; spinRpm: number }
 export interface ShotResult {
-  /** Sampled at 60 Hz from a 240 Hz RK4 integration; first sample is t=0 at launch position. */
+  /** Flight only, sampled at 60 Hz from a 120 Hz RK4 integration; first sample is t=0 at launch position, last is the landing. */
   samples: TrajectoryPoint[];
   carryM: number;
   totalM: number;
   /** signed lateral miss from the target line in metres, + = right */ offlineM: number;
   flightTimeS: number;
-  /** horizontal speed (m/s) at first ground contact; roll-out starts from LAND_ROLL_FRACTION of it */ landingSpeedMs: number;
+  /** highest point of the flight (m) */ apexM: number;
+  landing: Landing;
 }
-/** Flat fairway, no wind, ISA sea level, ball starts at origin heading along +z (target line); x is right, y up.
+/** Flat fairway, no wind, standard air (21 °C, 50% RH, sea level) unless `air` says otherwise; ball starts at origin heading along +z
+ *  (target line); x is right, y up. carry/total/offline include the bounce and roll on flat fairway (bounceRoll).
  *  Deterministic: same Launch => identical ShotResult (bitwise-equal numbers). */
-// contract: export function simulateShot(launch: Launch): ShotResult;
-// contract: export const LAND_ROLL_FRACTION: number; // shared by the sim and the server's surface roll
+// contract: export function simulateShot(launch: Launch, air?: Air): ShotResult;
+// contract: export function bounceRoll(landing: Landing, surface: Surface): RunOut; // shared by the sim and the server's surface roll
+// contract: export function captureSpeed(offsetM: number): number; // max speed (m/s) at which a ball crossing the cup at this offset drops
 
 export interface Club { key: string; label: string; loftDeg: number; maxClubSpeedMph: number }
 // contract: export const BAG: readonly Club[];
@@ -59,7 +64,7 @@ export interface Club { key: string; label: string; loftDeg: number; maxClubSpee
 // contract: export function isValidLength(n: unknown): n is number;      // any finite number (clamping is separate)
 // contract: export function clampLength(n: number): number;               // clamp to [MIN, MAX]; RangeError if not finite
 // contract: export function lengthFromHold(heldMs: number): number;       // clampLength(heldMs / FULL_TURN_MS); RangeError if not finite
-/** Club-speed multiplier: piecewise-linear through (0.05,0.18) (0.25,0.5) (0.5,0.68) (0.75,0.86) (1,1). RangeError outside [0.05,1]. */
+/** Club-speed multiplier: piecewise-linear through (0.05,0.25) (0.25,0.62) (0.5,0.76) (0.75,0.86) (1,1). RangeError outside [0.05,1]. */
 // contract: export function lengthSpeedFactor(length: number): number;
 /** Putt ball speed (m/s) = 15 x length (the old drawMs/1500 x 15 curve). RangeError outside [0.05,1]. */
 // contract: export function puttSpeedMs(length: number): number;

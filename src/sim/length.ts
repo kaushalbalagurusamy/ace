@@ -30,8 +30,8 @@ function interp(pts: Pts, x: number): number {
   return pts[pts.length - 1]![1];
 }
 
-/** Tunable config. Club speed by length, tuned so a perfect 25% 62-degree swing carries 40 to 75 yd. */
-const SPEED: Pts = [[0.05, 0.18], [0.25, 0.5], [0.5, 0.68], [0.75, 0.86], [1, 1]];
+/** Tunable config. Club speed by length, tuned so a perfect 25% 62-degree swing carries 40 to 75 yd (45 yd on the TrackMan-calibrated model). */
+const SPEED: Pts = [[0.05, 0.25], [0.25, 0.62], [0.5, 0.76], [0.75, 0.86], [1, 1]];
 
 export function lengthSpeedFactor(length: number): number { assertLength(length); return interp(SPEED, length); }
 /** Putt ball speed (m/s): 15 m/s x length, the old drawMs / 1500 x 15 curve. */
