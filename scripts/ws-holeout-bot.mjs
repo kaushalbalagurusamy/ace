@@ -2,7 +2,7 @@
 // Default 18 holes (C18-5). Run against a LOCAL server unless the supervisor says otherwise.
 // Aim is computed from the ball's reported position, shots use perfect scaled timings.
 import WebSocket from 'ws';
-import { BAG, launchFor, simulateShot } from '../src/sim/index.ts';
+import { BAG, PUTT_MAX_MS, launchFor, simulateShot } from '../src/sim/index.ts';
 const url = process.argv[2] ?? 'ws://localhost:3170/ws', HOLES = Number(process.argv[3] ?? 18);
 const w = new WebSocket(url), got = [];
 w.on('message', d => got.push(JSON.parse(d)));
@@ -32,7 +32,7 @@ const next = async (msg) => { const n = got.length; send(msg); let r;
 const finished = () => got.some(m => m.t === 'raceEnd');
 while (!finished() && shots < 14 * HOLES) {
   const d = dist(), yd = d * YD, onGreen = surface === 'green'; let msg;
-  if (onGreen) { const v0 = Math.sqrt(2 * 0.5486 * d + 1.1); msg = { t: 'putt', aimDeg: aim(), holdMs: Math.round(Math.min(1, Math.max(0.05, v0 / 15)) * 750) }; }
+  if (onGreen) { const v0 = Math.sqrt(2 * 0.5486 * d + 1.1); msg = { t: 'putt', aimDeg: aim(), holdMs: Math.round(Math.min(1, Math.max(0.05, (v0 / PUTT_MAX_MS) ** 2)) * 750) }; } // inverse of puttSpeedMs
   else { const pick = choose(yd);
     msg = { t: 'shot', clubKey: pick.club, aimDeg: aim(), holdMs: Math.round(pick.L * 750) }; }
   const r = await next(msg); shots++;
