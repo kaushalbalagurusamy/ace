@@ -22,3 +22,6 @@ __pycache__/
 
 # Motion QA composites contain reference frames/photos: critic-only, never committed (the renders are)
 assets/qa/motion/**/compare*
+
+# Realism side-by-sides contain real reference photos: never commit them (our renders next to them are committed)
+assets/qa/realism/*-side.jpg

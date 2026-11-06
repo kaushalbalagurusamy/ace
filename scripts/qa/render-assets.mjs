@@ -26,7 +26,7 @@ const T = { '.js': 'text/javascript', '.wasm': 'application/wasm', '.glb': 'mode
 const srv = http.createServer(async (q, res) => { try { const p = new URL(q.url, 'http://x').pathname; if (p === '/') { res.writeHead(200, { 'content-type': 'text/html' }); return res.end(HTML); }
   if (!/^\/(node_modules\/three|assets\/models)\//.test(p)) { res.writeHead(404); return res.end(); } const b = await readFile(join(ROOT, p)); res.writeHead(200, { 'content-type': T[extname(p)] ?? 'application/octet-stream' }); res.end(b); } catch { res.writeHead(404); res.end(); } }).listen(0, '127.0.0.1');
 await new Promise(r => srv.on('listening', r)); const port = srv.address().port;
-const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const browser = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] } : { args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 640, height: 640 } }); page.on('pageerror', e => console.log('PAGEERR', e.message));
 await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'domcontentloaded' });
 const out = {};

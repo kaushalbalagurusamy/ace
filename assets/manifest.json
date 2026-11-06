@@ -1462,40 +1462,50 @@
     "tier": "API",
     "quality": "high",
     "size": "2048x2048",
-    "prompt": "Seamless tileable texture, top-down orthographic photograph of raked golf bunker sand at Pebble Beach Golf Links, fine pale sand with soft shallow rake marks and individual grains in sharp focus filling the whole frame, cream colour close to #E3D3A8, no footprints, no grass, no stones. Soft even overcast light, no shadows, no perspective, no horizon, no mowing stripes, no objects, no text, no logos. Photographic, high detail, perfectly seamless: left/right and top/bottom edges match.",
+    "prompt": "Image 1 is a real photo of a bunker at Pebble Beach Golf Links. Make a seamless tileable texture: a top-down orthographic photograph of that bunker sand, filling the frame: bright, very pale cream-white crushed sand (#EEE3E1 in sun), fine grain, faint shallow rake lines, a few tiny darker grains, no grass, no footprints, no shadows of objects, even light, edges wrap seamlessly.",
     "date": "2026-11-05",
     "usage": {
-      "input_tokens": 117,
+      "input_tokens": 797,
       "input_tokens_details": {
-        "image_tokens": 0,
-        "text_tokens": 117
+        "image_tokens": 704,
+        "text_tokens": 93
       },
       "output_tokens": 14272,
       "output_tokens_details": {
         "image_tokens": 14272,
         "text_tokens": 0
       },
-      "total_tokens": 14389
+      "total_tokens": 15069
     },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/bunker-close.png"
+    ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)",
-    "sha256": "5a9abc4132bfe2dd0de547d6d493f61d9e52dd35047be0bbabc509495bbd9aa7",
-    "shipped_bytes": 1586256,
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/bunker-close.jpg"
+    ],
+    "sha256": "a8248bd0808398c4139fc6f66eb27c5a1e60c2025d8cdf296e486d62ff537f6b",
+    "shipped_bytes": 1327455,
     "variants": {
       "2048": {
         "file": "assets/textures/turf/2048/turf-sand.jpg",
-        "sha256": "5a9abc4132bfe2dd0de547d6d493f61d9e52dd35047be0bbabc509495bbd9aa7",
-        "bytes": 1586256
+        "sha256": "a8248bd0808398c4139fc6f66eb27c5a1e60c2025d8cdf296e486d62ff537f6b",
+        "bytes": 1327455
       },
       "1024": {
         "file": "assets/textures/turf/1024/turf-sand.jpg",
-        "sha256": "ec8125d0f02444a0ccba687061b5f389ce4a45866fa8036aff3cb86b9aa3d92d",
-        "bytes": 468090
+        "sha256": "2ff169b0e80fec8bb7730c7a379ab1955dccd9ba2e21f4edb8eaee7981779d45",
+        "bytes": 374331
       },
       "512": {
         "file": "assets/textures/turf/512/turf-sand.jpg",
-        "sha256": "102860c55765b92754de46058d8d8c1eb02d0eeaf7cfcfd6d2443c1f63b82eaf",
-        "bytes": 105074
+        "sha256": "245c5207337fe3d75b99cae2f1c61745cc0e48942cd32f3fdb780ae41961819d",
+        "bytes": 74380
       }
     },
     "source_png": "assets/images/turf-sand.png",
@@ -2118,5 +2128,809 @@
     "wheel_r": 0.22,
     "ground_y": -0.43,
     "stretch_y": 1.25
+  },
+  {
+    "id": "turf-sand-v1",
+    "file": "superseded (not shipped)",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x2048",
+    "prompt": "Seamless tileable texture, top-down orthographic photograph of raked golf bunker sand at Pebble Beach Golf Links, fine pale sand with soft shallow rake marks and individual grains in sharp focus filling the whole frame, cream colour close to #E3D3A8, no footprints, no grass, no stones. Soft even overcast light, no shadows, no perspective, no horizon, no mowing stripes, no objects, no text, no logos. Photographic, high detail, perfectly seamless: left/right and top/bottom edges match.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 117,
+      "input_tokens_details": {
+        "image_tokens": 0,
+        "text_tokens": 117
+      },
+      "output_tokens": 14272,
+      "output_tokens_details": {
+        "image_tokens": 14272,
+        "text_tokens": 0
+      },
+      "total_tokens": 14389
+    },
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "build session (script)",
+    "sha256": "5a9abc4132bfe2dd0de547d6d493f61d9e52dd35047be0bbabc509495bbd9aa7",
+    "shipped_bytes": 1586256,
+    "source_png": "assets/images/turf-sand.png",
+    "post_process": "made seamless (variance-preserving half-offset smoothstep blend, x then y), resized to 2048/1024/512, JPEG q80/84/86 4:2:0 (ImageMagick, scripts/turf_tiles.py); original PNG kept local; normal and roughness are derived in the client",
+    "superseded_by": "turf-sand (photo-seeded white sand, 2026-11-05)"
+  },
+  {
+    "id": "concept-cypress-a",
+    "file": "assets/images/concept-cypress-a.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of Monterey cypress trees at Pebble Beach. Create a reference image of ONE Monterey cypress tree exactly like the LEFT tree in the photo: a tall bare grey trunk that leans and twists, a few bare branches, and a flat-topped wind-sculpted crown of dense dark green foliage pads spreading sideways like a table top. Keep the real colours: foliage #232C22 to #516051, bark grey-brown. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 855,
+      "input_tokens_details": {
+        "image_tokens": 704,
+        "text_tokens": 151
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7879
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/lone-cypress.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-cypress-b",
+    "file": "assets/images/concept-cypress-b.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of Monterey cypress trees on granite at Point Lobos, beside Pebble Beach. Create a reference image of ONE Monterey cypress like the trees in the photo: a short twisted multi-stem trunk, branches swept to one side by the sea wind, a broad flat layered crown of dark green foliage pads, wider than it is tall. Real colours: foliage #232C22 to #516051. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 848,
+      "input_tokens_details": {
+        "image_tokens": 704,
+        "text_tokens": 144
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7872
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/point-lobos-cypress.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-cypress-c",
+    "file": "assets/images/concept-cypress-c.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the 18th hole at Pebble Beach Golf Links. Create a reference image of ONE tree exactly like the tall Monterey cypress standing in the fairway in the middle of the photo: a straight trunk and a tall, dense, irregular dark green crown with flattened, layered tiers and gaps between them. Real colours: foliage #232C22 to #3E4A38. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 845,
+      "input_tokens_details": {
+        "image_tokens": 704,
+        "text_tokens": 141
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7869
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-fairway-bay.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-pine",
+    "file": "assets/images/concept-pine.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the 18th hole at Pebble Beach. Create a reference image of ONE Monterey pine tree like the big pines along the course: a tall straight dark grey-brown trunk, an open irregular rounded crown of dark green needle clumps in the upper half, some bare lower branches. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 890,
+      "input_tokens_details": {
+        "image_tokens": 768,
+        "text_tokens": 122
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7914
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-view-back.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-rock-granite",
+    "file": "assets/images/concept-rock-granite.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the coastline at Pebble Beach. Create a reference image of ONE weathered coastal granite boulder like the boulders in the grass in the photo: rounded, about 2 m across, pale warm grey #CBC7BA with darker cracks, pits and patches of grey-green lichen, flat base. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 830,
+      "input_tokens_details": {
+        "image_tokens": 704,
+        "text_tokens": 126
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7854
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/coast-rocks-fescue.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-rock-sea",
+    "file": "assets/images/concept-rock-sea.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the 7th green at Pebble Beach with dark rocks at the water's edge. Create a reference image of ONE jagged dark coastal rock outcrop like the rocks along the shore in the photo: dark brown-grey weathered sandstone and granite, layered and fractured, about 4 m long and 2 m high, wet darker base, flat bottom. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 904,
+      "input_tokens_details": {
+        "image_tokens": 768,
+        "text_tokens": 136
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7928
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h07-green.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-cliff",
+    "file": "assets/images/concept-cliff.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the cliffs below the 6th and 8th holes at Pebble Beach. Create a reference image of ONE free-standing block of that coastal cliff: about 12 m wide and 10 m tall, vertical faces of layered ochre, tan and dark grey sandstone and mudstone with vertical fractures, a rough rocky base, a thin strip of green grass along the flat top edge. Three-quarter view. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 882,
+      "input_tokens_details": {
+        "image_tokens": 736,
+        "text_tokens": 146
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7906
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h06-cliffs.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "concept-seawall",
+    "file": "assets/images/concept-seawall.png",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 and image 2 are real photos of the 18th hole at Pebble Beach, which runs along Carmel Bay behind a stone sea wall. Create a reference image of ONE straight 8 m long section of that sea wall: a battered (sloping) wall about 3 m high built from fitted, rounded grey granite boulders with darker mortar joints, a flat top with a strip of grass, a little sand and a few loose rocks at the foot. Three-quarter view. Isolated single object, the whole thing in frame and centred, on a plain pure white background, no ground plane, no sky, no shadow on the background, photorealistic, soft even overcast daylight, side view, no text.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1949,
+      "input_tokens_details": {
+        "image_tokens": 1792,
+        "text_tokens": 157
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 8973
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-green-bunkers.png",
+      "refs/pebble-photos/seeds/h18-moreira.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-green-bunkers.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
+  },
+  {
+    "id": "tex-cliff",
+    "file": "assets/textures/tex-cliff.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the sea cliffs at Pebble Beach. Make a seamless tileable texture: a frontal orthographic photograph of that cliff face, filling the whole frame, layered ochre #94816B, tan and dark grey #595A59 sedimentary rock with vertical fractures and ledges, no sky, no grass, no water, no horizon, even diffuse light, edges wrap seamlessly.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 826,
+      "input_tokens_details": {
+        "image_tokens": 736,
+        "text_tokens": 90
+      },
+      "output_tokens": 7024,
+      "output_tokens_details": {
+        "image_tokens": 7024,
+        "text_tokens": 0
+      },
+      "total_tokens": 7850
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h06-cliffs.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "sha256": "7b14f02c4fac2159053eef89b1e236dc7b316d6834c2cc5bbdc58587b0b3bb32",
+    "shipped_bytes": 352448,
+    "source_png": "assets/images/tex-cliff.png",
+    "post_process": "made seamless (scripts/turf_tiles.py blend), 1024 px JPEG q84 (scripts/rock_tiles.py); normal map derived in code from luminance (src/client/coast.ts)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ]
+  },
+  {
+    "id": "tex-seawall",
+    "file": "assets/textures/tex-seawall.jpg",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "medium",
+    "size": "1024x1024",
+    "prompt": "Image 1 is a real photo of the 18th hole at Pebble Beach. Make a seamless tileable texture: a frontal orthographic photograph of a stone sea wall built from fitted rounded grey granite boulders (#8A8A84 to #B8B4A8) with darker grey mortar joints, filling the whole frame, no sky, no grass, no water, even diffuse light, edges wrap seamlessly.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1117,
+      "input_tokens_details": {
+        "image_tokens": 1024,
+        "text_tokens": 93
+      },
+      "output_tokens": 1756,
+      "output_tokens_details": {
+        "image_tokens": 1756,
+        "text_tokens": 0
+      },
+      "total_tokens": 2873
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-photos/seeds/h18-moreira.png"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "sha256": "9c2100d209ce5db0319c75ddde197cbcc7849e600047ddefdc5fa5e803bd82a3",
+    "shipped_bytes": 415741,
+    "source_png": "assets/images/tex-seawall.png",
+    "post_process": "made seamless (scripts/turf_tiles.py blend), 1024 px JPEG q84 (scripts/rock_tiles.py); normal map derived in code from luminance (src/client/coast.ts)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-moreira.jpg"
+    ]
+  },
+  {
+    "id": "cliff-r1",
+    "file": "assets/models/cliff-r1.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "free-standing block of layered ochre and dark grey coastal sandstone cliff with a grassy flat top",
+    "seed_images": [
+      "concept-cliff.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "task_id": "d79e08d2-8d4c-4ffa-9899-e25338cb7c72",
+    "faces_requested": 6000,
+    "credits_used": 0.5,
+    "balance_before": 30,
+    "balance_after": 29,
+    "target_height_m": 12.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 6000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "rock-r1",
+    "file": "assets/models/rock-r1.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "weathered rounded coastal granite boulder with lichen, flat base",
+    "seed_images": [
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "task_id": "0bcc82b7-03b3-4184-bb2f-20fcf15080a8",
+    "faces_requested": 3000,
+    "credits_used": 0.5,
+    "balance_before": 32,
+    "balance_after": 31,
+    "target_height_m": 1.6,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 3000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "rock-r2",
+    "file": "assets/models/rock-r2.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "jagged dark layered coastal sea rock outcrop, fractured sandstone, flat base",
+    "seed_images": [
+      "concept-rock-sea.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "task_id": "67bbb47f-6c05-4a12-a1c2-fefb0c98f1a3",
+    "faces_requested": 3000,
+    "credits_used": 0.5,
+    "balance_before": 32,
+    "balance_after": 31,
+    "target_height_m": 2.2,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 3000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "rock-r3",
+    "file": "assets/models/rock-r3.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "low flat wave-cut coastal reef rock shelf, dark layered sandstone, wide and low, flat base",
+    "seed_images": [
+      "concept-rock-sea.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h17-green.jpg"
+    ],
+    "task_id": "ab5dd55f-4973-4048-b70e-b4cb1fd6ee5c",
+    "faces_requested": 3000,
+    "credits_used": 0.5,
+    "balance_before": 31,
+    "balance_after": 30.5,
+    "target_height_m": 1.2,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 3000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "rock-r4",
+    "file": "assets/models/rock-r4.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "cluster of three weathered rounded coastal granite boulders with lichen, flat base",
+    "seed_images": [
+      "concept-rock-granite.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "2c3d0613-e526-4b33-9647-2502bcec5ee6",
+    "faces_requested": 3500,
+    "credits_used": 0.5,
+    "balance_before": 31,
+    "balance_after": 30,
+    "target_height_m": 2.4,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 3500), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "seawall-r1",
+    "file": "assets/models/seawall-r1.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "straight section of a sea wall of fitted rounded grey granite boulders with mortar, grass on the flat top",
+    "seed_images": [
+      "concept-seawall.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-green-bunkers.jpg"
+    ],
+    "task_id": "4db3ae33-934e-4207-b42c-48c13899f8d1",
+    "faces_requested": 4000,
+    "credits_used": 0.5,
+    "balance_before": 30,
+    "balance_after": 29,
+    "target_height_m": 3.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 4000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "tree-cypress-r1",
+    "file": "assets/models/tree-cypress-r1.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "Monterey cypress tree, wind-sculpted flat-topped crown of dark green foliage pads, tall leaning grey trunk",
+    "seed_images": [
+      "concept-cypress-a.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg"
+    ],
+    "task_id": "5c8735c3-3ace-46a3-a43f-1ad9820375ed",
+    "faces_requested": 9000,
+    "credits_used": 0.5,
+    "balance_before": 34,
+    "balance_after": 32.5,
+    "target_height_m": 13.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 9000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "tree-cypress-r2",
+    "file": "assets/models/tree-cypress-r2.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "Monterey cypress tree, twisted multi-stem trunk, wind-swept broad flat layered crown of dark green foliage pads",
+    "seed_images": [
+      "concept-cypress-b.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "task_id": "9efc9307-2453-415d-b043-fbe3243ae8bb",
+    "faces_requested": 9000,
+    "credits_used": 0.5,
+    "balance_before": 34,
+    "balance_after": 33,
+    "target_height_m": 10.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 9000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "tree-cypress-r3",
+    "file": "assets/models/tree-cypress-r3.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "tall Monterey cypress tree, straight trunk, dense layered dark green crown with flat tiers",
+    "seed_images": [
+      "concept-cypress-c.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg"
+    ],
+    "task_id": "8633e104-5785-49ab-a7f1-fb328ce80e74",
+    "faces_requested": 9000,
+    "credits_used": 0.5,
+    "balance_before": 34,
+    "balance_after": 32.5,
+    "target_height_m": 18.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 9000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "tree-pine-r1",
+    "file": "assets/models/tree-pine-r1.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "tier": "API",
+    "prompt": "Monterey pine tree, tall straight trunk, open irregular rounded crown of dark green needle clumps",
+    "seed_images": [
+      "concept-pine.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg"
+    ],
+    "task_id": "1b32c5b3-db7a-429d-8c6b-f6a005d03cbe",
+    "faces_requested": 9000,
+    "credits_used": 0.5,
+    "balance_before": 32.5,
+    "balance_after": 32,
+    "target_height_m": 20.0,
+    "date": "2026-11-05",
+    "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 9000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
+    "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-sky",
+    "file": "src/client/environment.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Gradient sky dome in the photo-measured zenith/horizon colours with sun glow and soft streak clouds; PMREM image light baked from it; ACES tone mapping; exponential haze",
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/h18-marine-layer.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-ocean",
+    "file": "src/client/ocean.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Carmel Bay water shader: depth gradient (turquoise shallows to slate blue) from the per-hole distance-to-land field, two tiling fBm normal maps generated in code, Fresnel sky reflection, sun glints, white surf at the shore",
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg",
+      "refs/pebble-photos/h07-morgen.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-cliffs-seawall",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Cliff faces (and the 18th-hole sea wall) extruded down to sea level along the marching-squares land/sea contour, noise-displaced, triplanar tex-cliff / tex-seawall with a normal map derived in code",
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg",
+      "refs/pebble-photos/h08-chasm.jpg",
+      "refs/pebble-photos/h18-green-bunkers.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-buildings-18",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Generic low cream two-storey buildings with hip roofs and a canvas window facade behind the 18th green, among cypress (deliberately not a replica of the Lodge)",
+    "seed_photos": [
+      "refs/pebble-photos/lodge.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-backdrop",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Far shore across the bay (hazy hills, pale beach line, dark shore trees) and an inland tree-line silhouette band",
+    "seed_photos": [
+      "refs/pebble-photos/h07-morgen.jpg",
+      "refs/pebble-photos/h18-fairway-bay.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-bunker-lips",
+    "file": "src/client/fescue.ts + src/client/terrain.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Instanced fescue tufts on every turf cell bordering sand, fescue-coloured lip band and sun-side lip shading in the terrain shader",
+    "seed_photos": [
+      "refs/pebble-photos/bunker-close.jpg",
+      "refs/pebble-photos/h18-green-bunkers.jpg",
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-turf-grade",
+    "file": "src/client/turf-bake.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Turf palette targets moved from lime to the measured olive Poa/rye greens and near-white sand",
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h08-fairway.jpg",
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/bunker-close.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
   }
 ]
