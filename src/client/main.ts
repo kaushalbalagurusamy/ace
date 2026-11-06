@@ -13,6 +13,7 @@ import { canAddress, golferSpot, lookScale, moveAxis, walkSpeed } from './rules'
 import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
+import { TouchControls, pullToHoldMs, touchText } from './touch';
 import { BAG as SIM_BAG, suggestClub } from '../sim';
 import { asLie, lieInfo } from './lieinfo';
 import { stanceSlope } from '../shared/height';
@@ -25,7 +26,6 @@ let cart: CartState = cartSpawn(0, 0), driving = false, mySlot = 0, orbit = 0, l
 import { Adaptive, TIER_LABEL, loadPref, pickTier, probeHardware, savePref, type Pref } from './graphics';
 let lookMult = loadMult();
 let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
-const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
 
 let sessionId = sessionStorage.getItem('ace.sid') ?? crypto.randomUUID();
 sessionStorage.setItem('ace.sid', sessionId);
@@ -89,12 +89,10 @@ const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbie
 ui.setClub(0);
 
 const net = new Net(onMsg, () => {
-  if (touchOnly) return;
   if (validName(name)) net.send({ t: 'hello', sessionId, name, token }); else { phase = 'name'; ui.showName(name); }
 }, () => {
   welcomed = false; lobby = null; hole = null; swing = null; phase = 'down'; ui.showDown('Server restarted or disconnected.');
 });
-if (touchOnly) ui.showTouch();
 
 function onMsg(m: ServerMsg) {
   switch (m.t) {
@@ -180,7 +178,15 @@ const board = () => ui.board(racers, pars(), selfId);
 
 // ---- input ----
 const canvas = world.renderer.domElement;
-canvas.addEventListener('click', () => { if (phase === 'race') void requestLock(canvas); });
+canvas.addEventListener('click', () => { if (phase === 'race' && !touch.on) void requestLock(canvas); });
+/** Touch: a pull-down swing replays the second Space press and its release, with the pull length standing in for the hold time. */
+Object.assign((window as unknown as { __ace: object }).__ace, { state: () => ({ pos, yaw, driving, club, rfOpen, swing: swing?.fsm.phase ?? null, aim: swing?.fsm.aim(), ballPos: swing?.fsm.ballPos(), chip: swing?.fsm.isChip(), cart }) });   // debug handle for the touch checks
+const touch = new TouchControls(ui.hud, canvas, () => touchCtx, px => {
+  const f = swing?.fsm; if (!f || swing!.sentAt !== undefined || f.phase !== 'stance') return;
+  const ms = pullToHoldMs(px, innerHeight, f.club().putt || f.isChip()); if (ms === null) return;   // a tiny pull stays in the stance
+  const t0 = performance.now(); act(f.key('Space', true, t0)); act(swing?.fsm.key('Space', false, t0 + ms) ?? null);
+});
+let touchCtx = { race: false, driving: false, stance: false, nearCart: false, putt: false, map: false, chip: false };
 addEventListener('mousemove', e => {
   if (phase !== 'race' || ui.settingsOpen() || (swing && swing.fsm.phase !== 'stance' && swing.fsm.phase !== 'idle') || (document.pointerLockElement !== canvas && !(e.buttons & 1))) return;
   const m = lookMult * lookScale(keys);                                    // Shift halves the look for fine aim and putting lines
@@ -212,7 +218,7 @@ addEventListener('keydown', e => {
     else if (canEnter(pos, cart)) { driving = true; orbit = 0; camYaw = yaw; }
     return;
   }
-  if (e.code === 'Space' && driving) { ui.toast('E: get out to play'); return; }
+  if (e.code === 'Space' && driving) { ui.toast(touch.on ? 'Cart: get out to play' : 'E: get out to play'); return; }
   if (e.code === 'Space' && started()) {
     const me = own();
     if (rfOpen || !me || !canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving })) return;
@@ -246,6 +252,12 @@ ui.bindGraphics(() => ({ pref: gfxPref, auto: adapt.tier }), p => {
 });
 addEventListener('keydown', e => { if (e.code === 'F3') { e.preventDefault(); ui.toggleFps(); } });
 
+/** Touch: stick dead zone, the turn rate at full sideways pull (px of mouse movement per second), and the reworded prompts. */
+const dz = (v: number) => Math.abs(v) < 0.15 ? 0 : v;
+const TURN_PX = 500;
+const prompt = (t: string) => ui.prompt(touch.on ? touchText(t) : t);
+const meter = (fr: number, label: string, maxZone: boolean) => ui.meterShow(fr, touch.on ? touchText(label) : label, maxZone);
+
 // ---- frame loop ----
 let last = performance.now(), stuckSince = 0, fpsFrames = 0, fpsSince = last;
 function frame(now: number) {
@@ -265,11 +277,12 @@ function frame(now: number) {
   if (phase !== 'race' || !hole) { if (phase === 'results' || phase === 'race') world.render(pos.x, pos.z, yaw, pitch); return; }
   const me = own(), go = started();
   if (!swing && go && !ui.settingsOpen() && !driving) {                      // arrow keys move; WASD is for the ball position in the stance
-    const { f, r } = moveAxis(keys), n = Math.hypot(f, r) || 1, speed = walkSpeed(keys);
+    const st = touch.stick, k = moveAxis(keys), { f, r } = st && !k.f && !k.r ? { f: dz(-st.y), r: 0 } : k, n = Math.max(1, Math.hypot(f, r)), speed = walkSpeed(keys);
+    if (st) yaw += lookDelta(dz(st.x) * TURN_PX * dt, lookMult * lookScale(keys));   // sideways pull turns at a rate set by the offset
     pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * speed * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * speed * dt;
   }
   // the cart always steps (a bumped, parked cart still rolls to a stop); arrows drive it only from the seat
-  const drive = driving && go && !ui.settingsOpen() ? moveAxis(keys) : { f: 0, r: 0 }, ground = (x: number, z: number) => cartGround(keyOf(hole!), x, z);
+  const drive = driving && go && !ui.settingsOpen() ? (touch.stick ? { f: dz(-touch.stick.y), r: dz(touch.stick.x) } : moveAxis(keys)) : { f: 0, r: 0 }, ground = (x: number, z: number) => cartGround(keyOf(hole!), x, z);
   for (let i = 0, n = Math.ceil(dt * 120); i < n; i++) {                     // small fixed sub-steps so a fast cart cannot skip a thin bunker lip
     const st = stepCart(cart, { throttle: drive.f, steer: drive.r }, dt / n, ground); cart = st.s;
     if (st.bumped > 1.5 && driving) { audio.bump(Math.min(1, st.bumped / CART.TOP) * 0.6); shake = Math.max(shake, 0.25); }
@@ -283,14 +296,18 @@ function frame(now: number) {
   if (me) world.placeCart(me, cart, driving ? drive.r : 0, dt);
   if (me) me.driving = driving;
   if (go && now - lastSend > 100) { lastSend = now; net.send({ t: 'move', x: pos.x, z: pos.z, yaw, driving, cart }); }
+  if (swing && swing.sentAt === undefined && (touch.aimHold || touch.aimPx)) {   // touch aim in the stance: ◀ ▶ held, or a sideways drag
+    yaw += lookDelta(touch.aimHold * TURN_PX * 0.35 * dt + touch.aimPx, lookMult * 0.5); touch.aimPx = 0; swing.fsm.setAim(aimDeg(yaw));
+  }
   if (swing) {
     if (swing.sentAt !== undefined) { if (!stuckSince) stuckSince = now; if (now - stuckSince > 3000) { swing = null; stuckSince = 0; } }
     else {
       act(swing.fsm.tick(now));                                                // auto-release at 1.10 s: a max-effort shot
       const f = swing?.fsm;
       if (f && swing) {
-        const ph = f.phase, fr = f.meter(now), putt = f.club().putt;
-        const chip = f.isChip(); ui.meterShow(fr, ph === 'stance' ? (putt ? 'Hold Space, release to putt' : chip ? 'CHIP (0-25% power) · hold Space, release · Shift: full swing' : 'Hold Space, release to hit · Shift: chip') : putt ? 'Release to putt' : chip ? `Chip · ${Math.round(Math.min(1, fr) * 25)}% power` : fr >= 1 ? 'MAX ZONE: release for a full shot, hold on for MAX effort' : 'Release to hit', !putt && !chip);
+        const pull = touch.pull !== null && f.phase === 'stance' ? (pullToHoldMs(touch.pull, innerHeight, f.club().putt || f.isChip()) ?? 0) / 750 : null;
+        const ph = pull !== null ? 'backswing' : f.phase, fr = pull ?? f.meter(now), putt = f.club().putt;
+        const chip = f.isChip(); meter(fr, ph === 'stance' ? (putt ? 'Hold Space, release to putt' : chip ? 'CHIP (0-25% power) · hold Space, release · Shift: full swing' : 'Hold Space, release to hit · Shift: chip') : putt ? 'Release to putt' : chip ? `Chip · ${Math.round(Math.min(1, fr) * 25)}% power` : fr >= 1 ? 'MAX ZONE: release for a full shot, hold on for MAX effort' : 'Release to hit', !putt && !chip);
         ui.ballPosGrid(putt ? null : f.ballPos());
       }
     }
@@ -304,7 +321,9 @@ function frame(now: number) {
   } else ui.liePanel(null);
   const base = swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`;
   const nearCart = go && !swing && !driving && canEnter(pos, cart);
-  ui.prompt(driving && go ? `WASD drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
+  touchCtx = { race: go, driving, stance: !!swing && swing.sentAt === undefined, nearCart, putt: !!swing?.fsm.club().putt, map: rfOpen, chip: !!swing?.fsm.isChip() };
+  touch.update(touchCtx);
+  prompt(driving && go ? `WASD drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
   { // pin indicator: on foot and in the stance, hidden while the ball flies and within about 30 yd of the pin
     const pinYd = me ? Math.hypot(hole.pin.x - me.ball.x, hole.pin.z - me.ball.z) * YD : 0, camYd = Math.hypot(hole.pin.x - pos.x, hole.pin.z - pos.z) * YD;
     ui.pinMarker(me && !me.anim && !rfOpen && !me.ball.holedOut ? world.pinScreen() : null, pinYd, pinOpacity(camYd));
@@ -321,7 +340,8 @@ function frame(now: number) {
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
     world.setClub(selfId, club);
     const f = swing && swing.sentAt === undefined ? swing.fsm : null;   // stance and backswing pose the golfer at the ball; depth follows the hold
-    world.setStance(selfId, f ? { depth: f.phase === 'backswing' ? Math.min(1, f.meter(now)) : 0, putt: f.club().putt || f.isChip() } : null);   // a chip uses the shoulder-only pendulum
+    const pullD = f && touch.pull !== null ? (pullToHoldMs(touch.pull, innerHeight, true) ?? 0) / 750 : 0;   // a touch pull winds the backswing up live
+    world.setStance(selfId, f ? { depth: f.phase === 'backswing' ? Math.min(1, f.meter(now)) : pullD, putt: f.club().putt || f.isChip() } : null);   // a chip uses the shoulder-only pendulum
   }
   world.ownBallDistM = ownDist();
   world.tick(now);

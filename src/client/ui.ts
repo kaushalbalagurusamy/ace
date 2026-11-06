@@ -43,9 +43,20 @@ const HELP_GROUPS: [string, [string, string][]][] = [
   ['Race', [[k('Tab'), 'Scorecard: every racer\'s strokes on every hole'], ['Top left', 'Live standings: hole, strokes and score to par']]],
   ['Settings', [[`${k('Esc')} or ${k('⚙')}`, 'Camera sensitivity and graphics'], [k(',', '.'), 'Look speed down or up'], [k('N'), 'Mute'], [k('F3'), 'Frame rate']]],
 ];
+/** The same, for touch screens (touch.ts). */
+const b = (x: string) => `<kbd>${x}</kbd>`;
+const TOUCH_HELP: [string, [string, string][]][] = [
+  ['Move', [['Pull', 'Touch the course and pull: up and down walk, sideways turns'], [b('Shift'), 'Toggle the 5 m/s walk and fine aim']]],
+  ['Swing', [[b('Swing'), 'Take your stance at the ball'], ['Pull down', 'The backswing: the longer the pull, the harder the shot. Release to hit; a tiny pull cancels'],
+    ['Pull far', '<b>MAX effort</b> past the full meter'], ['Drag sideways', `Aim (or hold ${b('◀ Aim')} ${b('Aim ▶')})`], [b('Chip'), 'Shoulders-only chip, 0-25% power'],
+    [b('Ball ▲▼◀▶'), 'Ball position: height and curve'], [b('✕'), 'Cancel the stance'], ['Tap the bag', 'Pick a club; the putter putts with the same pull']]],
+  ['Cart', [[b('Cart'), 'Get in or out (within 3 m)'], ['Pull', 'Up to drive, down to brake and reverse, sideways to steer']]],
+  ['Race', [[b('Map'), 'Hole map; tap it to set a target and pick the club'], ['Tap standings', 'Scorecard'], [`${b('🔈')} ${b('⚙')}`, 'Mute; settings and look speed']]],
+];
+const grid = (g: typeof HELP_GROUPS, cls: string) => `<div class="htp-grid ${cls}">${g.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>`;
 const HELP = `<dialog id="htp" aria-labelledby="htp-t"><form method="dialog" class="htp-head"><h2 id="htp-t">How to play</h2><button class="x" aria-label="Close">&times;</button></form>
   <p class="lede">Race your friends around Pebble Beach, Bethpage Black or Aronimink. First to hole out wins; strokes only decide finishes within 1 second.</p>
-  <div class="htp-grid">${HELP_GROUPS.map(([t, rows]) => `<section><h3>${t}</h3>${rows.map(([a, b]) => `<div class="kv"><span>${a}</span><span>${b}</span></div>`).join('')}</section>`).join('')}</div>
+  ${grid(HELP_GROUPS, 'kb-help')}${grid(TOUCH_HELP, 'touch-help')}
   <p class="foot">The red flag marks the pin, the yellow beacon your ball; white lines are out of bounds. After every shot a card shows carry, total, offline, ball position and effort.</p></dialog>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 /** Standings order: finished racers by time, then the furthest along, then the fewest strokes. */
@@ -114,7 +125,7 @@ const CSS = `
 .htp-head{display:flex;justify-content:space-between;align-items:center;margin:0}.htp-head h2{font:600 30px/1.1 "Playfair Display",Georgia,serif;margin:0}
 #home .x{width:40px;height:40px;padding:0;font-size:24px;font-weight:400}
 #htp .lede{color:var(--mute);margin:4px 0 14px}
-.htp-grid{columns:3 290px;column-gap:14px}
+.htp-grid{columns:3 290px;column-gap:14px}.touch-help,body.touch .kb-help{display:none}body.touch .touch-help{display:block}
 .htp-grid section{break-inside:avoid;margin-bottom:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .htp-grid h3{margin:0 0 10px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
 .kv{display:grid;grid-template-columns:124px 1fr;gap:10px;align-items:baseline;padding:4px 0;font-size:13.5px;line-height:1.4}.kv span:first-child{color:var(--mute);font-size:13px}
@@ -126,7 +137,7 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 .scr table{border-collapse:collapse;width:100%}.scr td,.scr th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}.scr th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
 @media (max-width:520px){.tag{letter-spacing:.14em}.glass{padding:18px}#htp{padding:20px}.kv{grid-template-columns:1fr;gap:2px}.spons{display:none}}
 .hud{position:absolute;background:rgba(20,20,20,.7);padding:6px 10px;border-radius:3px}
-#bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px}
+#bag{top:6px;left:50%;transform:translateX(-50%);display:flex;gap:3px;padding:4px;pointer-events:auto}#lb,.slot{cursor:pointer}#lb{pointer-events:auto}
 .slot{width:54px;text-align:center;padding:3px 0;background:#333;border:1px solid #555;font-size:12px}.slot b{display:block;color:#aaa}.slot.on{background:#ddd;color:#111}.slot.on b{color:#333}
 #info{left:10px;bottom:10px;line-height:1.5}
 #lb{left:52px;top:56px;font-size:12px;line-height:1.5;display:grid;grid-template-columns:minmax(0,74px) auto auto auto;column-gap:8px;max-width:180px;box-sizing:border-box}
@@ -159,7 +170,7 @@ export class UI {
   root = document.getElementById('app')!;
   private home = document.createElement('div');
   private scr = Object.assign(document.createElement('div'), { className: 'scr' });
-  private hud = document.createElement('div');
+  hud = document.createElement('div');
   private mini!: HTMLCanvasElement;
   private $ = (id: string) => this.hud.querySelector<HTMLElement>('#' + id)!;
   private toastT = 0; private cardT = 0;
@@ -183,6 +194,10 @@ export class UI {
     dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });   // a click on the dimmed area outside closes it; Esc closes natively
     this.root.append(this.home, this.hud);
     this.mini = this.hud.querySelector('canvas')!;
+    // the bag and the standings are buttons too (touch and mouse): they replay the club key and Tab
+    const key = (code: string) => { for (const t of ['keydown', 'keyup']) dispatchEvent(new KeyboardEvent(t, { code })); };
+    this.hud.querySelectorAll<HTMLElement>('.slot').forEach((e, i) => e.addEventListener('click', () => key(BAG[i]!.code)));
+    this.$('lb').addEventListener('click', () => key('Tab'));
     this.scr.addEventListener('click', e => {
       const el = (e.target as HTMLElement).closest<HTMLElement>('[data-act]');
       if (el && !(el as HTMLButtonElement).disabled) this.act(el.dataset.act!, el.dataset, this.scr);
@@ -195,7 +210,6 @@ export class UI {
     if (!html) this.home.querySelector('dialog')!.close();   // a modal left open in a hidden screen would make the race inert
   }
   private wm = (sm = true) => `<h1 class="wm${sm ? ' sm' : ''}">Ace<span>.</span></h1>`;
-  showTouch() { this.screen(`${this.wm(false)}<div class="glass"><h2>Keyboard required</h2><p class="sub">Open Ace on a desktop or laptop to play.</p></div>`); }
   showDown(msg: string) { this.screen(`${this.wm()}<div class="glass"><h2>Reconnecting…</h2><p class="sub">${esc(msg)}</p></div>`); }
   showName(name: string, err = '') {
     this.screen(`${this.wm(false)}<p class="tag">A race around championship golf</p><form class="glass"><label for="nm">Your name</label>
