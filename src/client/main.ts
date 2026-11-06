@@ -155,7 +155,7 @@ function onMsg(m: ServerMsg) {
       audio.bump(m.strength); shake = Math.max(shake, 0.4 + 0.6 * m.strength); break;
     case 'snap': pos = { x: m.x, z: m.z }; driving = m.driving; cart = { ...m.cart }; break;
     case 'raceEnd':
-      endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops(); audio.whir(0);
+      endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock?.(); audio.stopLoops(); audio.whir(0);
       ui.showResults([...m.results].sort((a, b) => a.place - b.place), COURSES[m.course]?.name ?? '', racers.length ? scorecard(racers, pars(), selfId) : ''); break;
   }
 }
@@ -211,7 +211,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Comma' || e.code === 'Period') { setLook(stepMult(lookMult, e.code === 'Period' ? 1 : -1)); ui.toast(lookLabel(lookMult)); return; }
   if (e.code === 'Escape' && !swing) { ui.toggleSettings(); return; }          // Esc opens the settings menu; in a stance it cancels the stance instead
   if (ui.settingsOpen()) return;
-  if (e.code === 'KeyM' && !swing) { rfOpen = !rfOpen; rfHover = null; ui.rf().style.display = rfOpen ? 'block' : 'none'; ui.rfTip(null); if (rfOpen) document.exitPointerLock(); return; }
+  if (e.code === 'KeyM' && !swing) { rfOpen = !rfOpen; rfHover = null; ui.rf().style.display = rfOpen ? 'block' : 'none'; ui.rfTip(null); if (rfOpen) document.exitPointerLock?.(); return; }
   const ci = BAG.findIndex(b => b.code === e.code);
   if (ci >= 0 && (!swing || (swing.sentAt === undefined && swing.fsm.setClub(BAG[ci]!.key, ci === PUTTER)))) { club = ci; ui.setClub(ci); return; }   // club changes stay allowed in the stance until the backswing starts
   if (swing) { if (swing.sentAt === undefined) act(swing.fsm.key(e.code, true, e.timeStamp)); return; }

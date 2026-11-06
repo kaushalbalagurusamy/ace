@@ -331,7 +331,7 @@ export class UI {
   fpsOn = false;
   toggleFps() { this.fpsOn = !this.fpsOn; this.$('fps').style.display = this.fpsOn ? 'block' : 'none'; }
   fps(text: string) { if (this.fpsOn) this.$('fps').textContent = text; }
-  toggleSettings(open?: boolean) { const p = this.$('settings'); const show = open ?? p.style.display !== 'block'; p.style.display = show ? 'block' : 'none'; if (show) { document.exitPointerLock(); this.syncSettings(); this.syncGraphics(); } return show; }
+  toggleSettings(open?: boolean) { const p = this.$('settings'); const show = open ?? p.style.display !== 'block'; p.style.display = show ? 'block' : 'none'; if (show) { document.exitPointerLock?.(); this.syncSettings(); this.syncGraphics(); } return show; }
   settingsOpen = () => this.$('settings').style.display === 'block';
   private bannerT = 0;
   /** A big, long-lasting message for events the player must not miss (penalties). */
