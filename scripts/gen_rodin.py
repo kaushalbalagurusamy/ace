@@ -31,7 +31,7 @@ def call(path, body=None, files=None):
 balance = lambda: call("/check_balance").get("balance")
 
 ap = argparse.ArgumentParser(); ap.add_argument("id"); ap.add_argument("height", type=float); ap.add_argument("prompt"); ap.add_argument("images", nargs="+")
-ap.add_argument("--faces", type=int, default=8000); ap.add_argument("--keep", type=float, default=1.0); ap.add_argument("--tier", default="Gen-2.5-Medium")
+ap.add_argument("--faces", type=int, default=8000); ap.add_argument("--keep", type=float, default=1.0); ap.add_argument("--tier", default="Gen-2.5-Low")   # Medium and up are refused on this API plan (API_NO_ACTIVE_SUBSCRIPTION)
 ap.add_argument("--seed-photo", action="append", default=[]); ap.add_argument("--texture", type=int, default=1024)
 ap.add_argument("--texture-mode", default=None, help="Rodin texture_mode (extreme-low..extreme-high); default follows the tier")
 a = ap.parse_args()
