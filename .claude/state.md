@@ -8,33 +8,22 @@ The game **Ace** is submitted (portal + Google Form, before midnight). The game 
 
 ## Live
 
-- GitLab `main` = live = `b73c265`, deployed via `scripts/deploy.sh`.
-- Working branch: `intake/sources-profile-minesweep`.
-- `b73c265` contains:
-  - real Pebble elevation and slope lies (`66d2990`)
-  - the captured swing, gait and seated driver, and the Rodin cart, which is still PENDING
-  - a ball-scale cup used as the hitbox. The run-out also captures on `CUP_VISUAL_RADIUS_M`.
-- Checks at `b73c265`: tsc clean; vitest 372 pass + 2 expected fail; the 18-hole bot passes on the local server (78 strokes).
+- GitLab `main` = live = `fe0ed2f` (deployed ~01:55 CST): real elevation on 3 courses (Pebble, Bethpage Black, Aronimink, course picker in lobby), photo-referenced Pebble environment (ocean/coast/sky/fescue/buildings), generated cypress r13 (critic PASS), 18th sea wall r3 (model PASS, in-scene 3.4), captured swing (critic 3.5) and gait, seated driver, sprung cart, finer code tyres, ball-scale cup.
+- Checks: tsc, vitest 386 + 2 expected fail, build; 18-hole bot PASS on all three courses concurrently (87 / 84 / 68).
+- Bot sessions now use a random id (concurrent bots used to collide on Date.now()).
+- Owner report: https://claude.ai/artifact/T9gRsv7gZyeecGUisPbxyk (photo-vs-game, critic scores, decisions).
 
-## In flight (background agents, worktree isolation)
+## Open decisions for the owner
 
-- **Realism:** photo-accurate Pebble assets (cypress, rocks, cliffs, ocean, sky, bunkers, sea wall) from `refs/pebble-photos`, using Rodin and Meshy, gated by a critic.
-- **Courses:** Bethpage Black and Aronimink, traced from BlueGolf, plus a course picker. Their height files exist in `src/shared/courses/` but are not yet registered in `COURSE_HEIGHTS`.
-- **Cart:** regenerate the Genesis body with Meshy multi-image (≤150 Meshy and ≤4 Rodin credits). The Rodin Low body came out silver and smeared, so it stays PENDING and the code body is shown.
-- **Swing critic:** compares the old hand-keyed swing (v12) with the new captured swing against the Dunaway clip. Output goes to `critic-swing.json` in the session scratchpad.
+- Ship the Meshy Genesis cart body (critic 2.75, far closer than the code box) under override? Recommended yes. One manifest change.
+- Further generation spend: Rodin 22.5, Meshy ~245, OpenAI 24/40 used. $30 top-up asked, unanswered.
 
 ## Known gaps
 
-- **Captured swing** (per the motion agent):
-  - the stance is too crouched
-  - at P4 the hands reach only head height
-  - at P8 the arms don't extend
-  - the P10 finish is off
-  - the club path is hand-keyed
-- **Sprint:** the arm swing is too small and the trunk lean too shallow.
-- **Walk:** built from 12 Muybridge frames.
-- **Clubs:** none passed the critic (best 3.8), so they stay gated.
-- **Cart suspension:** `heightAt` returns 0. The root follows the terrain tilt instead.
+- Rocks (best 3.5, felt-like surfaces), Monterey pine (3.25), cliff block unscored; failed GLBs live in gitignored assets/models/raw/rejected/.
+- Scenes vs photos avg 2–3/5: no bunker lips/green mounds, flat far shore band, no marine-layer sky, too many trees on 7 and 8, hole 8 chasm walls grey-green.
+- Swing: knees too bent P2–P9, P8 arms collapsed (rig arm reach); P4 turn capped by the 90±5° spec.
+- Clubs gated (best 3.8). ~70 sea-drawn cells still score as sand/path.
 
 ## Owner decisions not to undo
 
