@@ -1,7 +1,7 @@
 // Colour-grades a generated GLB's base-colour textures toward photo swatches (docs/research/pebble-look.md), keeping the generated detail.
 // Pixels are split by hue into foliage (green) and the rest (bark, rock); each group's mean colour is moved to its target by a per-channel gain,
 // so the texture's own variation (cracks, lichen, tufts) survives. Also scales roughness up (Rodin/Meshy rock reads too glossy).
-// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6] [--grain 1]
+// Usage: node scripts/grade_glb.mjs IN.glb OUT.glb [--green #2E4630] [--rest #B3AC9C] [--sat 0.8] [--rough 1] [--blur 0.8] [--squash 0.6] [--grain 1] [--thicken 1.6:0.45] [--destub 0.1:0.45:1.8]
 // Libraries come from the gltf-transform npx cache (same one the gen scripts call); set GT_MODULES to override.
 import { createRequire } from 'node:module';
 const req = createRequire((process.env.GT_MODULES ?? '/Users/kaushal/.npm/_npx/a6797f7ff67bb1f2/node_modules') + '/x.js');
@@ -80,6 +80,21 @@ if (opt.thicken) {
   for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (v[1] < top) { c[0] += v[0]; c[1] += v[2]; c[2]++; } } }
   const [mx, mz] = [c[0] / c[2], c[1] / c[2]];
   for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (v[1] < top) { const s = 1 + (K - 1) * (1 - 0.5 * (v[1] - lo) / (top - lo)) * Math.min(1, (top - v[1]) / (0.15 * (top - lo))); v[0] = mx + (v[0] - mx) * s; v[2] = mz + (v[2] - mz) * s; pos.setElement(i, v); } } }
+}
+// --destub F0:F1:R (e.g. 0.1:0.45:1.8): pull in vertices in the F0..F1 height band that lie over R times the band's median distance
+// from the trunk axis (flat fin-like branch stubs a generator leaves on a bare trunk); y up
+if (opt.destub) {
+  const [F0, F1, R] = opt.destub.split(':').map(Number), prims = doc.getRoot().listMeshes().flatMap(m => m.listPrimitives());
+  let lo = Infinity, hi = -Infinity; for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const y = pos.getElement(i, [])[1]; lo = Math.min(lo, y); hi = Math.max(hi, y); } }
+  // the axis and radius are taken per slice (S slices over the band) so a leaning trunk is followed
+  const S = 6, [y0, y1] = [lo + F0 * (hi - lo), lo + F1 * (hi - lo)], sl = y => Math.min(S - 1, Math.floor((y - y0) / (y1 - y0) * S)), pts = Array.from({ length: S }, () => []);
+  const med = a => [...a].sort((p, q) => p - q)[a.length >> 1];
+  for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (v[1] > y0 && v[1] < y1) pts[sl(v[1])].push(v); } }
+  const ax = pts.map(P => { const mx = med(P.map(v => v[0])), mz = med(P.map(v => v[2])); return [mx, mz, med(P.map(v => Math.hypot(v[0] - mx, v[2] - mz)))]; }); let cut = 0;
+  // vertices are pulled back onto the R-radius cylinder rather than triangles deleted, so the bark surface stays closed
+  for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []), a = v[1] > y0 && v[1] < y1 && ax[sl(v[1])]; if (!a) continue;
+    const d = Math.hypot(v[0] - a[0], v[2] - a[1]); if (d > R * a[2]) { const s = R * a[2] / d; v[0] = a[0] + (v[0] - a[0]) * s; v[2] = a[1] + (v[2] - a[1]) * s; pos.setElement(i, v); cut++; } } }
+  console.log('destub pulled in', cut, 'vertices');
 }
 // --squash Y: scale the model vertically (e.g. 0.6 turns a block into a low shelf); applied to the scene's top-level nodes
 if (opt.squash) for (const n of doc.getRoot().listScenes()[0].listChildren()) { const s = n.getScale(); n.setScale([s[0], s[1] * +opt.squash, s[2]]); }
