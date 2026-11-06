@@ -33,10 +33,11 @@ balance = lambda: call("/check_balance").get("balance")
 ap = argparse.ArgumentParser(); ap.add_argument("id"); ap.add_argument("height", type=float); ap.add_argument("prompt"); ap.add_argument("images", nargs="+")
 ap.add_argument("--faces", type=int, default=8000); ap.add_argument("--keep", type=float, default=1.0); ap.add_argument("--tier", default="Gen-2.5-Medium")
 ap.add_argument("--seed-photo", action="append", default=[]); ap.add_argument("--texture", type=int, default=1024)
+ap.add_argument("--texture-mode", default=None, help="Rodin texture_mode (extreme-low..extreme-high); default follows the tier")
 a = ap.parse_args()
 imgs = [pathlib.Path(p) for p in a.images]
 b0 = balance(); print("balance before:", b0, flush=True)
-sub = call("/rodin", {"tier": a.tier, "prompt": a.prompt, "geometry_file_format": "glb", "material": "PBR", "mesh_mode": "Raw", "quality": "medium", "quality_override": a.faces}, imgs)
+sub = call("/rodin", {"tier": a.tier, "prompt": a.prompt, "geometry_file_format": "glb", "material": "PBR", "mesh_mode": "Raw", "quality": "medium", "quality_override": a.faces, **({"texture_mode": a.texture_mode} if a.texture_mode else {})}, imgs)
 if "uuid" not in sub: sys.exit(f"submit failed: {sub}")
 print("submitted", sub["uuid"], "consumed", sub.get("consumed"), flush=True)
 time.sleep(8)
@@ -59,7 +60,7 @@ subprocess.run([GT, "optimize", str(raw), str(out), "--compress", "draco", "--te
 b1 = balance(); print("balance after:", b1, "| raw", raw.stat().st_size, "-> shipped", out.stat().st_size, "bytes", flush=True)
 row = ({"id": a.id, "file": f"assets/models/{a.id}.glb", "tool": "Hyper3D Rodin image-to-3D", "model": a.tier, "tier": "API",
              "prompt": a.prompt, "seed_images": [str(p.relative_to(ROOT)) if p.is_relative_to(ROOT) else p.name for p in imgs], "seed_photos": a.seed_photo,
-             "task_id": sub["uuid"], "faces_requested": a.faces, "credits_used": sub.get("consumed"), "balance_before": b0, "balance_after": b1,
+             "task_id": sub["uuid"], "faces_requested": a.faces, "texture_mode": a.texture_mode, "credits_used": sub.get("consumed"), "balance_before": b0, "balance_after": b1,
              "target_height_m": a.height, "date": datetime.date.today().isoformat(),
              "post_process": f"gltf-transform optimize: meshopt simplify ratio {a.keep} (1 = none; Rodin face target {a.faces}), draco, webp textures <= {a.texture}; raw kept local (assets/models/raw, gitignored)",
              "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm", "subagent": "visual realism (worktree session)",
