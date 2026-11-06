@@ -39,11 +39,11 @@ export function clubMatrix(grip: V3, shaft: V3, face: V3, out = new THREE.Matrix
 export const headScale = (measured: number, real: number) => (measured > 1e-6 ? real / measured : 1);
 
 const mat = (c: string, rough = 0.6, metal = 0) => new THREE.MeshStandardMaterial({ color: c, roughness: rough, metalness: metal });
-const STEEL = mat('#C9CDD2', 0.35, 0.8), BLACK = mat('#2B2E33', 0.5, 0.3), GRIP = mat('#1d1d1d', 0.9);
+const STEEL = mat('#C9CDD2', 0.35, 0.8), BLACK = mat('#2B2E33', 0.5, 0.3), GRIP = mat('#1d1d1d', 0.9), GLOSS_BLACK = mat('#0e0f11', 0.18, 0.4);
 
 /** Shaft and grip from the grip end down to `bottom` metres. */
 function shaftAndGrip(g: THREE.Group, bottom: number, black = false) {
-  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.006, bottom, 8).translate(0, -bottom / 2, 0), black ? BLACK : STEEL);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.006, bottom, 8).translate(0, -bottom / 2, 0), black ? GLOSS_BLACK : STEEL);
   const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.0085, 0.27, 10).translate(0, -0.135, 0), GRIP);
   g.add(shaft, grip);
 }
@@ -61,66 +61,90 @@ export function makeCodeClub(spec: ClubSpec): THREE.Group {
   return g;
 }
 
-/** Turns a generated head into a club: orientation from its manifest row (hosel up, face +Z, toe -X), real head size, hosel top
- *  under the grip end, plus a code shaft and grip. */
+/** Turns a generated head into a club: orientation from its manifest row (hosel up, face +Z, toe -X), real head size, the hosel's
+ *  axis under the grip end with a ferrule seated on the shaft, plus a code shaft and grip. */
 export function fitGeneratedHead(scene: THREE.Object3D, spec: ClubSpec, orientDeg: readonly number[] = [0, 0, 0]): THREE.Group {
   const head = new THREE.Group(); head.add(scene);
   const r = THREE.MathUtils.degToRad; scene.rotation.set(r(orientDeg[0] ?? 0), r(orientDeg[1] ?? 0), r(orientDeg[2] ?? 0));
   head.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(head), size = box.getSize(new THREE.Vector3());
-  head.scale.setScalar(headScale(size.x, spec.head)); head.updateMatrixWorld(true);
-  // hosel top = the highest vertex: it goes straight under the grip end, the sole sits at -length
-  const top = new THREE.Vector3(0, -Infinity, 0), v = new THREE.Vector3();
-  head.traverse(o => {
-    const p = (o as THREE.Mesh).geometry?.attributes?.position; if (!(o as THREE.Mesh).isMesh || !p) return;
-    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld); if (v.y > top.y) top.copy(v); }
-  });
-  const b2 = new THREE.Box3().setFromObject(head), hoselTop = spec.length - (top.y - b2.min.y);
-  head.position.set(-top.x, -spec.length - b2.min.y, -top.z); head.updateMatrixWorld(true);
-  // hosel radius just under its top: a ferrule tapers from it to the shaft, closing the step
-  let rTop = 0.006;
-  head.traverse(o => {
-    const p = (o as THREE.Mesh).geometry?.attributes?.position; if (!(o as THREE.Mesh).isMesh || !p) return;
-    for (let i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i).applyMatrix4(o.matrixWorld); if (v.y > -hoselTop - 0.015) rTop = Math.max(rTop, Math.hypot(v.x, v.z)); }
-  });
-  const black = spec.kind === 'putter', g = new THREE.Group();
-  const ferrule = new THREE.Mesh(new THREE.CylinderGeometry(0.0062, Math.min(rTop, 0.0075), 0.03, 12).translate(0, -hoselTop + 0.015, 0), black ? BLACK : GRIP);
-  shaftAndGrip(g, hoselTop - 0.03, black); g.add(ferrule, head);
+  head.scale.setScalar(headScale(vertexBox(head).getSize(new THREE.Vector3()).x, spec.head)); head.updateMatrixWorld(true);
+  const putter = spec.kind === 'putter';
+  if (putter) {   // the generated putter's own shaft is thin and kinked: drop everything 3.5 cm above the sole, a code shaft replaces it
+    const floor = vertexBox(head).min.y + 0.035;
+    eachMesh(head, m => { m.geometry = regroup(m, (_n, c) => (c.y > floor ? -1 : 0)); });
+  }
+  // hosel axis = the centre of the vertices within 1 cm of the top; its radius there sizes the ferrule
+  const b2 = vertexBox(head), c = new THREE.Vector3(), near: THREE.Vector3[] = [];
+  eachVertex(head, v => { if (v.y > b2.max.y - 0.01) near.push(v.clone()); });
+  near.forEach(v => c.add(v)); c.divideScalar(Math.max(1, near.length));
+  const rTop = Math.min(0.0075, Math.max(0.0062, ...near.map(v => Math.hypot(v.x - c.x, v.z - c.z))));
+  const hoselTop = spec.length - (b2.max.y - b2.min.y);
+  head.position.set(-c.x, -spec.length - b2.min.y, -c.z); head.updateMatrixWorld(true);
+  const g = new THREE.Group(), ferrule = new THREE.Mesh(new THREE.CylinderGeometry(0.006, rTop, 0.03, 12).translate(0, -hoselTop + 0.015, 0), putter ? GLOSS_BLACK : GRIP);
+  shaftAndGrip(g, hoselTop - 0.03, putter); g.add(ferrule, head);
   dressHead(head, spec);
   g.traverse(o => { o.castShadow = true; });
   return g;
 }
 
-/** Chrome (metalness 1, low roughness, a code environment map) for irons, wedges, the UT and the putter body, a gloss coat for the
- *  woods. Irons, wedges and the UT get a separate grooved face (triangles facing the loft direction), so the back's texture no
- *  longer shows mirrored on the face; lofts are stamped on the toe of the back. `head` sits in the club frame. */
+const eachMesh = (o: THREE.Object3D, f: (m: THREE.Mesh) => void) => o.traverse(x => { if ((x as THREE.Mesh).isMesh) f(x as THREE.Mesh); });
+/** Every vertex that an index still uses, in world space (dropped triangles don't count). */
+function eachVertex(o: THREE.Object3D, f: (v: THREE.Vector3) => void) {
+  const v = new THREE.Vector3();
+  eachMesh(o, m => {
+    const p = m.geometry.attributes.position!, idx = m.geometry.index;
+    const n = idx ? idx.count : p.count;
+    for (let i = 0; i < n; i++) f(v.fromBufferAttribute(p, idx ? idx.getX(i) : i).applyMatrix4(m.matrixWorld));
+  });
+}
+const vertexBox = (o: THREE.Object3D) => { const b = new THREE.Box3(); o.updateMatrixWorld(true); eachVertex(o, v => b.expandByPoint(v)); return b; };
+
+/** Matte black putter head with the white face insert, chrome irons, wedges and UT with a separate grooved face (only the front
+ *  of the blade, below the hosel), a gloss coat for the woods; small loft stamps on the toe. `head` sits in the club frame. */
 function dressHead(head: THREE.Object3D, spec: ClubSpec) {
-  const envMap = chromeEnv(), loft = THREE.MathUtils.degToRad(spec.loft), faced = spec.kind === 'iron' || spec.kind === 'wedge' || spec.kind === 'hybrid';
-  const faceDir = new THREE.Vector3(0, Math.sin(loft), Math.cos(loft));
+  const envMap = chromeEnv(), faced = spec.kind === 'iron' || spec.kind === 'wedge' || spec.kind === 'hybrid';
   head.updateMatrixWorld(true);
-  const meshes: THREE.Mesh[] = []; head.traverse(o => { if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh); });
-  for (const m of meshes) {
-    const old = m.material as THREE.MeshStandardMaterial, wood = spec.kind === 'wood';
-    const body = new THREE.MeshStandardMaterial({ map: old.map, envMap, metalness: wood ? 0.25 : spec.kind === 'putter' ? 0.7 : 1, roughness: wood ? 0.3 : 0.22, envMapIntensity: wood ? 0.6 : 1 });
-    if (!faced) { m.material = body; continue; }
-    const split = splitFace(m, faceDir);
-    m.geometry = split; m.material = [body, groovedFace(envMap, m)];
-  }
-  if (spec.stamp && meshes[0]) stamp(meshes[0], head, spec.stamp, spec.kind === 'wedge');
+  const box = vertexBox(head), soleY = box.min.y;
+  eachMesh(head, m => {
+    const old = m.material as THREE.MeshStandardMaterial;
+    if (spec.kind === 'wood') { m.material = new THREE.MeshStandardMaterial({ map: old.map, envMap, metalness: 0.25, roughness: 0.3, envMapIntensity: 0.6 }); return; }
+    if (spec.kind === 'putter') {
+      m.geometry = regroup(m, (n, c) => (n.z > 0.7 && c.z > box.max.z - 0.012 ? 1 : 0));   // the flat front face = the insert
+      m.material = [new THREE.MeshStandardMaterial({ color: '#16171a', roughness: 0.75, metalness: 0.2 }), new THREE.MeshStandardMaterial({ color: '#f2f2ee', roughness: 0.6 })];
+      return;
+    }
+    const body = new THREE.MeshStandardMaterial({ map: old.map, envMap, metalness: 1, roughness: 0.22 });
+    if (!faced) { m.material = body; return; }
+    // the face: forward-facing triangles on the blade (toe side of the hosel, below its neck)
+    m.geometry = regroup(m, (n, c) => (n.z > 0.3 && c.x < -0.012 && c.y < soleY + 0.06 ? 1 : 0));
+    m.material = [body, groovedFace(envMap, m)];
+  });
+  if (spec.kind === 'putter') sightline(head, box);
+  const first = head.getObjectByProperty('isMesh', true) as THREE.Mesh | undefined;
+  if (spec.stamp && first) stamp(first, head, spec.stamp, spec.kind === 'wedge');
 }
 
-/** Re-orders a mesh's triangles into two groups: 0 = the rest, 1 = those whose normal (club frame) is within ~50° of `dir`. */
-export function splitFace(m: THREE.Mesh, dir: THREE.Vector3): THREE.BufferGeometry {
+/** T sightline on the putter's top: a line back from the face and a cross tick along it. */
+function sightline(head: THREE.Object3D, box: THREE.Box3) {
+  const white = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.5 }), y = box.max.y + 0.0006, cx = (box.min.x + box.max.x) / 2, d = box.max.z - box.min.z;
+  const line = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.001, d * 0.55), white); line.position.set(cx, y, box.max.z - 0.012 - d * 0.275);
+  const tick = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.001, 0.003), white); tick.position.set(cx, y, box.max.z - 0.012);
+  const root = new THREE.Group(); root.add(line, tick); head.parent ? head.parent.updateMatrixWorld(true) : 0; head.attach(root);
+}
+
+/** Re-orders a mesh's triangles by `classify(normal, centroid)` (club frame): 0 = body, 1 = second material, -1 = dropped. */
+export function regroup(m: THREE.Mesh, classify: (n: THREE.Vector3, c: THREE.Vector3) => number): THREE.BufferGeometry {
   const geo = m.geometry.clone(), pos = geo.attributes.position!, nm = new THREE.Matrix3().getNormalMatrix(m.matrixWorld);
   const idx = geo.index ?? new THREE.BufferAttribute(Uint32Array.from({ length: pos.count }, (_, i) => i), 1);
-  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), face: number[] = [], rest: number[] = [];
+  const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), n = new THREE.Vector3(), mid = new THREE.Vector3(), out: number[][] = [[], []];
   for (let t = 0; t < idx.count; t += 3) {
     const i0 = idx.getX(t), i1 = idx.getX(t + 1), i2 = idx.getX(t + 2);
-    a.fromBufferAttribute(pos, i0); b.fromBufferAttribute(pos, i1); c.fromBufferAttribute(pos, i2);
-    n.subVectors(c, b).cross(a.sub(b)).applyMatrix3(nm).normalize();
-    (n.dot(dir) > 0.65 ? face : rest).push(i0, i1, i2);
+    a.fromBufferAttribute(pos, i0).applyMatrix4(m.matrixWorld); b.fromBufferAttribute(pos, i1).applyMatrix4(m.matrixWorld); c.fromBufferAttribute(pos, i2).applyMatrix4(m.matrixWorld);
+    mid.copy(a).add(b).add(c).divideScalar(3);
+    n.subVectors(c, b).cross(a.sub(b)).normalize();
+    const k = classify(n, mid); if (k >= 0) out[k]!.push(i0, i1, i2);
   }
-  geo.setIndex([...rest, ...face]); geo.clearGroups(); geo.addGroup(0, rest.length, 0); geo.addGroup(rest.length, face.length, 1);
+  geo.setIndex([...out[0]!, ...out[1]!]); geo.clearGroups(); geo.addGroup(0, out[0]!.length, 0); geo.addGroup(out[0]!.length, out[1]!.length, 1);
   return geo;
 }
 
@@ -159,8 +183,8 @@ function stamp(mesh: THREE.Mesh, head: THREE.Object3D, text: string, mirror = fa
   x.fillStyle = '#16181b'; x.font = 'bold 46px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 64, 34);
   head.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(head), w = box.max.x - box.min.x, d = box.max.z - box.min.z;
-  const at = new THREE.Vector3(box.min.x + 0.3 * w, box.min.y + 0.032, box.min.z + 0.25 * d);   // toe, a little above the sole
-  const geo = new DecalGeometry(mesh, at, new THREE.Euler(0, 0, Math.PI), new THREE.Vector3(0.026, 0.013, d * 0.5));
+  const at = new THREE.Vector3(box.min.x + 0.13 * w, box.min.y + 0.028, box.min.z + 0.25 * d);   // a small stamp on the toe
+  const geo = new DecalGeometry(mesh, at, new THREE.Euler(0, 0, Math.PI), new THREE.Vector3(0.017, 0.0085, d * 0.5));
   const decal = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, roughness: 0.5 }));
   const root = head.parent ?? head; root.updateMatrixWorld(true); head.attach(decal);   // built in world space; attach keeps it in place
 }

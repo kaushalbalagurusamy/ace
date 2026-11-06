@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
-import { CLUBS, clubMatrix, headScale, makeCodeClub, splitFace } from '../src/client/clubs';
+import { CLUBS, clubMatrix, headScale, makeCodeClub, regroup } from '../src/client/clubs';
 import { BAG } from '../src/client/ui';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 describe('club attach transform', () => {
   it('puts the grip end at the grip and runs the shaft (local -Y) along the shaft direction', () => {
@@ -32,12 +34,14 @@ describe('club specs and scale', () => {
     const inches = CLUBS.map(c => +(c.length / 0.0254).toFixed(2));
     expect(inches).toEqual([45.5, 43, 39.5, 38.5, 38, 37.5, 37, 36.5, 36, 35.5, 35.5, 35.5, 35.5, 34]);
   });
-  it('splits the triangles that face the loft direction into the face group', () => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1)); m.updateMatrixWorld(true);
-    const g = splitFace(m, new THREE.Vector3(0, 0, 1));
-    expect(g.groups).toEqual([{ start: 0, count: 30, materialIndex: 0 }, { start: 30, count: 6, materialIndex: 1 }]);   // the +Z side: 2 triangles
-    const lofted = splitFace(m, new THREE.Vector3(0, Math.sin(Math.PI / 4), Math.cos(Math.PI / 4)));
-    expect(lofted.groups[1]!.count).toBe(12);   // a 45° loft picks both the +Z and +Y sides (cos 45° > 0.65)
+  it('ships a 3W model of its own, not a copy of the driver', () => {
+    const hash = (id: string) => createHash('sha256').update(readFileSync(new URL(`../assets/models/${id}.glb`, import.meta.url))).digest('hex');
+    expect(hash('club-3w')).not.toBe(hash('club-driver'));
+  });
+  it('regroups triangles by normal and position: face group, body group, dropped', () => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1)); m.position.set(0, 2, 0); m.updateMatrixWorld(true);
+    const g = regroup(m, (n, c) => (n.y > 0.5 ? -1 : n.z > 0.5 && c.y > 1.5 ? 1 : 0));   // centroids are in world space (y about 2)
+    expect(g.groups).toEqual([{ start: 0, count: 24, materialIndex: 0 }, { start: 24, count: 6, materialIndex: 1 }]);   // top dropped, +Z face split off
   });
   it('scales a generated head to its real heel-to-toe length', () => {
     expect(headScale(2, 0.122)).toBeCloseTo(0.061);
