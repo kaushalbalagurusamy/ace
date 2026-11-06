@@ -74,7 +74,7 @@ export class TouchControls {
     canvas.style.touchAction = 'none';
     this.el.id = 'touch';
     const btn = (id: string, label: string, cls = '') => `<button class="tb ${cls}" id="t${id}">${label}</button>`;
-    this.el.innerHTML = `<div id="stick"><i></i></div>${btn('mute', '&#128264;', 'on')}<div id="tc">${btn('swing', 'Swing', 'big')}${btn('cart', 'Cart')}${btn('map', 'Map')}${btn('shift', 'Shift')}
+    this.el.innerHTML = `<div id="stick"><i></i></div>${btn('mute', '&#128264;')}<div id="tc">${btn('swing', 'Swing', 'big')}${btn('cart', 'Cart')}${btn('map', 'Map')}${btn('shift', 'Shift')}
       ${btn('x', '&#10005;')}${btn('chip', 'Chip')}${btn('aimr', 'Aim &#9654;')}${btn('aiml', '&#9664; Aim')}${btn('bd', 'Ball &#9660;')}${btn('bu', 'Ball &#9650;')}${btn('br', 'Ball &#9654;')}${btn('bl', '&#9664; Ball')}</div>`;
     hud.append(this.el);
     this.knob = this.el.querySelector('#stick i')!;
@@ -125,7 +125,7 @@ export class TouchControls {
   update(c: Ctx) {
     if (!this.on) return;
     const show = (id: string, v: boolean) => this.b[id]!.classList.toggle('on', v && c.race);
-    show('swing', !c.stance && !c.driving); show('cart', !c.stance && (c.driving || c.nearCart)); show('map', !c.stance); show('shift', !c.stance && !c.driving);
+    show('swing', !c.stance && !c.driving); show('cart', !c.stance && (c.driving || c.nearCart)); show('map', !c.stance); show('shift', !c.stance && !c.driving); show('mute', !c.map);
     for (const id of ['x', 'aiml', 'aimr']) show(id, c.stance);
     for (const id of ['chip', 'bu', 'bd', 'bl', 'br']) show(id, c.stance && !c.putt);
     this.b.map!.classList.toggle('lit', c.map); this.b.shift!.classList.toggle('lit', this.shift); this.b.chip!.classList.toggle('lit', c.chip);
