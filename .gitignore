@@ -16,3 +16,6 @@ public/
 
 # Python bytecode
 __pycache__/
+
+# Realism side-by-sides contain real reference photos: never commit them (our renders next to them are committed)
+assets/qa/realism/*-side.jpg

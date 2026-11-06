@@ -31,6 +31,34 @@ function openSea(hole: number, g: (typeof GRIDS)[number], cells: Uint8Array): Ui
   for (let x = 0; x < g.nx; x++) { let last = -1e9; for (let z = 0; z < g.nz; z++) { if (tmp[z * g.nx + x]) last = z; if (z - last <= R) m[z * g.nx + x] = 1; } last = 1e9; for (let z = g.nz - 1; z >= 0; z--) { if (tmp[z * g.nx + x]) last = z; if (last - z <= R) m[z * g.nx + x] = 1; } }
   seaMasks.set(hole, m); return m;
 }
+/** Per-cell sea data for the ocean, the coast and the terrain cut-out (one texel per cell, sim x not mirrored):
+ *  `sea` 1 for water and open sea, `dist` metres from the nearest land for sea cells (0 on land, capped at 80 m).
+ *  `tex` packs them as R = sea, G = dist / 80. Empty (no sea) on inland holes. */
+export interface SeaField { sea: Float32Array; dist: Float32Array; tex: THREE.DataTexture; any: boolean }
+const seaFields = new Map<number, SeaField>();
+export function seaField(hole: number): SeaField {
+  const hit = seaFields.get(hole); if (hit) return hit;
+  const g = GRIDS[hole]!, cells = decoded(hole), open = openSea(hole, g, cells), n = g.nx * g.nz;
+  const sea = new Float32Array(n), dist = new Float32Array(n).fill(1e9); let any = false;
+  for (let i = 0; i < n; i++) if (cells[i] === 119 || (g.coastal && cells[i] === 111 && open[i])) sea[i] = 1;
+  // drop small water specks (the traced graphics' dotted OB lines read as water): only bodies of 300+ cells are sea
+  const seen = new Uint8Array(n);
+  for (let s = 0; s < n; s++) if (sea[s] && !seen[s]) {
+    const comp = [s]; seen[s] = 1;
+    for (let k = 0; k < comp.length; k++) { const i = comp[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && sea[j] && !seen[j]) { seen[j] = 1; comp.push(j); } }
+    if (comp.length < 300) for (const i of comp) sea[i] = 0; else any = true;
+  }
+  for (let i = 0; i < n; i++) if (!sea[i]) dist[i] = 0;
+  // two-pass chamfer distance (3-4 metric) from land, in metres
+  const D = (i: number, j: number, w: number) => { if (dist[j]! + w < dist[i]!) dist[i] = dist[j]! + w; };
+  const c1 = g.cell, c2 = g.cell * 1.414;
+  for (let z = 0; z < g.nz; z++) for (let x = 0; x < g.nx; x++) { const i = z * g.nx + x; if (x) D(i, i - 1, c1); if (z) { D(i, i - g.nx, c1); if (x) D(i, i - g.nx - 1, c2); if (x < g.nx - 1) D(i, i - g.nx + 1, c2); } }
+  for (let z = g.nz - 1; z >= 0; z--) for (let x = g.nx - 1; x >= 0; x--) { const i = z * g.nx + x; if (x < g.nx - 1) D(i, i + 1, c1); if (z < g.nz - 1) { D(i, i + g.nx, c1); if (x < g.nx - 1) D(i, i + g.nx + 1, c2); if (x) D(i, i + g.nx - 1, c2); } }
+  const px = new Uint8Array(n * 4);
+  for (let i = 0; i < n; i++) { dist[i] = Math.min(80, dist[i]!); px[i * 4] = sea[i]! * 255; px[i * 4 + 1] = Math.round((dist[i]! / 80) * 255); px[i * 4 + 3] = 255; }
+  const tex = new THREE.DataTexture(px, g.nx, g.nz); tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearMipmapLinearFilter; tex.generateMipmaps = true; tex.needsUpdate = true;   // mips: the terrain asks 'near the sea?' from a blurred level
+  const f = { sea, dist, tex, any }; seaFields.set(hole, f); return f;
+}
 const decoded = (hole: number) => grids.get(hole) ?? (grids.set(hole, decodeGrid(GRIDS[hole]!)), grids.get(hole)!);
 /** Class char code at sim (x, z); no string allocation, for per-frame and per-instance lookups. */
 export const cellCode = (hole: number, x: number, z: number): number => {
@@ -62,8 +90,8 @@ export function gridCanvas(hole: number, px: number, mirrorX: boolean, flipZ: bo
   cache.set(key, c); return c;
 }
 
-/** Turf layer per class (order of graphics.SURFACES); trees stand on rough. Fringe (3) is the ring of fairway/cut/rough around a green. */
-const LAYER: Record<number, number> = { 102: 0, 99: 1, 114: 2, 116: 2, 103: 4, 115: 5 };
+/** Turf layer per class (order of graphics.SURFACES); trees and shore rocks stand on rough. Fringe (3) is the ring of fairway/cut/rough around a green. */
+const LAYER: Record<number, number> = { 102: 0, 99: 1, 114: 2, 116: 2, 107: 2, 103: 4, 115: 5 };   // rock/shore ground (k) wears the rough turf; the boulders sit on it
 const MASK_PX = 4;
 const masks = new Map<number, [THREE.DataTexture, THREE.DataTexture]>();
 function boxBlur(a: Uint8Array, w: number, h: number, r: number, tmp: Uint8Array) {
@@ -104,9 +132,15 @@ export function turfMasks(hole: number): [THREE.DataTexture, THREE.DataTexture] 
 const TILES = `float[6](${TURF_LAYERS.map(l => l.tile.toFixed(2)).join(', ')})`;
 const TURF_COMMON = /* glsl */`
 uniform sampler2D uDetail; varying vec2 vWxz;
+#ifdef HAS_SEA
+uniform sampler2D uSea; uniform vec4 uGrid;
+#endif
 #ifdef HAS_TURF
 uniform highp sampler2DArray uAlb; uniform highp sampler2DArray uNrm;
-uniform sampler2D uMaskA; uniform sampler2D uMaskB; uniform vec4 uGrid; uniform vec2 uStripe;
+uniform sampler2D uMaskA; uniform sampler2D uMaskB; uniform vec2 uStripe;
+#ifndef HAS_SEA
+uniform vec4 uGrid;
+#endif
 const float TILE[6] = ${TILES};
 float tHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float tNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -115,6 +149,9 @@ float tNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
 // Blend the surfaces by the lie masks (edges jittered so they are not grid-straight), two samplings per surface for anti-tiling
 // (the second rotated, larger and offset, chosen by world noise), macro colour variation, and mowing stripes across the tee-pin axis.
 const TURF_MAP = /* glsl */`
+#ifdef HAS_SEA
+if (textureLod(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw, 0.0).r > 0.55) discard;   // the ocean (ocean.ts) and the cliffs (coast.ts) show through
+#endif
 vec3 turfN = vec3(0.5, 0.5, 1.0); float turfW = 0.0;
 #ifdef HAS_DETAIL
 diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
@@ -142,8 +179,19 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
     }
     alb /= sum; nr /= sum;
     alb *= (0.9 + 0.2 * tNoise(vWxz * 0.021)) * (0.95 + 0.1 * tNoise(vWxz * 0.19 + 5.1));
+    // Pebble's bunker lips: a ragged ring of longer, darker, straw-tipped fescue where the turf meets the white sand
+    float ws = wt[5] / sum, lip = smoothstep(0.04, 0.3, ws) * (1.0 - smoothstep(0.42, 0.75, ws)) * (1.0 - wt[4] / sum) * (0.6 + 0.6 * tNoise(vWxz * 2.3));
+    alb = mix(alb, mix(vec3(0.17, 0.2, 0.08), vec3(0.42, 0.38, 0.2), tNoise(vWxz * 5.0)), clamp(lip, 0.0, 0.85));
+    // the flat ground has no bunker bowl, so fake its face: the lip toward the sun shades the sand behind it (sun from environment.ts SUN_DIR)
+    float wsSun = texture2D(uMaskB, muv + vec2(-0.507, -0.862) * 1.6 * uGrid.zw).g;
+    alb *= 1.0 - 0.45 * ws * clamp(1.0 - wsSun * 1.4, 0.0, 1.0);
+  #ifdef HAS_SEA
+    // traced sand on the cliff tops and shore reads as native scrub and fescue in the photos (h08-chasm, h06-cliffs), not white bunker sand
+    float coast = smoothstep(0.02, 0.12, textureLod(uSea, muv, 4.0).r) * ws;
+    alb = mix(alb, mix(vec3(0.075, 0.1, 0.03), vec3(0.16, 0.14, 0.07), tNoise(vWxz * 0.6)) * (0.8 + 0.4 * tNoise(vWxz * 4.0)), coast);
+  #endif
     float sp = dot(sim, uStripe);
-    alb *= 1.0 + 0.11 * (wt[0] / sum) * (smoothstep(-0.25, 0.25, sin(sp * 0.5236)) - 0.5) + 0.06 * (wt[4] / sum) * (smoothstep(-0.3, 0.3, sin(sp * 3.1416)) - 0.5);
+    alb *= 1.0 + 0.18 * (wt[0] / sum) * (smoothstep(-0.25, 0.25, sin(sp * 0.5236)) - 0.5) + 0.06 * (wt[4] / sum) * (smoothstep(-0.3, 0.3, sin(sp * 3.1416)) - 0.5);
   #ifdef TURF_DETAIL
     float near = smoothstep(30.0, 4.0, length(vViewPosition));
     if (near > 0.0) {
@@ -159,14 +207,14 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
 }
 #endif`;
 
-type TerrainU = { uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 } };
+type TerrainU = { uSea: { value: THREE.Texture | null }; uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 } };
 /** Ground mesh for a hole in three space (x mirrored, as everywhere in the client). Starts with the lie grid's canvas colours;
  *  the HD turf replaces them once `turf` resolves (if it resolves to null, a generated grass texture is multiplied in as detail instead). */
 export function terrainMesh(h: Pick<HoleInfo, 'index' | 'tee' | 'pin'>, turf: Promise<Turf | null>, detail: boolean): THREE.Mesh {
   const hole = h.index, g = GRIDS[hole]!, tex = new THREE.CanvasTexture(gridCanvas(hole, 4, true, false));
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const ax = h.pin.x - h.tee.x, az = h.pin.z - h.tee.z, al = Math.hypot(ax, az) || 1;
-  const u: TerrainU = { uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
+  const u: TerrainU = { uSea: { value: seaField(hole).tex }, uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
     uGrid: { value: new THREE.Vector4(g.x0, g.z0, 1 / (g.nx * g.cell), 1 / (g.nz * g.cell)) }, uStripe: { value: new THREE.Vector2(-az / al, ax / al) } };
   const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, metalness: 0 });
   mat.userData.turf = u;
@@ -179,7 +227,7 @@ export function terrainMesh(h: Pick<HoleInfo, 'index' | 'tee' | 'pin'>, turf: Pr
       // flat ground: the tangent frame is world x/z, so the baked slopes become a world normal directly
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n#ifdef HAS_TURF\nif (turfW > 0.0) { vec2 sl = (turfN.xy * 2.0 - 1.0) * turfW; normal = normalize((viewMatrix * vec4(normalize(vec3(sl.x, 1.0, sl.y)), 0.0)).xyz); }\n#endif');
   };
-  mat.defines = {};
+  mat.defines = seaDefs(hole);
   const w = g.nx * g.cell, d = g.nz * g.cell, m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2), mat);
   m.position.set(-(g.x0 + w / 2), 0, g.z0 + d / 2); m.receiveShadow = true; m.userData.hole = hole;
   void turf.then(t => setTurf(m, t, detail));
@@ -190,10 +238,12 @@ export function setTurf(m: THREE.Mesh, t: Turf | null, detail: boolean) {
   const mat = m.material as THREE.MeshStandardMaterial, u = mat.userData.turf as TerrainU;
   if (t) {
     [u.uMaskA.value, u.uMaskB.value] = turfMasks(m.userData.hole as number); u.uAlb.value = t.alb; u.uNrm.value = t.nrm;
-    mat.defines = detail ? { HAS_TURF: '', TURF_DETAIL: '' } : { HAS_TURF: '' }; mat.needsUpdate = true;
-  } else void loadTexture('tex-rough').then(d => { if (d && !u.uAlb.value) { u.uDetail.value = d; mat.defines = { HAS_DETAIL: '' }; mat.needsUpdate = true; } });
+    mat.defines = { ...seaDefs(m.userData.hole as number), ...(detail ? { HAS_TURF: '', TURF_DETAIL: '' } : { HAS_TURF: '' }) }; mat.needsUpdate = true;
+  } else void loadTexture('tex-rough').then(d => { if (d && !u.uAlb.value) { u.uDetail.value = d; mat.defines = { ...seaDefs(m.userData.hole as number), HAS_DETAIL: '' }; mat.needsUpdate = true; } });
 }
 export const isCoastal = (hole: number) => GRIDS[hole]!.coastal;
+/** Coastal holes cut the sea out of the terrain so the ocean and cliffs below show through. */
+const seaDefs = (hole: number): Record<string, string> => (GRIDS[hole]!.coastal && seaField(hole).any ? { HAS_SEA: '' } : {});
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
 export function propSpots(hole: number): PropSpot[] {
