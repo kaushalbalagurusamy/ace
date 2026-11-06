@@ -1823,7 +1823,14 @@
       "refs/pebble-photos/seeds/lone-cypress.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/lone-cypress.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-cypress-b",
@@ -1853,7 +1860,14 @@
       "refs/pebble-photos/seeds/point-lobos-cypress.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/point-lobos-cypress.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-cypress-c",
@@ -1883,7 +1897,14 @@
       "refs/pebble-photos/seeds/h18-fairway-bay.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-pine",
@@ -1913,7 +1934,14 @@
       "refs/pebble-photos/seeds/h18-view-back.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-rock-granite",
@@ -1943,7 +1971,14 @@
       "refs/pebble-photos/seeds/coast-rocks-fescue.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-rock-sea",
@@ -1973,7 +2008,14 @@
       "refs/pebble-photos/seeds/h07-green.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-cliff",
@@ -2003,7 +2045,14 @@
       "refs/pebble-photos/seeds/h06-cliffs.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "concept-seawall",
@@ -2034,7 +2083,15 @@
       "refs/pebble-photos/seeds/h18-moreira.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)"
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-green-bunkers.jpg",
+      "refs/pebble-photos/h18-moreira.jpg"
+    ],
+    "use": "seed image for Rodin image-to-3D (local only, not shipped)"
   },
   {
     "id": "tex-cliff",
@@ -2064,14 +2121,17 @@
       "refs/pebble-photos/seeds/h06-cliffs.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)",
+    "subagent": "visual realism (worktree session)",
     "sha256": "7b14f02c4fac2159053eef89b1e236dc7b316d6834c2cc5bbdc58587b0b3bb32",
     "shipped_bytes": 352448,
     "source_png": "assets/images/tex-cliff.png",
     "post_process": "made seamless (scripts/turf_tiles.py blend), 1024 px JPEG q84 (scripts/rock_tiles.py); normal map derived in code from luminance (src/client/coast.ts)",
     "qa": {
       "verdict": "PENDING"
-    }
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ]
   },
   {
     "id": "tex-seawall",
@@ -2101,14 +2161,17 @@
       "refs/pebble-photos/seeds/h18-moreira.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)",
+    "subagent": "visual realism (worktree session)",
     "sha256": "9c2100d209ce5db0319c75ddde197cbcc7849e600047ddefdc5fa5e803bd82a3",
     "shipped_bytes": 415741,
     "source_png": "assets/images/tex-seawall.png",
     "post_process": "made seamless (scripts/turf_tiles.py blend), 1024 px JPEG q84 (scripts/rock_tiles.py); normal map derived in code from luminance (src/client/coast.ts)",
     "qa": {
       "verdict": "PENDING"
-    }
+    },
+    "seed_photos": [
+      "refs/pebble-photos/h18-moreira.jpg"
+    ]
   },
   {
     "id": "turf-sand",
@@ -2138,7 +2201,7 @@
       "refs/pebble-photos/seeds/bunker-close.png"
     ],
     "licence": "OpenAI API terms: output usable commercially, owner to confirm",
-    "subagent": "build session (script)",
+    "subagent": "visual realism (worktree session)",
     "qa": {
       "verdict": "PENDING"
     },
@@ -2432,6 +2495,131 @@
     "date": "2026-11-05",
     "post_process": "gltf-transform optimize: meshopt simplify ratio 1.0 (1 = none; Rodin face target 9000), draco, webp textures <= 1024; raw kept local (assets/models/raw, gitignored)",
     "licence": "Hyper3D Rodin API terms (generated output owned by the user per plan): owner to confirm",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-sky",
+    "file": "src/client/environment.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Gradient sky dome in the photo-measured zenith/horizon colours with sun glow and soft streak clouds; PMREM image light baked from it; ACES tone mapping; exponential haze",
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/lone-cypress.jpg",
+      "refs/pebble-photos/h18-marine-layer.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-ocean",
+    "file": "src/client/ocean.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Carmel Bay water shader: depth gradient (turquoise shallows to slate blue) from the per-hole distance-to-land field, two tiling fBm normal maps generated in code, Fresnel sky reflection, sun glints, white surf at the shore",
+    "seed_photos": [
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/point-lobos-cypress.jpg",
+      "refs/pebble-photos/h07-morgen.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-cliffs-seawall",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Cliff faces (and the 18th-hole sea wall) extruded down to sea level along the marching-squares land/sea contour, noise-displaced, triplanar tex-cliff / tex-seawall with a normal map derived in code",
+    "seed_photos": [
+      "refs/pebble-photos/h06-cliffs.jpg",
+      "refs/pebble-photos/h08-chasm.jpg",
+      "refs/pebble-photos/h18-green-bunkers.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-buildings-18",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Generic low cream two-storey buildings with hip roofs and a canvas window facade behind the 18th green, among cypress (deliberately not a replica of the Lodge)",
+    "seed_photos": [
+      "refs/pebble-photos/lodge.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-backdrop",
+    "file": "src/client/coast.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Far shore across the bay (hazy hills, pale beach line, dark shore trees) and an inland tree-line silhouette band",
+    "seed_photos": [
+      "refs/pebble-photos/h07-morgen.jpg",
+      "refs/pebble-photos/h18-fairway-bay.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-bunker-lips",
+    "file": "src/client/fescue.ts + src/client/terrain.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Instanced fescue tufts on every turf cell bordering sand, fescue-coloured lip band and sun-side lip shading in the terrain shader",
+    "seed_photos": [
+      "refs/pebble-photos/bunker-close.jpg",
+      "refs/pebble-photos/h18-green-bunkers.jpg",
+      "refs/pebble-photos/coast-rocks-fescue.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
+    "subagent": "visual realism (worktree session)",
+    "qa": {
+      "verdict": "PENDING"
+    }
+  },
+  {
+    "id": "env-turf-grade",
+    "file": "src/client/turf-bake.ts",
+    "tool": "code-generated (three.js shader / geometry)",
+    "model": "n/a",
+    "prompt": "Turf palette targets moved from lime to the measured olive Poa/rye greens and near-white sand",
+    "seed_photos": [
+      "refs/pebble-photos/h18-fairway-bay.jpg",
+      "refs/pebble-photos/h08-fairway.jpg",
+      "refs/pebble-photos/h07-green.jpg",
+      "refs/pebble-photos/bunker-close.jpg"
+    ],
+    "date": "2026-11-05",
+    "licence": "project code",
     "subagent": "visual realism (worktree session)",
     "qa": {
       "verdict": "PENDING"
