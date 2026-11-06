@@ -12,6 +12,10 @@ import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
 import { suggestClub, type Lie } from '../sim';
+import { CART, canEnter, cartGround, cartSpawn, exitSpot, forwardSpeed, stepCart } from '../shared/cart';
+import type { CartState } from '../shared/protocol';
+/** The Box Buggy (PRD/07): my cart's state, whether I am in it, and the chase camera (mouse orbit offset, smoothed yaw, bump shake). */
+let cart: CartState = cartSpawn(0, 0), driving = false, mySlot = 0, orbit = 0, lastLook = 0, camYaw = 0, shake = 0, lastSend = 0;
 let lookMult = loadMult();
 let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
@@ -87,6 +91,7 @@ function onMsg(m: ServerMsg) {
       pos = me ? { x: me.ball.x + 1, z: me.ball.z - 0.5 } : { ...m.hole.tee };
       yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z);
       holeStartStrokes = 0; startAmbience(m.hole.index); world.selfId = selfId;
+      mySlot = Math.max(0, m.players.findIndex(p => p.id === selfId)); cart = cartSpawn(m.hole.index, mySlot); driving = false; camYaw = yaw;
       phase = 'race'; ui.screen(null); board(); break;
     }
     case 'shotResult': {
@@ -113,12 +118,19 @@ function onMsg(m: ServerMsg) {
         hole = m.hole; world.myHole = m.hole.index; world.buildCourse(m.hole); world.moveTo(m.playerId, m.ball, m.hole.index);
         pos = { x: m.ball.x + 1, z: m.ball.z - 0.5 }; yaw = Math.atan2(m.hole.pin.x - pos.x, m.hole.pin.z - pos.z); swing = null;
         holeStartStrokes = m.ball.strokes; startAmbience(m.hole.index);
+        cart = cartSpawn(m.hole.index, mySlot); driving = false; camYaw = yaw;          // the cart came along to the new tee
         ui.toast(`Hole ${m.hole.index + 1}: par ${m.hole.par}, ${Math.round(m.hole.lengthM * YD)} yd`);
       } else world.moveTo(m.playerId, m.ball, m.hole.index);
       board(); break;
     }
+    case 'movers': for (const p of m.players) world.remote(p); break;
+    case 'bump':
+      if (m.target === 'cart') { cart = { ...cart, x: cart.x + m.dx, z: cart.z + m.dz, vx: cart.vx + m.dvx, vz: cart.vz + m.dvz }; if (driving) pos = { x: cart.x, z: cart.z }; }
+      else if (!driving) pos = { x: pos.x + m.dx, z: pos.z + m.dz };
+      audio.bump(m.strength); shake = Math.max(shake, 0.4 + 0.6 * m.strength); break;
+    case 'snap': pos = { x: m.x, z: m.z }; driving = m.driving; cart = { ...m.cart }; break;
     case 'raceEnd':
-      endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops();
+      endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops(); audio.whir(0);
       ui.showResults([...m.results].sort((a, b) => a.place - b.place)); break;
   }
 }
@@ -146,7 +158,8 @@ canvas.addEventListener('click', () => { if (phase === 'race') void requestLock(
 addEventListener('mousemove', e => {
   if (phase !== 'race' || ui.settingsOpen() || (swing && swing.fsm.phase !== 'stance' && swing.fsm.phase !== 'idle') || (document.pointerLockElement !== canvas && !(e.buttons & 1))) return;
   const m = lookMult * lookScale(keys);                                    // Shift halves the look for fine aim and putting lines
-  yaw += lookDelta(e.movementX, m); pitch = Math.min(1.2, Math.max(0.05, pitch + lookDelta(e.movementY, m)));
+  if (driving) { orbit += lookDelta(e.movementX, m); lastLook = performance.now(); } else yaw += lookDelta(e.movementX, m);   // in the cart the mouse orbits the chase camera
+  pitch = Math.min(1.2, Math.max(0.05, pitch + lookDelta(e.movementY, m)));
   if (swing && swing.sentAt === undefined) swing.fsm.setAim(aimDeg(yaw));  // the mouse stays live in the stance: the golfer pivots, the ball does not move
 });
 const own = () => world.ents.get(selfId);
@@ -167,9 +180,15 @@ addEventListener('keydown', e => {
   const ci = BAG.findIndex(b => b.code === e.code);
   if (ci >= 0 && (!swing || (swing.sentAt === undefined && swing.fsm.setClub(BAG[ci]!.key, ci === PUTTER)))) { club = ci; ui.setClub(ci); return; }   // club changes stay allowed in the stance until the backswing starts
   if (swing) { if (swing.sentAt === undefined) act(swing.fsm.key(e.code, true, e.timeStamp)); return; }
+  if (e.code === 'KeyE' && started()) {                                       // E: get in within 3 m, or get out beside the cart
+    if (driving) { driving = false; pos = exitSpot(cart); cart = { ...cart, vx: 0, vz: 0 }; yaw = camYaw; }
+    else if (canEnter(pos, cart)) { driving = true; orbit = 0; camYaw = yaw; }
+    return;
+  }
+  if (e.code === 'Space' && driving) { ui.toast('E: get out to play'); return; }
   if (e.code === 'Space' && started()) {
     const me = own();
-    if (rfOpen || !me || !canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut })) return;
+    if (rfOpen || !me || !canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving })) return;
     swing = { fsm: new SwingFSM({ putt: club === PUTTER, aimDeg: aimDeg(yaw), clubKey: BAG[club]!.key }) };   // first press: take the stance (movement off; aim, club and ball position stay adjustable)
     act(swing.fsm.key(e.code, true, e.timeStamp)); // the machine models the first press too
   }
@@ -195,10 +214,25 @@ function frame(now: number) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (phase !== 'race' || !hole) { if (phase === 'results' || phase === 'race') world.render(pos.x, pos.z, yaw, pitch); return; }
   const me = own(), go = started();
-  if (!swing && go && !ui.settingsOpen()) {                                  // arrow keys move; WASD is for the ball position in the stance
+  if (!swing && go && !ui.settingsOpen() && !driving) {                      // arrow keys move; WASD is for the ball position in the stance
     const { f, r } = moveAxis(keys), n = Math.hypot(f, r) || 1, speed = walkSpeed(keys);
     pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * speed * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * speed * dt;
   }
+  // the cart always steps (a bumped, parked cart still rolls to a stop); arrows drive it only from the seat
+  const drive = driving && go && !ui.settingsOpen() ? moveAxis(keys) : { f: 0, r: 0 }, ground = (x: number, z: number) => cartGround(hole!.index, x, z);
+  for (let i = 0, n = Math.ceil(dt * 120); i < n; i++) {                     // small fixed sub-steps so a fast cart cannot skip a thin bunker lip
+    const st = stepCart(cart, { throttle: drive.f, steer: drive.r }, dt / n, ground); cart = st.s;
+    if (st.bumped > 1.5 && driving) { audio.bump(Math.min(1, st.bumped / CART.TOP) * 0.6); shake = Math.max(shake, 0.25); }
+  }
+  if (driving) {
+    pos = { x: cart.x, z: cart.z };
+    if (Math.abs(forwardSpeed(cart)) > 2 && now - lastLook > 1500) orbit *= Math.exp(-1.5 * dt);   // the chase camera swings back behind the cart
+    const want = cart.yaw + orbit; camYaw += Math.atan2(Math.sin(want - camYaw), Math.cos(want - camYaw)) * (1 - Math.exp(-6 * dt)); yaw = camYaw;
+  }
+  audio.whir(driving ? Math.min(1, Math.abs(forwardSpeed(cart)) / CART.TOP) : 0);
+  if (me) world.placeCart(me, cart, driving ? drive.r : 0, dt);
+  if (me) me.driving = driving;
+  if (go && now - lastSend > 100) { lastSend = now; net.send({ t: 'move', x: pos.x, z: pos.z, yaw, driving, cart }); }
   if (swing) {
     if (swing.sentAt !== undefined) { if (!stuckSince) stuckSince = now; if (now - stuckSince > 3000) { swing = null; stuckSince = 0; } }
     else {
@@ -212,14 +246,16 @@ function frame(now: number) {
     }
   } else { stuckSince = 0; ui.meterShow(null); ui.ballPosGrid(null); }
   if (!swing) { ui.meterShow(null); ui.ballPosGrid(null); }
-  const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut });
-  ui.prompt(swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`);
+  const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving });
+  const base = swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`;
+  const nearCart = go && !swing && !driving && canEnter(pos, cart);
+  ui.prompt(driving && go ? `Arrows drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
   { // pin indicator: on foot and in the stance, hidden while the ball flies and within about 30 yd of the pin
     const pinYd = me ? Math.hypot(hole.pin.x - me.ball.x, hole.pin.z - me.ball.z) * YD : 0, camYd = Math.hypot(hole.pin.x - pos.x, hole.pin.z - pos.z) * YD;
     ui.pinMarker(me && !me.anim && !rfOpen && !me.ball.holedOut ? world.pinScreen() : null, pinYd, pinOpacity(camYd));
   }
   ui.ballMarker(me && !me.ball.holedOut ? world.ballScreen() : null, me ? Math.hypot(me.ball.x - pos.x, me.ball.z - pos.z) * YD : 0);
-  const headingRad = (swing ? swing.fsm.aim() : aimDeg(yaw)) * Math.PI / 180;   // in the stance the arrow shows the aim (the shot's aimDeg), otherwise the camera facing
+  const headingRad = driving ? cart.yaw : (swing ? swing.fsm.aim() : aimDeg(yaw)) * Math.PI / 180;   // in the stance the arrow shows the aim (the shot's aimDeg), otherwise the camera facing
   if (rfOpen && me && hole) ui.drawRangefinder(hole, me.ball, pos, rfTarget, rfHover, headingRad);
   const cd = goAt - Date.now();
   ui.countdown(cd > 0 ? String(Math.ceil(cd / 1000)) : cd > -800 ? 'GO' : '');
@@ -230,12 +266,17 @@ function frame(now: number) {
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
   }
   world.tick(now);
-  ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => [
-    { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true, own: e.id === selfId },
-    { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade, own: e.id === selfId, heading: e.id === selfId ? headingRad : undefined },
-  ]));
+  ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => {
+    const mine = e.id === selfId, onFoot = mine ? !driving : !e.driving;
+    return [
+      { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true, own: mine },
+      ...(mine && driving ? [] : [{ x: e.cs.x, z: e.cs.z, shade: e.shade, cart: true, heading: e.cs.yaw }]),   // my cart is the heading arrow while I drive
+      ...(onFoot || mine ? [{ x: mine ? pos.x : e.remote?.x ?? e.ball.x + 1, z: mine ? pos.z : e.remote?.z ?? e.ball.z - 0.5, shade: e.shade, own: mine, heading: mine ? headingRad : undefined }] : []),
+    ];
+  }));
   const cam = me?.anim ? me.ballMesh.position : null; // camera follows the ball while it flies
-  world.render(cam ? -cam.x : pos.x, cam ? cam.z : pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : 1.5);
+  shake = Math.max(0, shake - dt * 2.5); const jx = shake * shake * 0.5 * (Math.random() - 0.5), jz = shake * shake * 0.5 * (Math.random() - 0.5);   // bump shake (trauma²)
+  world.render((cam ? -cam.x : pos.x) + jx, (cam ? cam.z : pos.z) + jz, swing ? swing.fsm.aim() * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : driving ? 1.8 : 1.5, cam ? 25 : driving ? 11 : 8);
 }
 requestAnimationFrame(frame);
 

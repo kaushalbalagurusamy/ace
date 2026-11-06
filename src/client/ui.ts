@@ -206,7 +206,7 @@ export class UI {
     e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */
-  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean; heading?: number }[]) {
+  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean; heading?: number; cart?: boolean }[]) {
     const c = this.mini.getContext('2d')!, W = this.mini.width, H = this.mini.height;
     const dx = h.pin.x - h.tee.x, dz = h.pin.z - h.tee.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L;
     const s = (H - 30) / (L + 20);
@@ -220,7 +220,7 @@ export class UI {
     c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
     const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);
     const [tx, tz] = P(h.tee.x, h.tee.z); c.fillStyle = '#222'; c.fillRect(tx - 4, tz - 2, 8, 4);
-    for (const d of dots) { const [x, y] = P(d.x, d.z); if (d.own && d.ball) { c.strokeStyle = '#ffe14d'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 6, 0, 7); c.stroke(); c.lineWidth = 1; } if (d.own && !d.ball && d.heading !== undefined) { this.heading(c, x, y, d.heading, 1); continue; } c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
+    for (const d of dots) { const [x, y] = P(d.x, d.z); if (d.cart) { c.save(); c.translate(x, y); c.rotate(mapArrowRotation(d.heading ?? 0)); c.fillStyle = d.shade; c.strokeStyle = '#000'; c.fillRect(-3, -5, 6, 10); c.strokeRect(-3, -5, 6, 10); c.fillStyle = '#9cc4ff'; c.fillRect(-2, -4, 4, 3); c.restore(); continue; } if (d.own && d.ball) { c.strokeStyle = '#ffe14d'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 6, 0, 7); c.stroke(); c.lineWidth = 1; } if (d.own && !d.ball && d.heading !== undefined) { this.heading(c, x, y, d.heading, 1); continue; } c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
   }
   /** Google-Maps-style heading marker: a soft view cone behind a chevron pointing where the camera (or, in the stance, the aim) faces. The map stays hole-up; the arrow rotates. */
   private heading(c: CanvasRenderingContext2D, x: number, y: number, yaw: number, k: number) {
