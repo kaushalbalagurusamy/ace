@@ -8,6 +8,8 @@ import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js
 
 interface Row { id: string; target_height_m?: number; height_m?: number; orient_deg?: number[]; qa?: { verdict?: string } }
 let manifest: Promise<Row[]> | null = null;
+/** QA renders only (?assets=pending): also draw models still awaiting their fidelity verdict, so the critic can judge them in place. Never set in play. */
+const PREVIEW_PENDING = typeof location !== 'undefined' && new URLSearchParams(location.search).get('assets') === 'pending';
 const rows = () => (manifest ??= fetch('/assets/manifest.json').then(async r => (r.ok ? ((await r.json()) as Row[]) : [] as Row[])).catch(() => [] as Row[]));
 
 let loader: GLTFLoader | null = null;
@@ -26,7 +28,7 @@ export async function loadRaw(id: string): Promise<{ scene: THREE.Object3D; row:
     raws.set(id, (async () => {
       try {
         const row = (await rows()).find(r => r.id === id);
-        if (!row || row.qa?.verdict !== 'PASS') return null; // owner rule: a 3D model ships only after its fidelity check passed; until then the code-built stand-in stays
+        if (!row || (row.qa?.verdict !== 'PASS' && !(PREVIEW_PENDING && row.qa?.verdict === 'PENDING'))) return null; // owner rule: a 3D model ships only after its fidelity check passed; until then the code-built stand-in stays
         return { scene: (await gltf().loadAsync(`/assets/models/${id}.glb`)).scene, row };
       } catch { return null; }
     })());
@@ -69,4 +71,4 @@ export function loadTexture(id: string): Promise<THREE.Texture | null> {
   return textures.get(id)!;
 }
 
-export interface PropSpot { kind: 'cypress' | 'pine' | 'rock'; x: number; z: number; scale: number; rotY: number }
+export interface PropSpot { kind: 'cypress' | 'pine' | 'rock'; x: number; z: number; scale: number; rotY: number; /** ground height, default 0 (shore boulders sit at sea level) */ y?: number }

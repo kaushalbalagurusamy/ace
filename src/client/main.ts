@@ -55,6 +55,10 @@ let gfxPref: Pref = loadPref();
 const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })), gfxPref === 'auto' ? adapt.tier : gfxPref);
 console.info('graphics:', hw.renderer ?? 'renderer masked', `max texture ${hw.maxTexture}`, `Auto picked ${adapt.tier}`);
 (window as unknown as { __ace?: unknown }).__ace = { world }; // debug handle for browser checks
+// QA camera for the realism side-by-sides (scripts/qa/realism-shots.mjs): ?view=hole,cx,cy,cz,tx,ty,tz[,fov] with the hole 1-based and
+// positions in sim metres (x right, z from the tee toward the pin) draws that hole from there, with no race and no UI.
+const qaView = new URLSearchParams(location.search).get('view')?.split(',').map(Number) ?? null;
+if (qaView) { world.qaView(qaView); setTimeout(() => { for (const el of document.body.children) if (el.tagName !== 'CANVAS') (el as HTMLElement).style.display = 'none'; }, 50); }
 const validName = (n: string) => n.trim().length >= 2 && n.trim().length <= 16;
 
 const ui = new UI((a, d, form) => {
@@ -237,6 +241,7 @@ function frame(now: number) {
     const me = world.ents.get(selfId), t = adapt.sample(rawMs, now, !!swing || !!me?.anim);
     if (t) { world.applyTier(t); ui.syncGraphics(); }
   }
+  if (qaView) { world.qaRender(); return; }
   if (phase !== 'race' || !hole) { if (phase === 'results' || phase === 'race') world.render(pos.x, pos.z, yaw, pitch); return; }
   const me = own(), go = started();
   if (!swing && go && !ui.settingsOpen() && !driving) {                      // arrow keys move; WASD is for the ball position in the stance

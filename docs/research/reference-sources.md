@@ -71,3 +71,39 @@ Yardages are the 2000 U.S. Open setup from the article. Hole 2 is played as a **
 - **Files:** `genesis-1.jpg` (rear three-quarter), `genesis-3.jpg` (front three-quarter, Genesis wing logo in the background), `genesis-4.jpg` (interior: plaid seats and a tan dash). `genesis-2` was a duplicate and is removed.
 - **Signature features:** a four-seat glass-canopy box body in dark blue, a horizontal light bar with chrome strips at the rear, chunky knobby wheels with exposed suspension, a tan and plaid interior, and the Genesis winged badge.
 - **Use:** Meshy image-to-3D for the player's cart, then the fidelity critic, as for every model. Reference only; the photos never ship.
+
+## Real photographs of Pebble Beach Golf Links: `refs/pebble-photos/` (gathered 2026-11-05)
+
+26 real photographs, used **only** as the fidelity reference and as seed inputs to generation (OpenAI image edits, then Rodin/Meshy image-to-3D). None of them ships, and the side-by-side composites that contain them (`assets/qa/realism/*-side.jpg`) are not committed. Full metadata (image URL, author, licence URL) is in `refs/pebble-photos/sources.json`; `refs/pebble-photos/seeds/` holds 1024 px PNG copies sent to the generators. The look-dev brief that distils them is `docs/research/pebble-look.md`.
+
+- **How:** the Wikimedia Commons API (category *Pebble Beach Golf Links*, the 2016 AT&T Pro-Am category and a Monterey cypress search) and the Openverse API (Flickr CC photos) for the holes Commons lacks (7 from the tee, 8, 17). Commons files were taken at 1280 px.
+- **Licences:** CC BY / CC BY-SA / public domain on Commons; four Flickr photos are NC or ND. All are used as reference only, which these licences allow; nothing derived is a copy of a photo.
+
+| File | Shows | Author | Licence | Source |
+|---|---|---|---|---|
+| `h18-green-cypress.jpg` | Hole 18 green and fairway cypress, Carmel Bay behind | glwx | CC BY-SA 3.0 | [page](https://commons.wikimedia.org/wiki/File:18th_Hole,_pebble_beach.jpg) |
+| `h18-view-back.jpg` | Hole 18 from behind the tee side: striped fairway, fairway cypress, bay and far shore | User:Dudesleeper | CC BY 2.5 | [page](https://commons.wikimedia.org/wiki/File:18th_hole_at_Pebble_Beach,_Dudesleeper.jpg) |
+| `h18-fairway-bay.jpg` | Hole 18 fairway, the lone fairway cypress, bay and far shore | Bernard Gagnon | CC BY-SA 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_18th_hole.jpg) |
+| `h06-cliffs.jpg` | Hole 6 headland: sandstone cliffs above Stillwater Cove, cypress on top | Bernard Gagnon | CC BY-SA 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_6th_hole.jpg) |
+| `h18-marine-layer.jpg` | Hole 18 under the marine layer (fog), cart path, cypress | Tewy | CC BY 2.5 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_Golf_Links_01.jpg) |
+| `h18-green-bunkers.jpg` | 18th green bunkers: white sand, grass lips, sea wall and bay behind | Tewy | CC BY 2.5 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_Golf_Links_02.jpg) |
+| `coast-rocks-fescue.jpg` | Coastal rocks and fescue grass at the sea edge, low sun | Dameon Hudson | CC BY 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach,_Del_Monte_Forest,_CA,_USA_-_panoramio_(3).jpg) |
+| `coast-headland-cypress.jpg` | Rocky headland with wind-sculpted Monterey cypress, Carmel Bay | Dameon Hudson | CC BY 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach,_Del_Monte_Forest,_CA,_USA_-_panoramio_(4).jpg) |
+| `cypress-path.jpg` | Monterey cypress canopy over a coastal path, ocean behind | Dameon Hudson | CC BY 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach,_Del_Monte_Forest,_CA,_USA_-_panoramio_(5).jpg) |
+| `cypress-silhouette-sea.jpg` | Monterey cypress silhouette over granite boulders and the sea | Dameon Hudson | CC BY 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach,_Del_Monte_Forest,_CA,_USA_-_panoramio_(6).jpg) |
+| `h18-green.jpg` | Hole 18 green, bunker and the Lodge behind | WilliamFMeyer | CC BY-SA 4.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_Golf_Links,_18th_green.jpg) |
+| `h07-green.jpg` | Hole 7 green on its point: bunkers, rocks, surf | Metallion | CC BY-SA 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_Golf_Links,_hole_7.jpg) |
+| `lodge.jpg` | The Lodge behind the 18th green (reference for a generic silhouette only) | Bernard Gagnon | CC BY-SA 3.0 | [page](https://commons.wikimedia.org/wiki/File:Pebble_Beach_Golf_Links_05.jpg) |
+| `coast-tee-shot.jpg` | Hole 7 tee shot (downhill par 3): cart path, the green on the point, rocks, surf and the far shore | RaymondHearn | CC BY-SA 4.0 | [page](https://commons.wikimedia.org/wiki/File:Ray_at_Pebble_Beach_GC.jpg) |
+| `bunker-close.jpg` | Bunker close-up: bright white sand, steep grass face | Presidio of Monterey | Public domain | [page](https://commons.wikimedia.org/wiki/File:2016_AT%26T_Pebble_Beach_Pro-Am_(24818527520).jpg) |
+| `green-bunker-play.jpg` | Green with a white bunker and grass lip | Presidio of Monterey | Public domain | [page](https://commons.wikimedia.org/wiki/File:2016_AT%26T_Pebble_Beach_Pro-Am_(25020762281).jpg) |
+| `green-bunker.jpg` | Green surface with a white bunker | Presidio of Monterey | Public domain | [page](https://commons.wikimedia.org/wiki/File:2016_AT%26T_Pebble_Beach_Pro-Am_(25087728626).jpg) |
+| `h18-dawn.jpg` | Dawn over the bay: cypress silhouette, the 18th green and far shore | Presidio of Monterey | Public domain | [page](https://commons.wikimedia.org/wiki/File:2016_AT%26T_Pebble_Beach_Pro-Am_(25114096335).jpg) |
+| `lone-cypress.jpg` | The Lone Cypress on its granite rock (17-Mile Drive) | Harvey Barrison | CC BY-SA 2.0 | [page](https://commons.wikimedia.org/wiki/File:Lone_Cypress_on_a_sunny_day.jpg) |
+| `point-lobos-cypress.jpg` | Monterey cypress on granite at Point Lobos, ocean horizon | Harvey Barrison | CC BY-SA 2.0 | [page](https://commons.wikimedia.org/wiki/File:Point_Lobos_10_09_09_01.jpg) |
+| `h07-morgen.jpg` | Chipping on hole 7: choppy surf, Carmel Beach, the far shore and Santa Lucia hills behind | morgen | CC BY-NC-SA 2.0 | [page](https://www.flickr.com/photos/40053024@N00/2290862548) |
+| `h08-fairway.jpg` | Hole 8 fairway toward the cliff edge and the chasm | morgen | CC BY-NC-SA 2.0 | [page](https://www.flickr.com/photos/40053024@N00/2290812994) |
+| `h08-chasm.jpg` | Hole 8 second shot over the chasm, cliffs and Carmel Bay | StonehouseGolf | CC BY-NC-ND 2.0 | [page](https://www.flickr.com/photos/40677827@N07/3856681019) |
+| `h17-green.jpg` | Hole 17 green by the sea, rocks and bunkers | morgen | CC BY-NC-SA 2.0 | [page](https://www.flickr.com/photos/40053024@N00/2290089605) |
+| `h18-moreira.jpg` | 18th green from the fairway under the marine layer: fairway cypress, white bunkers, bay | Mikael Moreira | CC BY 2.0 | [page](https://www.flickr.com/photos/38019000@N00/14380615940) |
+| `h18-across-bay.jpg` | Hole 18 and the Lodge across Carmel Bay | circulating | CC BY-NC-SA 2.0 | [page](https://www.flickr.com/photos/26835318@N00/1837331523) |

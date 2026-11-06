@@ -25,3 +25,5 @@ assets/qa/motion/**/compare*
 
 # QA composites that contain the refs/cart reference photos (scripts/qa/cart-compare.sh): local only
 assets/qa/motion/cart/compare/
+# Realism side-by-sides contain real reference photos: never commit them (our renders next to them are committed)
+assets/qa/realism/*-side.jpg
