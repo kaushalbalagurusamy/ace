@@ -1804,5 +1804,278 @@
     "balance_before": 455,
     "balance_after": 450,
     "height_m": 1.8
+  },
+  {
+    "id": "bg-hole-07",
+    "file": "assets/backdrops/bg-hole-07.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 7, the famous tiny par 3 of 106 yards on a rocky point jutting into the ocean, small green ringed by bunkers, surf on three sides, seen from above and behind the tee looking out to sea. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1737,
+      "input_tokens_details": {
+        "image_tokens": 1500,
+        "text_tokens": 237
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7387
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-07.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-07-sm.webp",
+    "source_png": "assets/images/bg-hole-07.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-07.jpg"
+    ],
+    "sha256": "cc5a1a6118deea9d8cb2dc92f50a2372eb8ffbddb57fd38e608181f7b072d4ea",
+    "sha256_placeholder": "6a6447dd5cac630083e1d83b6234aa38a7648f67e74b502201e44f6999dfdf7d",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-hole-08",
+    "file": "assets/backdrops/bg-hole-08.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 8, the par 4 with the dramatic cliff-to-cliff approach over a deep ocean chasm to a small green on the far clifftop, seen from high above the chasm. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1687,
+      "input_tokens_details": {
+        "image_tokens": 1458,
+        "text_tokens": 229
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7337
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-08.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-08-sm.webp",
+    "source_png": "assets/images/bg-hole-08.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-08.jpg"
+    ],
+    "sha256": "302108a2c079071d30f2b3624631fdd46b867bad5155ec9d461d59003b98e314",
+    "sha256_placeholder": "e5310680a6a5dd644ec657f43a425e299a1caed5ea1adbd53c8ffa9ec370e904",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-hole-18",
+    "file": "assets/backdrops/bg-hole-18.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 18, the long par 5 curving left along the seawall and rocky shore of Carmel Bay toward the green, a lone cypress tree in the fairway, seen from high over the water. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1743,
+      "input_tokens_details": {
+        "image_tokens": 1512,
+        "text_tokens": 231
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7393
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-18.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-18-sm.webp",
+    "source_png": "assets/images/bg-hole-18.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-18.jpg"
+    ],
+    "sha256": "989b5251f31ef0b05213a5a4109ca85bd3e8392c49db79357c609b96caaa88fe",
+    "sha256_placeholder": "99f84b3361aeb4957ad0dda03859810fe86cdf50749f0ff23ac8d9610af19b81",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-hole-17",
+    "file": "assets/backdrops/bg-hole-17.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 17, the par 3 of 208 yards with a long hourglass two-tier green beside the ocean and rocky shore of Carmel Bay, seen from above and to the side. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1708,
+      "input_tokens_details": {
+        "image_tokens": 1482,
+        "text_tokens": 226
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7358
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-17.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-17-sm.webp",
+    "source_png": "assets/images/bg-hole-17.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-17.jpg"
+    ],
+    "sha256": "a6a7385da3660e1c0229682b90fe594a5dc89ff3b9ddb18971dfe7cbe505bd77",
+    "sha256_placeholder": "1e9aad4c940588f3bdd748923f3bc2ffd909d6024e4afa48ba1d7f75c63518e1",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-hole-06",
+    "file": "assets/backdrops/bg-hole-06.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 6, the par 5 that climbs a steep headland with the ocean cliffs along its right side, seen from high above the bay. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1736,
+      "input_tokens_details": {
+        "image_tokens": 1518,
+        "text_tokens": 218
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7386
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-06.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-06-sm.webp",
+    "source_png": "assets/images/bg-hole-06.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-06.jpg"
+    ],
+    "sha256": "627a68600016fb30a4d738af811372aab386727f06fe2ea964c4231624815270",
+    "sha256_placeholder": "fc2d2cadfad07139bd69c6785c73f141ef27a0e8982f32426370b8f79f7c0cfe",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-hole-04",
+    "file": "assets/backdrops/bg-hole-04.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "Hole 4, the short par 4 running beside the ocean with a sandy beach and low seawall on the right, a large bunker on the left, seen from above. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1732,
+      "input_tokens_details": {
+        "image_tokens": 1508,
+        "text_tokens": 224
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7382
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/hole-04.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-hole-04-sm.webp",
+    "source_png": "assets/images/bg-hole-04.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/hole-04.jpg"
+    ],
+    "sha256": "3f05b2c6991d246224696e4df82ebc8247bfab28aab44fa6ea94bf7abdf4d834",
+    "sha256_placeholder": "6b4b223dade3f92995ba975626c5d8546257e9cfd241babceeca77d17778e300",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "bg-coast",
+    "file": "assets/backdrops/bg-coast.webp",
+    "tool": "OpenAI images",
+    "model": "gpt-image-2-2026-04-21",
+    "tier": "API",
+    "quality": "high",
+    "size": "2048x1152",
+    "prompt": "The whole Pebble Beach coastline from holes 4 to 10 and 17 and 18 around Carmel Bay and Stillwater Cove, fairways hugging the cliffs, seen from very high above the bay at a low oblique angle. Use the reference map only for the hole's layout: the shape of the fairway, green, bunkers, tee and the shoreline. Render it as a real photograph: a cinematic high-altitude aerial drone photo of this golf hole at Pebble Beach Golf Links on the Monterey Peninsula, California, golden hour, warm low sun raking across the turf, long soft shadows, lush striped fairway, smooth putting green with a flagstick, white sand bunkers, dark Monterey cypress trees, rugged rocky cliffs, Pacific Ocean surf breaking white on the rocks, turquoise and deep blue water, light sea haze on the horizon. Wide 16:9 landscape composition, the hole fills the frame, photorealistic, sharp, rich natural colour, magazine quality. No text, no labels, no logos, no watermark, no people, no golf carts, no map graphics, no flag illustration overlay.",
+    "date": "2026-11-05",
+    "usage": {
+      "input_tokens": 1747,
+      "input_tokens_details": {
+        "image_tokens": 1512,
+        "text_tokens": 235
+      },
+      "output_tokens": 5650,
+      "output_tokens_details": {
+        "image_tokens": 5650,
+        "text_tokens": 0
+      },
+      "total_tokens": 7397
+    },
+    "mode": "edit",
+    "edit_inputs": [
+      "refs/pebble-beach/layout.jpg"
+    ],
+    "licence": "OpenAI API terms: output usable commercially, owner to confirm",
+    "subagent": "home-redesign",
+    "placeholder": "assets/backdrops/bg-coast-sm.webp",
+    "source_png": "assets/images/bg-coast.png (gitignored original)",
+    "seed": null,
+    "seed_reference": [
+      "refs/pebble-beach/layout.jpg"
+    ],
+    "sha256": "33f17165183b4f3a550b46efa332b9d1fa5b9bec0b7b2e758cc40d4cf82dbe5f",
+    "sha256_placeholder": "5a13ca96ac759de69746eb66904192c81fe8e353dbf1b3e324f57461ba5d3e06",
+    "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
   }
 ]

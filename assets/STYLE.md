@@ -17,6 +17,9 @@ One cohesive look across every asset: **stylised low-poly, clean flat-shaded fac
 ## Exception: turf
 The ground turf (`turf-*` in the manifest) is photographic by owner request (2026-11-05): seamless top-down photos, colour-pulled toward the terrain palette in code so the lies stay readable.
 
+## Exception: home-screen backdrops
+The aerial views behind the name entry, waiting room and lobby (`bg-*` in the manifest, shipped in `assets/backdrops/`) are photographic by owner request (2026-11-05): golden-hour drone-style photos, each generated as an image edit seeded with the matching `refs/pebble-beach` hole graphic so the layout matches the real hole. No text, logos or people. WebP, 1920 px wide under 400 KB plus a 640 px placeholder.
+
 ## Rules
 - Units: **1 unit = 1 metre**, Y up, origin at the base centre (feet / trunk base / club sole). Face +Z.
 - Triangle budgets (final shipped .glb): tree <= 3,000; rock <= 2,000; golfer <= 15,000; club head <= 4,000.
