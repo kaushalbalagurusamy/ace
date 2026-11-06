@@ -180,7 +180,7 @@ const board = () => ui.board(racers, pars(), selfId);
 const canvas = world.renderer.domElement;
 canvas.addEventListener('click', () => { if (phase === 'race' && !touch.on) void requestLock(canvas); });
 /** Touch: a pull-down swing replays the second Space press and its release, with the pull length standing in for the hold time. */
-Object.assign((window as unknown as { __ace: object }).__ace, { state: () => ({ pos, yaw, driving, club, rfOpen, swing: swing?.fsm.phase ?? null, cart }) });   // debug handle for the touch checks
+Object.assign((window as unknown as { __ace: object }).__ace, { state: () => ({ pos, yaw, driving, club, rfOpen, swing: swing?.fsm.phase ?? null, aim: swing?.fsm.aim(), ballPos: swing?.fsm.ballPos(), chip: swing?.fsm.isChip(), cart }) });   // debug handle for the touch checks
 const touch = new TouchControls(ui.hud, canvas, () => touchCtx, px => {
   const f = swing?.fsm; if (!f || swing!.sentAt !== undefined || f.phase !== 'stance') return;
   const ms = pullToHoldMs(px, innerHeight, f.club().putt || f.isChip()); if (ms === null) return;   // a tiny pull stays in the stance
