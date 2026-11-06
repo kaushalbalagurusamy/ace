@@ -1,5 +1,7 @@
 import { GRIDS } from '../shared/course-grid';
 import { gridCanvas, rfView } from './terrain';
+import { edgePoint, mapArrowRotation, type Marker } from './overlay';
+import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 
@@ -24,11 +26,12 @@ const ERR: Record<string, string> = {
 export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ?? m.message;
 
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
-<li><b>Move</b> WASD, <b>look and aim</b> mouse (no aim line: line up by eye; the mini map and its rangefinder help you pick a club)</li>
-<li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter</li>
-<li><b>Swing</b> stand by your ball and press Space to take your stance (aim locks). Then <b>press and hold Space</b>: the club swings back and the meter fills. <b>Release Space at the length you want</b> (a short hold is a short shot). Then press and <b>hold</b> Z, X, C in order (hips, shoulders, release) right after the release, keeping them down until the ball is struck. Good timing = straight and long. Esc cancels before the release</li>
-<li><b>Putt</b> P, Space to take your stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
-<li><b>Shot card</b> after every shot: carry, total, offline and how well you timed each key</li>
+<li><b>Move</b> with the arrow keys (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
+<li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
+<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. <b>W S A D</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 20% further, 70% accurate. <b>Esc</b> cancels before you release</li>
+<li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
+<li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
+<li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>
 <li>First to hole out wins; fewer strokes only decides finishes within 1 second</li></ul></details>`;
 const esc = (s: string) => s.replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
 export interface Row { id: string; name: string; hole: number; strokes: number; done: boolean }
@@ -50,6 +53,11 @@ const CSS = `
 #meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
 #toast{left:50%;top:70px;transform:translateX(-50%);display:none}
+#bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px}#bpos canvas{display:block;margin:0 auto 2px}
+#meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
+#pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
+#gear{left:10px;top:84px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
+#settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;pointer-events:auto;min-width:340px;padding:16px 20px;background:rgba(18,24,22,.96);border:1px solid #567}#settings h3{margin:0 0 10px}#settings input[type=range]{width:100%}#settings button{margin-top:8px}
 #banner{left:50%;top:22%;transform:translateX(-50%);font-size:26px;padding:12px 22px;background:rgba(150,30,30,.88);display:none;text-align:center;max-width:70%}
 #arrow{position:absolute;display:none;background:none;padding:0;pointer-events:none;color:#ffe14d;font-weight:700;text-shadow:0 0 4px #000;text-align:center;width:90px}#arrow i{display:block;width:0;height:0;margin:0 auto;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:22px solid #ffe14d}
 #keys{left:50%;bottom:8px;transform:translateX(-50%);font-size:11px;opacity:.75;background:none;padding:0}
@@ -71,9 +79,12 @@ export class UI {
     this.hud.innerHTML = `<div class="hud" id="bag">${BAG.map(b => `<div class="slot"><b>${b.key}</b>${b.label}</div>`).join('')}</div>
       <div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
-      <div class="hud" id="meter"><div id="mlabel"></div><div style="background:#444"><div id="fill"></div></div></div>
+      <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">Space swing · Shift sprint · M rangefinder · N mute · , . look speed</div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
+      <div class="hud" id="keys">Arrows move · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed</div>
+      <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
+      <div class="hud" id="gear" title="Settings">&#9881;</div>
+      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.root.append(this.scr, this.hud);
     this.mini = this.hud.querySelector('canvas')!;
     this.scr.addEventListener('click', e => {
@@ -126,6 +137,35 @@ export class UI {
   board(rows: Row[], self: string) {
     this.$('lb').innerHTML = rows.map(r => `<div style="${r.id === self ? 'font-weight:bold' : ''}">${esc(r.name)} &nbsp; H${r.hole + 1} &nbsp; ${r.strokes}${r.done ? ' &check;' : ''}</div>`).join('');
   }
+  /** Small grid showing where the ball sits against the feet in the stance (fb: up = forward, io: right = away from the body). */
+  ballPosGrid(p: { fb: number; io: number } | null) {
+    const e = this.$('bpos'); e.style.display = p ? 'block' : 'none'; if (!p) return;
+    const c = e.querySelector('canvas')!, x = c.getContext('2d')!; x.clearRect(0, 0, 100, 100); x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 0, 100, 100); x.strokeStyle = '#777';
+    for (let i = 0; i <= 4; i++) { x.beginPath(); x.moveTo(10 + i * 20, 10); x.lineTo(10 + i * 20, 90); x.moveTo(10, 10 + i * 20); x.lineTo(90, 10 + i * 20); x.stroke(); }
+    x.fillStyle = '#9ad'; x.fillRect(46, 90 - 28, 8, 28 + 4 - 4);                           // the feet / body line below the grid centre
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(10 + (p.io + 2) * 20, 10 + (2 - p.fb) * 20, 6, 0, 7); x.fill();
+    x.fillStyle = '#ffe14d'; x.beginPath(); x.arc(50, 50, 2, 0, 7); x.fill();                // the centre (optimal)
+    e.querySelector('span')!.textContent = `Fwd ${p.fb >= 0 ? '+' : ''}${p.fb} · Away ${p.io >= 0 ? '+' : ''}${p.io}`;
+  }
+  /** Pin indicator: a flag drawn over the pin at constant pixel size with the yardage from your ball when it is on screen, an edge arrow toward it when not. */
+  pinMarker(m: Marker | null, yards: number, opacity: number) {
+    const e = this.$('pin'); if (!m || opacity <= 0) { e.style.display = 'none'; return; }
+    e.style.display = 'block'; e.style.opacity = String(opacity);
+    const p = m.onScreen ? { x: m.x, y: m.y - 22 } : edgePoint(m.dir, innerWidth, innerHeight, 90);
+    e.style.left = `${p.x - 55}px`; e.style.top = `${p.y - 15}px`;
+    (e.querySelector('svg') as SVGElement).style.transform = m.onScreen ? '' : `rotate(${m.dir + Math.PI / 2}rad)`;
+    e.querySelector('span')!.textContent = `Pin ${Math.round(yards)} yd`;
+  }
+  /** Settings panel (camera sensitivity slider); callbacks keep the slider, the keys and the saved setting in one place. */
+  bindSettings(get: () => number, set: (v: number) => void, reset: () => void) {
+    const gear = this.$('gear'), panel = this.$('settings'), sl = panel.querySelector<HTMLInputElement>('#sens')!, val = panel.querySelector<HTMLElement>('#sensval')!;
+    const sync = () => { sl.value = String(get()); val.textContent = `${get().toFixed(2)}×`; };
+    gear.onclick = () => this.toggleSettings(); sl.oninput = () => { set(Number(sl.value)); sync(); };
+    panel.querySelector<HTMLElement>('#sensreset')!.onclick = () => { reset(); sync(); }; this.syncSettings = sync; sync();
+  }
+  syncSettings: () => void = () => {};
+  toggleSettings(open?: boolean) { const p = this.$('settings'); const show = open ?? p.style.display !== 'block'; p.style.display = show ? 'block' : 'none'; if (show) { document.exitPointerLock(); this.syncSettings(); } return show; }
+  settingsOpen = () => this.$('settings').style.display === 'block';
   private bannerT = 0;
   /** A big, long-lasting message for events the player must not miss (penalties). */
   banner(t: string, ms = 5000) { const e = this.$('banner'); e.style.display = 'block'; e.textContent = t; clearTimeout(this.bannerT); this.bannerT = window.setTimeout(() => (e.style.display = 'none'), ms); }
@@ -137,12 +177,12 @@ export class UI {
     (e.firstElementChild as HTMLElement).style.transform = `rotate(${m.dir + Math.PI / 2}rad)`; (e.lastElementChild as HTMLElement).textContent = `ball ${Math.round(yards)} yd`;
   }
   /** Expanded mini map: terrain, markers, the target and the line from the ball to the hovered point (PRD/02 section 7). */
-  drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null) {
+  drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null, heading = 0) {
     const c = this.rfCanvas(); if (c.width !== c.clientWidth || c.height !== c.clientHeight) { c.width = c.clientWidth; c.height = c.clientHeight; }
     const ctx = c.getContext('2d')!, v = rfView(h.index, c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
     ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(h.index, 2, false, true), v.x0, v.y0, v.w, v.h);
     const dot = (p: { x: number; z: number }, col: string, r: number) => { const [x, y] = v.toScreen(p.x, p.z); ctx.fillStyle = col; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); return [x, y] as const; };
-    dot(h.tee, '#222', 5); dot(h.pin, '#ffe14d', 6); dot(golfer, '#fff', 5);
+    dot(h.tee, '#222', 5); dot(h.pin, '#ffe14d', 6); { const [gx, gy] = v.toScreen(golfer.x, golfer.z); this.heading(ctx, gx, gy, heading, 1.6); }
     const [bx, by] = dot(ball, '#fff', 6); ctx.strokeStyle = '#ffe14d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(bx, by, 10, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
     if (target) { const [x, y] = v.toScreen(target.x, target.z); ctx.strokeStyle = '#ff8a3d'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - 8, y - 8); ctx.lineTo(x + 8, y + 8); ctx.moveTo(x + 8, y - 8); ctx.lineTo(x - 8, y + 8); ctx.stroke(); ctx.lineWidth = 1; }
     if (hover) { const [x, y] = v.toScreen(hover.x, hover.z); ctx.strokeStyle = '#fff'; ctx.setLineDash([6, 5]); ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(x, y); ctx.stroke(); ctx.setLineDash([]); }
@@ -153,19 +193,20 @@ export class UI {
   prompt(t: string) { const e = this.$('prompt'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   meterShow(frac: number | null, label = '') {
     const e = this.$('meter'); e.style.display = frac === null ? 'none' : 'block';
-    if (frac !== null) { this.$('mlabel').textContent = label; this.$('fill').style.width = `${Math.min(1, Math.max(0, frac)) * 100}%`; }
+    // the bar spans 0 to 1100 ms of hold (1.4667 of the full turn); the red band is the max-effort zone beyond the full 750 ms
+    if (frac !== null) { this.$('mlabel').textContent = label; this.$('fill').style.width = `${Math.min(1, Math.max(0, frac / (1100 / 750))) * 100}%`; }
   }
   countdown(t: string) { const e = this.$('cd'); e.style.display = t ? 'block' : 'none'; e.textContent = t; }
   toast(t: string) { const e = this.$('toast'); e.style.display = 'block'; e.textContent = t; clearTimeout(this.toastT); this.toastT = window.setTimeout(() => (e.style.display = 'none'), 3000); }
   card(m: Extract<ServerMsg, { t: 'shotResult' }>) {
-    const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), g = (v: number) => ((1 - v) * 100).toFixed(0) + '%'; // server sends normalised error n; show accuracy
+    const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), fx = (n: number) => (n === 0 ? '0' : n > 0 ? `+${n}` : `${n}`);
     const off = m.offlineM * YD;
     e.innerHTML = `<b>Shot</b><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
-      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Timing Z ${g(m.grade.z)} X ${g(m.grade.x)} C ${g(m.grade.c)}${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
+      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)}<br>Effort: ${m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
     e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */
-  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean }[]) {
+  drawMini(h: HoleInfo, dots: { x: number; z: number; shade: string; ball?: boolean; own?: boolean; heading?: number }[]) {
     const c = this.mini.getContext('2d')!, W = this.mini.width, H = this.mini.height;
     const dx = h.pin.x - h.tee.x, dz = h.pin.z - h.tee.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L;
     const s = (H - 30) / (L + 20);
@@ -179,7 +220,14 @@ export class UI {
     c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
     const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);
     const [tx, tz] = P(h.tee.x, h.tee.z); c.fillStyle = '#222'; c.fillRect(tx - 4, tz - 2, 8, 4);
-    for (const d of dots) { const [x, y] = P(d.x, d.z); if (d.own && d.ball) { c.strokeStyle = '#ffe14d'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 6, 0, 7); c.stroke(); c.lineWidth = 1; } c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
+    for (const d of dots) { const [x, y] = P(d.x, d.z); if (d.own && d.ball) { c.strokeStyle = '#ffe14d'; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 6, 0, 7); c.stroke(); c.lineWidth = 1; } if (d.own && !d.ball && d.heading !== undefined) { this.heading(c, x, y, d.heading, 1); continue; } c.fillStyle = d.shade; c.beginPath(); c.arc(x, y, d.ball ? 2.5 : 4, 0, 7); c.fill(); if (!d.ball) { c.strokeStyle = '#000'; c.stroke(); } }
+  }
+  /** Google-Maps-style heading marker: a soft view cone behind a chevron pointing where the camera (or, in the stance, the aim) faces. The map stays hole-up; the arrow rotates. */
+  private heading(c: CanvasRenderingContext2D, x: number, y: number, yaw: number, k: number) {
+    c.save(); c.translate(x, y); c.rotate(mapArrowRotation(yaw));
+    const g = c.createRadialGradient(0, 0, 2, 0, 0, 34 * k); g.addColorStop(0, 'rgba(80,160,255,.55)'); g.addColorStop(1, 'rgba(80,160,255,0)');
+    c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 34 * k, -Math.PI / 2 - 0.5, -Math.PI / 2 + 0.5); c.closePath(); c.fill();
+    c.fillStyle = '#2f7dff'; c.strokeStyle = '#fff'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(0, -7 * k); c.lineTo(5 * k, 6 * k); c.lineTo(0, 3 * k); c.lineTo(-5 * k, 6 * k); c.closePath(); c.fill(); c.stroke(); c.restore();
   }
 }
 export type { BallState };

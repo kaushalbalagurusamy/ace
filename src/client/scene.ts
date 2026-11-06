@@ -3,6 +3,7 @@ import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/proto
 import { isCoastal, propSpots, terrainMesh } from './terrain';
 import { loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
+import { toMarker, type Marker } from './overlay';
 
 const SHADES = ['#D64545', '#3F6FD6', '#E8C23A', '#EDEDED']; // player colourways (assets/STYLE.md)
 export interface Ent {
@@ -30,6 +31,7 @@ export class World {
     beam.renderOrder = tip.renderOrder = 20; g.add(beam, tip); g.visible = false; return g;
   })();
   private propToken = 0;
+  private pinTop = new THREE.Vector3();
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = new THREE.Fog('#cfe6f4', 220, 900);
@@ -68,7 +70,7 @@ export class World {
     const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
     base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
     this.course.add(base, terrainMesh(h.index));
-    const pin = V(h.pin.x, 0, h.pin.z);
+    const pin = V(h.pin.x, 0, h.pin.z); this.pinTop.set(pin.x, 2.6, pin.z);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     this.course.add(pole, flag);
@@ -132,6 +134,8 @@ export class World {
     const x = (v.x * 0.5 + 0.5) * innerWidth, y = (-v.y * 0.5 + 0.5) * innerHeight, onScreen = !behind && x > 20 && x < innerWidth - 20 && y > 20 && y < innerHeight - 20;
     return { x, y, onScreen, dir: Math.atan2((behind ? -1 : 1) * (y - innerHeight / 2), (behind ? -1 : 1) * (x - innerWidth / 2)) };
   }
+  /** Screen marker for the pin (flag top), for the pin indicator. */
+  pinScreen(): Marker { const v = this.pinTop.clone().project(this.cam); return toMarker(v.x, v.y, v.z > 1, innerWidth, innerHeight); }
   tick(now: number) {
     const own = this.ents.get(this.selfId);
     this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole;

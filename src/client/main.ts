@@ -7,11 +7,12 @@ import { Net } from './net';
 import { BAG, PUTTER, UI, YD, errText } from './ui';
 import { World } from './scene';
 
-import { RANGE, WALK_SPEED, SPRINT_SPEED, canAddress, golferSpot, distance } from './rules';
-import { DEFAULT_MULT, label as lookLabel, loadMult, lookDelta, requestLock, saveMult, stepMult } from './sensitivity';
+import { canAddress, golferSpot, lookScale, moveAxis, walkSpeed } from './rules';
+import { pinOpacity } from './overlay';
+import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
-import { BAG as SIMBAG, IDEAL_MS, durationScale, launchFor, scoreSwing, simulateShot } from '../sim';
-let lookMult = loadMult() ?? DEFAULT_MULT;
+import { BAG as SIMBAG, launchFor, simulateShot } from '../sim';
+let lookMult = loadMult();
 let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
 
@@ -26,7 +27,7 @@ let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
 let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.55, club = 0; // higher default camera so the golfer and ball both read at address
 const keys = new Set<string>();
 /** swing exists from the first Space press (stance, aim locked, WASD off) until the shot or putt is sent. */
-type Swing = { fsm: SwingFSM; putt: boolean; aim: number; sentAt?: number };
+type Swing = { fsm: SwingFSM; sentAt?: number };
 let swing: Swing | null = null;
 /** Applies a state-machine action: cancel, or send the shot/putt (the server decides every outcome). */
 const audio = new GameAudio();
@@ -35,7 +36,7 @@ const act = (a: Action | null) => {
   if (!a || !swing) return;
   if (a.type === 'cancel') { swing = null; return; }
   net.send(a.msg); swing.sentAt = performance.now();
-  if (a.type === 'send-shot') void audio.play(a.msg.length < 0.4 ? 'sfx-swing-soft' : a.msg.length < 0.85 ? 'sfx-swing-full' : 'sfx-swing-max', 0.7);
+  if (a.type === 'send-shot') { const L = a.msg.holdMs / 750; void audio.play(L < 0.4 ? 'sfx-swing-soft' : L < 0.85 ? 'sfx-swing-full' : 'sfx-swing-max', 0.7); }
 };
 
 const world = new World(document.body.appendChild(Object.assign(document.createElement('canvas'), { style: 'position:fixed;inset:0' })));
@@ -129,8 +130,8 @@ function startAmbience(holeIndex: number) {
 /** Impact on strike, landing sound when the ball comes down (from the replay samples), on the right surface. */
 function shotSounds(m: Extract<ServerMsg, { t: 'shotResult' }>) {
   const mine = m.playerId === selfId, same = m.hole === hole?.index; if (!same) return;
-  const vol = mine ? 0.8 : 0.35, putt = m.clubSpeedMph === 0, bad = (m.grade.z + m.grade.x + m.grade.c) / 3 > 0.65;
-  const impact = putt ? 'sfx-impact-putter' : bad ? 'sfx-impact-mishit' : m.ballSpeedMs > 62 ? 'sfx-impact-driver' : m.ballSpeedMs > 46 ? 'sfx-impact-fairway' : m.ballSpeedMs > 32 ? 'sfx-impact-iron' : 'sfx-impact-wedge';
+  const vol = mine ? 0.8 : 0.35, putt = m.clubSpeedMph === 0;
+  const impact = putt ? 'sfx-impact-putter' : m.ballSpeedMs > 62 ? 'sfx-impact-driver' : m.ballSpeedMs > 46 ? 'sfx-impact-fairway' : m.ballSpeedMs > 32 ? 'sfx-impact-iron' : 'sfx-impact-wedge';
   void audio.play(impact, vol);
   if (putt) return;
   const land = m.samples.find(s => s.t > 0.4 && s.p.y <= 0.06)?.t ?? m.samples.at(-1)?.t ?? 0;
@@ -143,8 +144,10 @@ const board = () => ui.board([...world.ents.values()].map(e => ({ id: e.id, name
 const canvas = world.renderer.domElement;
 canvas.addEventListener('click', () => { if (phase === 'race') void requestLock(canvas); });
 addEventListener('mousemove', e => {
-  if (phase !== 'race' || swing || (document.pointerLockElement !== canvas && !(e.buttons & 1))) return;
-  yaw += lookDelta(e.movementX, lookMult); pitch = Math.min(1.2, Math.max(0.05, pitch + lookDelta(e.movementY, lookMult)));
+  if (phase !== 'race' || ui.settingsOpen() || (swing && swing.fsm.phase !== 'stance' && swing.fsm.phase !== 'idle') || (document.pointerLockElement !== canvas && !(e.buttons & 1))) return;
+  const m = lookMult * lookScale(keys);                                    // Shift halves the look for fine aim and putting lines
+  yaw += lookDelta(e.movementX, m); pitch = Math.min(1.2, Math.max(0.05, pitch + lookDelta(e.movementY, m)));
+  if (swing && swing.sentAt === undefined) swing.fsm.setAim(aimDeg(yaw));  // the mouse stays live in the stance: the golfer pivots, the ball does not move
 });
 const own = () => world.ents.get(selfId);
 const started = () => Date.now() >= goAt && !endAt;
@@ -153,20 +156,21 @@ const aimDeg = (y: number) => ((y * 180 / Math.PI) % 360 + 360) % 360;
 
 addEventListener('keydown', e => {
   if (phase !== 'race' || (e.target as HTMLElement).tagName === 'INPUT') return;
-  if (['Space', 'Escape'].includes(e.code)) e.preventDefault();
+  if (['Space', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === 'KeyN') { audio.toggleMute(); return; }
-  if (e.code === 'Comma' || e.code === 'Period') { lookMult = stepMult(lookMult, e.code === 'Period' ? 1 : -1); saveMult(lookMult); ui.toast(lookLabel(lookMult)); return; }
+  if (e.code === 'Comma' || e.code === 'Period') { setLook(stepMult(lookMult, e.code === 'Period' ? 1 : -1)); ui.toast(lookLabel(lookMult)); return; }
+  if (e.code === 'Escape' && !swing) { ui.toggleSettings(); return; }          // Esc opens the settings menu; in a stance it cancels the stance instead
+  if (ui.settingsOpen()) return;
   if (e.code === 'KeyM' && !swing) { rfOpen = !rfOpen; rfHover = null; ui.rf().style.display = rfOpen ? 'block' : 'none'; ui.rfTip(null); if (rfOpen) document.exitPointerLock(); return; }
   const ci = BAG.findIndex(b => b.code === e.code);
-  if (ci >= 0 && !swing) { club = ci; ui.setClub(ci); return; } // locked once the stance starts
+  if (ci >= 0 && (!swing || (swing.sentAt === undefined && swing.fsm.setClub(BAG[ci]!.key, ci === PUTTER)))) { club = ci; ui.setClub(ci); return; }   // club changes stay allowed in the stance until the backswing starts
   if (swing) { if (swing.sentAt === undefined) act(swing.fsm.key(e.code, true, e.timeStamp)); return; }
   if (e.code === 'Space' && started()) {
     const me = own();
     if (rfOpen || !me || !canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut })) return;
-    const putt = club === PUTTER, aim = aimDeg(yaw); // first press: take the stance and lock the aim
-    swing = { fsm: new SwingFSM({ putt, aimDeg: aim, clubKey: BAG[club]!.key }), putt, aim };
+    swing = { fsm: new SwingFSM({ putt: club === PUTTER, aimDeg: aimDeg(yaw), clubKey: BAG[club]!.key }) };   // first press: take the stance (movement off; aim, club and ball position stay adjustable)
     act(swing.fsm.key(e.code, true, e.timeStamp)); // the machine models the first press too
   }
 });
@@ -176,9 +180,13 @@ addEventListener('keyup', e => {
 });
 /** A stance or backswing must never survive a lost key-up: blur, tab switch, or leaving pointer lock cancels it. */
 const abortSwing = () => { if (swing && swing.sentAt === undefined) act(swing.fsm.abort()); };
-addEventListener('blur', () => { keys.clear(); abortSwing(); });
+addEventListener('blur', () => { keys.clear(); abortSwing(); });   // no stuck Shift or arrow key on focus loss
 document.addEventListener('visibilitychange', () => { if (document.hidden) abortSwing(); });
 document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) abortSwing(); });
+
+/** One saved setting for the slider and the , . keys. */
+function setLook(v: number, byPlayer = true) { lookMult = v; saveMult(v, undefined, byPlayer); ui.syncSettings(); }
+ui.bindSettings(() => lookMult, v => setLook(sliderValue(v)), () => { lookMult = resetMult(); ui.syncSettings(); });
 
 // ---- frame loop ----
 let last = performance.now(), stuckSince = 0;
@@ -187,51 +195,54 @@ function frame(now: number) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (phase !== 'race' || !hole) { if (phase === 'results' || phase === 'race') world.render(pos.x, pos.z, yaw, pitch); return; }
   const me = own(), go = started();
-  if (!swing && go) {
-    const f = Number(keys.has('KeyW')) - Number(keys.has('KeyS')), r = Number(keys.has('KeyD')) - Number(keys.has('KeyA'));
-    const n = Math.hypot(f, r) || 1, speed = keys.has('ShiftLeft') || keys.has('ShiftRight') ? SPRINT_SPEED : WALK_SPEED;
+  if (!swing && go && !ui.settingsOpen()) {                                  // arrow keys move; WASD is for the ball position in the stance
+    const { f, r } = moveAxis(keys), n = Math.hypot(f, r) || 1, speed = walkSpeed(keys);
     pos.x += ((Math.sin(yaw) * f + Math.cos(yaw) * r) / n) * speed * dt; pos.z += ((Math.cos(yaw) * f - Math.sin(yaw) * r) / n) * speed * dt;
   }
   if (swing) {
     if (swing.sentAt !== undefined) { if (!stuckSince) stuckSince = now; if (now - stuckSince > 3000) { swing = null; stuckSince = 0; } }
     else {
-      act(swing.fsm.tick(now));
+      act(swing.fsm.tick(now));                                                // auto-release at 1.10 s: a max-effort shot
       const f = swing?.fsm;
       if (f && swing) {
-        const ph = f.phase;
-        ui.meterShow(f.meter(now), ph === 'stance' ? (swing.putt ? 'Hold Space, release to strike' : 'Hold Space to swing back, release at the top')
-          : ph === 'backswing' ? (swing.putt ? 'Release Space to strike' : 'Release Space at the top, then Z X C') : 'Z, X, C now');
+        const ph = f.phase, fr = f.meter(now), putt = f.club().putt;
+        ui.meterShow(fr, ph === 'stance' ? 'Hold Space, release to hit' : putt ? 'Release to putt' : fr >= 1 ? 'MAX ZONE: release for a full shot, hold on for MAX effort' : 'Release to hit');
+        ui.ballPosGrid(putt ? null : f.ballPos());
       }
     }
-  } else { stuckSince = 0; ui.meterShow(null); }
-  if (!swing) ui.meterShow(null);
+  } else { stuckSince = 0; ui.meterShow(null); ui.ballPosGrid(null); }
+  if (!swing) { ui.meterShow(null); ui.ballPosGrid(null); }
   const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut });
   ui.prompt(swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`);
+  { // pin indicator: on foot and in the stance, hidden while the ball flies and within about 30 yd of the pin
+    const pinYd = me ? Math.hypot(hole.pin.x - me.ball.x, hole.pin.z - me.ball.z) * YD : 0, camYd = Math.hypot(hole.pin.x - pos.x, hole.pin.z - pos.z) * YD;
+    ui.pinMarker(me && !me.anim && !rfOpen && !me.ball.holedOut ? world.pinScreen() : null, pinYd, pinOpacity(camYd));
+  }
   ui.ballMarker(me && !me.ball.holedOut ? world.ballScreen() : null, me ? Math.hypot(me.ball.x - pos.x, me.ball.z - pos.z) * YD : 0);
-  if (rfOpen && me && hole) ui.drawRangefinder(hole, me.ball, pos, rfTarget, rfHover);
+  const headingRad = (swing ? swing.fsm.aim() : aimDeg(yaw)) * Math.PI / 180;   // in the stance the arrow shows the aim (the shot's aimDeg), otherwise the camera facing
+  if (rfOpen && me && hole) ui.drawRangefinder(hole, me.ball, pos, rfTarget, rfHover, headingRad);
   const cd = goAt - Date.now();
   ui.countdown(cd > 0 ? String(Math.ceil(cd / 1000)) : cd > -800 ? 'GO' : '');
   if (me) {
     const dest = me.anim?.final ?? me.ball; // show the outcome distance as soon as the shot is resolved
     const d = Math.hypot(hole.pin.x - dest.x, hole.pin.z - dest.z) * YD;
     ui.info(hole, d, me.ball.surface, ui.clock(go ? (Date.now() - goAt) / 1000 : 0), me.ball.strokes);
-    world.placeGolfer(me, pos.x, pos.z, swing ? swing.aim * Math.PI / 180 : yaw);
+    world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
   }
   world.tick(now);
   ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => [
     { x: e.ballMesh.position.x * -1, z: e.ballMesh.position.z, shade: e.shade, ball: true, own: e.id === selfId },
-    { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade },
+    { x: e.id === selfId ? pos.x : e.ball.x + 1, z: e.id === selfId ? pos.z : e.ball.z - 0.5, shade: e.shade, own: e.id === selfId, heading: e.id === selfId ? headingRad : undefined },
   ]));
   const cam = me?.anim ? me.ballMesh.position : null; // camera follows the ball while it flies
-  world.render(cam ? -cam.x : pos.x, cam ? cam.z : pos.z, swing ? swing.aim * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : 1.5);
+  world.render(cam ? -cam.x : pos.x, cam ? cam.z : pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw, pitch, cam ? Math.max(1.5, cam.y * 0.7) : 1.5);
 }
 requestAnimationFrame(frame);
 
 // ---- rangefinder (PRD/02 section 7): M toggles; hover shows distances and a club suggestion; click sets a target shown on the maps only ----
 const rfCanvas = ui.rfCanvas();
-const perfectAt = (L: number) => { const d = durationScale(L); return scoreSwing({ zMs: IDEAL_MS.z, xMs: IDEAL_MS.x * d, cMs: IDEAL_MS.c * d }, L); };
 const clubs = SIMBAG.filter(c => c.key !== 'P');
-const carryYd = (c: (typeof SIMBAG)[number], L = 1) => simulateShot(launchFor(c, perfectAt(L), L)).carryM * YD;
+const carryYd = (c: (typeof SIMBAG)[number], L = 1) => simulateShot(launchFor(c, { length: L })).carryM * YD;
 let fullCarries: { label: string; yd: number }[] | null = null;
 /** "Plays like" suggestion from the sim's perfect-swing carries; below the wedge's full carry it names the wedge and a swing length. */
 function playsLike(yd: number): string {

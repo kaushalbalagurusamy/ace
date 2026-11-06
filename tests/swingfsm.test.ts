@@ -84,3 +84,33 @@ describe('SS-8 Esc and abort', () => {
   });
   it('releasing the first press does not start the swing; the machine ignores Space release in idle', () => { const f = raw(); expect(f.key('Space', false, 5)).toBeNull(); f.key('Space', true, 10); f.key('Space', false, 80); expect(f.phase).toBe('stance'); });
 });
+
+describe('mouse aim and club change in the stance (owner: both stay live until the backswing starts)', () => {
+  it('re-aiming in the stance changes the aim that is sent; after the backswing starts it is locked', () => {
+    const f = armed(raw()); expect(f.setAim(40)).toBe(true); expect(f.aim()).toBe(40); f.setAim(41);
+    f.key('Space', true, 0); expect(f.setAim(99)).toBe(false); expect(f.aim()).toBe(41);
+    expect(shot(f.key('Space', false, 300)).msg.aimDeg).toBe(41);
+  });
+  it('aim and ball position are kept across re-aims and club changes', () => {
+    const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyD', true, 1); f.setAim(77); f.setClub('9', false); f.setAim(78); f.key('Space', true, 5);
+    expect(shot(f.key('Space', false, 400)).msg).toEqual({ t: 'shot', clubKey: '9', aimDeg: 78, holdMs: 395, fb: 1, io: 1 });
+  });
+  it('a club change in the stance updates the club used; after the backswing starts it is ignored', () => {
+    const f = armed(raw()); expect(f.setClub('1', false)).toBe(true); expect(f.club()).toEqual({ clubKey: '1', putt: false });
+    f.key('Space', true, 0); expect(f.setClub('3', false)).toBe(false); expect(shot(f.key('Space', false, 200)).msg.clubKey).toBe('1');
+  });
+  it('switching to the putter in the stance swaps to putt mode in place (no new stance), and back again restores ball-position keys', () => {
+    const f = armed(raw()); f.key('KeyW', true, 0); expect(f.setClub('P', true)).toBe(true); expect(f.phase).toBe('stance');
+    f.key('KeyD', true, 1); expect(f.ballPos()).toEqual({ fb: 1, io: 0 });                    // ball keys are ignored for the putter; earlier position kept
+    expect(f.setClub('7', false)).toBe(true); f.key('KeyD', true, 2); expect(f.ballPos()).toEqual({ fb: 1, io: 1 });
+    const g = armed(raw()); g.setClub('P', true); g.key('Space', true, 0); expect(g.key('Space', false, 300)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 12.5, holdMs: 300 } });
+  });
+  it('putter to a full swing club: the shot uses full-swing mode and may auto-release at 1.10 s', () => {
+    const f = armed(raw(true)); f.setClub('5', false); f.key('Space', true, 0); expect(shot(f.tick(1100)).msg).toMatchObject({ clubKey: '5', holdMs: 1100 });
+  });
+  it('re-aiming and club changes work before the first Space press too (idle), and not after cancel or release', () => {
+    const f = raw(); expect(f.setAim(5)).toBe(true); expect(f.setClub('4', false)).toBe(true);
+    const g = armed(raw()); g.key('Space', true, 0); shot(g.key('Space', false, 200)); expect(g.setAim(1)).toBe(false); expect(g.setClub('2', false)).toBe(false);
+    const h = armed(raw()); h.key('Escape', true, 0); expect(h.setAim(1)).toBe(false);
+  });
+});
