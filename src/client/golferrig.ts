@@ -83,15 +83,16 @@ export class GolferRig {
     this.model.updateMatrixWorld(true);
     // legs: ankles to the stance, knees forward (following half the pelvis turn). The ankle targets are pinned to the ground;
     // if a straightened leg can't reach its target the pelvis drops until it can, so the golfer never floats.
-    const knee: V3 = [Math.sin(p.pelvis[1] * 0.5), 0, Math.cos(p.pelvis[1] * 0.5)];
+    // a lifted heel turns that knee in (critic: at impact the trail knee kicks in toward the target, at the top the lead knee in toward the trail side)
+    const kn = (a: number): V3 => [Math.sin(a), 0, Math.cos(a)], knee = kn(p.pelvis[1] * 0.5), lKnee = kn(p.pelvis[1] * 0.5 - p.lHeel * 0.6), rKnee = kn(p.pelvis[1] * 0.5 + p.rHeel * 0.6);
     const lFoot = this.add(R.LeftFoot.mp, p.lAnkle), rFoot = this.add(R.RightFoot.mp, p.rAnkle);
     const drop = Math.max(this.legDrop('LeftUpLeg', 'LeftLeg', 'LeftFoot', lFoot), this.legDrop('RightUpLeg', 'RightLeg', 'RightFoot', rFoot));
     if (drop > 0) {
       hips.getWorldPosition(_v); _v.applyMatrix4(this.inv.copy(this.model.matrixWorld).invert()); _v.y -= drop;
       hips.position.copy(hips.parent!.worldToLocal(_v.applyMatrix4(this.model.matrixWorld))); this.model.updateMatrixWorld(true);
     }
-    this.ik('LeftUpLeg', 'LeftLeg', 'LeftFoot', lFoot, knee);
-    this.ik('RightUpLeg', 'RightLeg', 'RightFoot', rFoot, knee);
+    this.ik('LeftUpLeg', 'LeftLeg', 'LeftFoot', lFoot, p.free ? knee : lKnee);   // gait heels pitch both ways: knees stay forward
+    this.ik('RightUpLeg', 'RightLeg', 'RightFoot', rFoot, p.free ? knee : rKnee);
     this.foot('LeftFoot', p.lHeel); this.foot('RightFoot', p.rHeel);
     // arms
     const club = !p.free;

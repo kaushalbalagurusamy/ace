@@ -44,7 +44,9 @@ const pocket = (i: number) => v(p1, LM.lWr) - 0.3 * (v(p1, LM.lWr) - v(i, LM.lSh
 const first = (a: number, b: number, ok: (i: number) => boolean, dflt: number) => { for (let i = a; i <= b; i++) if (ok(i)) return i; return dflt; };
 const p3 = first(p1 + 1, top, i => v(i, LM.lWr) <= v(i, LM.lSh), Math.round(p1 + (top - p1) * 0.6));   // lead arm parallel
 const p2 = first(p1 + 1, p3 - 1, i => v(i, LM.lWr) <= pocket(i), Math.round(p1 + (p3 - p1) * 0.45));
-const p5 = first(top + 1, impact - 2, i => v(i, LM.lWr) >= v(i, LM.lSh), Math.round(top + (impact - top) * 0.45));
+// lead arm parallel on the way down: the wrist halfway between shoulder and pocket height in the image (at the shoulder line the
+// arm still points up the slope; critic round 2 put P5 three frames later, at belt height)
+const p5 = first(top + 1, impact - 2, i => v(i, LM.lWr) >= (v(i, LM.lSh) + pocket(i)) / 2, Math.round(top + (impact - top) * 0.6));
 const p6 = first(p5 + 1, impact - 1, i => v(i, LM.lWr) >= pocket(i), Math.round(p5 + (impact - p5) * 0.5));
 const p8 = first(impact + 1, N - 1, i => v(i, LM.lWr) <= pocket(i), impact + 3);
 const p9 = first(p8 + 1, N - 1, i => v(i, LM.rWr) <= v(i, LM.rSh), p8 + 4);                            // trail arm parallel
@@ -86,37 +88,40 @@ console.log('captured arm', capArm.toFixed(3), 'm, scale to rig', S.toFixed(3));
 // ---- fusion with the P-system ranges at the keys ----
 const r = (k: number, val: number, tol: number) => ({ f: KEYS[k]!, lo: val - tol, hi: val + tol });
 const keysFor = (get: (p: Pose) => number, tol: (k: number) => number) => KEYS.map((_, k) => r(k, get(P_KEYED[k]!), tol(k)));
-const turnTol = (k: number) => (k <= 6 ? deg(4) : k === 9 ? deg(12) : deg(15));
+// Critic round 2 (P3, P4, P7, P8 scored 2/5: the top too low and the arm bent, impact like address, the P3 shaft and P8 hands wrong):
+// at these keys the single camera's depth is weakest, so the prior holds them exactly (STRICT); the capture still shapes the frames between.
+const STRICT = new Set([2, 3, 4, 5, 6, 7, 8]);   // round 3 added P5 (hands at the face); round 4 P6 and P9
+const turnTol = (k: number) => (k === 3 ? 0 : k <= 8 ? deg(4) : deg(12));   // P8 too: the capture over-turned the chest
 const pelY = fuse(capPelY, keysFor(p => p.pelvis[1], turnTol));
 const shY = fuse(capShY, keysFor(p => p.pelvis[1] + p.torso[1], turnTol));
-// P1-P7 keep the address spine angle (no standing up): those keys are held within 0.02 rad of the prior's P1 tilt
+// P1-P8 keep the address spine angle (no standing up; critic round 2: at P8 too): those keys are held within 0.02 rad of the prior's P1 tilt
 const tilt0 = P_KEYED[0]!.pelvis[0] + P_KEYED[0]!.torso[0];
-const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 6 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], 0.15))));
+const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 7 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], k === 8 ? 0.04 : 0.15))));
 const headW = fuse(capHeadWorld.map((h, i) => clamp(h, shY[i]! - deg(100), shY[i]! + deg(100))), keysFor(p => p.pelvis[1] + p.torso[1] + p.head[1], k => (k <= 6 ? deg(12) : deg(25))));
-const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], () => 0.03));
-const shiftZ = fuse(capShift.map(s => clamp(s[2] * S, -0.12, 0.2)), keysFor(p => p.shift[2] - P_KEYED[0]!.shift[2], () => 0.04));
-const heelKeys = (side: 'l' | 'r') => keysFor(p => (side === 'l' ? p.lHeel : p.rHeel), k => (k === 0 ? 0 : k >= 6 ? 0.2 : 0.1));
+const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], k => (k <= 7 ? 0.01 : 0.03)));
+const shiftZ = fuse(capShift.map(s => clamp(s[2] * S, -0.12, 0.2)), keysFor(p => p.shift[2] - P_KEYED[0]!.shift[2], k => (STRICT.has(k) ? 0.01 : 0.04)));
+const heelKeys = (side: 'l' | 'r') => keysFor(p => (side === 'l' ? p.lHeel : p.rHeel), k => (k === 0 ? 0 : k === 6 ? 0.05 : k >= 6 ? 0.2 : 0.1));
 const lHeel = fuse(capLHeel, heelKeys('l')).map(x => clamp(x, 0, 1.3)), rHeel = fuse(capRHeel, heelKeys('r')).map(x => clamp(x, 0, 1.3));
 // lead wrist: model-space path from address (scaled to the rig's arm), pinned to the prior's grip at P1 and P7
 const lw = (i: number) => w(i, LM.lWr);
 const gripCap = W.map((_, i) => add(P_KEYED[0]!.grip as unknown as P3, mul(sub(lw(i), lw(p1)), S)));
 // x (toward the target) is the camera's depth axis, so it is held close to the prior; y and z (up, toward the ball) are seen well
 const grip = [0, 1, 2].map(ax => fuse(gripCap.map(g => g[ax]!), KEYS.map((f, k) => {
-  const pk = P_KEYED[k]!.grip[ax]!, tol = k === 0 || k === 6 ? 0 : ax === 0 ? 0.08 : 0.15; return { f, lo: pk - tol, hi: pk + tol };
+  const pk = P_KEYED[k]!.grip[ax]!, tol = k === 0 || STRICT.has(k) ? 0 : ax === 0 ? 0.08 : 0.15; return { f, lo: pk - tol, hi: pk + tol };
 })));
 // lead wrist in the turned thorax frame (x lead shoulder line, y up the spine, z out of the chest), used around the top
 const tgrip = W.map((_, i) => {
   const x = norm(sub(w(i, LM.lSh), w(i, LM.rSh))), t = trunk(i), y = norm(sub(t, mul(x, dot(t, x)))), z = cross(x, y);
   const d = mul(sub(lw(i), mid(w(i, LM.lSh), w(i, LM.rSh))), S); return [dot(d, x), dot(d, y), dot(d, z)] as P3;
 });
-const tg = [0, 1, 2].map(ax => fuse(tgrip.map(t => t[ax]!), [{ f: top, lo: P_KEYED[3]!.tgrip[ax]! - 0.12, hi: P_KEYED[3]!.tgrip[ax]! + 0.12 }]));
+const tg = [0, 1, 2].map(ax => fuse(tgrip.map(t => t[ax]!), [{ f: top, lo: P_KEYED[3]!.tgrip[ax]!, hi: P_KEYED[3]!.tgrip[ax]! }]));
 // the game scrubs the backswing with the hold time, so P1..P4 must be monotonic: shoulders only turn further, hands only rise
 // (kept between the address and top values, then a running extreme)
 for (let i = p1; i <= top; i++) { shY[i] = clamp(shY[i]!, shY[top]!, shY[p1]!); grip[1]![i] = clamp(grip[1]![i]!, grip[1]![p1]!, grip[1]![top]!); }
 for (let i = p1 + 1; i <= top; i++) { shY[i] = Math.min(shY[i]!, shY[i - 1]!); grip[1]![i] = Math.max(grip[1]![i]!, grip[1]![i - 1]!); }
 const smoothstep = (a: number, b: number, x: number) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const poles = (s: number, e: number, wr: number, pr: (p: Pose) => V3) => W.map((_, i) => {
-  const { dir, bend } = pole(w(i, s), w(i, e), w(i, wr)), k = smoothstep(0.02, 0.07, bend), p = norm(pr(PR[i]!) as unknown as P3);
+  const { dir, bend } = pole(w(i, s), w(i, e), w(i, wr)), k = smoothstep(0.02, 0.07, bend) * (1 - Math.max(0, ...[...STRICT].map(q => 1 - Math.abs(i - KEYS[q]!) / 4))), p = norm(pr(PR[i]!) as unknown as P3);
   return norm(add(mul(p, 1 - k), mul(dir, k)));
 });
 const lPole = poles(LM.lSh, LM.lEl, LM.lWr, p => p.lPole), rPole = poles(LM.rSh, LM.rEl, LM.rWr, p => p.rPole);
