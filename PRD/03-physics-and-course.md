@@ -75,7 +75,7 @@
 | Rough | 0.85 | 0.55 (flyer) | +1.5° | ±1.5° random face noise |
 | Bunker | 0.75; non-wedges 0.55 | 0.60 | +2° | |
 | Fringe / green | putter only is efficient; other clubs 0.9 | 1.0 | | |
-| Slope | | | launch shifts by the slope angle | sidehill shifts the aim by ±slope·0.5 |
+| Slope (real elevation) | | | uphill: loft +1°/°, attack +0.5°/° (downhill the reverse) | side slope turns the face by atan(tan(loft)·sin(slope)): ball above the feet draws, below fades; the curve comes from the D-plane. See `docs/research/elevation.md` |
 
 With the sourced aero, the rough's 0.55 flyer spin offsets most of its 0.85 speed loss: a 9i totals 163 yd from fairway and 153 yd from rough.
 
