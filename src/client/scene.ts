@@ -197,11 +197,11 @@ export class World {
     spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
     const built: THREE.Object3D[] = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
     for (const gr of groups.values()) {
-      const id = gr.id, tpl = (await loadModel(id)) ?? makeProp(gr.kind, gr.v);
+      const id = gr.id, model = await loadModel(id), tpl = model ?? makeProp(gr.kind, gr.v);
       if (token !== this.propToken) return;                      // a newer hole replaced this request
       tpl.updateMatrixWorld(true);
-      // grade generated textures toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
-      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
+      // grade generated textures (not the code-built props' palette colours) toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
+      if (model) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
       tpl.traverse(o => {
         const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
         const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
