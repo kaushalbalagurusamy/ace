@@ -24,3 +24,16 @@ The owner submits the form and the portal. No agent submits forms or posts on th
 - **By about 22:00:** a playable race on the deployed URL (greyscale is fine). Record the demo video from it.
 - **By 23:30:** video, tweet draft and repo link ready for the owner. The owner submits the portal and the form before midnight.
 - **Midnight to 08:00:** polish in place on the same URL: generated assets, audio, physics calibration. Re-test from a cold browser before 08:00.
+
+## Demo video (ready 2026-11-05 about 20:10 CST)
+- **File:** `~/Movies/ace-clips/ace-demo.mp4` (61 s, 1280×720, captioned, no audio), recorded from the live site at deploy 21d88e1.
+- **Contents:** title card, waiting room and a two-player lobby, the other player on the shared tee, stance and ball position, hold-and-release swing, flight with tracer, shot card, rangefinder auto-club, a draw from ball position, max effort (its shot card is blurred until the speed decision), and a closing card with the URL.
+- **Needs a public link for the portal:** upload it (YouTube unlisted, Loom or Drive) and paste the link.
+
+## Tweet draft (owner posts)
+> I built ACE for Gauntlet AI Game Week ⛳ A multiplayer golf race on Pebble Beach Golf Links: first to hole out on 18 wins. Hold and release Space to swing, move the ball for draws and fades, TrackMan-style ball flight. Every visual and sound is AI-generated. Play free in your browser: https://ace-x92s.onrender.com
+
+Shorter version:
+> ACE: a multiplayer golf race on Pebble Beach, built for Gauntlet AI Game Week. First to hole out on 18 wins. Play in your browser: https://ace-x92s.onrender.com
+
+Attach the demo video or a still from it.
