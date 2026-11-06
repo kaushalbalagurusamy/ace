@@ -1040,18 +1040,18 @@
     "tier": "Pro",
     "stage": "textured",
     "seed_photos": [
-      "refs/callaway/club-3w-1.jpg"
+      "refs/callaway/club-3w-2.jpg"
     ],
     "seed_source": "callawaygolf.com / odyssey.callawaygolf.com product photos (reference only, never shipped); owner-approved, sponsor allows logos as they appear",
     "product": "Callaway Elyte Triple Diamond Fairway Wood (2025)",
     "loft_label": "15 deg",
-    "task_id": "01a1ad20-291f-7665-bece-efc673e3db61",
+    "task_id": "01a1ad28-3fc0-76da-9ec3-358debf60d0a",
     "credits_used": 30,
     "date": "2026-11-05",
     "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
     "subagent": "build session (script)",
     "raw": "assets/models/raw/club-3w.glb (local only)",
-    "balance_before": 730,
-    "balance_after": 670
+    "balance_before": 670,
+    "balance_after": 640
   }
 ]

@@ -23,13 +23,20 @@ def call(method, path, body=None):
     with urllib.request.urlopen(req, timeout=300) as r: return json.load(r)
 def uri(p): return "data:image/jpeg;base64," + base64.b64encode(p.read_bytes()).decode()
 
+SINGLE = {}   # asset id -> the one photo number to use (single image-to-3D), set with --single asset=N
+
 def make(asset):
     stem, product, loft = CLUBS[asset]; photos = sorted((ROOT / "refs/callaway").glob(f"{stem}-[1-4].jpg"))
     assert len(photos) == 4, (asset, photos)
-    tid = call("POST", "/v1/multi-image-to-3d", {"image_urls": [uri(p) for p in photos], "ai_model": "meshy-6", "should_texture": True, "enable_pbr": False,
-          "should_remesh": True, "topology": "triangle", "target_polycount": 4000, "target_formats": ["glb"]})["result"]
+    if asset in SINGLE:
+        photos = [ROOT / "refs/callaway" / f"{stem}-{SINGLE[asset]}.jpg"]; ep = "/v1/image-to-3d"
+        body = {"image_url": uri(photos[0]), "ai_model": "meshy-6", "should_texture": True, "enable_pbr": False, "should_remesh": True, "topology": "triangle", "target_polycount": 4000, "target_formats": ["glb"]}
+    else:
+        ep = "/v1/multi-image-to-3d"
+        body = {"image_urls": [uri(p) for p in photos], "ai_model": "meshy-6", "should_texture": True, "enable_pbr": False, "should_remesh": True, "topology": "triangle", "target_polycount": 4000, "target_formats": ["glb"]}
+    tid = call("POST", ep, body)["result"]
     while True:
-        t = call("GET", f"/v1/multi-image-to-3d/{tid}")
+        t = call("GET", f"{ep}/{tid}")
         if t["status"] in ("SUCCEEDED", "FAILED", "CANCELED"): break
         time.sleep(8)
     if t["status"] != "SUCCEEDED": return {"asset": asset, "error": f"{t['status']}: {t.get('task_error')}"}
@@ -41,7 +48,9 @@ def make(asset):
             "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm", "subagent": "build session (script)", "raw": f"assets/models/raw/{asset}.glb (local only)"}
 
 if __name__ == "__main__":
-    ids = sys.argv[1:] or list(CLUBS)
+    args = sys.argv[1:]
+    for a in [x for x in args if x.startswith("--single=")]: k, n = a[len("--single="):].split(":"); SINGLE[k] = int(n)   # e.g. --single=club-driver:1
+    ids = [x for x in args if not x.startswith("--")] or list(CLUBS)
     b0 = call("GET", "/v1/balance")["balance"]; print("balance before:", b0, flush=True)
     with ThreadPoolExecutor(4) as ex: results = list(ex.map(make, ids))
     b1 = call("GET", "/v1/balance")["balance"]; print("balance after:", b1, "| used:", b0 - b1)

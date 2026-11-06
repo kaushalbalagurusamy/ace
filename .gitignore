@@ -13,3 +13,6 @@ assets/models/raw/
 assets/images/
 assets/models/ops/
 public/
+
+# Python bytecode
+__pycache__/
