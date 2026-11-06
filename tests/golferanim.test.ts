@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BACK_KEYS, DOWNSWING_MS, DOWN_KEYS, FOLLOW_KEYS, P_POS, POSES, TEMPO, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, walkPose } from '../src/client/golferanim';
+import { BACK_KEYS, DOWNSWING_MS, P_FRAMES, P_POS, POSES, SWING_CURVE, TEMPO, backswingFrame, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, walkPose } from '../src/client/golferanim';
 
 const L = 0.94; // 7-iron
 const hyp = (v: readonly number[]) => Math.hypot(v[0]!, v[1]!, v[2]!);
@@ -7,10 +7,22 @@ const near = (a: readonly number[], b: readonly number[], d = 9) => a.forEach((x
 const shoulderTurn = (p: { pelvis: readonly number[]; torso: readonly number[] }) => p.pelvis[1]! + p.torso[1]!;
 const deg = (r: number) => (r * 180) / Math.PI;
 
-describe('Dunaway timings', () => {
-  it('backswing to downswing is about 3:1 and the downswing is the 750 ms turn divided by it', () => {
-    expect(TEMPO).toBeCloseTo(47 / 15, 6);
+// The swing is now the pose-estimated Dunaway clip (src/client/motion/swingcapture.ts), not hand-keyed poses: the phase frames
+// and tempo are detected from the capture, so these tests check the captured curve against the same owner spec as before.
+describe('Dunaway timings (captured)', () => {
+  it('backswing to downswing is about 3:1 (tour tempo) and the downswing is the 750 ms turn divided by it', () => {
+    expect(TEMPO).toBeGreaterThan(2.5); expect(TEMPO).toBeLessThan(3.5);
+    expect(TEMPO).toBeCloseTo((P_FRAMES[3] - P_FRAMES[0]) / (P_FRAMES[6] - P_FRAMES[3]), 9);
     expect(DOWNSWING_MS).toBeCloseTo(750 / TEMPO, 6);
+  });
+  it('the curve is one pose per captured frame, P1..P10 are frames of it in order, and it moves smoothly frame to frame', () => {
+    expect(P_FRAMES[0]).toBe(0); expect(P_FRAMES[9]).toBe(SWING_CURVE.length - 1);
+    for (let i = 1; i < 10; i++) expect(P_FRAMES[i]!).toBeGreaterThan(P_FRAMES[i - 1]!);
+    P_FRAMES.forEach((f, i) => expect(P_POS[i]).toBe(SWING_CURVE[f]));
+    for (let i = 1; i < SWING_CURVE.length; i++) {   // no pops: under 25° of turn per 33 ms frame except through impact
+      const a = SWING_CURVE[i - 1]!, b = SWING_CURVE[i]!;
+      expect(Math.abs(deg(shoulderTurn(b) - shoulderTurn(a))), `frame ${i}`).toBeLessThan(25);
+    }
   });
 });
 
@@ -39,6 +51,7 @@ describe('backswing', () => {
     near(backswingPose(0.55, L).grip, P_POS[2]!.grip);
     near(backswingPose(1, L).grip, P_POS[3]!.grip);
     near(backswingPose(backswingDepth(750), L).torso, P_POS[3]!.torso);
+    expect(backswingFrame(1)).toBe(P_FRAMES[3]);   // a full hold reaches the captured top
   });
   it('the pose lookup is monotonic in the hold fraction: the shoulders only turn further and the hands only rise', () => {
     let turn = Infinity, y = -Infinity;
@@ -61,14 +74,11 @@ describe('address geometry', () => {
 
 describe('release', () => {
   it('runs P5, P6, P7 then P8, P9, P10 in order', () => {
-    const T = releaseTimes(1), at = (frac: number, keys: readonly number[]) => {   // the ms at which an eased phase passes a key
-      const k = keys === DOWN_KEYS ? Math.sqrt(frac) : 1 - Math.sqrt(1 - frac);
-      return keys === DOWN_KEYS ? k * T.down : T.down + k * T.follow;
-    };
-    const order = [[DOWN_KEYS[1], DOWN_KEYS, 4], [DOWN_KEYS[2], DOWN_KEYS, 5], [1, DOWN_KEYS, 6], [FOLLOW_KEYS[1], FOLLOW_KEYS, 7], [FOLLOW_KEYS[2], FOLLOW_KEYS, 8], [1, FOLLOW_KEYS, 9]] as const;
+    // the captured downswing and follow-through play at the clip's own frame rate (scaled), so each key is passed at its frame time
+    const T = releaseTimes(1), K = P_FRAMES, at = (i: number) => (i <= 6 ? ((K[i]! - K[3]) / (K[6] - K[3])) * T.down : T.down + ((K[i]! - K[6]) / (K[9] - K[6])) * T.follow);
     let last = -1;
-    for (const [frac, keys, i] of order) {
-      const ms = at(frac, keys); expect(ms).toBeGreaterThan(last); last = ms;
+    for (const i of [4, 5, 6, 7, 8, 9]) {
+      const ms = at(i); expect(ms).toBeGreaterThan(last); last = ms;
       const p = releasePose(1, ms - (i === 6 ? 1e-6 : 0), L).pose;
       if (i !== 6) near(p.grip, P_POS[i]!.grip, 4); else near(p.grip, P_POS[6]!.grip, 3);
     }
