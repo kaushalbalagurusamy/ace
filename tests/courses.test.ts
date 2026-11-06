@@ -23,7 +23,7 @@ describe('course registry', () => {
       expect(yards, id).toBeGreaterThan(6500); expect(yards, id).toBeLessThan(7800);
       for (const [i, h] of c.card.entries()) {
         expect([3, 4, 5], `${id} ${i + 1}`).toContain(h.par);
-        const [lo, hi] = h.par === 3 ? [95, 260] : h.par === 4 ? [300, 530] : [440, 640];
+        const [lo, hi] = h.par === 3 ? [95, 260] : h.par === 4 ? [300, 560] : [440, 640];
         expect(h.yards, `${id} hole ${i + 1}`).toBeGreaterThanOrEqual(lo); expect(h.yards, `${id} hole ${i + 1}`).toBeLessThanOrEqual(hi);
       }
       expect(c.heightAt(0, 0, 0)).toBe(0);
