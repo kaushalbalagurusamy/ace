@@ -76,7 +76,7 @@ The owner's Pebble Beach contact approved using the **Pebble Beach** name in the
 | terrain | Terrain mesh and surface map (fairway, first cut, rough, sand, green, fringe, path) | 18 holes | Code from OSM and 3DEP | Same polygons drive the physics lies (03 §4) | P0 |
 | water | Ocean and shoreline foam | 1 shader | Code, with a generated normal map | | P0 / P1 |
 | sky | Sky and coastal fog | 1 | Code (`Sky` addon) | | P0 |
-| tex-ground | Tileable fairway, rough, sand and green textures | 4 | Code noise, then OpenAI tileables | Fairway mowing stripes in a shader | P0 / P1 |
+| tex-ground | Tileable fairway, first cut, rough, fringe, green and sand turf (`turf-*`, photographic, owner request 2026-11-05) | 6 | OpenAI `gpt-image-2-2026-04-21` at 2048 px, made seamless and downsized by `scripts/turf_tiles.py` | Normal and roughness derived in the client; mowing stripes in the shader | P1 |
 | ui-icons | 14 club icons for the HUD row | 14 | Code SVG | Generic labels | P0 |
 | minimap | Mini map and rangefinder art | 1 | Code, rendered from the course data | | P0 |
 
@@ -100,6 +100,25 @@ The owner's Pebble Beach contact approved using the **Pebble Beach** name in the
 - **Subagents:** one per group: clubs, golfer, foliage and rocks, sound effects and ambience, music and voice. Each writes to `assets/<group>/` and adds manifest rows. None of them edits game code.
 - **Formats:** models are glTF binary (`.glb`). Each model gets a Draco-compressed copy, ≤ 2 MB per model, checked by `asset_report.py`. Audio is `.ogg` and `.mp3`, loudness-normalised to −16 LUFS for sound effects and −20 LUFS for music [ASSUMED targets].
 - **Integration:** the client loads `assets/manifest.json`. A missing ID falls back to the greyscale stand-in, so assets can land in any order.
+
+## 6. Graphics presets [GIVEN by the owner 2026-11-05]
+
+The turf is HD and realistic, and each device loads only what its hardware can carry. Settings menu (Esc or gear): **Graphics: Auto (High)** by default, with Low, Medium, High and Ultra as overrides, saved in `localStorage` (`ace.gfx`). **F3** toggles an FPS, tier, draw-call and triangle readout. Code: `src/client/graphics.ts` (table, Auto, adaptation; unit tested), `turf*.ts`, `terrain.ts`, `grass.ts`.
+
+| | Low | Medium | High | Ultra |
+|---|---|---|---|---|
+| Turf files downloaded | 6 × 512 px (~0.7 MB) | 6 × 1024 (~3.2 MB) | 6 × 2048 (~10.6 MB) | 6 × 2048 + close-range detail sampling |
+| Rough grass blades (instanced, wind sway) | off | off | 30 m, 0.45 m spacing | 50 m, 0.36 m spacing |
+| Sun shadows (box follows the player) | off | 1024 | 2048 | 4096, softer |
+| Pixel ratio | 0.75 | 1.0 | min(DPR, 1.5) | min(DPR, 2) |
+| Antialias (MSAA, applies on the next load) | off | on | on | on |
+| Trees and rocks placed | 50% | 75% | 100% | 100% |
+| Fog / far plane | 160–650 / 900 m | 200–800 / 1200 m | 220–900 / 2000 m | 260–1100 / 2000 m |
+
+- **Turf:** six surfaces blended by the lie grid (fringe is the ring around each green), with soft, noise-jittered edges. Each surface is sampled twice (the second rotated, larger and offset, mixed by world noise) and carries macro colour variation, so tiles do not repeat visibly. Fairway mowing stripes (6 m) and green stripes (1 m) run along the tee-to-pin axis. A worker bakes each photo's colour toward the course palette and derives a normal and roughness map from its luminance (Sobel). If any turf file fails, the terrain keeps the flat lie-grid colours.
+- **Auto, initial tier:** from the unmasked WebGL renderer string when available, `MAX_TEXTURE_SIZE`, `navigator.deviceMemory`, `hardwareConcurrency` and a mobile check. Software GL, ≤2 GB, ≤2 cores or a max texture below 8192 get Low. Phones get Low (Medium with ≥6 GB). An M1 or Intel integrated GPU gets Medium. Newer Apple chips and mainstream discrete GPUs get High. RTX x060+, RX 6000+ and M-series Max/Ultra get Ultra. A masked renderer gets Medium.
+- **Auto, runtime:** a 2.5 s rolling frame-time window. Averaging over 20 ms steps down one tier. Staying under 12 ms for 10 s steps up one, never above the initial tier + 1, and not back into a tier it left for being slow within 45 s. Frames over 250 ms (tab switch, loading) reset the window. No switch happens during a swing or while your ball is in flight; it waits for rest.
+- **Limits:** rAF frame time cannot go below the display refresh interval, so on a 60 Hz screen (16.7 ms) Auto steps down but never up. Medium at 60 fps on an M1 MacBook Air at 1280×720 is the budget, but it has not been measured on an M1 (only on an M5 Pro, where every tier holds 60 fps).
 
 ## Acceptance criteria
 

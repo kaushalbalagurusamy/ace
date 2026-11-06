@@ -2,7 +2,10 @@ import * as THREE from 'three';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { isCoastal, propSpots, terrainMesh } from './terrain';
+import { isCoastal, propSpots, setTurf, terrainMesh } from './terrain';
+import { SPEC, type Tier } from './graphics';
+import { dropTurf, loadTurf, type Turf } from './turf';
+import { Grass } from './grass';
 import { loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
@@ -36,13 +39,44 @@ export class World {
   })();
   private propToken = 0;
   private pinTop = new THREE.Vector3();
-  constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = new THREE.Fog('#cfe6f4', 220, 900);
+  private fog = new THREE.Fog('#cfe6f4', 220, 900);
+  private sun = new THREE.DirectionalLight('#ffffff', 1.5);
+  private grass = new Grass(this.scene);
+  private terrain: THREE.Mesh | null = null;
+  private spots: PropSpot[] = [];
+  /** current graphics tier (graphics.ts SPEC); the turf promise is for this tier's texture size */
+  tier: Tier;
+  private turf: Promise<Turf | null>;
+  private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3();
+  constructor(canvas: HTMLCanvasElement, tier: Tier) {
+    this.tier = tier; this.turf = loadTurf(tier);
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
+    this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.scene.background = new THREE.Color('#cfe6f4'); this.scene.fog = this.fog;
     this.scene.add(new THREE.HemisphereLight('#ffffff', '#6b7b6b', 1.9), this.course, this.props, this.beacon);
-    const sun = new THREE.DirectionalLight('#ffffff', 1.5); sun.position.set(50, 100, 30); this.scene.add(sun);
+    // the sun's shadow box (90 m) follows the player; sun.position/target are moved in render()
+    const sc = this.sun.shadow.camera; sc.left = sc.bottom = -45; sc.right = sc.top = 45; sc.near = 1; sc.far = 320;
+    this.sun.shadow.bias = -0.0004; this.sun.shadow.normalBias = 0.04;
+    this.scene.add(this.sun, this.sun.target);
     const resize = () => { this.renderer.setSize(innerWidth, innerHeight); this.cam.aspect = innerWidth / innerHeight; this.cam.updateProjectionMatrix(); };
     addEventListener('resize', resize); resize();
+    this.applyTier(tier, true);
+  }
+  /** Applies a graphics tier live: pixel ratio, shadows, fog and draw distance, grass, foliage density and the turf texture size. */
+  applyTier(t: Tier, first = false) {
+    const s = SPEC[t], prev = SPEC[this.tier]; this.tier = t;
+    this.renderer.setPixelRatio(s.pixelRatio(devicePixelRatio));
+    this.sun.castShadow = s.shadow > 0;
+    if (s.shadow && this.sun.shadow.mapSize.x !== s.shadow) { this.sun.shadow.mapSize.set(s.shadow, s.shadow); this.sun.shadow.map?.dispose(); this.sun.shadow.map = null; }
+    this.sun.shadow.radius = t === 'ultra' ? 3 : 1;
+    this.fog.near = s.fogNear; this.fog.far = s.fogFar; this.cam.far = s.far; this.cam.updateProjectionMatrix();
+    this.grass.configure(s.grassM, s.grassSpacing);
+    if (first) return;
+    if (s.tex !== prev.tex) {
+      const p = loadTurf(t), old = prev.tex; this.turf = p;
+      void p.then(tf => { if (!tf || this.turf !== p) return; if (this.terrain) setTurf(this.terrain, tf, s.detail); dropTurf(old); });
+    } else if (s.detail !== prev.detail && this.terrain) void this.turf.then(tf => { if (tf && this.terrain) setTurf(this.terrain, tf, s.detail); });
+    if (s.foliage !== prev.foliage) void this.setProps(this.spots);
   }
   private mat = (c: string) => new THREE.MeshLambertMaterial({ color: c });
   private band(w: number, l: number, cx: number, cz: number, rotY: number, y: number, c: string) {
@@ -57,6 +91,7 @@ export class World {
       const shade = SHADES[i % 4]!;
       const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')),
         cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
+      e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
       e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
     });
@@ -82,17 +117,21 @@ export class World {
     this.course.clear();
     const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
     base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
-    this.course.add(base, terrainMesh(h.index));
+    this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
+    this.course.add(base, this.terrain);
     const pin = V(h.pin.x, 0, h.pin.z); this.pinTop.set(pin.x, 2.6, pin.z);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
+    pole.castShadow = flag.castShadow = true;
     this.course.add(pole, flag);
-    void this.setProps(propSpots(h.index));
+    this.spots = propSpots(h.index);
+    void this.setProps(this.spots);
   }
 
   /** Places generated trees and rocks (cheap clones of cached models); kinds that fail to load are skipped. */
   async setProps(spots: PropSpot[]) {
-    const token = ++this.propToken;
+    const token = ++this.propToken, f = SPEC[this.tier].foliage;
+    spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
     this.props.clear();
     const ids = { cypress: ['tree-cypress-a', 'tree-cypress-b'], pine: ['tree-pine-a'], rock: ['rock-a', 'rock-b', 'rock-c'] } as const;
     let i = 0;
@@ -100,7 +139,7 @@ export class World {
       const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
       i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; this.props.add(m);
+      m.position.copy(V(s.x, 0, s.z)); m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
     }
   }
   private makeGolfer(shade: string, name: string) {
@@ -116,8 +155,10 @@ export class World {
       if (!model) return;
       for (const ch of [...g.children]) if (ch !== s) g.remove(ch);
       const disc = new THREE.Mesh(new THREE.CircleGeometry(0.7, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: shade })); disc.position.y = 0.03;
+      model.traverse(o => { o.castShadow = true; });
       g.add(model, disc);
     });
+    g.traverse(o => { if (o instanceof THREE.Mesh) o.castShadow = true; });
     return g;
   }
   setBall(e: Ent, b: BallState) { e.ball = b; e.ballMesh.position.copy(V(b.x, 0.22, b.z)); e.ballMesh.visible = !b.holedOut; }
@@ -179,9 +220,15 @@ export class World {
     }
   }
   render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
-    const f = [Math.sin(yaw), Math.cos(yaw)] as const;
-    const target = V(x, y, z);
-    this.cam.position.copy(V(x - f[0] * dist * Math.cos(pitch), y + dist * Math.sin(pitch), z - f[1] * dist * Math.cos(pitch)));
-    this.cam.lookAt(target); this.renderer.render(this.scene, this.cam);
+    const fx = Math.sin(yaw), fz = Math.cos(yaw);
+    const target = this.tmpA.set(-x, y, z);
+    this.cam.position.set(-(x - fx * dist * Math.cos(pitch)), y + dist * Math.sin(pitch), z - fz * dist * Math.cos(pitch));
+    this.cam.lookAt(target);
+    if (this.sun.castShadow) {   // shadow box centred on the player, snapped to whole texels so edges do not shimmer
+      const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, 0, Math.round(target.z / snap) * snap);
+      this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, 100, c.z + 30); this.sun.target.updateMatrixWorld();
+    }
+    this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
+    this.renderer.render(this.scene, this.cam);
   }
 }
