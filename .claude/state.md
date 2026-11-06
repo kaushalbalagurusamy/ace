@@ -8,15 +8,14 @@ The game **Ace** is submitted (portal + Google Form, before midnight). The game 
 
 ## Live
 
-- GitLab `main` = live = `fe0ed2f` (deployed ~01:55 CST): real elevation on 3 courses (Pebble, Bethpage Black, Aronimink, course picker in lobby), photo-referenced Pebble environment (ocean/coast/sky/fescue/buildings), generated cypress r13 (critic PASS), 18th sea wall r3 (model PASS, in-scene 3.4), captured swing (critic 3.5) and gait, seated driver, sprung cart, finer code tyres, ball-scale cup.
-- Checks: tsc, vitest 386 + 2 expected fail, build; 18-hole bot PASS on all three courses concurrently (87 / 84 / 68).
-- Bot sessions now use a random id (concurrent bots used to collide on Date.now()).
-- Owner report: https://claude.ai/artifact/T9gRsv7gZyeecGUisPbxyk (photo-vs-game, critic scores, decisions).
-
-## Open decisions for the owner
-
-- Ship the Meshy Genesis cart body (critic 2.75, far closer than the code box) under override? Recommended yes. One manifest change.
-- Further generation spend: Rodin 22.5, Meshy ~245, OpenAI 24/40 used. $30 top-up asked, unanswered.
+- GitLab `main` = live = `98471c7` (deployed ~07:30 CST Fri 6 Nov). Three courses on real elevation with lie, slope, run-out and Stimp-10 greens.
+- Generated assets live (critic PASS): cypress r13, pine r19b, rock r20, 18th sea wall r3. The cart body is Meshy cart-meshy-5 under owner override (critic 3.25). The golfer ships under owner override.
+- Live scorecard: standings strip, a Tab full card, and a results card, broadcast by the server as `progress` messages.
+- Swing: MediaPipe capture fused with hand keys, critic 3.5. The Uthana video-to-motion swing is behind `?swing=uthana` (critic 3.0).
+- Checks: tsc; vitest 392 + 2 expected fail; build. The bot passes 18 holes on all courses solo, three races at once, and a 4-player lobby race (Aronimink, places 1–4).
+- Bot multiplayer mode: `HOST=<n>` creates the lobby and starts it; `JOIN=1` joins one.
+- Rodin works only at Gen-2.5-Low; `gen_rodin.py` now defaults to it. Meshy was upgraded by the owner. The Uthana key is in `.env`.
+- Owner report: https://claude.ai/artifact/T9gRsv7gZyeecGUisPbxyk
 
 ## Known gaps
 
