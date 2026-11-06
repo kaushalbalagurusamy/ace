@@ -422,6 +422,8 @@ function fineTiles(hole: number, coarse: THREE.BufferGeometry, segX: number, seg
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
 export const themeOf = (hole: number) => COURSES[COURSE_IDS[Math.floor(hole / HOLES_PER_COURSE)]!].theme;
+/** Tree density on Pebble's open clifftop holes (0-based), from the photos: the 7th and 8th are treeless links ground (h07, h08-chasm), 6, 9 and 10 sparse. */
+const OPEN_LINKS: Record<number, number> = { 5: 0.35, 6: 0, 7: 0.08, 8: 0.35, 9: 0.35 };
 export function propSpots(hole: number): PropSpot[] {
   if (themeOf(hole) === 'parkland') return treeLines(hole);
   const g = gridOf(hole), sea = seaField(hole).sea; let seed = (hole + 1) * 2654435761 >>> 0;
@@ -429,7 +431,7 @@ export function propSpots(hole: number): PropSpot[] {
   const trees: PropSpot[] = [], rocks: PropSpot[] = [];
   for (let z = g.z0; z < g.z0 + g.nz * g.cell; z += 6) for (let x = g.x0; x < g.x0 + g.nx * g.cell; x += 6) {
     const px = x + rnd() * 6, pz = z + rnd() * 6, r = rnd(), c = sea[Math.floor((pz - g.z0) / g.cell) * g.nx + Math.floor((px - g.x0) / g.cell)] ? 'w' : cellClass(hole, px, pz);   // land specks drawn as sea get no props
-    if (c === 't' && r < 0.22 && trees.length < 150) trees.push({ kind: rnd() < 0.6 ? 'cypress' : 'pine', x: px, z: pz, scale: 0.8 + rnd() * 0.5, rotY: rnd() * 6.28 });
+    if (c === 't' && r < 0.22 * (OPEN_LINKS[hole % HOLES_PER_COURSE] ?? 1) && trees.length < 150) trees.push({ kind: rnd() < 0.6 ? 'cypress' : 'pine', x: px, z: pz, scale: 0.8 + rnd() * 0.5, rotY: rnd() * 6.28 });
     else if (c === 'k' && r < 0.12 && rocks.length < 30) rocks.push({ kind: 'rock', x: px, z: pz, scale: 0.7 + rnd() * 0.8, rotY: rnd() * 6.28 });
   }
   return [...trees, ...rocks];
