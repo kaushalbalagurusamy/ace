@@ -2113,11 +2113,10 @@
     "model": "meshy-7.1 (latest)",
     "tier": "Pro",
     "inputs": [
-      "refs/cart/genesis-1.jpg",
-      "refs/cart/genesis-3.jpg"
+      "concept-1.png, concept-3.png: scripts/gen_cart_concept.py (gpt-image-2) edits of refs/cart/genesis-1.jpg and genesis-3.jpg, local only"
     ],
-    "source_row": "cart-meshy-2",
-    "date": "2026-11-05",
+    "source_row": "cart-meshy-5",
+    "date": "2026-11-06",
     "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
     "subagent": "cart asset agent (script)",
     "qa": {
@@ -2160,18 +2159,69 @@
           "proportions": 3,
           "detail": 2,
           "mean": 2.75
+        },
+        {
+          "round": 5,
+          "model": "cart-meshy-4 (concept + photos), tyres and Meshy steering wheel cut",
+          "silhouette": 3,
+          "colour_material": 3,
+          "proportions": 3,
+          "detail": 2,
+          "mean": 2.75,
+          "verdict": "FAIL"
+        },
+        {
+          "round": 5,
+          "model": "cart-meshy-5 (two concepts), tyres and Meshy steering wheel cut",
+          "silhouette": 3,
+          "colour_material": 3,
+          "proportions": 3,
+          "detail": 2,
+          "mean": 2.75,
+          "verdict": "FAIL"
+        },
+        {
+          "round": 6,
+          "model": "cart-meshy-5 + lofted canopy panes, slate-blue body shift, pinstripes and red light bar",
+          "silhouette": 4,
+          "colour_material": 3,
+          "proportions": 4,
+          "detail": 2,
+          "mean": 3.25,
+          "verdict": "FAIL"
+        },
+        {
+          "round": 7,
+          "model": "cart-meshy-6 (two concepts, new seed), same post-process",
+          "silhouette": 3,
+          "colour_material": 3,
+          "proportions": 3,
+          "detail": 2,
+          "mean": 2.75,
+          "verdict": "FAIL"
+        },
+        {
+          "round": 7,
+          "model": "cart-meshy-5, round-6 post-process with darker panes and repainted pinstripes (shipped)",
+          "silhouette": 4,
+          "colour_material": 3,
+          "proportions": 4,
+          "detail": 2,
+          "mean": 3.25,
+          "verdict": "FAIL"
         }
       ],
-      "open_issues": "critic: canopy still reads as tinted glass rather than an opaque navy frame around clear panes; no plaid, tablet screen or badges; interior driver view crude; lower blue sills missing; tyres lack BOX BUGGY lettering",
-      "local_only": "assets/qa/motion/cart/compare/meshy-genesis-*.jpg (photo beside render; gitignored, never committed)"
+      "open_issues": "critic (round 7, cart-meshy-5): Interior/dashboard geometry is broken: jagged white spikes, a mangled screen and smeared, stretched plaid textures in the genesis-4 view; Steering wheel, centre screen mount, vents and toggle switches are missing or crude compared with the reference; Rear white double stripes render as blurry chrome reflections instead of crisp white stripes, and the badge is unreadable; The GENESIS lettering on the rear red light bar is missing; The body looks taller and narrower than the low, wide reference; the B-pillar is heavier than the reference's continuous glass canopy; Seats are separate headrest buckets rather than the reference's low beige seats with plaid inserts",
+      "local_only": "assets/qa/motion/cart/compare/meshy-genesis-*.jpg (photo beside render; gitignored, never committed)",
+      "critic_json": "local only: scratchpad cart-final/critic-r*.json (fresh critic per round: renders + refs/cart photos + rubric only)"
     },
     "orient_deg": [
       0,
       90,
       0
     ],
-    "wheel_r": 0.236,
-    "ground_y": -0.536,
+    "wheel_r": 0.234,
+    "ground_y": -0.544,
     "seat": [
       0.38,
       0.87,
@@ -2182,12 +2232,12 @@
       1.17,
       0.56
     ],
-    "task_id": "01a1af74-1c2a-77f3-8eb7-3ae3cb48d224",
+    "task_id": "01a1b0c8-fda3-732b-806a-c4b8b8f43f8f",
     "credits_used": 35,
-    "post_process": "scripts/fit_cart_meshy.mjs (tyres cut so the code wheels spin, steer and ride the suspension; canopy panes split into a tinted see-through glass material; roof and corner pillars, the front pinstripes and the rear red light bar repainted in texture space in the body navy sampled from the model; interior grey-white tinted cream by vertex colour), then gltf-transform optimize --compress meshopt --texture-compress webp --texture-size 2048 --simplify false; raw kept local in assets/models/raw",
+    "post_process": "BLUE=62,80,128 STRIPES=-0.05,-0.025,-0.005,0.02,0.0,0.04 PANES=0.0 CUT=0.745,-0.31,0.23,0.3 CUT_ONLY=1 DROP=-0.52,-0.18,-0.06,0.32,-0.17,0.17 node scripts/fit_cart_meshy.mjs (tyres cut so the code wheels spin, steer and ride the suspension; Meshy's centre steering wheel cut so the code wheel shows; tinted panes lofted inside the open navy canopy frame; navy shifted to the photos' slate blue; twin white pinstripes and the red light bar painted; interior tinted cream), then gltf-transform optimize --compress meshopt --texture-compress webp --texture-size 2048 --simplify false; raw kept local in assets/models/raw",
     "fit": "src/client/cartmodel.ts fitBody: turned 90 deg (Meshy put the length along x, rear at +x), scaled 1.91 so its wheelbase matches CORNERS (code tyres slightly larger than its arches, as the photos huge turf tyres), axle at WHEEL_R; driver seat and steering wheel moved onto its front bench and dash",
-    "triangles": 31957,
-    "shipped_bytes": 2454992
+    "triangles": 28492,
+    "shipped_bytes": 2037612
   },
   {
     "id": "bg-bethpage-04",
@@ -5675,5 +5725,144 @@
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": false
     }
+  },
+  {
+    "id": "cart-meshy-2-style",
+    "file": "assets/models/raw/cart-meshy-2-style.glb (local only, raw intermediate)",
+    "tool": "Meshy retexture",
+    "model": "meshy-7",
+    "retexture_of": "01a1af74-1c2a-77f3-8eb7-3ae3cb48d224",
+    "tier": "Pro",
+    "inputs": [
+      "refs/cart/genesis-1.jpg"
+    ],
+    "prompt": null,
+    "task_id": "01a1b0c4-922b-75c6-bf0c-acb85efbdbc4",
+    "target_polycount": 50000,
+    "geometry_resolution": "standard",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 10,
+    "balance_before": 1940,
+    "balance_after": 1930
+  },
+  {
+    "id": "cart-meshy-3",
+    "file": "assets/models/raw/cart-meshy-3.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3d",
+    "model": "meshy-7.1 (latest)",
+    "retexture_of": null,
+    "tier": "Pro",
+    "inputs": [
+      "refs/cart/genesis-1.jpg",
+      "refs/cart/genesis-3.jpg",
+      "refs/cart/genesis-4.jpg"
+    ],
+    "prompt": "Genesis Box Buggy concept golf cart. Opaque glossy dark navy blue (#2E3F66) roof frame and four thick navy corner pillars framing large perfectly clear transparent glass panes; navy body panels with blue lower side sills. Interior visible through clear glass: cream tan leather (#D8C4A0) seats with beige brown black tartan plaid cushions and backrests, a dashboard with a black tablet touch screen, steering wheel. Front navy panel with two thin white pinstripes and silver Genesis wing badge; rear red light bar and white GENESIS lettering. Black turf tyres, silver rims.",
+    "task_id": "01a1b0c4-844a-71f8-a5fb-a5e97d48f703",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 1975,
+    "balance_after": 1895
+  },
+  {
+    "id": "cart-meshy-4",
+    "file": "assets/models/raw/cart-meshy-4.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3d",
+    "model": "meshy-7.1 (latest)",
+    "retexture_of": null,
+    "tier": "Pro",
+    "inputs": [
+      "concept-1.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-1.jpg, gpt-image-2)",
+      "refs/cart/genesis-3.jpg",
+      "refs/cart/genesis-4.jpg"
+    ],
+    "prompt": "Genesis Box Buggy concept golf cart. Opaque glossy dark navy blue (#2E3F66) roof frame and four thick navy corner pillars framing large perfectly clear transparent glass panes; navy body panels with blue lower side sills. Interior: cream tan leather (#D8C4A0) seats with beige brown black tartan plaid cushions and backrests, black tablet screen on the dashboard, steering wheel. Front navy panel with two thin white pinstripes and silver wing badge; rear red light bar and white GENESIS lettering. Black turf tyres, silver rims.",
+    "task_id": "01a1b0c6-2d7d-739b-9403-29954849465e",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 1930,
+    "balance_after": 1860
+  },
+  {
+    "id": "cart-meshy-5",
+    "file": "assets/models/raw/cart-meshy-5.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3d",
+    "model": "meshy-7.1 (latest)",
+    "retexture_of": null,
+    "tier": "Pro",
+    "inputs": [
+      "concept-1.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-1.jpg, gpt-image-2)",
+      "concept-3.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-3.jpg, gpt-image-2)"
+    ],
+    "prompt": "Genesis Box Buggy concept golf cart. Opaque glossy dark navy blue (#2E3F66) roof frame and thick navy corner pillars framing large perfectly clear transparent glass panes; navy body panels and navy lower side sills. Interior: cream tan leather (#D8C4A0) with beige brown black tartan plaid seat cushions and backrests, black tablet screen on the dashboard, black steering wheel. Front navy panel with two thin white pinstripes and silver wing badge; rear white light line. Black turf tyres, silver rims.",
+    "task_id": "01a1b0c8-fda3-732b-806a-c4b8b8f43f8f",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 1895,
+    "balance_after": 1770
+  },
+  {
+    "id": "cart-meshy-6",
+    "file": "assets/models/raw/cart-meshy-6.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3d",
+    "model": "meshy-7.1 (latest)",
+    "retexture_of": null,
+    "tier": "Pro",
+    "inputs": [
+      "concept-1.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-1.jpg, gpt-image-2)",
+      "concept-3.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-3.jpg, gpt-image-2)"
+    ],
+    "prompt": "Genesis Box Buggy concept golf cart. Slate blue (#4A5F8F) glossy body, roof frame and pillars around large clear glass panes. Interior cream tan leather (#D8C4A0): clean smooth cream dashboard with a beige brown tartan plaid inset panel, a cream two-spoke steering wheel and a vertical black tablet screen on a stalk; seats with beige brown black tartan plaid cushions. Rear panel with two white pinstripes and a silver wing badge; front panel with a red light bar. Black turf tyres, silver rims.",
+    "task_id": "01a1b0d1-c12f-74e9-8bc7-429644a479a4",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 1710,
+    "balance_after": 1580
+  },
+  {
+    "id": "cart-meshy-7",
+    "file": "assets/models/raw/cart-meshy-7.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3d",
+    "model": "meshy-7.1 (latest)",
+    "retexture_of": null,
+    "tier": "Pro",
+    "inputs": [
+      "concept-3.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-3.jpg, gpt-image-2)",
+      "concept-1.png (local only: scripts/gen_cart_concept.py edit of refs/cart/genesis-1.jpg, gpt-image-2)"
+    ],
+    "prompt": null,
+    "task_id": "01a1b0d1-cefd-72af-9bce-23ec28c7e24f",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 1710,
+    "balance_after": 1580
   }
 ]
