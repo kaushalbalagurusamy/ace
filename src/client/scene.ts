@@ -11,7 +11,7 @@ const holeInfo = (i: number) => courseHole(i).info;
 import { SPEC, type Tier } from './graphics';
 import { dropTurf, loadTurf, type Turf } from './turf';
 import { Grass } from './grass';
-import { isGraded, loadModel, type PropSpot } from './assets';
+import { isGraded, loadLod, loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
 import { fogDensity, makeEnvironment, setSky, SUN_DIR, type Env, type SkyPreset } from './environment';
@@ -35,6 +35,7 @@ interface Look {
   rel?: { t0: number; depth: number; putt: boolean; at: THREE.Vector3; rotY: number };
 }
 const DEFAULT_CLUB = 6;
+const LOD_FAR_M = 120;   // camera to 80 m tile centre: beyond this a tile draws its trees' far version (row.lod)
 const MAX_PROPS = 320;   // parkland tree lines; coastal holes place at most 180 (terrain.propSpots)   // 7-iron in other players' hands (their club choice is not sent)
 const BOX_GRIP = clubMatrix([-0.36, 0.83, 0.12], [0, -0.62, 0.78], [0, 0, 1]);   // the box stand-in's right hand
 
@@ -208,19 +209,27 @@ export class World {
     spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
     const built: THREE.Object3D[] = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
     for (const gr of groups.values()) {
-      const id = gr.id, model = await loadModel(id), tpl = model ?? makeProp(gr.kind, gr.v), graded = await isGraded(id);
+      const id = gr.id, model = await loadModel(id), tpl = model ?? makeProp(gr.kind, gr.v), graded = await isGraded(id), far = model ? await loadLod(id) : null;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      tpl.updateMatrixWorld(true);
       // grade generated textures (not the code-built props' palette colours) toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake;
       // models already graded offline (grade_glb.mjs, recorded in their manifest row) keep their albedo, a second tint would darken them twice
-      if (model) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { if (!graded) mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
-      tpl.traverse(o => {
-        const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
-        const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
-        // on the real ground, sunk a little so trunks on a slope do not float; shore boulders carry their own y (sea level)
-        gr.list.forEach((s, j) => im.setMatrixAt(j, m.compose(p.copy(V(s.x, s.y ?? this.groundAt(s.x, s.z, this.propHole) - 0.15, s.z)), q.setFromAxisAngle(up, s.rotY), sc.setScalar(s.scale)).multiply(mesh.matrixWorld)));
-        im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); built.push(im);
-      });
+      if (model) for (const t of [tpl, far]) t?.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { if (!graded) mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
+      // a model with a far version (row.lod) gets a THREE.LOD per tile, instances placed relative to the tile centre: 220 full trees would be ~3M triangles
+      const o0 = far ? V((Math.floor(gr.list[0]!.x / 80) + 0.5) * 80, 0, (Math.floor(gr.list[0]!.z / 80) + 0.5) * 80) : new THREE.Vector3();
+      const inst = (t: THREE.Object3D) => {
+        const out: THREE.InstancedMesh[] = []; t.updateMatrixWorld(true);
+        t.traverse(o => {
+          const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
+          const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
+          // on the real ground, sunk a little so trunks on a slope do not float; shore boulders carry their own y (sea level)
+          gr.list.forEach((s, j) => im.setMatrixAt(j, m.compose(p.copy(V(s.x, s.y ?? this.groundAt(s.x, s.z, this.propHole) - 0.15, s.z)).sub(o0), q.setFromAxisAngle(up, s.rotY), sc.setScalar(s.scale)).multiply(mesh.matrixWorld)));
+          im.castShadow = true; im.receiveShadow = true; im.computeBoundingSphere(); out.push(im);
+        });
+        return out;
+      };
+      if (!far) { built.push(...inst(tpl)); continue; }
+      const lod = new THREE.LOD(); lod.position.copy(o0);
+      lod.addLevel(new THREE.Group().add(...inst(tpl)), 0); lod.addLevel(new THREE.Group().add(...inst(far)), LOD_FAR_M); built.push(lod);
     }
     this.props.clear(); this.props.add(...built);
   }
