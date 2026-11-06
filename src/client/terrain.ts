@@ -59,16 +59,18 @@ export function seaField(hole: number): SeaField {
   const sea = new Float32Array(n), dist = new Float32Array(n).fill(1e9); let any = false;
   for (let i = 0; i < n; i++) if (cells[i] === 119 || (g.coastal && cells[i] === 111 && open[i])) sea[i] = 1;
   /** Flips every 4-connected component of cells equal to `v` that is smaller than `min` cells. */
-  const specks = (v: number, min: number) => {
-    const seen = new Uint8Array(n);
+  const specks = (v: number, min: number, flat = false) => {
+    const seen = new Uint8Array(n), sy = seaY(hole);
     for (let s = 0; s < n; s++) if (sea[s] === v && !seen[s]) {
       const comp = [s]; seen[s] = 1;
       for (let k = 0; k < comp.length; k++) { const i = comp[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && sea[j] === v && !seen[j]) { seen[j] = 1; comp.push(j); } }
-      if (comp.length < min) for (const i of comp) sea[i] = 1 - v; else if (v) any = true;
+      // flat: a land patch under `min` cells that never rises 1.5 m above the real sea level is traced-graphic noise, not an island
+      const low = flat && comp.every(i => ground(hole, g.x0 + (i % g.nx + 0.5) * g.cell, g.z0 + (Math.floor(i / g.nx) + 0.5) * g.cell) < sy + 1.5);
+      if (comp.length < min && (!flat || low)) for (const i of comp) sea[i] = 1 - v; else if (v) any = true;
     }
   };
   specks(1, 300);   // drop small water specks (the traced graphics' dotted OB lines read as water): only bodies of 300+ cells are sea
-  if (any) specks(0, 40);   // and small land specks out in the sea (stray path/sand cells of the same dotted lines) are drawn as sea
+  if (any) { specks(0, 40); specks(0, 2000, true); }   // and small land specks out in the sea (stray path/sand cells of the same dotted lines), and flat offshore slabs, are drawn as sea
   for (let i = 0; i < n; i++) if (!sea[i]) dist[i] = 0;
   // two-pass chamfer distance (3-4 metric) from land, in metres
   const D = (i: number, j: number, w: number) => { if (dist[j]! + w < dist[i]!) dist[i] = dist[j]! + w; };
@@ -438,6 +440,13 @@ function fineTiles(hole: number, coarse: THREE.BufferGeometry, segX: number, seg
 export const themeOf = (hole: number) => COURSES[COURSE_IDS[Math.floor(hole / HOLES_PER_COURSE)]!].theme;
 /** Tree density on Pebble's open clifftop holes (0-based), from the photos: the 7th and 8th are treeless links ground (h07, h08-chasm), 6, 9 and 10 sparse. */
 const OPEN_LINKS: Record<number, number> = { 5: 0.35, 6: 0, 7: 0.08, 8: 0.35, 9: 0.35 };
+/** A tree spot stands on dry land: at least 0.3 m above the real sea and no sea cell within 4 m (the terrain is cut away at the shore). */
+function dryLand(hole: number, x: number, z: number): boolean {
+  if (ground(hole, x, z) < seaY(hole) + 0.3) return false;
+  const g = gridOf(hole), sea = seaField(hole).sea, cx = Math.floor((x - g.x0) / g.cell), cz = Math.floor((z - g.z0) / g.cell);
+  for (let dz = -2; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) { const ix = cx + dx, iz = cz + dz; if (ix >= 0 && iz >= 0 && ix < g.nx && iz < g.nz && sea[iz * g.nx + ix]) return false; }
+  return true;
+}
 export function propSpots(hole: number): PropSpot[] {
   if (themeOf(hole) === 'parkland') return treeLines(hole);
   const g = gridOf(hole), sea = seaField(hole).sea; let seed = (hole + 1) * 2654435761 >>> 0;
@@ -445,7 +454,7 @@ export function propSpots(hole: number): PropSpot[] {
   const trees: PropSpot[] = [], rocks: PropSpot[] = [];
   for (let z = g.z0; z < g.z0 + g.nz * g.cell; z += 6) for (let x = g.x0; x < g.x0 + g.nx * g.cell; x += 6) {
     const px = x + rnd() * 6, pz = z + rnd() * 6, r = rnd(), c = sea[Math.floor((pz - g.z0) / g.cell) * g.nx + Math.floor((px - g.x0) / g.cell)] ? 'w' : cellClass(hole, px, pz);   // land specks drawn as sea get no props
-    if (c === 't' && r < 0.22 * (OPEN_LINKS[hole % HOLES_PER_COURSE] ?? 1) && trees.length < 150) trees.push({ kind: rnd() < 0.6 ? 'cypress' : 'pine', x: px, z: pz, scale: 0.8 + rnd() * 0.5, rotY: rnd() * 6.28 });
+    if (c === 't' && r < 0.22 * (OPEN_LINKS[hole % HOLES_PER_COURSE] ?? 1) && trees.length < 150 && dryLand(hole, px, pz)) trees.push({ kind: rnd() < 0.6 ? 'cypress' : 'pine', x: px, z: pz, scale: 0.8 + rnd() * 0.5, rotY: rnd() * 6.28 });
     else if (c === 'k' && r < 0.12 && rocks.length < 30) rocks.push({ kind: 'rock', x: px, z: pz, scale: 0.7 + rnd() * 0.8, rotY: rnd() * 6.28 });
   }
   return [...trees, ...rocks];
