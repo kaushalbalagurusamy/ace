@@ -11,12 +11,17 @@ import path from 'node:path';
 import { GRIDS } from '../src/shared/course-grid.ts';
 import { decodeGrid } from '../src/shared/gridtools.ts';
 import { CARD } from '../src/shared/pebble-card.ts';
+import { CARD as BP_CARD, GRIDS as BP_GRIDS } from '../src/shared/course-grid-bethpage-black.ts';
+import { CARD as AR_CARD, GRIDS as AR_GRIDS } from '../src/shared/course-grid-aronimink.ts';
+const card = rows => rows.map(([par, yards]) => ({ par, yards }));
 
-/** Courses the pipeline knows: the OSM golf_course name to search, an optional tag filter for its holes, and the traced lie grids and card if the game has them. */
+/** Courses the pipeline knows: the OSM golf_course name to search, an optional tag filter for its holes, and the traced lie grids and card if the game has them.
+ *  Grids that carry `geo` (tee lat/lng, bearing of +z, scale) are laid on the Earth by it, so heights line up with the traced lies exactly; OSM is not needed.
+ *  `sea: false`: inland, traced water keeps its lidar surface instead of dropping to sea level. */
 const COURSES = {
   pebble: { osmName: 'Pebble Beach Golf', grids: GRIDS, card: CARD },
-  'bethpage-black': { osmName: 'Bethpage State Park Golf', holes: { 'golf:course:name': 'Black' } },   // one OSM boundary holds all five Bethpage courses
-  aronimink: { osmName: 'Aronimink' },
+  'bethpage-black': { osmName: 'Bethpage State Park Golf', holes: { 'golf:course:name': 'Black' }, grids: BP_GRIDS, card: card(BP_CARD), sea: false },   // one OSM boundary holds all five Bethpage courses
+  aronimink: { osmName: 'Aronimink', grids: AR_GRIDS, card: card(AR_CARD), sea: false },
 };
 const arg = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : undefined; };
 const ID = arg('--course') ?? 'pebble', C = COURSES[ID];
@@ -39,13 +44,14 @@ async function cached(name, url, body) {
   throw new Error(`could not fetch ${name}`);
 }
 
-// ---- 1. OSM ----
+// ---- 1. OSM (skipped when every traced grid has its geo frame) ----
+const GEO = C.grids?.every(g => g.geo) ?? false;
 const Q = `[out:json][timeout:90];area["leisure"="golf_course"]["name"~"${C.osmName}"]->.c;(way["golf"="hole"](area.c);way["golf"="green"](area.c););out geom tags;`;
-const osm = JSON.parse(await cached('osm.json', 'https://overpass-api.de/api/interpreter', 'data=' + encodeURIComponent(Q)));
+const osm = GEO ? { elements: [] } : JSON.parse(await cached('osm.json', 'https://overpass-api.de/api/interpreter', 'data=' + encodeURIComponent(Q)));
 const refOf = e => Number(/(\d+)\s*$/.exec(e.tags.ref ?? '')?.[1]);                  // "7" or "Black - 7"
 const holesOsm = osm.elements.filter(e => e.tags.golf === 'hole' && Object.entries(C.holes ?? {}).every(([k, v]) => e.tags[k] === v)).sort((a, b) => refOf(a) - refOf(b)), greensOsm = osm.elements.filter(e => e.tags.golf === 'green');
-if (!holesOsm.length) throw new Error(`no golf=hole ways inside a golf course named ~"${C.osmName}"`);
-const ZONE = Math.floor((holesOsm[0].geometry[0].lon + 180) / 6) + 1, EPSG = 26900 + ZONE;   // NAD83 / UTM zone N
+if (!GEO && !holesOsm.length) throw new Error(`no golf=hole ways inside a golf course named ~"${C.osmName}"`);
+const ZONE = Math.floor(((GEO ? C.grids[0].geo.lng : holesOsm[0].geometry[0].lon) + 180) / 6) + 1, EPSG = 26900 + ZONE;   // NAD83 / UTM zone N
 
 // ---- UTM (WGS84 ellipsoid; NAD83 differs by about a metre) ----
 function utm(lat, lon) {
@@ -61,7 +67,18 @@ function utm(lat, lon) {
 const centroid = g => { let a = 0, x = 0, y = 0; for (let i = 0; i < g.length - 1; i++) { const p = utm(g[i].lat, g[i].lon), q = utm(g[i + 1].lat, g[i + 1].lon), c = p.e * q.n - q.e * p.n; a += c; x += (p.e + q.e) * c; y += (p.n + q.n) * c; } return { e: x / (3 * a), n: y / (3 * a) }; };
 
 const inPoly = (g, p) => { let c = false; for (let i = 0, j = g.length - 1; i < g.length; j = i++) { const a = utm(g[i].lat, g[i].lon), b = utm(g[j].lat, g[j].lon); if ((a.n > p.n) !== (b.n > p.n) && p.e < ((b.e - a.e) * (p.n - a.n)) / (b.n - a.n) + a.e) c = !c; } return c; };
-const frames = holesOsm.map((w, i) => {
+// a traced grid's own frame: tee at geo, +z along geo.bearing, as scripts/trace_bluegolf.py laid it (local equirectangular about the tee)
+const R_EARTH = 6371008.8, RAD = Math.PI / 180;
+const along = (geo, m) => ({ lat: geo.lat + (m * Math.cos(geo.bearing * RAD)) / (R_EARTH * RAD), lon: geo.lng + (m * Math.sin(geo.bearing * RAD)) / (R_EARTH * Math.cos(geo.lat * RAD) * RAD) });
+const geoFrame = (grid, i) => {
+  const { geo } = grid, tee = utm(geo.lat, geo.lng), far = utm(along(geo, 100).lat, along(geo, 100).lon), d = Math.hypot(far.e - tee.e, far.n - tee.n);
+  const fwd = { e: (far.e - tee.e) / d, n: (far.n - tee.n) / d }, s = d / 100 / geo.scale, lengthM = grid.pinZ ?? C.card[i].yards * M_PER_YD;   // s: UTM metres per game metre (grid convergence and scale factor included)
+  const toUtm = (x, z) => ({ e: tee.e + s * (z * fwd.e + x * fwd.n), n: tee.n + s * (z * fwd.n - x * fwd.e) });
+  const cells = decodeGrid(grid, 0), cls = (x, z) => { const ix = Math.floor((x - grid.x0) / grid.cell), iz = Math.floor((z - grid.z0) / grid.cell); return ix < 0 || iz < 0 || ix >= grid.nx || iz >= grid.nz ? 111 : cells[iz * grid.nx + ix]; };
+  const greenLL = along(geo, lengthM / geo.scale);
+  return { i, ref: i + 1, par: C.card[i].par, yards: C.card[i].yards, tee, teeLL: { lat: geo.lat, lon: geo.lng }, greenLL, s, realM: lengthM * s, lengthM, grid, cls, toUtm };
+};
+const frames = GEO ? C.grids.map(geoFrame) : holesOsm.map((w, i) => {
   const teeLL = w.geometry[0], endLL = w.geometry.at(-1), end = utm(endLL.lat, endLL.lon);
   const greenW = [...greensOsm].sort((p, q) => { const a = centroid(p.geometry), b = centroid(q.geometry); return Math.hypot(a.e - end.e, a.n - end.n) - Math.hypot(b.e - end.e, b.n - end.n); })[0];
   const green = greenW ? centroid(greenW.geometry) : end;
@@ -120,7 +137,7 @@ for (const f of frames) {
   // average 5 points over the cell footprint: a light low-pass so 1 m lidar texture does not alias onto the 4 m grid
   for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) { let s = 0; for (const [dx, dz] of [[0, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]]) { const p = f.toUtm(X(i) + dx, Z(j) + dz); s += demAt(p.e, p.n); } h[j * nx + i] = Math.max(0, s / 5); }
   let water = 0, waterLow = 0;
-  for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) if (cls(X(i), Z(j)) === 119) { water++; if (h[j * nx + i] < 3) waterLow++; h[j * nx + i] = 0; }   // traced water is the sea surface
+  if (C.sea !== false) for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) if (cls(X(i), Z(j)) === 119) { water++; if (h[j * nx + i] < 3) waterLow++; h[j * nx + i] = 0; }   // traced water is the sea surface
   // green: least-squares quadratic over the green nodes, slopes held to 1-3 %, blended into the DEM over 8 m
   let gn = []; for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) if (cls(X(i), Z(j)) === 103 && Math.hypot(X(i), Z(j) - f.lengthM) < 45) gn.push([X(i), Z(j) - f.lengthM, h[j * nx + i]]);
   if (gn.length < 3) gn = [];                                                       // no mapped green: keep the DEM

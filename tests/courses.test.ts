@@ -14,7 +14,7 @@ describe('course registry', () => {
     for (const id of COURSE_IDS) expect(isCourseId(id)).toBe(true);
     for (const bad of ['', 'Pebble', 'augusta', 'pebble ', 1, null, undefined, {}, '__proto__', 'toString']) expect(isCourseId(bad), String(bad)).toBe(false);
   });
-  it('every course has 18 holes with sane pars (par 70-72) and yardages, one grid per hole, and a registered height field', () => {
+  it('every course has 18 holes with sane pars (par 70-72) and yardages, one grid per hole, and a height field laid on that grid', () => {
     for (const id of COURSE_IDS) {
       const c = COURSES[id];
       expect(c.id).toBe(id);
@@ -27,8 +27,13 @@ describe('course registry', () => {
         const [lo, hi] = h.par === 3 ? [95, 260] : h.par === 4 ? [300, 560] : [440, 640];
         expect(h.yards, `${id} hole ${i + 1}`).toBeGreaterThanOrEqual(lo); expect(h.yards, `${id} hole ${i + 1}`).toBeLessThanOrEqual(hi);
       }
-      expect(COURSE_HEIGHTS[id], id).toHaveLength(18);
-      for (let i = 0; i < 18; i++) expect(Math.abs(heightAt(id, i, 0, 0))).toBeLessThan(0.02);   // heights are relative to a level tee
+      // the height field covers the traced grid exactly and, where the grid has a geo frame, is anchored on that same tee
+      COURSE_HEIGHTS[id]!.forEach((f, i) => {
+        const g = c.grids[i]!; expect([f.x0, f.z0], `${id} ${i + 1}`).toEqual([g.x0, g.z0]);   // extents to the nearest 4 m node
+        expect(Math.abs((f.nx - 1) * f.cell - g.nx * g.cell)).toBeLessThanOrEqual(2); expect(Math.abs((f.nz - 1) * f.cell - g.nz * g.cell)).toBeLessThanOrEqual(2);
+        if (g.geo) { expect(f.tee).toEqual([g.geo.lat, g.geo.lng]); expect(f.scale).toBeCloseTo(1, 2); }
+        expect(Math.abs(heightAt(id, i, 0, 0))).toBeLessThan(0.02);
+      });
       if (id !== 'pebble') for (const g of c.grids) { expect(g.geo, id).toBeDefined(); expect(g.margin).toBe(0); expect(g.pinZ).toBeGreaterThan(100); }
     }
   });
