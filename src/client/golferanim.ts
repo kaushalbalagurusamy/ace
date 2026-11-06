@@ -155,6 +155,8 @@ type Cycle = (typeof GAIT_CAPTURE)[keyof typeof GAIT_CAPTURE];
 export const GAITS: readonly Cycle[] = [GAIT_CAPTURE.walk, GAIT_CAPTURE.jog, GAIT_CAPTURE.sprint];
 /** Fastest believable cadence, cycles per second: 5 steps a second, an elite sprinter's. */
 export const MAX_CADENCE = 2.5;
+/** Longest ground contact of one foot, metres: about 1.1 leg lengths of the rig (0.78 m hip to ankle), as for a sprinter. */
+export const MAX_CONTACT_M = 0.85;
 /** Which captured cycles play at `speed` (m/s) and how much of the second: pure walk up to 2 m/s, pure jog from 2.6 to 6 (the
  *  5 m/s Shift pace; no human walks at 5 m/s, so it is a jog), pure sprint from 8 (the 15 m/s default run). */
 export function gaitMix(speed: number): { a: Cycle; b: Cycle; k: number } {
@@ -170,20 +172,38 @@ export function gaitMix(speed: number): { a: Cycle; b: Cycle; k: number } {
 const cycleRate = (c: Cycle, speed: number) => Math.min(MAX_CADENCE, Math.max(0.6 * c.cadence, c.cadence * (Math.max(0.3, speed) / c.speed) ** 0.4));
 /** Gait phase advance, cycles per second (one cycle = two steps, from left-foot strike). */
 export function gaitCadence(speed: number): number { const m = gaitMix(speed); return lerp(cycleRate(m.a, speed), cycleRate(m.b, speed), m.k); }
-/** Stride scale for a cycle at `speed`: the planted foot moves back at exactly `speed` (stride x scale x cadence = speed). */
+/** Stride scale for a cycle at `speed`: how much further than captured the body travels per cycle (stride x scale x cadence = speed). */
 export const strideScale = (c: Cycle, speed: number) => Math.max(0.3, speed) / (c.stride * gaitCadence(speed));
-function cyclePose(c: Cycle, phase: number, s: number): Pose {
+/** Each foot's stance at `speed`, as [start, duration] in cycle fractions. Faster than the capture, the foot stays down for the same
+ *  ground distance it did in the clip (sprinters' contacts shorten, legs do not lengthen), so its stance takes a smaller share of
+ *  the cycle and the swing a larger one; slower, the share grows up to 80%, then the stance travel shrinks instead. */
+export function gaitStance(c: Cycle, speed: number): { l: [number, number]; r: [number, number]; zScale: number } {
+  // the ground a foot covers in one contact is also capped at MAX_CONTACT_M (the clip's own contacts, at a 15% height threshold,
+  // read long; past it the rig's legs cannot reach without the hips sinking into a lunge), so the whole foot path is scaled to fit
+  const s = strideScale(c, speed), D = c.stance[1] - c.stance[0], Dr = Math.min(0.8, D / s, MAX_CONTACT_M / (c.stride * s));
+  return { l: [c.stance[0], Dr], r: [c.stance[2], Dr], zScale: (s * Dr) / D };
+}
+const sampleAt = (c: Cycle, phase: number) => {
   const n = c.samples.length, x = (((phase % 1) + 1) % 1) * n, i = Math.floor(x) % n, j = (i + 1) % n, t = x - Math.floor(x);
-  const q = c.samples[i]!.map((v, k) => lerp(v, c.samples[j]![k]!, t)), v3 = (k: number, sz = 1): V3 => [q[k]!, q[k + 1]!, q[k + 2]! * sz];
-  const lean = q[0]!, py = q[1]!, ty = q[3]!, idle = POSES.idle;
+  return c.samples[i]!.map((v, k) => lerp(v, c.samples[j]![k]!, t));
+};
+function cyclePose(c: Cycle, phase: number, speed: number): Pose {
+  const q = sampleAt(c, phase), v3 = (r: readonly number[], k: number, sz = 1): V3 => [r[k]!, r[k + 1]!, r[k + 2]! * sz];
+  const st = gaitStance(c, speed), D = c.stance[1] - c.stance[0];
+  // a foot's own phase is warped so its runtime stance [0, Dr] plays the captured stance [0, D] and the rest plays the swing
+  const foot = (on: number, Dr: number) => {
+    const f = (((phase - on) % 1) + 1) % 1, g = f <= Dr ? (f * D) / Dr : D + ((f - Dr) * (1 - D)) / (1 - Dr);
+    return sampleAt(c, on + g);
+  };
+  const L = foot(st.l[0], st.l[1]), R = foot(st.r[0], st.r[1]), lean = q[0]!, py = q[1]!, ty = q[3]!, idle = POSES.idle;
   return { ...idle, pelvis: [0.3 * lean, py, q[2]!], torso: [0.7 * lean, ty, 0], head: [-0.8 * lean, -0.6 * (py + ty), 0], shift: [0, q[4]!, 0],
-    lAnkle: v3(5, s), rAnkle: v3(8, s), lHeel: q[11]!, rHeel: q[12]!, free: { l: v3(13), r: v3(16) }, lPole: v3(19), rPole: v3(22) };
+    lAnkle: v3(L, 5, st.zScale), rAnkle: v3(R, 8, st.zScale), lHeel: L[11]!, rHeel: R[12]!, free: { l: v3(q, 13), r: v3(q, 16) }, lPole: v3(q, 19), rPole: v3(q, 22) };
 }
 /** Walking or running at `speed` m/s, `phase` in cycles (advance it by gaitCadence(speed) per second); below 0.8 m/s it blends
  *  into the idle at time `t` seconds, and at 0.3 m/s and under it is the idle. */
 export function gaitPose(phase: number, speed: number, t = 0): Pose {
-  const m = gaitMix(speed), a = cyclePose(m.a, phase, strideScale(m.a, speed));
-  const g = m.k > 0 ? lerpPose(a, cyclePose(m.b, phase, strideScale(m.b, speed)), m.k) : a;
+  const m = gaitMix(speed), a = cyclePose(m.a, phase, speed);
+  const g = m.k > 0 ? lerpPose(a, cyclePose(m.b, phase, speed), m.k) : a;
   const k = smooth((speed - 0.3) / 0.5);
   return k >= 1 ? g : lerpPose(idlePose(t), g, k);
 }

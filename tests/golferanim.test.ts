@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BACK_KEYS, DOWNSWING_MS, P_FRAMES, P_POS, POSES, SWING_CURVE, TEMPO, backswingFrame, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, GAITS, MAX_CADENCE, gaitCadence, gaitMix, gaitPose, idlePose, seatedPose } from '../src/client/golferanim';
+import { BACK_KEYS, DOWNSWING_MS, P_FRAMES, P_POS, POSES, SWING_CURVE, TEMPO, backswingFrame, addressHead, backswingDepth, backswingPose, lerpPose, releasePose, releaseTimes, GAITS, MAX_CADENCE, gaitCadence, gaitMix, gaitPose, gaitStance, idlePose, seatedPose } from '../src/client/golferanim';
 
 const L = 0.94; // 7-iron
 const hyp = (v: readonly number[]) => Math.hypot(v[0]!, v[1]!, v[2]!);
@@ -120,11 +120,11 @@ describe('pose blending', () => {
 describe('captured gait: foot locking', () => {
   /** Runs at a steady `speed` and returns, for each stance of each foot, how far the planted foot moved over the ground (m). */
   function drift(speed: number) {
-    const { a } = gaitMix(speed), out: number[] = [], dt = 1 / 480, edge = 1 / 96;   // stance ends fall between samples: skip half a sample
-    for (const [foot, on, off] of [['lAnkle', a.stance[0], a.stance[1]], ['rAnkle', a.stance[2], a.stance[3]]] as const) {
+    const { a } = gaitMix(speed), st = gaitStance(a, speed), out: number[] = [], dt = 1 / 480, edge = 1 / 96;   // stance ends fall between samples: skip half a sample
+    for (const [foot, on, dur] of [['lAnkle', ...st.l], ['rAnkle', ...st.r]] as const) {
       for (let cyc = 0; cyc < 3; cyc++) {
         let phase = cyc + on + edge, root = 0, lo = Infinity, hi = -Infinity, yMax = 0;
-        while (phase <= cyc + off - edge) {   // the planted foot over the ground while the golfer moves at `speed`
+        while (phase <= cyc + on + dur - edge) {   // the planted foot over the ground while the golfer moves at `speed`
           const p = gaitPose(phase, speed)[foot]; lo = Math.min(lo, root + p[2]); hi = Math.max(hi, root + p[2]); yMax = Math.max(yMax, p[1]);
           phase += gaitCadence(speed) * dt; root += speed * dt;
         }

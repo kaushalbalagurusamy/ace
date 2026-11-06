@@ -69,7 +69,9 @@ for (const sp of specs) {
   // ---- bilateral symmetry: in a side view the far limbs are half hidden, so each side is the visibility-weighted mean of itself
   // and the other side half a cycle later (mirrored across the body); trunk channels are made (anti)symmetric the same way ----
   const visOf = (j: number) => cap.frames.slice(sp.a, sp.b + 1).reduce((s, f) => s + (f.world?.[j]?.[3] ?? 0), 0);
-  const wl = visOf(LM.lAnk) / (visOf(LM.lAnk) + visOf(LM.rAnk)), wa = visOf(LM.lWr) / (visOf(LM.lWr) + visOf(LM.rWr));
+  // arms cross the body twice a cycle and their labels flip unreliably, so averaging the two would cancel the swing: the
+  // nearer (more visible) arm drives both
+  const wl = visOf(LM.lAnk) / (visOf(LM.lAnk) + visOf(LM.rAnk)), wa = visOf(LM.lWr) >= visOf(LM.rWr) ? 1 : 0;
   const half = (s: number) => avg[(s + NS / 2) % NS]!, sym: number[][] = avg.map(r => [...r]);
   for (let s = 0; s < NS; s++) {
     const r = avg[s]!, h = half(s), o = sym[s]!;
@@ -81,6 +83,13 @@ for (const sp of specs) {
     pair(5, 8, 3, true, wl); pair(11, 12, 1, false, wl); pair(25, 26, 1, false, wl); pair(13, 16, 3, true, wa); pair(19, 22, 3, true, wa);
   }
   avg.splice(0, NS, ...sym);
+  // trunk lean: a circular 5-sample median (a single bad frame of a 12-frame plate tipped the walk 60° back), clamped to a runner's
+  // range; hip height: the captured bob kept, its highest point set 2-3 cm under standing height (MediaPipe's metric height is
+  // compressed, which sank the hips into a crouch)
+  const leanS = avg.map((_, s) => [-2, -1, 0, 1, 2].map(k => avg[(s + k + NS) % NS]![0]!).sort((p, q) => p - q)[2]!);
+  const top = Math.max(...avg.map(r => r[4]!)), peak = sp.belt === null ? -0.02 : -0.03;
+  avg.forEach((r, s) => { r[0] = clamp(leanS[s]!, -0.05, 0.35); for (const k of [4, 14, 17]) r[k] = r[k]! - top + peak;   // the wrists ride with the hips
+    for (const k of [14, 17]) r[k] = clamp(r[k]!, 0.78, 1.5); });   // a hand never below the thigh (a mis-detected Muybridge frame put one at the knee)
   // ---- foot locking ----
   // stance: the longest circular run of phases where the foot is at its lowest. Treadmill clips (one static camera, a level belt)
   // use the image: contact is the same image height every step, within 15% of the foot's vertical range. Muybridge's frames come
