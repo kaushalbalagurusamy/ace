@@ -617,7 +617,7 @@
     },
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/golfer-v10/",
+      "renders": "assets/qa/golfer-v11/",
       "compare_against": "refs/golfer/character-reference.png; swing: refs/swing/dunaway-dtl-sybervision.mp4",
       "views": [
         "p1-faceon",
@@ -657,31 +657,35 @@
         "face-side",
         "swing-strip.mp4"
       ],
-      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v10/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
+      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v11/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": true,
       "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
       "previous": {
-        "v9": "FAIL 3.6, swing 2; outfit, likeness, proportions, readability 4 (fresh critic)",
-        "v9_changes": "P4 hands at head height over the trail shoulder with the lead arm diagonal across the chest and the trail elbow down (no surrender); P5 shaft shallowed behind the hands, club head below head height, hips 25 open; hard two-hand grip constraint (the grip slides toward the shoulders when out of reach, hands solved exactly, 0 cm error in every P position); shader: skin no longer whitened at neck and arms, no gold in the beard, embroidery subtler, wider trouser streak clean-up",
+        "v10": "FAIL 3.8, swing 3, all else 4 (fresh critic)",
+        "v10_changes": "P4 hand target fixed: after the 90 degree turn the chest faces away from the target, so the trail side of the head is out of the chest (+z in the thorax frame), not the thorax trail side; hands now on the trail side at head height. P1/P7: grips keyed within arm reach (they were sliding up to the chest) and elbows pointed at the hips, so the forearms form a V with the left (lead) wrist target-side of and above the right. Iris emissive 4.5 -> 7. Arm chains checked: LeftArm takes the lead (grip-top) target, RightArm the trail target 7 cm down the shaft; the wrists now sit 3 cm either side of the shaft along the clubface direction (palms facing), which removed the visual X of the overlapping hand meshes",
         "earlier": {
           "v9": "FAIL 3.6, swing 2; outfit, likeness, proportions, readability 4 (fresh critic)",
           "v9_changes": "P4 hands at head height over the trail shoulder with the lead arm diagonal across the chest and the trail elbow down (no surrender); P5 shaft shallowed behind the hands, club head below head height, hips 25 open; hard two-hand grip constraint (the grip slides toward the shoulders when out of reach, hands solved exactly, 0 cm error in every P position); shader: skin no longer whitened at neck and arms, no gold in the beard, embroidery subtler, wider trouser streak clean-up",
           "earlier": {
-            "v8": "FAIL 3.6, swing 3 (fresh critic)",
-            "v8_changes": "P4 lead-wrist target keyed in the turned thorax frame (hands above and behind the trail shoulder, arms clear of the face); turn pushed further into the lowest spine bone (0.7/0.2/0.1); P3 hands lowered to a level lead arm; P5 re-keyed (hands between shoulder and hip, shaft shallowed toward the trail side with lag, hips 20 open); P6 hips 39 and P7 hips 44 open (top-down); trail hand held 7 cm below the lead on the grip; P10 club head up behind the trail shoulder; gold embroidery richer and red/orange specks whitened in the shader; eye-glow sprites removed, irises emissive only",
+            "v9": "FAIL 3.6, swing 2; outfit, likeness, proportions, readability 4 (fresh critic)",
+            "v9_changes": "P4 hands at head height over the trail shoulder with the lead arm diagonal across the chest and the trail elbow down (no surrender); P5 shaft shallowed behind the hands, club head below head height, hips 25 open; hard two-hand grip constraint (the grip slides toward the shoulders when out of reach, hands solved exactly, 0 cm error in every P position); shader: skin no longer whitened at neck and arms, no gold in the beard, embroidery subtler, wider trouser streak clean-up",
             "earlier": {
-              "v7": "FAIL 3.4, swing 2 (fresh critic)",
-              "v7_changes": "golf-expert critic: torso turn weighted to the lower spine (0.55/0.30/0.15) so the chest skin turns with the shoulders; P5-P7 distinct from P3-P1 (hips opening 20->34->36 deg, pelvis 9-13 cm toward the target, shoulders opening, hands 13 cm ahead at impact, trail heel up, head held back); P4 shaft along the target line; P1 hinge about 42 deg, narrower stance, more shaft lean; trouser streaks and shirt blotches cleaned in the shader; top-down renders per position",
+              "v8": "FAIL 3.6, swing 3 (fresh critic)",
+              "v8_changes": "P4 lead-wrist target keyed in the turned thorax frame (hands above and behind the trail shoulder, arms clear of the face); turn pushed further into the lowest spine bone (0.7/0.2/0.1); P3 hands lowered to a level lead arm; P5 re-keyed (hands between shoulder and hip, shaft shallowed toward the trail side with lag, hips 20 open); P6 hips 39 and P7 hips 44 open (top-down); trail hand held 7 cm below the lead on the grip; P10 club head up behind the trail shoulder; gold embroidery richer and red/orange specks whitened in the shader; eye-glow sprites removed, irises emissive only",
               "earlier": {
-                "v6": "FAIL 3.0, swing positions 2 (golf-expert critic)",
-                "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it",
+                "v7": "FAIL 3.4, swing 2 (fresh critic)",
+                "v7_changes": "golf-expert critic: torso turn weighted to the lower spine (0.55/0.30/0.15) so the chest skin turns with the shoulders; P5-P7 distinct from P3-P1 (hips opening 20->34->36 deg, pelvis 9-13 cm toward the target, shoulders opening, hands 13 cm ahead at impact, trail heel up, head held back); P4 shaft along the target line; P1 hinge about 42 deg, narrower stance, more shaft lean; trouser streaks and shirt blotches cleaned in the shader; top-down renders per position",
                 "earlier": {
-                  "v5": "supervisor review (not the critic): P9/P10 floating, P10 club out to the left, P4 hands against the head",
-                  "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
+                  "v6": "FAIL 3.0, swing positions 2 (golf-expert critic)",
+                  "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it",
                   "earlier": {
-                    "v4": "FAIL 3.33, swing 2 (third critic)",
-                    "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
+                    "v5": "supervisor review (not the critic): P9/P10 floating, P10 club out to the left, P4 hands against the head",
+                    "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
+                    "earlier": {
+                      "v4": "FAIL 3.33, swing 2 (third critic)",
+                      "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
+                    }
                   }
                 }
               }
@@ -692,7 +696,7 @@
       "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it",
       "measured_topdown_deg": {
         "P1": {
-          "shoulders_closed": 3.4,
+          "shoulders_closed": 2.9,
           "hips_closed": -0.1,
           "pelvis_x_m": 0.004,
           "hand_to_grip_cm": {
@@ -701,8 +705,8 @@
           }
         },
         "P2": {
-          "shoulders_closed": 40.4,
-          "hips_closed": 13.4,
+          "shoulders_closed": 42.5,
+          "hips_closed": 14.7,
           "pelvis_x_m": -0.016,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -710,8 +714,8 @@
           }
         },
         "P3": {
-          "shoulders_closed": 72.4,
-          "hips_closed": 28.8,
+          "shoulders_closed": 73.6,
+          "hips_closed": 31,
           "pelvis_x_m": -0.026,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -719,8 +723,8 @@
           }
         },
         "P4": {
-          "shoulders_closed": 90.5,
-          "hips_closed": 38.2,
+          "shoulders_closed": 90.4,
+          "hips_closed": 40.7,
           "pelvis_x_m": -0.036,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -728,8 +732,8 @@
           }
         },
         "P5": {
-          "shoulders_closed": 43,
-          "hips_closed": -24.7,
+          "shoulders_closed": 44.6,
+          "hips_closed": -26.6,
           "pelvis_x_m": 0.094,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -737,8 +741,8 @@
           }
         },
         "P6": {
-          "shoulders_closed": 22.2,
-          "hips_closed": -39.4,
+          "shoulders_closed": 22.6,
+          "hips_closed": -41.9,
           "pelvis_x_m": 0.114,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -746,8 +750,8 @@
           }
         },
         "P7": {
-          "shoulders_closed": -14.2,
-          "hips_closed": -44.2,
+          "shoulders_closed": -15.8,
+          "hips_closed": -44.5,
           "pelvis_x_m": 0.144,
           "hand_to_grip_cm": {
             "lead": 0,
@@ -786,7 +790,8 @@
       "v7_changes": "golf-expert critic: torso turn weighted to the lower spine (0.55/0.30/0.15) so the chest skin turns with the shoulders; P5-P7 distinct from P3-P1 (hips opening 20->34->36 deg, pelvis 9-13 cm toward the target, shoulders opening, hands 13 cm ahead at impact, trail heel up, head held back); P4 shaft along the target line; P1 hinge about 42 deg, narrower stance, more shaft lean; trouser streaks and shirt blotches cleaned in the shader; top-down renders per position",
       "v8_changes": "P4 lead-wrist target keyed in the turned thorax frame (hands above and behind the trail shoulder, arms clear of the face); turn pushed further into the lowest spine bone (0.7/0.2/0.1); P3 hands lowered to a level lead arm; P5 re-keyed (hands between shoulder and hip, shaft shallowed toward the trail side with lag, hips 20 open); P6 hips 39 and P7 hips 44 open (top-down); trail hand held 7 cm below the lead on the grip; P10 club head up behind the trail shoulder; gold embroidery richer and red/orange specks whitened in the shader; eye-glow sprites removed, irises emissive only",
       "v9_changes": "P4 hands at head height over the trail shoulder with the lead arm diagonal across the chest and the trail elbow down (no surrender); P5 shaft shallowed behind the hands, club head below head height, hips 25 open; hard two-hand grip constraint (the grip slides toward the shoulders when out of reach, hands solved exactly, 0 cm error in every P position); shader: skin no longer whitened at neck and arms, no gold in the beard, embroidery subtler, wider trouser streak clean-up",
-      "v10_changes": "P4 hand target fixed: after the 90 degree turn the chest faces away from the target, so the trail side of the head is out of the chest (+z in the thorax frame), not the thorax trail side; hands now on the trail side at head height. P1/P7: grips keyed within arm reach (they were sliding up to the chest) and elbows pointed at the hips, so the forearms form a V with the left (lead) wrist target-side of and above the right. Iris emissive 4.5 -> 7. Arm chains checked: LeftArm takes the lead (grip-top) target, RightArm the trail target 7 cm down the shaft; the wrists now sit 3 cm either side of the shaft along the clubface direction (palms facing), which removed the visual X of the overlapping hand meshes"
+      "v10_changes": "P4 hand target fixed: after the 90 degree turn the chest faces away from the target, so the trail side of the head is out of the chest (+z in the thorax frame), not the thorax trail side; hands now on the trail side at head height. P1/P7: grips keyed within arm reach (they were sliding up to the chest) and elbows pointed at the hips, so the forearms form a V with the left (lead) wrist target-side of and above the right. Iris emissive 4.5 -> 7. Arm chains checked: LeftArm takes the lead (grip-top) target, RightArm the trail target 7 cm down the shaft; the wrists now sit 3 cm either side of the shaft along the clubface direction (palms facing), which removed the visual X of the overlapping hand meshes",
+      "v11_changes": "down-the-line swing plane: P1 spine about 35 degrees and hands nearer the thighs; P3 hands chest high over the trail side with the shaft angled toward the ball line; P4 hands deeper, above and behind the trail shoulder, less knee squat (hips 3 cm higher); P5 shaft shallow behind the hands; P6 shaft level along the line behind the hands; P7 hands 4 cm further ahead of the ball. Face-on kept."
     },
     "edit_inputs": [
       "refs/golfer/character-reference.png",
