@@ -195,7 +195,7 @@ export class World {
   async setProps(spots: PropSpot[]) {
     const token = ++this.propToken, f = SPEC[this.tier].foliage;
     spots = spots.filter((_, i) => (i * 0.618034) % 1 < f);   // golden-ratio thinning: an even spread at any density
-    const ids = { cypress: ['tree-cypress-r13'], pine: ['tree-pine-r1'], rock: ['rock-r1', 'rock-r2', 'rock-r3', 'rock-r4'], oak: ['tree-oak-a', 'tree-oak-b'], maple: ['tree-maple-a', 'tree-maple-b'] } as const;
+    const ids = { cypress: ['tree-cypress-r13'], pine: ['tree-pine-r1'], rock: ['rock-r20'], oak: ['tree-oak-a', 'tree-oak-b'], maple: ['tree-maple-a', 'tree-maple-b'] } as const;
     // one batch per model and 80 m tile, so the camera and the 90 m shadow box cull the far batches (an M1 Air keeps 60 fps on Medium)
     const groups = new Map<string, { id: string; kind: PropSpot['kind']; v: number; list: PropSpot[] }>();
     spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
