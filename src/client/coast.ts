@@ -182,14 +182,16 @@ function facadeTexture(): THREE.CanvasTexture {
 }
 
 const BACKDROP_VERT = /* glsl */`varying float vH; varying float vU; attribute float aU; void main() { vH = position.y; vU = aU; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
-const BACKDROP_FRAG = /* glsl */`uniform vec3 uLow; uniform vec3 uHigh; uniform vec3 uHaze; uniform float uTop; uniform float uMix; varying float vH; varying float vU;
-void main() { float t = clamp(vH / uTop, 0.0, 1.0); vec3 c = mix(uLow, uHigh, smoothstep(0.0, 0.8, t)); c = mix(c, uHaze, uMix + 0.15 * t);
+const BACKDROP_FRAG = /* glsl */`uniform vec3 uLow; uniform vec3 uHigh; uniform vec3 uHaze; uniform float uTop; uniform float uMix; uniform float uBeach; varying float vH; varying float vU;
+void main() { float t = clamp(vH / uTop, 0.0, 1.0); vec3 c = mix(uLow, uHigh, smoothstep(0.0, 0.8, t));
+  c = mix(vec3(0.78, 0.76, 0.68), c, smoothstep(uBeach - 0.4, uBeach + 0.4, vH));   // a pale strand of beach and surf where the shore meets the water
+  c = mix(c, uHaze, uMix + 0.15 * t);
   gl_FragColor = vec4(c, 1.0);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }`;
 /** A silhouette band on a circle around the hole: `profile(a)` gives the top height at angle a. Unlit, its own haze (no scene fog). */
-function band(cx: number, cz: number, R: number, a0: number, a1: number, y0: number, profile: (a: number) => number, low: string, high: string, haze: number): THREE.Mesh {
+function band(cx: number, cz: number, R: number, a0: number, a1: number, y0: number, profile: (a: number) => number, low: string, high: string, haze: number, beach = -9): THREE.Mesh {
   const N = 220, pos: number[] = [], us: number[] = [], idx: number[] = [];
   for (let i = 0; i <= N; i++) {
     const a = a0 + ((a1 - a0) * i) / N, x = cx + Math.sin(a) * R, z = cz + Math.cos(a) * R;
@@ -199,7 +201,7 @@ function band(cx: number, cz: number, R: number, a0: number, a1: number, y0: num
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('aU', new THREE.Float32BufferAttribute(us, 1)); g.setIndex(idx);
   const top = Math.max(...pos.filter((_, i) => i % 3 === 1)) - y0;
   const mat = new THREE.ShaderMaterial({ vertexShader: BACKDROP_VERT, fragmentShader: BACKDROP_FRAG, side: THREE.DoubleSide,
-    uniforms: { uLow: { value: new THREE.Color(low) }, uHigh: { value: new THREE.Color(high) }, uHaze: { value: HAZE.clone() }, uTop: { value: top }, uMix: { value: haze } } });
+    uniforms: { uLow: { value: new THREE.Color(low) }, uHigh: { value: new THREE.Color(high) }, uHaze: { value: HAZE.clone() }, uTop: { value: top }, uMix: { value: haze }, uBeach: { value: beach + 2 } } });
   const m = new THREE.Mesh(g, mat); m.position.y = 0; m.renderOrder = -1; m.frustumCulled = false;
   (m.geometry as THREE.BufferGeometry).translate(0, -y0, 0); m.position.y = y0; return m;
 }
@@ -214,10 +216,16 @@ export function makeBackdrop(hole: number, farM: number): THREE.Group {
   // the inland tree line stands from sea level (the ground beyond the map) to crowns above the tee's height
   const inland = (a: number) => -y + crowns(a);
   if (hasSea) {
-    const taper = (a: number) => Math.min(1, (span - Math.abs(a - seaA)) / 0.35);   // the hills fall to the water at both ends, no cut-off slab
-    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => taper(a) * (14 + 38 * (0.5 + 0.5 * noise3(a * 2.2, 1, hole)) ** 1.5 + 7 * noise3(a * 9, 2, hole)), '#3a4a44', '#7a8ea3', 0.3));
-    grp.add(band(cx, cz, R - 3, seaA - span, seaA + span, y, a => taper(a) * (1.5 + 3 * Math.abs(noise3(a * 90, 5, hole))), '#b9b4a2', '#2a3a2c', 0.25));   // pale beach line and the dark shore trees
-    grp.add(band(cx, cz, R * 0.75, seaA + span, seaA + Math.PI * 2 - span, y, a => inland(a) * Math.min(1, Math.min(a - seaA - span, seaA + Math.PI * 2 - span - a) / 0.3), '#1f2a1f', '#2c3a2b', 0.3));
+    // Layered silhouettes across the bay, each further layer paler and bluer (aerial perspective), tens of metres apart in depth so they
+    // never z-fight: the Santa Lucia ridge, the hills above Carmel, then low dark headlands (Carmel Point, Point Lobos) with a pale strand.
+    const taper = (a: number, w = 0.35) => Math.max(0, Math.min(1, (span - Math.abs(a - seaA)) / w));   // the land falls to the water at both ends
+    const ridge = (a: number, k: number) => 0.5 + 0.5 * noise3(a * 2.2, k, hole);
+    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => taper(a) * (28 + 55 * ridge(a, 1) ** 1.4 + 9 * noise3(a * 11, 2, hole) + 3 * noise3(a * 40, 3, hole)), '#7d93a8', '#9fb3c6', 0.55));
+    grp.add(band(cx, cz, R * 0.88, seaA - span * 0.9, seaA + span * 0.9, y, a => taper(a, 0.5) * (12 + 26 * ridge(a + 4, 4) ** 1.6 + 4 * noise3(a * 18, 5, hole)), '#4f6270', '#71879a', 0.35));
+    // headlands: low, dark, tree-capped points reaching into the water at two places across the bay
+    const head = (a: number) => { const d1 = (a - seaA - span * 0.45) / 0.22, d2 = (a - seaA + span * 0.55) / 0.3; return Math.max(Math.exp(-d1 * d1), Math.exp(-d2 * d2)); };
+    grp.add(band(cx, cz, R * 0.76, seaA - span * 0.95, seaA + span * 0.95, y, a => { const h = head(a); return h < 0.08 ? -3 : h * (12 + 12 * ridge(a, 7) + 4 * Math.abs(noise3(a * 120, 8, hole))); }, '#2f3c33', '#45554a', 0.18, 0));
+    grp.add(band(cx, cz, R * 0.75, seaA + span, seaA + Math.PI * 2 - span, y, a => inland(a) * Math.min(1, Math.min(a - seaA - span, seaA + Math.PI * 2 - span - a) / 0.3), '#1f2a1f', '#2c3a2b', 0.42));   // wooded hills inland, softened by the bay's haze
   } else grp.add(band(cx, cz, R * 0.75, 0, Math.PI * 2, y, inland, '#1f2a1f', '#2c3a2b', 0.3));
   grp.name = 'backdrop'; return grp;
 }
