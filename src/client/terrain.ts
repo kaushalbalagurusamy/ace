@@ -326,7 +326,7 @@ const seaDefs = (hole: number): Record<string, string> => ({ ...(gridOf(hole).co
 // Client-side drawing only: the server's lie and physics keep the shared height field; the ball, golfers, cart and grass are drawn
 // on visualGround so they sit in the bowl rather than float over it.
 const SAND = 115, GREEN_C = 103, FAIRWAY = 102, TILE_CELLS = 8, FINE_SEGS = 24;
-interface Micro { sd: Float32Array; green: Float32Array; fair: Float32Array; seaD: Float32Array; mounds: boolean; tiles: number[]; mask: THREE.DataTexture | null }
+interface Micro { sd: Float32Array; green: Float32Array; fair: Float32Array; seaD: Float32Array; mounds: boolean; greenZ: number; tiles: number[]; mask: THREE.DataTexture | null }
 const micros = new Map<number, Micro>();
 /** Chamfer distance (m) from each cell to the nearest cell where `src` is true (0 on those cells). */
 function distTo(g: HoleGrid, src: (i: number) => boolean): Float32Array {
@@ -339,7 +339,7 @@ function distTo(g: HoleGrid, src: (i: number) => boolean): Float32Array {
 }
 function micro(hole: number): Micro {
   const hit = micros.get(hole); if (hit) return hit;
-  const g = gridOf(hole), n = g.nx * g.nz, none: Micro = { sd: new Float32Array(0), green: new Float32Array(0), fair: new Float32Array(0), seaD: new Float32Array(0), mounds: false, tiles: [], mask: null };
+  const g = gridOf(hole), n = g.nx * g.nz, none: Micro = { sd: new Float32Array(0), green: new Float32Array(0), fair: new Float32Array(0), seaD: new Float32Array(0), mounds: false, greenZ: 0, tiles: [], mask: null };
   if (courseOf(hole) !== 'pebble') { micros.set(hole, none); return none; }   // parkland courses keep their flat bunkers
   const cells = decoded(hole), sea = seaField(hole).sea, sand = new Uint8Array(n);
   // bunkers only: traced sand within reach of the sea is native scrub on the cliff tops (terrain shader), not a bowl
@@ -356,7 +356,8 @@ function micro(hole: number): Micro {
   // a 3x3 box pass (plus a little back for the shrink) rounds off the 2 m cell staircase, so the lips curve instead of zigzagging
   for (let pass = 0; pass < 1; pass++) { const src = sd.slice(); for (let z = 1; z < g.nz - 1; z++) for (let x = 1; x < g.nx - 1; x++) { let a = 0; for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) a += Math.max(-8, src[(z + dz) * g.nx + x + dx]!); sd[z * g.nx + x] = a / 9 + 0.35; } }
   const k = hole % HOLES_PER_COURSE, mounds = k === 16 || k === 17;
-  const m: Micro = { sd, mounds, tiles: [], mask: null,
+  let gz = 0, gn = 0; for (let i = 0; i < n; i++) if (cells[i] === GREEN_C) { gz += g.z0 + (Math.floor(i / g.nx) + 0.5) * g.cell; gn++; }
+  const m: Micro = { sd, mounds, greenZ: gn ? gz / gn : 0, tiles: [], mask: null,
     green: mounds ? distTo(g, i => cells[i] === GREEN_C) : new Float32Array(0), fair: mounds ? distTo(g, i => cells[i] === FAIRWAY) : new Float32Array(0), seaD };
   micros.set(hole, m);
   // 16 m tiles where the offset is non-zero anywhere on their fine vertices get a fine mesh; the coarse ground is hidden there
@@ -392,9 +393,14 @@ export function dip(hole: number, x: number, z: number): number {
   let off = sd > -4.5 ? bunkerProfile(sd) : 0;
   if (m.mounds) {
     const gd = cellLerp(g, m.green, x, z);
-    if (gd > 2.5 && gd < 18) {
+    if (hole % HOLES_PER_COURSE === 16) {
+      // the 17th (h17-green photo): a hummocky ridge about 2.5 m high wrapping the back and sides of the green, rolling down to the cliff top
+      // rather than fading out metres short of it; none in front (the tee is at z 0, so 'behind' is +z of the green's middle)
+      const w = sstep(2, 6.5, gd) * (1 - sstep(11, 20, gd)) * sstep(-16, -2, z - m.greenZ) * sstep(0.5, 4.5, cellLerp(g, m.seaD, x, z));
+      if (w > 0) off += 2.5 * w * (0.65 + 0.35 * (0.5 + 0.5 * Math.sin(x * 0.31 + Math.sin(z * 0.19) * 2.1) * Math.cos(z * 0.27 - x * 0.09)));
+    } else if (gd > 2.5 && gd < 18) {
       const w = Math.sin(Math.PI * (gd - 2.5) / 15.5) * sstep(1, 6, cellLerp(g, m.fair, x, z)) * sstep(3, 8, cellLerp(g, m.seaD, x, z));
-      if (w > 0) off += (hole % HOLES_PER_COURSE === 16 ? 1.7 : 1.1) * w * (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.23 + Math.sin(z * 0.17) * 2.1) * Math.cos(z * 0.21 - x * 0.07)));
+      if (w > 0) off += 1.1 * w * (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(x * 0.23 + Math.sin(z * 0.17) * 2.1) * Math.cos(z * 0.21 - x * 0.07)));
     }
   }
   return Math.abs(off) < 1e-4 ? 0 : off;
