@@ -285,6 +285,7 @@ function frame(now: number) {
     ui.info(hole, d, me.ball.surface, ui.clock(go ? (Date.now() - goAt) / 1000 : 0), me.ball.strokes);
     world.placeGolfer(me, pos.x, pos.z, swing ? swing.fsm.aim() * Math.PI / 180 : yaw);
   }
+  world.ownBallDistM = ownDist();
   world.tick(now);
   ui.drawMini(hole, [...world.ents.values()].filter(e => e.hole === hole!.index).flatMap(e => {
     const mine = e.id === selfId, onFoot = mine ? !driving : !e.driving;

@@ -20,7 +20,7 @@ export interface Ent {
 }
 // Sim space is left-handed (x right, z forward); three is right-handed, so mirror x.
 const V = (x: number, y: number, z: number) => new THREE.Vector3(-x, y, z);
-/** Camera-to-ball distance under which your ball's beacon is hidden (address camera sits about 8 m back). */
+/** Golfer-to-ball distance (m) under which your ball's beacon is hidden. */
 const BEACON_HIDE_M = 15;
 
 export class World {
@@ -193,6 +193,8 @@ export class World {
   /** Screen marker for the pin (flag top), for the pin indicator. */
   pinScreen(): Marker { const v = this.pinTop.clone().project(this.cam); return toMarker(v.x, v.y, v.z > 1, innerWidth, innerHeight); }
   private lastTick = 0;
+  /** Set by the client each frame: how far the local golfer stands from their own ball, metres. */
+  ownBallDistM = Infinity;
   tick(now: number) {
     const dt = this.lastTick ? Math.min(0.1, (now - this.lastTick) / 1000) : 0; this.lastTick = now;
     const k = 1 - Math.exp(-10 * dt);                                     // frame-rate independent easing toward the 10 Hz reports
@@ -204,7 +206,7 @@ export class World {
     }
     const own = this.ents.get(this.selfId);
     // Hidden once you're at your ball: up close the tall beacon read as an aim line, which the owner ruled out.
-    const near = !!own && !own.anim && this.cam.position.distanceTo(own.ballMesh.position) < BEACON_HIDE_M;
+    const near = !!own && !own.anim && this.ownBallDistM < BEACON_HIDE_M;
     this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole && !near;
     if (own) this.beacon.position.set(own.ballMesh.position.x, 0, own.ballMesh.position.z);
     for (const e of this.ents.values()) {
