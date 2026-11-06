@@ -11,7 +11,7 @@ import { canAddress, golferSpot, lookScale, moveAxis, walkSpeed } from './rules'
 import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
-import { BAG as SIMBAG, launchFor, simulateShot } from '../sim';
+import { suggestClub, type Lie } from '../sim';
 let lookMult = loadMult();
 let rfOpen = false, rfTarget: { x: number; z: number } | null = null, rfHover: { x: number; z: number } | null = null;
 const touchOnly = matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
@@ -241,21 +241,25 @@ requestAnimationFrame(frame);
 
 // ---- rangefinder (PRD/02 section 7): M toggles; hover shows distances and a club suggestion; click sets a target shown on the maps only ----
 const rfCanvas = ui.rfCanvas();
-const clubs = SIMBAG.filter(c => c.key !== 'P');
-const carryYd = (c: (typeof SIMBAG)[number], L = 1) => simulateShot(launchFor(c, { length: L })).carryM * YD;
-let fullCarries: { label: string; yd: number }[] | null = null;
-/** "Plays like" suggestion from the sim's perfect-swing carries; below the wedge's full carry it names the wedge and a swing length. */
-function playsLike(yd: number): string {
-  fullCarries ??= clubs.map(c => ({ label: c.label, yd: carryYd(c) }));
-  const wedge = clubs.find(c => c.key === 'O')!, wedgeFull = fullCarries.find(f => f.label === wedge.label)!.yd;
-  if (yd < wedgeFull) { let lo = 0.05, hi = 1; for (let i = 0; i < 14; i++) { const mid = (lo + hi) / 2; if (carryYd(wedge, mid) < yd) lo = mid; else hi = mid; } return `${wedge.label} at ${Math.round(((lo + hi) / 2) * 100)}%`; }
-  return fullCarries.reduce((a, b) => (Math.abs(b.yd - yd) < Math.abs(a.yd - yd) ? b : a)).label;
-}
 const rfWorld = (e: MouseEvent) => { const r = rfCanvas.getBoundingClientRect(); return { p: rfView(hole!.index, rfCanvas.width, rfCanvas.height).toWorld(((e.clientX - r.left) / r.width) * rfCanvas.width, ((e.clientY - r.top) / r.height) * rfCanvas.height), cx: e.clientX - r.left, cy: e.clientY - r.top }; };
 rfCanvas.addEventListener('mousemove', e => {
   const me = own(); if (!rfOpen || !hole || !me) return;
   const { p, cx, cy } = rfWorld(e); rfHover = p;
   const fromBall = Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, toPin = Math.hypot(p.x - hole.pin.x, p.z - hole.pin.z) * YD;
-  ui.rfTip(`From your ball: ${Math.round(fromBall)} yd\nTo the pin: ${Math.round(toPin)} yd\nElevation: flat\nPlays like: ${playsLike(fromBall)}`, cx, cy);
+  ui.rfTip(`From your ball: ${Math.round(fromBall)} yd\nTo the pin: ${Math.round(toPin)} yd\nElevation: flat\nPlays like: ${playsLikeFrom(fromBall, me.ball.surface)}`, cx, cy);
 });
-rfCanvas.addEventListener('click', e => { if (rfOpen && hole) rfTarget = rfWorld(e).p; });
+const LIES: readonly string[] = ['tee', 'fairway', 'firstCut', 'rough', 'bunker', 'fringe', 'green'];
+const asLie = (s: string): Lie => (LIES.includes(s) ? s : 'rough') as Lie;   // paths and other surfaces play like rough for club choice
+function playsLikeFrom(yd: number, surface: string): string {
+  const s = suggestClub(yd, asLie(surface));
+  return s.holdPct ? `${s.label} at about ${s.holdPct}%` : s.label;
+}
+// Clicking a target auto-selects the club from the ball's actual lie (PRD/02 section 7); no auto-aim, and number keys still override.
+rfCanvas.addEventListener('click', e => {
+  const me = own(); if (!rfOpen || !hole || !me) return;
+  const p = rfWorld(e).p; rfTarget = p;
+  const s = suggestClub(Math.hypot(p.x - me.ball.x, p.z - me.ball.z) * YD, asLie(me.ball.surface));
+  const ci = BAG.findIndex(b => b.key === s.club);
+  if (ci >= 0 && (!swing || (swing.sentAt === undefined && swing.fsm.setClub(BAG[ci]!.key, ci === PUTTER)))) { club = ci; ui.setClub(ci); }
+  ui.toast(s.text);
+});

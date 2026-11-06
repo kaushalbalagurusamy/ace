@@ -3,3 +3,4 @@ export * from './ranking';
 export * from './delivery';
 export * from './physics';
 export * from './length';
+export * from './autoclub';
