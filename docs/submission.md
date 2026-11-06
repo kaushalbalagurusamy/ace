@@ -31,7 +31,7 @@ The owner submits the form and the portal. No agent submits forms or posts on th
 - **Needs a public link for the portal:** upload it (YouTube unlisted, Loom or Drive) and paste the link.
 
 ## Tweet draft (owner posts)
-> I built ACE for Gauntlet AI Game Week ⛳ A multiplayer golf race on Pebble Beach: first to hole out on 18 wins. One-button swing, draws and fades from ball position, TrackMan-style flight. All art and sound AI-generated. Play free: https://ace-x92s.onrender.com  (255/280)
+> I built ACE for Gauntlet AI Game Week ⛳ A multiplayer golf race on Pebble Beach: first to hole out on 18 wins. One-button swing, draws and fades from ball position, TrackMan-style flight. Every asset generated for the game. Play free: https://ace-x92s.onrender.com  (259/280)
 
 Shorter version:
 > ACE: a multiplayer golf race on Pebble Beach, built for Gauntlet AI Game Week. First to hole out on 18 wins. Play in your browser: https://ace-x92s.onrender.com
