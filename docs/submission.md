@@ -28,7 +28,7 @@ The owner submits the form and the portal. No agent submits forms or posts on th
 ## Demo video (ready 2026-11-05 about 20:10 CST)
 - **File:** `~/Movies/ace-clips/ace-demo.mp4` (69 s, 1280×720, captioned, no audio), recorded from the live site at deploy 2d5aa26 (HD turf, Genesis cart).
 - **Contents:** title card, waiting room and a two-player lobby, the other player on the shared tee, stance and ball position, hold-and-release swing, flight with tracer, shot card, rangefinder auto-club, a draw from ball position, max effort (its shot card is blurred until the speed decision), and a closing card with the URL.
-- **Needs a public link for the portal:** upload it (YouTube unlisted, Loom or Drive) and paste the link.
+- **Public link for the portal:** https://ace-demo.onrender.com (Render static site `srv-dbmlclugekts73drli1g`, from github.com/kaushalbalagurusamy/ace-demo; the MP4 streams with range requests).
 
 ## Tweet draft (owner posts)
 > I built ACE for Gauntlet AI Game Week ⛳ A multiplayer golf race on Pebble Beach: first to hole out on 18 wins. One-button swing, draws and fades from ball position, TrackMan-style flight. Every asset generated for the game. Play free: https://ace-x92s.onrender.com  (259/280)
