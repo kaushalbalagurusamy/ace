@@ -14,6 +14,8 @@ Course: **Pebble Beach Golf Links** (name approved by the course). Hole 1 is pla
 - **Putt:** equip the putter (P), press Space for the stance, hold **Space** to draw the putter back, release it to strike: the longer the hold, the harder the putt.
 - **Shot card:** after every shot you see carry, total distance, how far offline, club and ball speed, the ball position you used and whether it was a normal or MAX effort shot.
 - **Winning:** first to hole out wins; fewer strokes only decides finishes within one second of each other. A room lasts at most 20 minutes, and once someone finishes the others have one minute.
+- **Settings:** **Esc** (outside a stance) or the gear opens the settings menu: camera sensitivity and **Graphics**. Graphics defaults to **Auto**, shown as "Auto (High)" with the level it picked for your hardware; it steps down when frames run slow and back up when there is headroom, never mid-swing. Pick Low, Medium, High or Ultra to override it (saved in this browser).
+- **F3** shows the frame rate, frame time, graphics level, draw calls and triangles.
 - A keyboard is required (touch screens see a notice).
 
 ## Develop
