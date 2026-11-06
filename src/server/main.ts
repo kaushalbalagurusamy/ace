@@ -7,9 +7,10 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { LobbyManager } from './lobbies';
 import { playPutt, playShot, type Played } from './race';
 import { parseClientMsg } from './parse';
+import { acceptMove, applyPush, atTee, contacts, type MoverState } from './movers';
 import { HOLE_COUNT, hole, teeBall, type Hole } from './course';
 import { rankPlayers } from '../sim';
-import type { BallState, ClientMsg, PlayerRace, ServerMsg } from '../shared/protocol';
+import type { BallState, ClientMsg, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from './lobby-types';
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -45,8 +46,9 @@ const HOLES: readonly Hole[] = Array.from({ length: HOLE_COUNT }, (_, i) => hole
 const HOLE_CARD_S = 2; // PRD/04: 2 s hole card, then the player is moved to the next tee; the clock keeps running
 const COUNTDOWN_S = 5, RACE_LIMIT_MS = 20 * 60_000, AFTER_FIRST_MS = 60_000;
 
-interface RPlayer { name: string; hole: number; holesDone: number; ball: BallState; nextAtMs: number; finishS?: number }
-interface Race { lobbyId: string; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean }
+interface RPlayer { name: string; hole: number; holesDone: number; ball: BallState; nextAtMs: number; finishS?: number; /** cart spawn slot */ slot: number; mv: MoverState }
+interface Race { lobbyId: string; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean; /** pair key -> last bump (ms) */ bumpAt: Map<string, number> }
+const MOVERS_MS = 100, BUMP_COOLDOWN_MS = 250;
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
 const tokens = new Map<string, string>(); // sessionId -> secret resume token (never broadcast)
@@ -98,11 +100,12 @@ function startCountdown(lobbyId: string) {
 function beginRace(l: LobbyView) {
   const h = HOLES[0]!, goAtMs = Date.now();
   const players = new Map<string, RPlayer>();
-  for (const p of l.players) {
-    players.set(p.sessionId, { name: p.name, hole: 0, holesDone: 0, nextAtMs: goAtMs, ball: teeBall(h, 0) });
-  }
-  const race: Race = { lobbyId: l.id, goAtMs, players, timers: [], firstFinish: false };
+  l.players.forEach((p, slot) => {
+    players.set(p.sessionId, { name: p.name, hole: 0, holesDone: 0, nextAtMs: goAtMs, ball: teeBall(h, 0), slot, mv: atTee(0, slot, goAtMs) });
+  });
+  const race: Race = { lobbyId: l.id, goAtMs, players, timers: [], firstFinish: false, bumpAt: new Map() };
   race.timers.push(setTimeout(safe(() => endRace(race)), RACE_LIMIT_MS));
+  race.timers.push(setInterval(safe(() => broadcastMovers(race)), MOVERS_MS));   // clearTimeout also clears an interval in Node
   races.set(l.id, race);
   mgr.setState(l.id, 'in_race');
   touched.set(l.id, Date.now());
@@ -160,7 +163,32 @@ function advance(r: Race, sid: string, me: RPlayer) {
   me.hole++;
   me.ball = teeBall(HOLES[me.hole]!, me.ball.strokes);
   me.nextAtMs = Date.now();
+  me.mv = atTee(me.hole, me.slot, me.nextAtMs);            // the cart comes along to the new tee
   toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: HOLES[me.hole]!.info, ball: { ...me.ball } });
+}
+
+function broadcastMovers(r: Race) {
+  const players: Mover[] = [...r.players].filter(([id]) => present(r, id)).map(([id, p]) => ({ id, hole: p.hole, x: p.mv.x, z: p.mv.z, yaw: p.mv.yaw, driving: p.mv.driving, cart: p.mv.cart }));
+  r.players.forEach((_, id) => { if (present(r, id)) send(socks.get(id), { t: 'movers', players }); });
+}
+
+/** A player's reported golfer and cart: refused teleports are answered with the server's state; accepted ones are checked for bumps. */
+function onMove(ws: WebSocket, sid: string, r: Race, me: RPlayer, m: Extract<ClientMsg, { t: 'move' }>) {
+  const now = Date.now(), next = acceptMove(me.mv, m, now, me.ball);
+  if (!next) { const { x, z, driving, cart } = me.mv; send(ws, { t: 'snap', x, z, driving, cart }); me.mv.atMs = now; return; }
+  me.mv = next;
+  for (const [oid, o] of r.players) {
+    if (oid === sid || o.hole !== me.hole || !present(r, oid)) continue;
+    const key = sid < oid ? `${sid}|${oid}` : `${oid}|${sid}`;
+    if (now - (r.bumpAt.get(key) ?? 0) < BUMP_COOLDOWN_MS) continue;
+    const c = contacts(me.mv, o.mv);
+    if (!c.a.length && !c.b.length) continue;
+    r.bumpAt.set(key, now);
+    for (const [who, pushes] of [[sid, c.a], [oid, c.b]] as const) for (const p of pushes) {
+      applyPush(r.players.get(who)!.mv, p);
+      send(socks.get(who), { t: 'bump', ...p });
+    }
+  }
 }
 
 /** 32-bit seed (FNV-1a) for a shot's random errors, keyed by a per-process secret so clients cannot predict dispersion. */
@@ -196,9 +224,15 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       if (!r || !me) return err(ws, 'NOT_IN_RACE', 'not in a race');
       const now = Date.now();
       if (me.ball.holedOut) return err(ws, 'NOT_YOUR_TURN', 'already holed out');
+      if (me.mv.driving) return err(ws, 'NOT_YOUR_TURN', 'get out of the cart to play (E)');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
       const seed = shotSeed(`${sid}|${me.hole}|${me.ball.strokes}|${r.goAtMs}`);
       applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, seed }) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
+      return;
+    }
+    case 'move': {
+      const r = raceOf(sid), me = r?.players.get(sid);
+      if (r && me) onMove(ws, sid, r, me, m);                  // outside a race a stray move is dropped silently (sent while the race ended)
       return;
     }
     default: return err(ws, 'BAD_MESSAGE', 'unexpected hello');
