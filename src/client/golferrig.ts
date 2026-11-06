@@ -96,12 +96,16 @@ export class GolferRig {
     // arms
     const club = !p.free;
     let tgt = club ? this.gripTarget(p) : null;
-    const below = (t: V3): V3 => [t[0] + p.shaft[0] * 0.07, t[1] + p.shaft[1] * 0.07, t[2] + p.shaft[2] * 0.07];   // trail hand 7 cm down the grip
+    // wrists sit either side of the shaft, palms facing: the lead (left) wrist on the clubface side, the trail (right) wrist on the other,
+    // the trail 7 cm further down the grip (on the shaft line itself the two hand meshes overlapped into an X)
+    const sh = new THREE.Vector3(...p.shaft), side = new THREE.Vector3(...p.face).addScaledVector(sh, -new THREE.Vector3(...p.face).dot(sh)).normalize().multiplyScalar(0.03);
+    const off = (t: V3, k: number, down: number): V3 => [t[0] + side.x * k + p.shaft[0] * down, t[1] + side.y * k + p.shaft[1] * down, t[2] + side.z * k + p.shaft[2] * down];
+    const below = (t: V3): V3 => off(t, -1, 0.07);
     // hard grip constraint: if either hand's grip point is out of reach, slide the whole grip toward the shoulders until both arms
     // reach it, so the hands never come off the club (critic: hands separating at P6 and P7)
-    if (tgt) tgt = keepReachable(tgt, below(tgt), this.modelPos('LeftArm'), this.modelPos('RightArm'), this.armLen('Left') * 0.995, this.armLen('Right') * 0.995);
-    const lT: V3 = tgt ?? p.free!.l;
-    const rT: V3 = tgt ? below(tgt) : p.free!.r;
+    if (tgt) tgt = keepReachable(off(tgt, 1, 0), below(tgt), this.modelPos('LeftArm'), this.modelPos('RightArm'), this.armLen('Left') * 0.995, this.armLen('Right') * 0.995);
+    const lT: V3 = tgt ?? p.free!.l;   // keepReachable returned the (lead-side) wrist point
+    const rT: V3 = tgt ? off(tgt, -2, 0.07) : p.free!.r;   // from the lead wrist: across the shaft and down the grip
     this.ik('LeftArm', 'LeftForeArm', 'LeftHand', lT, p.lPole);
     this.ik('RightArm', 'RightForeArm', 'RightHand', rT, p.rPole);
     this.handError = { lead: this.modelPos('LeftHand').distanceTo(new THREE.Vector3(...lT)), trail: this.modelPos('RightHand').distanceTo(new THREE.Vector3(...rT)) };
@@ -113,7 +117,8 @@ export class GolferRig {
     }
     // club: grip end a few cm above the holding wrist, along the shaft
     const hand = this.modelPos(club ? 'LeftHand' : 'RightHand', _t);
-    const g: V3 = [hand.x - p.shaft[0] * 0.03, hand.y - p.shaft[1] * 0.03, hand.z - p.shaft[2] * 0.03];
+    const k = club ? 1 : 0;   // with the club in both hands the shaft runs between the wrists: back across from the lead wrist
+    const g: V3 = [hand.x - side.x * k - p.shaft[0] * 0.03, hand.y - side.y * k - p.shaft[1] * 0.03, hand.z - side.z * k - p.shaft[2] * 0.03];
     return clubMatrix(g, p.shaft, p.face, out);
   }
 
