@@ -11,7 +11,7 @@ KEY = os.environ["OPENAI_API_KEY"]
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 mf = ROOT / "assets/manifest.json"
 rows = json.loads(mf.read_text()) if mf.exists() else []
-used = sum(1 for r in rows if r.get("tool") == "OpenAI images")
+used = sum(1 for r in rows if r.get("tool") == "OpenAI images" and r.get("date") == datetime.date.today().isoformat())   # nightly cap: count today's images only
 ap = argparse.ArgumentParser(); ap.add_argument("id"); ap.add_argument("prompt")
 ap.add_argument("--size", default="1024x1024"); ap.add_argument("--quality", default="low", choices=["low", "medium", "high"])
 ap.add_argument("--edit", nargs="*", default=[], help="reference image paths for an image edit")

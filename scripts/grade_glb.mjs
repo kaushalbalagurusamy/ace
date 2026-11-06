@@ -53,6 +53,34 @@ if (opt.wet) {
     p.setAttribute('COLOR_0', doc.createAccessor().setArray(col).setType('VEC3').setBuffer(p.getAttribute('POSITION').getBuffer()));
   });
 }
+// --cut AXIS:F (e.g. x:-0.11): press everything beyond F of the bounding box (negative = from the min side) almost flat onto that plane,
+// turning a generator artefact at one end (thin flap, hollow lip) into a broken joint face; local coordinates, single-mesh models
+if (opt.cut) {
+  const [ax, f] = opt.cut.split(':'), a = 'xyz'.indexOf(ax), F = +f, prims = doc.getRoot().listMeshes().flatMap(m => m.listPrimitives());
+  let lo = Infinity, hi = -Infinity; for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, [])[a]; lo = Math.min(lo, v); hi = Math.max(hi, v); } }
+  const t = F < 0 ? lo - F * (hi - lo) : hi - F * (hi - lo), beyond = v => (F < 0 ? v < t : v > t);
+  for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (beyond(v[a])) { v[a] = t + (v[a] - t) * 0.12; pos.setElement(i, v); } } }
+  // re-derive normals of the pressed vertices (area-weighted face normals, keyed by position so UV seams stay smooth)
+  for (const p of prims) {
+    const pos = p.getAttribute('POSITION'), nor = p.getAttribute('NORMAL'), I = p.getIndices()?.getArray(); if (!nor || !I) continue;
+    const key = i => pos.getElement(i, []).map(c => c.toFixed(5)).join(), acc = new Map();
+    for (let k = 0; k < I.length; k += 3) { const [A, B, C] = [I[k], I[k + 1], I[k + 2]].map(i => pos.getElement(i, [])), e1 = B.map((x, j) => x - A[j]), e2 = C.map((x, j) => x - A[j]);
+      const n = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+      for (const i of [I[k], I[k + 1], I[k + 2]]) { const q = key(i), s = acc.get(q) ?? [0, 0, 0]; acc.set(q, s.map((x, j) => x + n[j])); } }
+    for (let i = 0; i < pos.getCount(); i++) if (Math.abs(pos.getElement(i, [])[a] - t) <= (0.12 * Math.abs(F) + 0.02) * (hi - lo)) {   // the pressed slab plus a thin rim
+      const n = acc.get(key(i)), l = Math.hypot(...n) || 1; nor.setElement(i, n.map(x => x / l)); }
+  }
+}
+// --thicken K:F (e.g. 1.6:0.45): widen everything below F of the height by K around its mean x/z, tapering to 1 at F (a generated trunk too thin
+// for a mature tree); local coordinates, y up
+if (opt.thicken) {
+  const [K, F] = opt.thicken.split(':').map(Number), prims = doc.getRoot().listMeshes().flatMap(m => m.listPrimitives());
+  let lo = Infinity, hi = -Infinity; for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const y = pos.getElement(i, [])[1]; lo = Math.min(lo, y); hi = Math.max(hi, y); } }
+  const top = lo + F * (hi - lo), c = [0, 0, 0];
+  for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (v[1] < top) { c[0] += v[0]; c[1] += v[2]; c[2]++; } } }
+  const [mx, mz] = [c[0] / c[2], c[1] / c[2]];
+  for (const p of prims) { const pos = p.getAttribute('POSITION'); for (let i = 0; i < pos.getCount(); i++) { const v = pos.getElement(i, []); if (v[1] < top) { const s = 1 + (K - 1) * (1 - 0.5 * (v[1] - lo) / (top - lo)) * Math.min(1, (top - v[1]) / (0.15 * (top - lo))); v[0] = mx + (v[0] - mx) * s; v[2] = mz + (v[2] - mz) * s; pos.setElement(i, v); } } }
+}
 // --squash Y: scale the model vertically (e.g. 0.6 turns a block into a low shelf); applied to the scene's top-level nodes
 if (opt.squash) for (const n of doc.getRoot().listScenes()[0].listChildren()) { const s = n.getScale(); n.setScale([s[0], s[1] * +opt.squash, s[2]]); }
 await io.write(out, doc);

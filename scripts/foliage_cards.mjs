@@ -37,7 +37,8 @@ for (let k = 0; k < N * N; k++) {
     const sx = c.x + Math.floor(i * CELL / T), sy = c.y + Math.floor(j * CELL / T), sp = (sy * ci.width + sx) * 4, dp = ((oy + j) * T * N + ox + i) * 4;
     // frayed round mask: no straight tile edges survive, so each card reads as a ragged spray (and leaves a clear mip border)
     const dx = (i - T / 2) / (T / 2), dy = (j - T / 2) / (T / 2), rr = Math.hypot(dx, dy), th = Math.atan2(dy, dx);
-    const on = fol(sx, sy) && rr < 0.8 + 0.08 * Math.sin(lobes * th + ph) + 0.1 * (rnd() - 0.5);
+    // --sprite 1: the concept is a sheet of separate sprigs (pine needle tufts), so keep their own spiky outline instead of the lobed blob mask
+    const on = fol(sx, sy) && (opt.sprite ? rr < 0.98 : rr < 0.8 + 0.08 * Math.sin(lobes * th + ph) + 0.1 * (rnd() - 0.5));
     // recesses are lifted to at least 55% of the target so they read as shade, not as black holes through the card
     const lift = Math.max(1, (0.55 * (hex(opt.green)[1])) / Math.max(1, cd[sp + 1] * gain[1]));
     for (let ch = 0; ch < 3; ch++) atlas[dp + ch] = Math.min(255, cd[sp + ch] * gain[ch] * lift); atlas[dp + 3] = on ? 255 : 0;
@@ -82,6 +83,7 @@ for (const node of root.listNodes()) {
       }
       const a = P(ia[3 * t]), b = P(ia[3 * t + 1]), c = P(ia[3 * t + 2]), n = cross(sub(b, a), sub(c, a)), ar = len(n) / 2;
       const cy = (a[1] + b[1] + c[1]) / 3; if (cy < cutY || !inTier(cy)) { low.add(t); continue; }   // opens the gaps between tiers in the mesh too
+      if (opt['drop-crown']) low.add(t);   // --drop-crown 1: cards replace the generated crown surface (its painted blobs read as broadleaf)
       if (ar > 0) tris.push({ a, b, c, n: norm(n), ar });
     }
     if (low.size) { idx.setArray(new Uint32Array(ia.filter((_, k) => !low.has(Math.floor(k / 3))))); lowRemoved += low.size; }
