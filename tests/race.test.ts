@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BAG, LAND_ROLL_FRACTION, launchFor, rollDistance, simulateShot } from '../src/sim';
+import { BAG, launchFor, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
@@ -18,7 +18,7 @@ function findLie(h: ReturnType<typeof hole>, lie: string, minZ = 40, maxZ = 200)
   throw new Error(`no ${lie} spot on the hole`);
 }
 
-describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture)', () => {
+describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture, research §5.2)', () => {
   const start = ball(pin.x, pin.z - 1);
   it('a putt that stops at the cup drops: holedOut, one stroke', () => {
     // v0 = sqrt(2 a d) for d = 1 m at Stimp 10 is about 1.05 m/s => length 0.07 (the old 105 ms draw)
@@ -28,8 +28,8 @@ describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture)', () => {
     expect(r.ball.x).toBeCloseTo(pin.x, 6);
     expect(r.ball.z).toBeCloseTo(pin.z, 6);
   });
-  it('a putt hit too hard rolls past the cup without dropping (speed above 1.6 m/s)', () => {
-    const r = ok(playPutt(h, start, 0, 0.15 * 750)); // 2.25 m/s: about 2.0 m/s over the cup, above the 1.6 m/s capture limit
+  it('a putt hit too hard rolls past the cup without dropping (speed above the 1.31 m/s centred capture speed)', () => {
+    const r = ok(playPutt(h, start, 0, 0.15 * 750)); // 2.25 m/s: about 2.0 m/s over the cup, above the 1.31 m/s capture limit (research §5.2)
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeGreaterThan(pin.z);
     expect(r.ball.strokes).toBe(1);
@@ -79,13 +79,19 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(r.totalM).toBeGreaterThan(r.carryM);
     expect(r.flightS).toBeGreaterThan(simulateShot(launchFor(BAG[0]!)).flightTimeS);
   });
-  it('server total = sim carry + one roll-out from LAND_ROLL_FRACTION of the landing speed on the landing lie (one roll model)', () => {
-    const sim = simulateShot(launchFor(BAG[0]!));
-    const r = ok(playShot(h, tee, { clubKey: '1', aimDeg: 0, ...perfect }));
+  it('TM-15 one run-out model: landing on fairway, the server total equals the sim total (carry, bounce and roll) within 3%', () => {
+    const pick = (() => {                                                         // a club and aim that land and rest on fairway (no layout assumption)
+      for (const c of BAG.filter(c => c.key !== 'P')) {
+        const s = simulateShot(launchFor(c));
+        for (let aim = -15; aim <= 15; aim++) { const a = (aim * Math.PI) / 180, on = (d: number) => h.surfaceAt(d * Math.sin(a), d * Math.cos(a)) === 'fairway'; if (on(s.carryM) && on(s.totalM)) return { c, s, aim }; }
+      }
+      throw new Error('no fairway landing on hole 1');
+    })();
+    const sim = pick.s;
+    const r = ok(playShot(h, tee, { clubKey: pick.c.key, aimDeg: pick.aim, ...perfect }));
     expect(r.penalty).toBeUndefined();
-    const landing = h.surfaceAt(0, sim.carryM);
-    const expected = sim.carryM + rollDistance(LAND_ROLL_FRACTION * sim.landingSpeedMs, landing);
-    expect(Math.abs(r.totalM - expected)).toBeLessThan(0.03 * expected);
+    expect(Math.abs(r.totalM - sim.totalM)).toBeLessThan(0.03 * sim.totalM);
+    expect(r.samples.some(s => s.t > sim.flightTimeS && s.p.y > 0.05)).toBe(true);   // the replay shows the bounce
   });
   it('aim rotates the shot about the ball: 90 degrees aim sends a drive sideways (out of bounds, penalty)', () => {
     const r = ok(playShot(h, tee, { clubKey: '1', aimDeg: 90, ...perfect }));
@@ -122,7 +128,7 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
   it('the rough lie costs 15% of ball speed versus the fairway for the same swing (PRD/03 section 4: 0.85)', () => {
     const f = findLie(h, 'fairway', 60), r = findLie(h, 'rough', 60);
     const fw = ok(playShot(h, ball(f.x, f.z), { clubKey: '7', aimDeg: 0, ...perfect })), ro = ok(playShot(h, ball(r.x, r.z), { clubKey: '7', aimDeg: 0, ...perfect }));
-    expect(ro.ballSpeedMs / fw.ballSpeedMs).toBeCloseTo(0.85, 6);
+    expect(ro.ballSpeedMs / fw.ballSpeedMs).toBeCloseTo(0.85, 3);   // 3 places: the rough's random face angle raises the 3-D spin loft, a <0.05% smash cost
   });
   it('the bunker lie costs 45% of ball speed for a non-wedge iron (0.55) and 25% for a wedge (0.75)', () => {
     const f = findLie(h, 'fairway', 60), b = findLie(h, 'bunker', 0, 400), at = (club: string, p: { x: number; z: number }) => ok(playShot(h, ball(p.x, p.z), { clubKey: club, aimDeg: 0, ...perfect }));

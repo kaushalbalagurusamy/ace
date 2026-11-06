@@ -29,5 +29,13 @@ Replace the placeholder constants in `src/sim` with the research models:
 | TM-14 | In-game bag: a perfect full swing's carries are ordered and plausible for the 130 mph game (driver 320 to 345 yd, PW 130 to 150, ordered by loft), and a full swing stays straight (< 1% offline) | unit |
 | TM-15 | The server uses the sim's bounce and roll (one model): its total on a flat fairway equals the sim's total within 3% | unit (existing race test updated) |
 
+## Deviations found while implementing (2026-11-05)
+- **Integrator step:** 1/120 s rather than 0.01 s, so the 60 Hz replay samples fall on whole steps. R§3.5 reports under 0.001 yd of change between 0.001 s and 0.02 s.
+- **Fairway roll:** 4.5 m/s², tuned to TM-10's sourced 30 yd. The research's suggested "about 3" gives 34 yd on this bounce.
+- **TM-9(b) conflicts with TM-10.** The 2028 ODS ball's hops alone are 16.9 yd on a 302.7 yd carry, so a total of 320 yd or less would need almost no roll. It totals 324 yd. TM-9(b)'s total band is kept as an `it.fails` tripwire; its carry (302.8 ± 6) is asserted.
+- **TM-11's 0 rpm half conflicts with TM-10.** The research modelled ≥ 8 yd at a decel of 1 to 3 m/s²; at 4.5 the PW rolls 7.2 yd. The test now asserts the intent (the spinless ball releases at least 8 yd more than the spinning one) and keeps the literal bound as an `it.fails` tripwire.
+- **K for cases 4 and 6** uses the exact PGA row value, 2545 / (115·sin 14.7°) = 87.2. The research's rounded 87 gives 2158 rpm, just under its own 2160 lower bound for case 6.
+- **Wedge smash** is held at the trend value (no cos(SL) law), and the swing-length speed curve is retuned so AC-S6 (25% 62° carries 40 to 75 yd) still holds. See PRD/03 §2.
+
 ## Not in this slice (stated limits)
 Gear effect and off-centre smash loss (§2.4, §2.5: constants "not found"; the game keeps its E-based speed and smash penalties); wind; lip-out deflection (§5.3 "not found"); soft or wet turf variants; wedge distances beyond extrapolation.

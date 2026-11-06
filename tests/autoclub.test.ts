@@ -25,9 +25,10 @@ describe('monotone and lie/slope adjustments', () => {
     let prev = FULL.length;
     for (let t = 40; t <= 240; t += 10) { const i = idx(suggestClub(t, 'fairway').club); expect(i, `${t}`).toBeLessThanOrEqual(prev); prev = i; }
   });
-  it('rough and bunker need an equal or longer club than fairway; rough 150 strictly longer', () => {
+  it('rough and bunker need an equal or longer club than fairway; rough 160 strictly longer', () => {
     for (const t of [80, 110, 150, 170]) for (const lie of ['rough', 'bunker'] as const) expect(idx(suggestClub(t, lie).club), `${lie} ${t}`).toBeLessThanOrEqual(idx(suggestClub(t, 'fairway').club));
-    expect(idx(suggestClub(150, 'rough').club)).toBeLessThan(idx(suggestClub(150, 'fairway').club));
+    // 160, not 150: with sourced aero the rough's x0.55 flyer spin offsets most of its x0.85 speed, so a 9i reaches 150 from both lies (163 / 153 yd)
+    expect(idx(suggestClub(160, 'rough').club)).toBeLessThan(idx(suggestClub(160, 'fairway').club));
   });
   it('uphill 15 adds 15 to playsYd and moves up a club; downhill 15 moves down one', () => {
     const flat = suggestClub(150, 'fairway'), up = suggestClub(150, 'fairway', { riseYd: 15 }), down = suggestClub(150, 'fairway', { riseYd: -15 });
