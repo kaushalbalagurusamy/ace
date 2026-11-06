@@ -177,7 +177,8 @@ export class World {
       const list = ids[s.kind], m = (await loadModel(list[i % list.length]!)) ?? makeProp(s.kind, i); // a generated model if it passed QA, else the code-built prop
       i++;
       if (token !== this.propToken) return;                      // a newer hole replaced this request
-      m.position.copy(this.onGround(this.propHole, s.x, s.z, -0.15));   // sunk a little so trunks on a slope do not float m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
+      m.position.copy(this.onGround(this.propHole, s.x, s.z, -0.15));   // sunk a little so trunks on a slope do not float
+      m.scale.setScalar(s.scale); m.rotation.y = s.rotY; m.traverse(o => { o.castShadow = true; }); this.props.add(m);
     }
   }
   private makeGolfer(shade: string, name: string) {
