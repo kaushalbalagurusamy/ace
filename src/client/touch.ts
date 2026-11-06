@@ -36,16 +36,17 @@ const CSS = `
 .tb{position:absolute;pointer-events:auto;min-width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(10,24,19,.6);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 4px 14px rgba(0,0,0,.3);color:#f5f0e4;font:600 12px Inter,system-ui,sans-serif;padding:0 8px;display:none;align-items:center;justify-content:center}
 .tb.on{display:flex}.tb.lit{background:#d6b45a;color:#14231b;border-color:#d6b45a}.tb:active{filter:brightness(1.4)}
 #tc{position:absolute;right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(3,44px);grid-auto-rows:44px;gap:6px;grid-template-areas:"shift map cart" "swing swing swing"}
-#tc.st{grid-template-columns:repeat(5,38px);grid-auto-rows:38px;gap:4px;grid-template-areas:". bu . . x" "bl bc br aiml aimr" ". bd . . chip"}#tc .tb{position:static;min-width:0;padding:0 2px;font-size:11px}#tc.st .tb{height:38px}#tbc{border-radius:10px;font-size:10px}
+#tc.st{grid-template-columns:repeat(5,36px);grid-auto-rows:36px;gap:4px;grid-template-areas:". bu . . x" "bl bc br aiml aimr" ". bd . . chip"}#tc .tb{position:static;min-width:0;padding:0 2px;font-size:11px}#tc.st .tb{height:36px}#tbc{border-radius:10px;font-size:10px}
 #tc .big{background:rgba(214,180,90,.82);color:#14231b;border-color:#d6b45a;font-size:16px;height:48px}
 ${['shift','map','cart','swing','bl','bu','br','bc','aiml','bd','aimr','chip','x'].map(a => `#t${a}{grid-area:${a}}`).join('')}
 #tmute{display:none!important}body.touch #bpos{display:none!important}
 #stick{position:absolute;width:${STICK_PX * 2}px;height:${STICK_PX * 2}px;margin:-${STICK_PX}px 0 0 -${STICK_PX}px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.06);display:none}
 #stick i{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px;border-radius:50%;background:rgba(255,255,255,.55)}
-body.touch #mini canvas{width:67px;height:94px}body.touch #meter{width:min(200px,56vw);padding:3px 8px;font-size:11px}body.touch #prompt{font-size:11px;padding:3px 10px}body.touch #info{font-size:11px;padding:3px 8px}
-body.touch #lb,body.touch #gear{pointer-events:auto;top:max(56px,calc(env(safe-area-inset-top) + 46px))}body.touch #gear{font-size:26px;padding:6px 12px}
+body.touch #mini canvas{width:67px;height:94px}body.touch #meter{width:min(170px,50vw);padding:3px 8px;font-size:11px}body.touch #prompt{font-size:11px;padding:3px 10px}body.touch #info{font-size:11px;padding:3px 8px}
+body.touch #lb,body.touch #gear{pointer-events:auto;top:max(56px,calc(env(safe-area-inset-top) + 46px))}body.touch #gear{font-size:20px;padding:4px 10px}body.touch #lb .lbh{display:none}body.touch .slot{width:30px;height:30px;font-size:10px}body.touch .slot.on{width:48px;height:48px;font-size:13px}body.touch #meter #mlabel{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (orientation:portrait){body.touch #info{bottom:auto;top:max(104px,calc(env(safe-area-inset-top) + 96px))}}
 body.touch #lb{left:max(64px,calc(env(safe-area-inset-left) + 54px))}
-body.touch #meter{bottom:auto;top:max(116px,26%);width:min(300px,72vw)}body.touch #prompt{bottom:auto;top:calc(max(116px,26%) + 48px);max-width:80vw;text-align:center}
+body.touch #meter{bottom:auto;top:max(116px,26%)}body.touch #prompt{bottom:auto;top:calc(max(116px,26%) + 48px);max-width:80vw;text-align:center}
 body.touch #rf{inset:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 150px max(10px,env(safe-area-inset-left));touch-action:none}
 body.touch #card{min-width:0;font-size:10px;line-height:1.3;padding:4px 8px;bottom:auto;top:max(150px,calc(env(safe-area-inset-top) + 140px))}
 @media (orientation:landscape){body.touch #rf{bottom:max(10px,env(safe-area-inset-bottom));right:210px}body.touch #card{top:auto;bottom:max(10px,env(safe-area-inset-bottom));right:calc(max(10px,env(safe-area-inset-right)) + 160px)}}
