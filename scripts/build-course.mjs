@@ -12,10 +12,10 @@ import { GRIDS } from '../src/shared/course-grid.ts';
 import { decodeGrid } from '../src/shared/gridtools.ts';
 import { CARD } from '../src/shared/pebble-card.ts';
 
-/** Courses the pipeline knows: the OSM golf_course name to search, and the traced lie grids and card if the game has them. */
+/** Courses the pipeline knows: the OSM golf_course name to search, an optional tag filter for its holes, and the traced lie grids and card if the game has them. */
 const COURSES = {
   pebble: { osmName: 'Pebble Beach Golf', grids: GRIDS, card: CARD },
-  'bethpage-black': { osmName: 'Bethpage.*Black' },
+  'bethpage-black': { osmName: 'Bethpage State Park Golf', holes: { 'golf:course:name': 'Black' } },   // one OSM boundary holds all five Bethpage courses
   aronimink: { osmName: 'Aronimink' },
 };
 const arg = k => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : undefined; };
@@ -42,7 +42,8 @@ async function cached(name, url, body) {
 // ---- 1. OSM ----
 const Q = `[out:json][timeout:90];area["leisure"="golf_course"]["name"~"${C.osmName}"]->.c;(way["golf"="hole"](area.c);way["golf"="green"](area.c););out geom tags;`;
 const osm = JSON.parse(await cached('osm.json', 'https://overpass-api.de/api/interpreter', 'data=' + encodeURIComponent(Q)));
-const holesOsm = osm.elements.filter(e => e.tags.golf === 'hole').sort((a, b) => Number(a.tags.ref) - Number(b.tags.ref)), greensOsm = osm.elements.filter(e => e.tags.golf === 'green');
+const refOf = e => Number(/(\d+)\s*$/.exec(e.tags.ref ?? '')?.[1]);                  // "7" or "Black - 7"
+const holesOsm = osm.elements.filter(e => e.tags.golf === 'hole' && Object.entries(C.holes ?? {}).every(([k, v]) => e.tags[k] === v)).sort((a, b) => refOf(a) - refOf(b)), greensOsm = osm.elements.filter(e => e.tags.golf === 'green');
 if (!holesOsm.length) throw new Error(`no golf=hole ways inside a golf course named ~"${C.osmName}"`);
 const ZONE = Math.floor((holesOsm[0].geometry[0].lon + 180) / 6) + 1, EPSG = 26900 + ZONE;   // NAD83 / UTM zone N
 
@@ -73,7 +74,7 @@ const frames = holesOsm.map((w, i) => {
   const cls = cells ? (x, z) => { const ix = Math.floor((x - grid.x0) / grid.cell), iz = Math.floor((z - grid.z0) / grid.cell); return ix < 0 || iz < 0 || ix >= grid.nx || iz >= grid.nz ? 111 : cells[iz * grid.nx + ix]; }
     : (x, z) => (greenW && Math.hypot(x, z - lengthM) < 45 && inPoly(greenW.geometry, toUtm(x, z)) ? 103 : 114);
   const yards = Number(w.tags.dist ?? w.tags.yardage ?? w.tags['dist:yards']) || Math.round(d / M_PER_YD);
-  return { i, ref: Number(w.tags.ref) || i + 1, par: Number(w.tags.par) || card?.par || null, yards: card?.yards ?? yards, tee, green, teeLL, greenLL: greenW ? greenW.geometry[0] : endLL, s, realM: d, lengthM, grid, cls, toUtm };
+  return { i, ref: refOf(w) || i + 1, par: Number(w.tags.par) || card?.par || null, yards: card?.yards ?? yards, tee, green, teeLL, greenLL: greenW ? greenW.geometry[0] : endLL, s, realM: d, lengthM, grid, cls, toUtm };
 });
 if (C.card && frames.length !== C.card.length) throw new Error(`OSM has ${frames.length} holes, the card ${C.card.length}`);
 
