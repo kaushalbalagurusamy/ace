@@ -5675,5 +5675,50 @@
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": false
     }
+  },
+  {
+    "id": "tree-pine-r19b",
+    "file": "assets/models/tree-pine-r19b.glb",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-pine-r15a",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0c3-d6dc-7115-8a34-a1ada2c86bcd",
+    "seed_images": [
+      "concept-pine-r4.png"
+    ],
+    "seed_photos": [
+      "refs/pebble-photos/h18-view-back.jpg",
+      "refs/pebble-photos/h18-across-bay.jpg",
+      "refs/pebble-photos/h06-cliffs.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 22.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs --green \"#2B381F\" --rest \"#4B4636\" --sat 0.7 --rough 1 --thicken 1.1:0.1 --squash 0.88 --widen 1.35",
+      "node scripts/bake_detail.mjs assets/images/concept-pine-r4.png --crop 478,1100,50 --height 22 --tile 0.9 --blur 2 --nblur 2 --bump 3 --mix 1.2 --size 2048",
+      "node scripts/grade_glb.mjs --rest \"#403A2E\" --sat 1",
+      "gltf-transform weld; simplify --ratio 0.8 --error 0.02",
+      "node scripts/foliage_cards.mjs assets/images/pine-needle-sheet.png --green \"#2B381F\" --cards 4500 --flat 0.1 --size 3.4 --cell 200 --min-island 0.01 --up 1.0 --sprite 1 --outward 1 --min-y 0.3 --drop-crown 1",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048 --simplify false --flatten true --join true"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "PASS",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 4,
+        "scale": 4
+      },
+      "mean": 4.0,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r26.json",
+      "notes": "Reads correctly as a Monterey pine, not a cypress: a tall clean trunk taking about 45% of the height under a broad, asymmetric umbrella crown. This matches the tall left-hand pine in h18-view-back.jpg and the rounded crowns on the h06-cliffs.jpg forest skyline. The dark blue-green needle colour matches the hazy pine mass in h18-across-bay.jpg and h06-cliffs.jpg, and the needle tufts read well up close. Defects: the crown is one continuous dense blob. Real Monterey pines show separate lumpy clumps with sky gaps between them and a flatter, more irregular top. The lower-left lobe droops like a weeping tree, and the bark is smooth purple-brown, where the real bark is dark grey-brown and deeply furrowed. Fixes: break the crown into 4-6 separate clumps with gaps, flatten the top slightly, add furrowed grey-brown bark, and remove the stray upright card on the left edge of top.jpg.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-pine-r19b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": true
+    }
   }
 ]
