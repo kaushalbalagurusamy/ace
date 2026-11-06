@@ -7,7 +7,7 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { normalise } from '/src/client/assets.ts';
 import { GolferRig, smoothShading, tintPolo } from '/src/client/golferrig.ts';
-import { POSES, backswingPose, releasePose, puttPose, swingPoses, walkPose } from '/src/client/golferanim.ts';
+import { POSES, backswingPose, curvePose, gaitPose, idlePose, releasePose, puttPose, seatedPose, swingPoses } from '/src/client/golferanim.ts';
 import { CLUBS, fitGeneratedHead, makeCodeClub } from '/src/client/clubs.ts';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(640, 640); document.body.append(r.domElement);
@@ -16,7 +16,7 @@ const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setDRACOLoader
 const gltf = await loader.loadAsync('/assets/models/golfer.glb'), rows = await (await fetch('/assets/manifest.json')).json();
 // the club in hand is the generated head for that slot (fitted as the game does), the code club only if the file is missing
 const club = async spec => { try { return fitGeneratedHead((await loader.loadAsync(`/assets/models/${spec.model}.glb`)).scene, spec, rows.find(r => r.id === spec.model)?.orient_deg); } catch { return makeCodeClub(spec); } };
-// show(view, pose, {club, tint, depth, ms}): pose is 'rest' | 'idle' | 'address' | 'top' | 'back' (depth) | 'release' (depth, ms) | 'putt' | 'walk'
+// show(view, pose, {club, tint, depth, ms}): pose is 'rest' | 'idle' | 'address' | 'top' | 'back' (depth) | 'release' (depth, ms) | 'putt' | 'gait' (phase, speed) | 'idlet' (t) | 'seat' (steer)
 window.show = async (view, pose, o = {}) => {
   const model = normalise(cloneSkinned(gltf.scene), 1.8), rig = new GolferRig(model), spec = CLUBS[o.club ?? 6];
   smoothShading(model); tintPolo(model, o.tint ?? '#ffffff');   // white polo = untinted; also lights the violet eyes
@@ -25,7 +25,7 @@ window.show = async (view, pose, o = {}) => {
   let p = null;
   if (pose === 'idle') p = POSES.idle; else if (pose === 'address') p = backswingPose(0, spec.length); else if (pose === 'top') p = backswingPose(1, spec.length);
   else if (pose === 'back') p = backswingPose(o.depth ?? 0.5, spec.length); else if (pose === 'release') p = releasePose(o.depth ?? 1, o.ms ?? 0, spec.length).pose;
-  else if (pose === 'P') p = swingPoses(spec.length)[o.n]; else if (pose === 'putt') p = puttPose(o.t ?? 0, spec.length); else if (pose === 'walk') p = walkPose(o.phase ?? 1, 1);
+  else if (pose === 'P') p = swingPoses(spec.length)[o.n]; else if (pose === 'curve') p = curvePose(o.f, spec.length); else if (pose === 'putt') p = puttPose(o.t ?? 0, spec.length); else if (pose === 'gait') p = gaitPose(o.phase ?? 0, o.speed ?? 15, o.t ?? 0); else if (pose === 'idlet') p = idlePose(o.t ?? 0); else if (pose === 'seat') p = seatedPose(o.steer ?? 0);
   if (p) { const c = await club(spec); c.matrixAutoUpdate = false; rig.apply(p, c.matrix); model.add(c); }
   model.updateMatrixWorld(true);
   // fixed frame (a skinned mesh's box is its bind pose): 2.4 m tall around the golfer, the same for every shot
@@ -34,7 +34,8 @@ window.show = async (view, pose, o = {}) => {
   r.render(scene, cam); let tris = 0; gltf.scene.traverse(m => { if (m.isMesh) tris += m.geometry.index ? m.geometry.index.count / 3 : 0; });
   // top-down measurement from the posed joints: degrees the line from trail to lead joint is turned away from the target (closed > 0, open < 0)
   const closed = (lead, trail) => { const a = rig.modelPos(lead), b = rig.modelPos(trail); return +(Math.atan2(a.z - b.z, a.x - b.x) * 180 / Math.PI).toFixed(1); };
-  return { tris, shouldersClosed: closed('LeftArm', 'RightArm'), hipsClosed: closed('LeftUpLeg', 'RightUpLeg'), pelvisX: +rig.modelPos('Hips').x.toFixed(3), handToGripCm: { lead: +(rig.handError.lead * 100).toFixed(1), trail: +(rig.handError.trail * 100).toFixed(1) }, joints: Object.fromEntries(['LeftForeArm', 'LeftHand', 'RightForeArm', 'RightHand', 'Head'].map(n => [n, rig.modelPos(n).toArray().map(x => +x.toFixed(3))])) };
+  const arm = rig.restPos('LeftArm').distanceTo(rig.restPos('LeftForeArm')) + rig.restPos('LeftForeArm').distanceTo(rig.restPos('LeftHand'));
+  return { tris, arm: +arm.toFixed(3), shouldersClosed: closed('LeftArm', 'RightArm'), hipsClosed: closed('LeftUpLeg', 'RightUpLeg'), pelvisX: +rig.modelPos('Hips').x.toFixed(3), handToGripCm: { lead: +(rig.handError.lead * 100).toFixed(1), trail: +(rig.handError.trail * 100).toFixed(1) }, joints: Object.fromEntries(['LeftForeArm', 'LeftHand', 'RightForeArm', 'RightHand', 'Head', 'Hips', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightFoot', 'LeftArm', 'RightArm'].map(n => [n, rig.modelPos(n).toArray().map(x => +x.toFixed(3))])) };
 };
 window.ready = true;
 </script>

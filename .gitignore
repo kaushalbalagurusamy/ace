@@ -16,3 +16,6 @@ public/
 
 # Python bytecode
 __pycache__/
+
+# Motion QA composites contain reference frames/photos: critic-only, never committed (the renders are)
+assets/qa/motion/**/compare*
