@@ -28,7 +28,7 @@ export class Grass {
   private m = new THREE.Matrix4(); private q = new THREE.Quaternion(); private p = new THREE.Vector3(); private s = new THREE.Vector3(); private c = new THREE.Color();
   private static readonly UP = new THREE.Vector3(0, 1, 0);
   constructor(private parent: THREE.Object3D) {
-    this.mat = new THREE.MeshLambertMaterial({ color: '#7cb35c', vertexColors: true, side: THREE.DoubleSide });
+    this.mat = new THREE.MeshLambertMaterial({ color: '#71883f', vertexColors: true, side: THREE.DoubleSide });
     this.mat.onBeforeCompile = sh => {
       sh.uniforms.uTime = this.time;
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <begin_vertex>', `#include <begin_vertex>

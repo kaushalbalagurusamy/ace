@@ -3,6 +3,7 @@
 // and chunky turf-tread wheels on silver rims standing outboard on exposed coil-over suspension. The wheels follow the ground and
 // the body rides on springs above them (src/shared/cartmotion.ts); a generated body can replace the code one (fitBody).
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { loadRaw } from './assets';
 import { WHEEL_R, CORNERS, restRide, stepRide, cornerGround, type Ride } from '../shared/cartmotion';
 
@@ -18,26 +19,36 @@ export interface CartView {
 
 const mat = (color: string, extra: THREE.MeshLambertMaterialParameters = {}) => new THREE.MeshLambertMaterial({ color, flatShading: true, ...extra });
 const BLUE = mat('#3B5785'), DARK = mat('#1E2430'), TAN = mat('#C9A77C'), PLAID = mat('#8E6B4A'), CHROME = mat('#E4E8EE'), STEEL = mat('#7A8088');
-const TYRE = mat('#26272A'), RIM = mat('#C4C9D0'), LIGHT = mat('#E0463C');
+const TYRE = mat('#26272A'), RIM = mat('#A3AAB2'), VANE = mat('#3A3F46'), LIGHT = mat('#E0463C');
 const GLASS = new THREE.MeshLambertMaterial({ color: '#3A5A8C', transparent: true, opacity: 0.35, depthWrite: false });
 
 function box(g: THREE.Object3D, m: THREE.Material, w: number, h: number, d: number, x: number, y: number, z: number) {
   const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); g.add(b); return b;
 }
 
-/** Wide turf tyre (refs/cart: square block lugs in rows, white sidewall lettering omitted) on a dished silver turbine rim. */
+/** Merges positioned box geometries into one mesh (one draw call per part instead of one per lug or vane). */
+function merged(m: THREE.Material, parts: { size: [number, number, number]; at: [number, number, number]; rx?: number; ry?: number; lift?: number }[]) {
+  return new THREE.Mesh(mergeGeometries(parts.map(p => new THREE.BoxGeometry(...p.size).translate(0, p.lift ?? 0, 0).rotateY(p.ry ?? 0).rotateX(p.rx ?? 0).translate(...p.at))), m);
+}
+
+/** Wide turf tyre (refs/cart: fine rectangular blocks in four staggered rows, white sidewall lettering omitted) on a dished silver
+ *  turbine rim with a lip and a hub cap. */
 function wheel(side: number): { pivot: THREE.Group; spinner: THREE.Group } {
   const pivot = new THREE.Group(), spinner = new THREE.Group(); pivot.add(spinner);
-  spinner.add(new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R - 0.03, WHEEL_R - 0.03, 0.44, 20).rotateZ(Math.PI / 2), TYRE));
-  for (let i = 0; i < 22; i++) for (const row of [-0.15, 0, 0.15]) {   // three rows of block lugs, the middle row staggered
-    const a = ((i + (row === 0 ? 0.5 : 0)) / 22) * Math.PI * 2, lug = box(spinner, TYRE, 0.12, 0.05, 0.1, row, Math.cos(a) * (WHEEL_R - 0.02), Math.sin(a) * (WHEEL_R - 0.02));
-    lug.rotation.x = a;
+  spinner.add(new THREE.Mesh(new THREE.CylinderGeometry(WHEEL_R - 0.03, WHEEL_R - 0.03, 0.44, 28).rotateZ(Math.PI / 2), TYRE));
+  const lugs: Parameters<typeof merged>[1] = [], N = 40;
+  for (let i = 0; i < N; i++) for (const [k, row] of [-0.16, -0.055, 0.055, 0.16].entries()) {
+    const a = ((i + (k % 2) * 0.5) / N) * Math.PI * 2, r = WHEEL_R - 0.028;
+    lugs.push({ size: [0.085, 0.022, 0.05], at: [row, Math.cos(a) * r, Math.sin(a) * r], rx: -a + Math.PI / 2 });
   }
-  const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.24, 0.05, 16).rotateZ(Math.PI / 2), RIM); rim.position.x = side * 0.2; spinner.add(rim);
-  for (let i = 0; i < 5; i++) {                                       // dark turbine slots, so the spin reads
-    const slot = box(spinner, DARK, 0.02, 0.15, 0.04, side * 0.225, 0, 0); slot.rotation.x = (i / 5) * Math.PI * 2;
-    slot.geometry.translate(0, 0.14, 0);
-  }
+  spinner.add(merged(TYRE, lugs));
+  const face = side * 0.2;
+  const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.19, 0.08, 24).rotateZ(-side * Math.PI / 2), RIM); dish.position.x = face; spinner.add(dish);
+  const lip = new THREE.Mesh(new THREE.TorusGeometry(0.265, 0.022, 6, 28).rotateY(Math.PI / 2), RIM); lip.position.x = face + side * 0.04; spinner.add(lip);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.09, 0.06, 12).rotateZ(Math.PI / 2), CHROME); hub.position.x = face + side * 0.05; spinner.add(hub);
+  const vanes: Parameters<typeof merged>[1] = [];                     // grey turbine vanes, so the spin reads
+  for (let i = 0; i < 8; i++) vanes.push({ size: [0.03, 0.12, 0.035], lift: 0.15, ry: 0.5, rx: (i / 8) * Math.PI * 2, at: [face + side * 0.045, 0, 0] });
+  spinner.add(merged(VANE, vanes));
   return { pivot, spinner };
 }
 
@@ -72,8 +83,10 @@ export function makeCart(shade: string, load = true): CartView {
   const seat = new THREE.Object3D(); seat.position.set(0.38, 1.15, 0.2); frame.add(seat);
   const wheelC = new THREE.Object3D(), col = new THREE.Vector3(0, 0.34, -0.94).normalize();
   wheelC.position.set(0.38, 1.45, 0.66); wheelC.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), col); frame.add(wheelC);
-  wheelC.add(new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.022, 6, 20), TAN));
-  box(wheelC, TAN, 0.3, 0.03, 0.02, 0, 0, 0);                         // spoke
+  wheelC.add(new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.032, 8, 28), TAN));   // thick cream rim, two spokes, a hub with a dark badge
+  box(wheelC, TAN, 0.3, 0.05, 0.03, 0, -0.02, 0);
+  const hubC = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.07, 0.05, 16).rotateX(Math.PI / 2), TAN); hubC.position.z = 0.01; wheelC.add(hubC);
+  box(wheelC, DARK, 0.06, 0.018, 0.01, 0, 0, 0.04);
   const column = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.32, 6).rotateX(Math.PI / 2), DARK); column.position.z = -0.17; wheelC.add(column);
   // wheels outboard of the body; coil-overs and lower arms ride with the body
   const spinners: THREE.Object3D[] = [], steer: THREE.Object3D[] = [], wheels: THREE.Object3D[] = [];
@@ -91,10 +104,10 @@ export function makeCart(shade: string, load = true): CartView {
 
 /** How a generated body sits (assets/manifest.json row cart-body, in the raw model's units): its turn, the radius of the wheels it
  *  was generated with (cut out by scripts/cut_cart_wheels.mjs) and its tyre-bottom height. */
-export interface BodyFit { orient_deg?: number[]; wheel_r?: number; ground_y?: number; stretch_y?: number }
+export interface BodyFit { orient_deg?: number[]; wheel_r?: number; ground_y?: number; stretch_y?: number; seat?: number[]; steer_wheel?: number[] }
 /** Swaps the code shell for a generated body: turned, scaled so its own wheels match the code wheels (WHEEL_R), stretched in height
  *  where the generator squashed the photos' canopy, centred, its tyre bottoms on the ground so the code wheels fill its arches; the
- *  player's roof stripe moves onto its roof. */
+ *  player's roof stripe moves onto its roof; the driver's seat and steering wheel move to the body's own (cart metres) when given. */
 export function fitBody(v: CartView, gen: THREE.Object3D, fit: BodyFit = {}) {
   const g = new THREE.Group(); g.add(gen); gen.rotation.set(...((fit.orient_deg ?? [0, 0, 0]).map(d => (d * Math.PI) / 180) as [number, number, number]));
   const k = WHEEL_R / (fit.wheel_r ?? WHEEL_R), ky = k * (fit.stretch_y ?? 1); gen.scale.set(k, ky, k); gen.updateMatrixWorld(true);
@@ -102,6 +115,8 @@ export function fitBody(v: CartView, gen: THREE.Object3D, fit: BodyFit = {}) {
   gen.position.set(-c.x, -(fit.ground_y ?? b.min.y / ky) * ky, -c.z);  // rotation is about y only, so raw heights scale straight across
   v.shell.visible = false; v.shell.parent!.add(g);
   const stripe = v.body.getObjectByName('stripe'); if (stripe) stripe.position.y = gen.position.y + b.max.y + 0.01;
+  if (fit.seat) v.seat.position.fromArray(fit.seat);
+  if (fit.steer_wheel) v.wheel.position.fromArray(fit.steer_wheel);
   return g;
 }
 

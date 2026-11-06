@@ -1,0 +1,6 @@
+[["gen-genesis-1",{"mode":"gen","cam":[-2.4,0.4,5.0],"look":[-0.1,1.0,0],"fov":40}],
+ ["gen-genesis-3",{"mode":"gen","cam":[-5.6,1.2,-3.0],"look":[0,0.95,0.2],"fov":38}],
+ ["gen-genesis-4",{"mode":"gen","cam":[0.38,1.78,-0.35],"look":[0.38,1.0,0.6],"fov":55}],
+ ["gen-side",{"mode":"gen","cam":[7,1.1,0],"look":[0,1.0,0],"fov":35}],
+ ["gen-front34",{"mode":"gen","cam":[4.5,2.2,5.5],"look":[0,1.0,0],"fov":35}],
+ ["gen-rear34",{"mode":"gen","cam":[-4.5,1.6,-5.5],"look":[0,1.0,0],"fov":35}]]
