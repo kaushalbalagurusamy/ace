@@ -34,6 +34,8 @@ for (const mat of doc.getRoot().listMaterials()) {
     tex.setImage(new Uint8Array(await img.png().toBuffer())).setMimeType('image/png');
     mat.setBaseColorFactor([1, 1, 1, mat.getBaseColorFactor()[3]]);
   }
+  const nt = mat.getNormalTexture();   // the generator's crosshatch noise lives in the normal map too
+  if (opt.blur && nt) nt.setImage(new Uint8Array(await sharp(Buffer.from(nt.getImage())).blur(+opt.blur).png().toBuffer())).setMimeType('image/png');
   if (opt.rough) mat.setRoughnessFactor(+opt.rough).setMetallicFactor(0);
 }
 // --squash Y: scale the model vertically (e.g. 0.6 turns a block into a low shelf); applied to the scene's top-level nodes
