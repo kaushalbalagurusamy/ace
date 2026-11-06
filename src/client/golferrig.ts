@@ -214,7 +214,7 @@ export function tintPolo(model: THREE.Object3D, colour: string) {
     float blue = diffuseColor.b - max(diffuseColor.r, diffuseColor.g * 1.05);
     eyeMask = smoothstep(0.905, 0.915, vBindH) * (1.0 - smoothstep(0.94, 0.945, vBindH)) * smoothstep(-0.015, 0.01, blue) * smoothstep(0.12, 0.2, mx);   // bright: not the dark hair
     diffuseColor.rgb = mix(diffuseColor.rgb, uEye, eyeMask); }`)
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uEye * eyeMask * 4.5;');
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uEye * eyeMask * 7.0;');
     };
     m.material = mat;
   });

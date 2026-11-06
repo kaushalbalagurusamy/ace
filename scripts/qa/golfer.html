@@ -34,7 +34,7 @@ window.show = async (view, pose, o = {}) => {
   r.render(scene, cam); let tris = 0; gltf.scene.traverse(m => { if (m.isMesh) tris += m.geometry.index ? m.geometry.index.count / 3 : 0; });
   // top-down measurement from the posed joints: degrees the line from trail to lead joint is turned away from the target (closed > 0, open < 0)
   const closed = (lead, trail) => { const a = rig.modelPos(lead), b = rig.modelPos(trail); return +(Math.atan2(a.z - b.z, a.x - b.x) * 180 / Math.PI).toFixed(1); };
-  return { tris, shouldersClosed: closed('LeftArm', 'RightArm'), hipsClosed: closed('LeftUpLeg', 'RightUpLeg'), pelvisX: +rig.modelPos('Hips').x.toFixed(3), handToGripCm: { lead: +(rig.handError.lead * 100).toFixed(1), trail: +(rig.handError.trail * 100).toFixed(1) } };
+  return { tris, shouldersClosed: closed('LeftArm', 'RightArm'), hipsClosed: closed('LeftUpLeg', 'RightUpLeg'), pelvisX: +rig.modelPos('Hips').x.toFixed(3), handToGripCm: { lead: +(rig.handError.lead * 100).toFixed(1), trail: +(rig.handError.trail * 100).toFixed(1) }, joints: Object.fromEntries(['LeftForeArm', 'LeftHand', 'RightForeArm', 'RightHand', 'Head'].map(n => [n, rig.modelPos(n).toArray().map(x => +x.toFixed(3))])) };
 };
 window.ready = true;
 </script>
