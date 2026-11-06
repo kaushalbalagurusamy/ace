@@ -11,13 +11,13 @@ const holeInfo = (i: number) => courseHole(i).info;
 import { SPEC, type Tier } from './graphics';
 import { dropTurf, loadTurf, type Turf } from './turf';
 import { Grass } from './grass';
-import { loadModel, type PropSpot } from './assets';
+import { isGraded, loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
 import { fogDensity, makeEnvironment, SUN_DIR } from './environment';
 import { makeOcean } from './ocean';
 import { makeFescue } from './fescue';
-import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, shorePieces, shoreRockSpots } from './coast';
+import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, seaWallMeshes, shorePieces, shoreRockSpots } from './coast';
 import { GolferRig, hasRig, smoothShading } from './golferrig';
 import { addressPoint, backswingPose, gaitCadence, gaitPose, idlePose, lerpPose, puttPose, releasePose, seatedPose, type Pose } from './golferanim';
 import { CLUBS, clubMatrix, loadClub, makeCodeClub } from './clubs';
@@ -185,7 +185,7 @@ export class World {
     cup.position.set(pin.x, pin.y + 0.012, pin.z); rim.position.set(pin.x, pin.y + 0.013, pin.z);
     this.course.add(pole, flag, cup, rim);
     if (coast) void this.placeShorePieces(k);
-    this.spots = [...propSpots(k), ...(coast ? buildingTrees(k, h.pin.z) : []), ...(coast && isCoastal(k) ? shoreRockSpots(k).map(r => ({ kind: 'rock' as const, ...r, y: seaY(k) - 0.6 })) : [])];
+    this.spots = [...propSpots(k).filter(s => !(coast && h.index === 17 && s.kind === 'rock')), ...(coast ? buildingTrees(k, h.pin.z) : []), ...(coast && isCoastal(k) ? shoreRockSpots(k).map(r => ({ kind: 'rock' as const, ...r, y: seaY(k) - 0.6 })) : [])];
     this.propHole = h.index;
     void this.setProps(this.spots);
   }
@@ -201,11 +201,12 @@ export class World {
     spots.slice(0, 220).forEach((s, i) => { const l = ids[s.kind], v = i % l.length, id = l[v]!, k = `${id}:${Math.floor(s.x / 80)}:${Math.floor(s.z / 80)}`; (groups.get(k) ?? groups.set(k, { id, kind: s.kind, v, list: [] }).get(k)!).list.push(s); });
     const built: THREE.Object3D[] = [], m = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
     for (const gr of groups.values()) {
-      const id = gr.id, model = await loadModel(id), tpl = model ?? makeProp(gr.kind, gr.v);
+      const id = gr.id, model = await loadModel(id), tpl = model ?? makeProp(gr.kind, gr.v), graded = await isGraded(id);
       if (token !== this.propToken) return;                      // a newer hole replaced this request
       tpl.updateMatrixWorld(true);
-      // grade generated textures (not the code-built props' palette colours) toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
-      if (model) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
+      // grade generated textures (not the code-built props' palette colours) toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake;
+      // models already graded offline (grade_glb.mjs, recorded in their manifest row) keep their albedo, a second tint would darken them twice
+      if (model) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { if (!graded) mt.color.set(id.startsWith('tree') ? '#c9d2bb' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; mt.side = THREE.DoubleSide; } });
       tpl.traverse(o => {
         const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
         const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
@@ -219,17 +220,18 @@ export class World {
   /** Generated coast pieces (shown once their rows pass QA): sea-wall sections along 18, cliff blocks at the foot of the tall cliffs. */
   private async placeShorePieces(hole: number) {
     const wall = hole === 17, y = seaY(hole); if (!isCoastal(hole)) return;
-    const token = this.courseToken, course = this.course, id = wall ? 'seawall-r1' : 'cliff-r1', model = await loadModel(id);
+    const token = this.courseToken, course = this.course, id = wall ? 'seawall-r3' : 'cliff-r1', model = await loadModel(id);
     if (!model || token !== this.courseToken) return;   // a newer hole was built meanwhile
+    if (wall) { course.add(...seaWallMeshes(hole, model)); return; }
     // cliff blocks only where the real cliff is over 8 m
-    const spots = wall ? shorePieces(hole, 7, 0.6) : shorePieces(hole, 26, 2.5).filter(s => s.top - y > 8), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
+    const spots = shorePieces(hole, 26, 2.5).filter(s => s.top - y > 8), m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0);
     if (!spots.length) return;
     model.updateMatrixWorld(true);
     model.traverse(o => {
       const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
       const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, spots.length);
-      // the wall section's top sits at the turf beside it; cliff blocks stand in the water, scaled to the local cliff height, tops just below the turf
-      spots.forEach((s, j) => { const sc = wall ? 1 : (s.top - y + 2) / 12; im.setMatrixAt(j, m.compose(V(s.x, wall ? s.top - 3 : y - 2, s.z), q.setFromAxisAngle(up, -s.yaw + (wall ? 0 : j * 1.3)), new THREE.Vector3(sc * (wall ? 1.1 : 1), sc, sc)).multiply(mesh.matrixWorld)); });
+      // cliff blocks stand in the water, scaled to the local cliff height, tops just below the turf
+      spots.forEach((s, j) => { const sc = (s.top - y + 2) / 12; im.setMatrixAt(j, m.compose(V(s.x, y - 2, s.z), q.setFromAxisAngle(up, -s.yaw + j * 1.3), new THREE.Vector3(sc, sc, sc)).multiply(mesh.matrixWorld)); });
       im.receiveShadow = true; im.computeBoundingSphere(); course.add(im);
     });
   }
