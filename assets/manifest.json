@@ -2083,5 +2083,40 @@
     "sha256": "33f17165183b4f3a550b46efa332b9d1fa5b9bec0b7b2e758cc40d4cf82dbe5f",
     "sha256_placeholder": "5a13ca96ac759de69746eb66904192c81fe8e353dbf1b3e324f57461ba5d3e06",
     "post": "cwebp q78 1920 px wide; placeholder q45 640 px"
+  },
+  {
+    "id": "cart-body",
+    "file": "assets/models/cart-body.glb",
+    "tool": "Hyper3D Rodin image-to-3D",
+    "model": "Gen-2.5-Low",
+    "quality": "low",
+    "stage": "generated",
+    "inputs": [
+      "refs/cart/genesis-1.jpg",
+      "refs/cart/genesis-3.jpg"
+    ],
+    "prompt": "Genesis Box Buggy concept golf cart body: tall rounded glass canopy box with a dark navy-blue frame, tan and plaid interior, open sides, rear panel with white chrome strips. Body only.",
+    "task_id": "b6b112e0-fb9f-4cd2-a51e-71cce7e40947",
+    "date": "2026-11-05",
+    "licence": "Hyper3D Rodin paid API terms: owner to confirm",
+    "subagent": "motion-fidelity fork (script)",
+    "credits_used": 0.5,
+    "balance_before": 35,
+    "balance_after": 34.5,
+    "qa": {
+      "verdict": "PENDING",
+      "notes": "body only (wheels cut); code-built wheels, steering, suspension; supervisor critic decides"
+    },
+    "orient_deg": [
+      0,
+      180,
+      0
+    ],
+    "post_process": "scripts/cut_cart_wheels.mjs (Rodin generated the whole buggy: its four wheels, 25k of 60k triangles, are cut so the code wheels can spin, steer and ride the suspension), then gltf-transform optimize --compress meshopt --texture-compress webp --texture-size 1024 --simplify-ratio 0.4 --simplify-error 0.002; raw kept local in assets/models/raw",
+    "fit": "src/client/cartmodel.ts fitBody: turned 180 deg (Rodin put the rear at +z), scaled so its wheels (raw radius 0.22) match the code WHEEL_R, tyre bottoms (raw y -0.43) on the ground; stretched 1.25x in height (the generated canopy is about 25% lower than the photos, measured as height over tyre diameter: photo 2.45, generated 1.83)",
+    "note": "Rodin Gen-2.5-Medium was refused (API_NO_ACTIVE_SUBSCRIPTION: Basic access); Gen-2.5-Low ran. Texture is baked shading (material Shaded), so the glass reads opaque with baked reflections.",
+    "wheel_r": 0.22,
+    "ground_y": -0.43,
+    "stretch_y": 1.25
   }
 ]
