@@ -6,7 +6,9 @@ import type { CourseId } from './courses';
 export type ClientMsg =
   /** token = the secret from the last `welcome`; required to take over an existing session (reload/reconnect). */
   | { t: 'hello'; sessionId: string; name: string; token?: string }
-  | { t: 'createLobby' }
+  | { t: 'createLobby'; course?: CourseId }
+  /** Host only, while the lobby is open. */
+  | { t: 'setCourse'; course: CourseId }
   | { t: 'joinLobby'; lobbyId: string }
   | { t: 'leaveLobby' }
   | { t: 'ready'; ready: boolean }
@@ -46,4 +48,4 @@ export type ServerMsg =
   | { t: 'bump'; target: 'cart' | 'golfer'; dx: number; dz: number; dvx: number; dvz: number; strength: number }
   /** To one player whose `move` was refused (a teleport or entering from too far): the server's last accepted state. */
   | { t: 'snap'; x: number; z: number; driving: boolean; cart: CartState }
-  | { t: 'raceEnd';results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };
+  | { t: 'raceEnd'; course: CourseId; results: { id: string; name: string; place: number; timeS?: number; strokes: number; holes: number }[] };

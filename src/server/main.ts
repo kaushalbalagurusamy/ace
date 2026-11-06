@@ -8,7 +8,8 @@ import { LobbyManager } from './lobbies';
 import { playPutt, playShot, type Played } from './race';
 import { parseClientMsg } from './parse';
 import { acceptMove, applyPush, atTee, contacts, type MoverState } from './movers';
-import { HOLE_COUNT, hole, teeBall, type Hole } from './course';
+import { holesOf, teeBall, type Hole } from './course';
+import { gridKey, type CourseId } from '../shared/courses';
 import { rankPlayers } from '../sim';
 import type { BallState, ClientMsg, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from './lobby-types';
@@ -42,12 +43,11 @@ const server = http.createServer((req, res) => {
 // ---- ws layer ----
 const mgr = new LobbyManager();
 const socks = new Map<string, WebSocket>(); // sessionId -> socket
-const HOLES: readonly Hole[] = Array.from({ length: HOLE_COUNT }, (_, i) => hole(i));
 const HOLE_CARD_S = 2; // PRD/04: 2 s hole card, then the player is moved to the next tee; the clock keeps running
 const COUNTDOWN_S = 5, RACE_LIMIT_MS = 20 * 60_000, AFTER_FIRST_MS = 60_000;
 
 interface RPlayer { name: string; hole: number; holesDone: number; ball: BallState; nextAtMs: number; finishS?: number; /** cart spawn slot */ slot: number; mv: MoverState }
-interface Race { lobbyId: string; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean; /** pair key -> last bump (ms) */ bumpAt: Map<string, number> }
+interface Race { lobbyId: string; course: CourseId; holes: readonly Hole[]; goAtMs: number; players: Map<string, RPlayer>; timers: NodeJS.Timeout[]; firstFinish: boolean; /** pair key -> last bump (ms) */ bumpAt: Map<string, number> }
 const MOVERS_MS = 100, BUMP_COOLDOWN_MS = 250, MOVES_PER_S = 30;
 const races = new Map<string, Race>(); // lobbyId -> race
 const countdowns = new Map<string, NodeJS.Timeout>();
@@ -98,12 +98,12 @@ function startCountdown(lobbyId: string) {
 }
 
 function beginRace(l: LobbyView) {
-  const h = HOLES[0]!, goAtMs = Date.now();
+  const holes = holesOf(l.course), h = holes[0]!, goAtMs = Date.now();
   const players = new Map<string, RPlayer>();
   l.players.forEach((p, slot) => {
-    players.set(p.sessionId, { name: p.name, hole: 0, holesDone: 0, nextAtMs: goAtMs, ball: teeBall(h, 0), slot, mv: atTee(0, slot, goAtMs) });
+    players.set(p.sessionId, { name: p.name, hole: 0, holesDone: 0, nextAtMs: goAtMs, ball: teeBall(h, 0), slot, mv: atTee(gridKey(l.course, 0), slot, goAtMs) });
   });
-  const race: Race = { lobbyId: l.id, goAtMs, players, timers: [], firstFinish: false, bumpAt: new Map() };
+  const race: Race = { lobbyId: l.id, course: l.course, holes, goAtMs, players, timers: [], firstFinish: false, bumpAt: new Map() };
   race.timers.push(setTimeout(safe(() => endRace(race)), RACE_LIMIT_MS));
   race.timers.push(setInterval(safe(() => broadcastMovers(race)), MOVERS_MS));   // clearTimeout also clears an interval in Node
   races.set(l.id, race);
@@ -123,12 +123,12 @@ function endRace(r: Race) {
   r.timers.forEach(clearTimeout);
   const arr = [...r.players].map(([id, p]) => ({ id, p }));
   const places = rankPlayers(arr.map(({ id, p }) => {
-    const pin = HOLES[p.hole]!.info.pin;
+    const pin = r.holes[p.hole]!.info.pin;
     return { id, finishTime: p.finishS, strokes: p.ball.strokes, holesCompleted: p.holesDone,
       distanceToHole: p.finishS === undefined ? Math.hypot(p.ball.x - pin.x, p.ball.z - pin.z) : undefined };
   }));
   const results = places.map(pl => { const p = r.players.get(pl.id)!; return { id: pl.id, name: p.name, place: pl.place, timeS: p.finishS, strokes: p.ball.strokes, holes: p.holesDone }; });
-  const m: ServerMsg = { t: 'raceEnd', results };
+  const m: ServerMsg = { t: 'raceEnd', course: r.course, results };
   r.players.forEach((_, sid) => { if (present(r, sid)) send(socks.get(sid), m); });
   // Back to open (ready flags cleared) so the same players can play again and the slot is never stuck.
   if (mgr.setState(r.lobbyId, 'open')) { touched.set(r.lobbyId, Date.now()); lobbyChanged(mgr.list().find(x => x.id === r.lobbyId)); }
@@ -144,7 +144,7 @@ function applyPlay(ws: WebSocket, sid: string, r: Race, me: RPlayer, out: Played
   const lobby = mgr.lobbyOf(sid);
   toLobby(lobby, { t: 'shotResult', playerId: sid, hole: me.hole, ...wire });
   if (!out.ball.holedOut) return;
-  const splitS = (nowMs - r.goAtMs) / 1000 + flightS, last = me.hole === HOLE_COUNT - 1;
+  const splitS = (nowMs - r.goAtMs) / 1000 + flightS, last = me.hole === r.holes.length - 1;
   me.holesDone++;
   toLobby(lobby, { t: 'holedOut', playerId: sid, hole: me.hole, strokes: out.ball.strokes, splitS, finished: last });
   if (!last) {
@@ -159,12 +159,12 @@ function applyPlay(ws: WebSocket, sid: string, r: Race, me: RPlayer, out: Played
 
 /** Moves a player who holed out to the next tee (the race clock never stopped). */
 function advance(r: Race, sid: string, me: RPlayer) {
-  if (races.get(r.lobbyId) !== r || !present(r, sid) || me.hole >= HOLE_COUNT - 1) return;
+  if (races.get(r.lobbyId) !== r || !present(r, sid) || me.hole >= r.holes.length - 1) return;
   me.hole++;
-  me.ball = teeBall(HOLES[me.hole]!, me.ball.strokes);
+  me.ball = teeBall(r.holes[me.hole]!, me.ball.strokes);
   me.nextAtMs = Date.now();
-  me.mv = atTee(me.hole, me.slot, me.nextAtMs);            // the cart comes along to the new tee
-  toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: HOLES[me.hole]!.info, ball: { ...me.ball } });
+  me.mv = atTee(gridKey(r.course, me.hole), me.slot, me.nextAtMs);            // the cart comes along to the new tee
+  toLobby(mgr.lobbyOf(sid), { t: 'nextHole', playerId: sid, hole: r.holes[me.hole]!.info, ball: { ...me.ball } });
 }
 
 function broadcastMovers(r: Race) {
@@ -204,8 +204,8 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
   const before = mgr.lobbyOf(sid);
   const fail = (res: { ok: boolean; error?: string }) => { if (!res.ok) { err(ws, res.error as never); return true; } return false; };
   switch (m.t) {
-    case 'createLobby': case 'joinLobby': case 'ready': case 'start': case 'startSolo': {
-      const res = m.t === 'createLobby' ? mgr.createLobby(sid) : m.t === 'joinLobby' ? mgr.joinLobby(sid, m.lobbyId) : m.t === 'ready' ? mgr.setReady(sid, m.ready) : m.t === 'start' ? mgr.start(sid) : mgr.startSolo(sid);
+    case 'createLobby': case 'joinLobby': case 'ready': case 'start': case 'startSolo': case 'setCourse': {
+      const res = m.t === 'createLobby' ? mgr.createLobby(sid, m.course) : m.t === 'setCourse' ? mgr.setCourse(sid, m.course) : m.t === 'joinLobby' ? mgr.joinLobby(sid, m.lobbyId) : m.t === 'ready' ? mgr.setReady(sid, m.ready) : m.t === 'start' ? mgr.start(sid) : mgr.startSolo(sid);
       if (fail(res)) return;
       lobbyChanged(mgr.lobbyOf(sid), m.t !== 'ready'); // toggling ready is not activity: it must not keep an idle lobby alive
       if (m.t === 'start' || m.t === 'startSolo') startCountdown(mgr.lobbyOf(sid)!.id);
@@ -227,7 +227,7 @@ function onMessage(ws: WebSocket, sid: string, m: ClientMsg) {
       if (me.mv.driving) return err(ws, 'NOT_YOUR_TURN', 'get out of the cart to play (E)');
       if (now < me.nextAtMs) return err(ws, 'NOT_YOUR_TURN', `ball still moving, wait ${((me.nextAtMs - now) / 1000).toFixed(1)}s`);
       const seed = shotSeed(`${sid}|${me.hole}|${me.ball.strokes}|${r.goAtMs}`);
-      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(HOLES[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, chip: m.chip, seed }) : playPutt(HOLES[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
+      applyPlay(ws, sid, r, me, m.t === 'shot' ? playShot(r.holes[me.hole]!, me.ball, { clubKey: m.clubKey, aimDeg: m.aimDeg, holdMs: m.holdMs, fb: m.fb, io: m.io, chip: m.chip, seed }) : playPutt(r.holes[me.hole]!, me.ball, m.aimDeg, m.holdMs), now);
       return;
     }
     case 'move': {
