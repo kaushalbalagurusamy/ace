@@ -63,12 +63,13 @@ export function makePine(): THREE.Group {
  *  colour so a dense tree line stays cheap (3 meshes a tree). */
 export function makeDeciduous(kind: 'oak' | 'maple', variant: number): THREE.Group {
   const rnd = prng(707 + variant * 23 + (kind === 'oak' ? 0 : 400)), g = new THREE.Group(), oak = kind === 'oak';
-  const H = oak ? 15 + variant * 2 : 12 + variant * 1.5, crownY = H * (oak ? 0.58 : 0.62), R = H * (oak ? 0.42 : 0.3);
-  g.add(trunk(H * 0.5, oak ? 0.7 : 0.45, oak ? 0.35 : 0.25, (rnd() - 0.5) * 0.08));
+  // the crown starts low (about a fifth of the height) so a tree line reads as foliage from the tee, not a stand of poles
+  const H = oak ? 15 + variant * 2 : 12 + variant * 1.5, crownY = H * (oak ? 0.5 : 0.56), R = H * (oak ? 0.42 : 0.3);
+  g.add(trunk(H * 0.36, oak ? 0.55 : 0.38, oak ? 0.3 : 0.22, (rnd() - 0.5) * 0.08));
   const byColour: THREE.BufferGeometry[][] = [[], []], cols = oak ? PAL.oak : PAL.maple;
   for (let i = 0; i < 7; i++) {
     const a = (i / 7) * Math.PI * 2 + rnd() * 0.5, d = i === 0 ? 0 : R * (0.45 + rnd() * 0.35);
-    const b = blob(R * (i === 0 ? 0.75 : 0.5 + rnd() * 0.2), 1.1, oak ? 0.72 : 0.95, 1.1, 0.45, rnd, cols[0]!);
+    const b = blob(R * (i === 0 ? 0.8 : 0.55 + rnd() * 0.2), 1.1, oak ? 0.85 : 1.15, 1.1, 0.45, rnd, cols[0]!);
     b.position.set(Math.cos(a) * d, crownY + (i === 0 ? R * 0.25 : (rnd() - 0.3) * R * 0.5), Math.sin(a) * d); b.updateMatrix();
     byColour[i % 2]!.push(b.geometry.applyMatrix4(b.matrix));
   }
