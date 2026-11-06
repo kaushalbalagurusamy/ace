@@ -40,14 +40,14 @@ const BASE: Pose = {
 };
 const deg = (d: number) => (d * Math.PI) / 180;
 // Turns (y) are about the spine: pelvis = hip turn, pelvis + torso = shoulder turn; negative is away from the target.
-const STANCE = { lAnkle: [0.07, 0, 0] as V3, rAnkle: [-0.07, 0, 0] as V3 };
-const TILT = 0.58, SPINE = 0.12;   // ~40° forward from the hips (pelvis) plus a flat upper back; kept P1 to P7 (no standing up)
+const STANCE = { lAnkle: [0.05, 0, 0] as V3, rAnkle: [-0.05, 0, 0] as V3 };
+const TILT = 0.66, SPINE = 0.08;   // ~40° forward from the hips (pelvis) plus a flat upper back; kept P1 to P7 (no standing up)
 
 /** The ten standard swing positions (right-handed). P1 and P7 aim the shaft at the ball per club (withClub). */
 export const P_POS: readonly Pose[] = [
   // P1 address: hip hinge, knees flexed, spine 5° away from the target, arms hanging, hands a fist off the thighs, slight shaft lean
   P({ ...STANCE, pelvis: [TILT, 0, 0], shift: [0, -0.1, -0.14], torso: [SPINE, 0, deg(5)], head: [0.22, 0, 0],
-    grip: [0.06, 0.72, 0.24], lPole: [0.5, -0.3, -1], rPole: [-0.5, -0.3, -1] }),
+    grip: [0.09, 0.72, 0.24], lPole: [0.5, -0.3, -1], rPole: [-0.5, -0.3, -1] }),
   // P2 shaft parallel back: shoulders 45°, hips 17°, head outside the hands, toe up, lead arm straight
   P({ ...STANCE, pelvis: [TILT, deg(-17), 0], shift: [-0.02, -0.1, -0.14], torso: [SPINE, deg(-28), deg(5)], head: [0.22, deg(40), 0],
     grip: [-0.3, 0.9, 0.3], shaft: [-1, 0.06, 0.14], face: [0, 0.15, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.3] }),
@@ -56,16 +56,16 @@ export const P_POS: readonly Pose[] = [
     grip: [-0.38, 1.22, 0.16], shaft: [0.05, 1, 0.12], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.1] }),
   // P4 top: shoulders 90°, hips 45°, lead arm across the chest, hands above the trail shoulder, trail elbow down, shaft along the line
   P({ ...STANCE, pelvis: [TILT, deg(-45), 0], shift: [-0.04, -0.1, -0.14], torso: [SPINE, deg(-45), deg(5)], head: [0.22, deg(85), 0], lHeel: 0.15,
-    grip: [-0.08, 1.56, -0.15], shaft: [0.6, 0.04, 0.8], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
-  // P5 lead arm parallel down: hips 20° open and shifting, shoulders 45° closed, lag (shaft ~90° to the lead arm)
-  P({ ...STANCE, pelvis: [TILT, deg(20), 0], shift: [0.04, -0.1, -0.14], torso: [SPINE, deg(-65), deg(10)], head: [0.22, deg(45), 0],
+    grip: [-0.25, 1.5, -0.1], shaft: [1, 0.02, -0.1], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
+  // P5 lead arm parallel down: hips 25° open, pelvis 9 cm toward the target, shoulders 45° closed, lag (shaft ~90° to the lead arm)
+  P({ ...STANCE, pelvis: [TILT, deg(25), 0], shift: [0.09, -0.1, -0.14], torso: [SPINE, deg(-70), deg(12)], head: [0.22, deg(45), 0],
     grip: [-0.36, 1.18, 0.2], shaft: [0.2, 1, -0.05], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.2], rHeel: 0.05 }),
-  // P6 shaft parallel down: hips 30° open, shoulders 20° closed, hands hip high, shaft along the line
-  P({ ...STANCE, pelvis: [TILT, deg(30), 0], shift: [0.06, -0.1, -0.13], torso: [SPINE, deg(-50), deg(10)], head: [0.22, deg(20), 0],
-    grip: [-0.22, 0.9, 0.3], shaft: [-1, 0.08, 0.12], face: [0, 0.2, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.4], rHeel: 0.12 }),
-  // P7 impact: hips 40° open, shoulders square, lead arm and shaft in line, hands ahead, weight forward, head behind the ball
-  P({ ...STANCE, pelvis: [TILT - 0.04, deg(40), 0], shift: [0.08, -0.08, -0.12], torso: [SPINE, deg(-38), deg(8)], head: [0.22, deg(5), 0], rHeel: 0.3,
-    grip: [0.11, 0.74, 0.25], lPole: [0.5, -0.3, -1], rPole: [-0.3, -0.4, -1] }),
+  // P6 shaft parallel down: hips 40° open, shoulders 20° closed, trail knee toward the ball, hands hip high
+  P({ ...STANCE, pelvis: [TILT, deg(40), 0], shift: [0.11, -0.1, -0.13], torso: [SPINE, deg(-60), deg(13)], head: [0.22, deg(20), 0],
+    grip: [-0.22, 0.9, 0.3], shaft: [-1, 0.08, 0.12], face: [0, 0.2, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.4], rHeel: 0.25, rAnkle: [-0.05, 0.015, 0.02] }),
+  // P7 impact: hips 40° open, shoulders 20° open, pelvis over the lead foot, hands 13 cm ahead (shaft lean), trail heel up, head behind the ball
+  P({ ...STANCE, pelvis: [TILT - 0.04, deg(42), 0], shift: [0.13, -0.09, -0.12], torso: [SPINE, deg(-14), deg(15)], head: [0.22, deg(-20), 0], rHeel: 0.5,
+    rAnkle: [-0.05, 0.03, 0.03], grip: [0.13, 0.76, 0.25], lPole: [0.5, -0.3, -1], rPole: [-0.3, -0.4, -1] }),
   // P8 shaft parallel through: arms extended, trail arm over, club head up (toe up)
   P({ ...STANCE, pelvis: [0.42, deg(60), 0], shift: [0.1, -0.06, -0.1], torso: [0.1, deg(-10), deg(6)], head: [0.18, deg(-15), 0], rHeel: 0.6,
     rAnkle: [-0.07, 0.03, 0.03], grip: [0.42, 0.95, 0.34], shaft: [1, 0.1, 0.1], face: [0, 0.15, 1], lPole: [0, -1, 0.3], rPole: [0, -1, -0.2] }),
