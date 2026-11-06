@@ -2118,5 +2118,73 @@
     "wheel_r": 0.22,
     "ground_y": -0.43,
     "stretch_y": 1.25
+  },
+  {
+    "id": "cart-meshy-1",
+    "file": "assets/models/raw/cart-meshy-1.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-7.1 (latest)",
+    "tier": "Pro",
+    "inputs": [
+      "refs/cart/genesis-1.jpg",
+      "refs/cart/genesis-3.jpg",
+      "refs/cart/genesis-4.jpg"
+    ],
+    "prompt": "Concept golf cart. Body panels, roof frame and pillars glossy dark navy blue (#2E3F66). Large clear glass windows. Interior cream tan leather (#D8C4A0) with beige-brown tartan plaid seat panels. Two thin white pinstripes across the front panel, small silver wing badge. Red light bar across the rear. Black knobby turf tyres on silver rims, dark grey suspension.",
+    "task_id": "01a1af67-de12-72d2-9db9-83809667dd61",
+    "target_polycount": 50000,
+    "enable_pbr": true,
+    "date": "2026-11-05",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 30,
+    "balance_before": 450,
+    "balance_after": 420
+  },
+  {
+    "id": "cart-meshy-2",
+    "file": "assets/models/raw/cart-meshy-2.glb (local only, raw intermediate)",
+    "tool": "Meshy multi-image-to-3D",
+    "model": "meshy-7.1 (latest)",
+    "tier": "Pro",
+    "inputs": [
+      "refs/cart/genesis-1.jpg",
+      "refs/cart/genesis-3.jpg"
+    ],
+    "prompt": "Concept golf cart. Body panels, roof frame and pillars solid glossy dark navy blue (#2E3F66). Large clear glass canopy windows. Front panel solid navy with two crisp thin white horizontal pinstripes and a small silver wing badge; below it a black ribbed radiator block and two square fog lights. Interior smooth cream tan leather (#D8C4A0) sculpted seat tub and dash, seat cushions and dash inserts in beige, brown and black tartan plaid. Rear panel with a red light bar and white GENESIS lettering. Black turf tyres with fine tread on dished silver rims, dark grey coil-over suspension.",
+    "task_id": "01a1af74-1c2a-77f3-8eb7-3ae3cb48d224",
+    "target_polycount": 60000,
+    "geometry_resolution": "2k",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 35,
+    "balance_before": 420,
+    "balance_after": 325
+  },
+  {
+    "id": "cart-meshy-2-retex",
+    "file": "assets/models/raw/cart-meshy-2-retex.glb (local only, raw intermediate)",
+    "tool": "Meshy retexture",
+    "model": "meshy-7",
+    "retexture_of": "01a1af74-1c2a-77f3-8eb7-3ae3cb48d224",
+    "tier": "Pro",
+    "inputs": [
+      "refs/cart/genesis-1.jpg",
+      "refs/cart/genesis-3.jpg",
+      "refs/cart/genesis-4.jpg"
+    ],
+    "prompt": null,
+    "task_id": "01a1af7e-2e01-754c-a244-61ed4a62de15",
+    "target_polycount": 50000,
+    "geometry_resolution": "standard",
+    "enable_pbr": true,
+    "date": "2026-11-06",
+    "subagent": "cart asset agent (script)",
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "credits_used": 10,
+    "balance_before": 325,
+    "balance_after": 315
   }
 ]
