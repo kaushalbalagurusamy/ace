@@ -271,7 +271,7 @@ function frame(now: number) {
   const canStance = !!me && canAddress(pos, me.ball, { atRest: !me.anim, holedOut: me.ball.holedOut, inCart: driving });
   const base = swing || !go || !me || me.ball.holedOut || me.anim ? '' : rfOpen ? 'Close the rangefinder (M) to swing' : canStance ? 'Space: take your stance' : `Walk to your ball (yellow beacon): ${Math.round(ownDist() * YD)} yd`;
   const nearCart = go && !swing && !driving && canEnter(pos, cart);
-  ui.prompt(driving && go ? `Arrows drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
+  ui.prompt(driving && go ? `WASD drive · ${Math.round(Math.abs(forwardSpeed(cart)) * 2.237)} mph · E: get out to play` : nearCart ? (base ? `${base} · E: get in the cart` : 'E: get in the cart') : base);
   { // pin indicator: on foot and in the stance, hidden while the ball flies and within about 30 yd of the pin
     const pinYd = me ? Math.hypot(hole.pin.x - me.ball.x, hole.pin.z - me.ball.z) * YD : 0, camYd = Math.hypot(hole.pin.x - pos.x, hole.pin.z - pos.z) * YD;
     ui.pinMarker(me && !me.anim && !rfOpen && !me.ball.holedOut ? world.pinScreen() : null, pinYd, pinOpacity(camYd));

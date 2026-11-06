@@ -33,21 +33,21 @@ await p.keyboard.press('Space'); await sleep(200); R('Space in the cart:', await
 
 /** Steer toward (tx, tz) with the arrow keys until stop() says so or the time runs out. */
 async function drive(tx, tz, stop, ms) {
-  let still = 0, bumps = 0; const t0 = Date.now(); await p.keyboard.down('ArrowUp');
+  let still = 0, bumps = 0; const t0 = Date.now(); await p.keyboard.down('KeyW');
   while (Date.now() - t0 < ms) {
     const s = await st(), want = Math.atan2(tx - s.x, tz - s.z), d = Math.atan2(Math.sin(want - s.yaw), Math.cos(want - s.yaw));
-    await p.keyboard.up('ArrowLeft'); await p.keyboard.up('ArrowRight');
-    if (Math.abs(d) > 0.05) await p.keyboard.down(d > 0 ? 'ArrowRight' : 'ArrowLeft');
+    await p.keyboard.up('KeyA'); await p.keyboard.up('KeyD');
+    if (Math.abs(d) > 0.05) await p.keyboard.down(d > 0 ? 'KeyD' : 'KeyA');
     const v = Math.hypot(s.vx, s.vz); still = v < 0.6 ? still + 1 : 0;
     if (stop(s, still)) break;
     if (still >= 8) {                                                         // nosed into blocked ground short of the goal (a bunker lip): back up, turning, and retry
-      for (const k of ['ArrowUp', 'ArrowLeft', 'ArrowRight']) await p.keyboard.up(k);
-      await p.keyboard.down('ArrowDown'); await p.keyboard.down('ArrowLeft'); await sleep(1500); await p.keyboard.up('ArrowDown'); await p.keyboard.up('ArrowLeft');
-      await p.keyboard.down('ArrowUp'); still = 0; bumps++;
+      for (const k of ['KeyW', 'KeyA', 'KeyD']) await p.keyboard.up(k);
+      await p.keyboard.down('KeyS'); await p.keyboard.down('KeyA'); await sleep(1500); await p.keyboard.up('KeyS'); await p.keyboard.up('KeyA');
+      await p.keyboard.down('KeyW'); still = 0; bumps++;
     }
     await sleep(100);
   }
-  for (const k of ['ArrowUp', 'ArrowLeft', 'ArrowRight']) await p.keyboard.up(k);
+  for (const k of ['KeyW', 'KeyA', 'KeyD']) await p.keyboard.up(k);
   await sleep(600); return { ...(await st()), backups: bumps };
 }
 let top = 0;
@@ -67,7 +67,7 @@ await p.keyboard.press('KeyE'); await sleep(300); R('after E (driving?):', (awai
 for (let i = 0; i < 60 && !(await txt('#prompt')).includes('Space: take your stance'); i++) {   // walk to the ball (tee, origin) in short arrow taps, relative to the facing
   const g = await p.evaluate(() => { const w = window.__ace.world, e = w.ents.get(w.selfId); return { x: -e.golfer.position.x, z: e.golfer.position.z, yaw: -e.golfer.rotation.y }; });
   const a = Math.atan2(Math.sin(Math.atan2(-g.x, -g.z) - g.yaw), Math.cos(Math.atan2(-g.x, -g.z) - g.yaw));
-  const k = Math.abs(a) < Math.PI / 4 ? 'ArrowUp' : Math.abs(a) > 3 * Math.PI / 4 ? 'ArrowDown' : a > 0 ? 'ArrowRight' : 'ArrowLeft';
+  const k = Math.abs(a) < Math.PI / 4 ? 'KeyW' : Math.abs(a) > 3 * Math.PI / 4 ? 'KeyS' : a > 0 ? 'KeyD' : 'KeyA';
   await p.keyboard.down('ShiftLeft'); await p.keyboard.down(k); await sleep(100); await p.keyboard.up(k); await p.keyboard.up('ShiftLeft'); await sleep(60);
 }
 R('prompt on foot:', await txt('#prompt'));

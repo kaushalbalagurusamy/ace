@@ -23,7 +23,7 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 
 *Revised 2026-11-05 (owner decision Q13: the one-button swing; `docs/slices/simple-swing/spec.md`). Supersedes the earlier WASD movement, the Z/X/C timed downswing and "Space locks the aim".*
 
-1. [GIVEN] **Movement is the arrow keys**, on foot and later in the cart. WASD is no longer movement; in the stance it sets the ball position (section 3).
+1. [GIVEN, owner 2026-11-05, swapped back] **Movement is W A S D**, on foot and in the cart. In the stance the **arrow keys** set the ball position (section 3): Up/Down forward/back, Right/Left away/closer.
 2. [ASSUMED] Movement is relative to the camera. The mouse orbits a third-person camera.
 3. [GIVEN, owner playtest] On-foot speed is **15 m/s**. Holding **Shift** is the **precise walk at 5 m/s** and also halves the look sensitivity (x0.5 on top of the saved setting) on foot and in the stance, for putting lines and fine aim. The arrow keys, Shift and the mouse combine; Shift is released on key-up or on losing focus. Config in `src/client/rules.ts`.
 4. [GIVEN, owner playtest] **Look speed:** the default is **1.75 times** the original 0.003 rad per pixel (the owner found 2.5 times too fast). A settings menu (gear icon, or Esc when not in a stance) has a "Camera sensitivity" slider from 0.5 to 4.0 in 0.05 steps with "Reset to default (1.75x)"; `,` and `.` step it by 10% with a toast and write the same saved setting (localStorage). A saved 2.5 that the player never adjusted moves to 1.75. Pointer lock asks for unadjusted movement first so a mouse and a trackpad scale the same (`src/client/sensitivity.ts`).
@@ -83,7 +83,7 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 ## Acceptance criteria
 
 - **AC-S1:** All 14 keys select the matching club, and the HUD highlight updates within one frame.
-- **AC-S2:** On foot only the arrow keys move; in the stance WASD sets the ball position and moves nothing. Esc before the release cancels the swing.
+- **AC-S2:** On foot only W A S D move; in the stance the arrow keys set the ball position and move nothing. Esc before the release cancels the swing.
 - **AC-S3:** A centre full swing is straight (under 1% curvature) and deterministic for every club.
 - **AC-S4:** The server decides length and max effort from the reported hold time; the client never computes an outcome.
 - **AC-S5:** Max-effort dispersion is seeded: the same seed gives the same shot, and over 500 seeded shots the offline spread is about 3 times the reference.

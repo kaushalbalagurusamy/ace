@@ -13,7 +13,7 @@ export const canAddress = (golfer: Pt, ball: Pt, opts: { atRest: boolean; holedO
 
 /** Movement is the arrow keys only (up = forward, right = right). WASD belongs to the stance (ball position). */
 export function moveAxis(keys: ReadonlySet<string>): { f: number; r: number } {
-  return { f: Number(keys.has('ArrowUp')) - Number(keys.has('ArrowDown')), r: Number(keys.has('ArrowRight')) - Number(keys.has('ArrowLeft')) };
+  return { f: Number(keys.has('KeyW')) - Number(keys.has('KeyS')), r: Number(keys.has('KeyD')) - Number(keys.has('KeyA')) }; // owner 2026-11-05: WASD moves and drives, arrows set ball position
 }
 /** Held Shift on either side. */
 export const shiftHeld = (keys: ReadonlySet<string>) => keys.has('ShiftLeft') || keys.has('ShiftRight');

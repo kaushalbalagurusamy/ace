@@ -9,7 +9,7 @@ export type Action = { type: 'send-shot'; msg: ShotMsg } | { type: 'send-putt'; 
 
 type Phase = 'idle' | 'stance' | 'backswing' | 'done' | 'cancelled';
 /** W/S: ball forward/back; D/A: ball away from / closer to the body. Each press is one step, clamped to -2..2. */
-const BALL_KEYS: Record<string, ['fb' | 'io', 1 | -1] | undefined> = { KeyW: ['fb', 1], KeyS: ['fb', -1], KeyD: ['io', 1], KeyA: ['io', -1] };
+const BALL_KEYS: Record<string, ['fb' | 'io', 1 | -1] | undefined> = { ArrowUp: ['fb', 1], ArrowDown: ['fb', -1], ArrowRight: ['io', 1], ArrowLeft: ['io', -1] };
 const clamp2 = (n: number) => Math.min(2, Math.max(-2, n));
 
 export class SwingFSM {

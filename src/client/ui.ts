@@ -27,9 +27,9 @@ const ERR: Record<string, string> = {
 export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ?? m.message;
 
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
-<li><b>Move</b> with the arrow keys (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
+<li><b>Move</b> with <b>W A S D</b> (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
 <li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
-<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. <b>W S A D</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
+<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. The <b>arrow keys</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
 <li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
 <li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
 <li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>
@@ -83,7 +83,7 @@ export class UI {
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
       <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
-      <div class="hud" id="keys">Arrows move / drive · E cart · Shift walk / fine aim · Space swing · W S A D ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
+      <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
       <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;

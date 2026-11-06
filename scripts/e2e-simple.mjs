@@ -13,12 +13,12 @@ await p.click('[data-act=create]'); await p.click('[data-act=solo]');
 await p.waitForSelector('#bag', { state: 'visible', timeout: 15000 }); await sleep(7000);
 R('keys hint:', await txt('#keys')); R('pin indicator at the tee:', (await txt('#pin')) + ' | display ' + await p.evaluate(() => getComputedStyle(document.querySelector('#pin')).display));
 R('prompt at start:', await txt('#prompt'));
-await p.keyboard.down('KeyW'); await sleep(700); await p.keyboard.up('KeyW'); R('after holding W (no movement):', await txt('#prompt'));
-await p.keyboard.down('ArrowUp'); await sleep(1000); await p.keyboard.up('ArrowUp'); R('after holding ArrowUp 1 s:', await txt('#prompt'));
-await p.keyboard.down('ArrowDown'); await sleep(1000); await p.keyboard.up('ArrowDown'); R('after ArrowDown back:', await txt('#prompt'));
+await p.keyboard.down('ArrowUp'); await sleep(700); await p.keyboard.up('ArrowUp'); R('after holding ArrowUp (no movement):', await txt('#prompt'));
+await p.keyboard.down('KeyW'); await sleep(1000); await p.keyboard.up('KeyW'); R('after holding W 1 s:', await txt('#prompt'));
+await p.keyboard.down('KeyS'); await sleep(1000); await p.keyboard.up('KeyS'); R('after ArrowDown back:', await txt('#prompt'));
 await p.keyboard.press('Digit7'); await p.keyboard.press('Space'); await sleep(150);
 R('stance meter:', await txt('#meter')); R('ball grid shown:', await p.evaluate(() => getComputedStyle(document.querySelector('#bpos')).display));
-await p.keyboard.press('KeyW'); await p.keyboard.press('KeyD'); await p.keyboard.press('KeyD'); await sleep(100); R('ball position text:', await txt('#bpos'));
+await p.keyboard.press('ArrowUp'); await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight'); await sleep(100); R('ball position text:', await txt('#bpos'));
 await p.keyboard.press('Digit9'); await sleep(100); R('club change in stance:', await p.evaluate(() => document.querySelector('.slot.on')?.textContent));
 await p.mouse.move(640, 360); await p.mouse.down(); await p.mouse.move(640 - 40, 360, { steps: 4 }); await p.mouse.up();   // re-aim in the stance
 await p.keyboard.down('Space'); await sleep(700); R('meter at 700 ms:', await txt('#meter')); await sleep(600);

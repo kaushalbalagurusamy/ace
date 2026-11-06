@@ -22,11 +22,11 @@ Tags as in [README.md](README.md): **[GIVEN]** is the owner's, **[ASSUMED]** fil
 
 ## Driving
 
-- **[GIVEN]** Arrow keys drive: Up is throttle, Down brakes and then reverses, Left and Right steer. The mouse orbits the chase camera.
+- **[GIVEN, swapped 2026-11-05]** W A S D drive: W is throttle, S brakes and then reverses, A and D steer. The mouse orbits the chase camera.
 - **[GIVEN]** Arcade feel: top speed 18 m/s, acceleration about 6 m/s², braking about 10 m/s², a steering rate that tightens with speed, a little drift damping, and the cart cannot flip.
 - **[ASSUMED]** Coasting with no key loses 2 m/s². Reverse tops out at 5 m/s. The turn rate is zero at a standstill, peaks at about 1.65 rad/s at 4 m/s, and falls to about 0.9 rad/s at 18 m/s. Sideways slip dies away at 5 per second. There is no roll or pitch, so the cart cannot flip.
 - **[ASSUMED]** The chase camera sits 11 m back and eases toward the cart's heading plus the mouse orbit (frame-rate independent). When you drive faster than 2 m/s and have not moved the mouse for 1.5 s, the orbit eases back behind the cart. A bump adds a short camera shake.
-- **[ASSUMED]** The prompt shows "Arrows drive · speed in mph · E: get out to play" while driving, and "E: get in the cart" when you are in range on foot.
+- **[ASSUMED]** The prompt shows "WASD drive · speed in mph · E: get out to play" while driving, and "E: get in the cart" when you are in range on foot.
 
 ## Where carts may go
 

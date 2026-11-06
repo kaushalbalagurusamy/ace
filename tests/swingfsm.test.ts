@@ -40,26 +40,26 @@ describe('SS-8 max effort: auto-release at 1.10 s', () => {
 });
 
 describe('SS-8 ball position in the stance (W/S forward-back, A/D closer-away), 5 steps per axis, only in the stance', () => {
-  it('W and S step the ball forward and back (fb), D and A step it away from and closer to the body (io)', () => {
+  it('Up and Down step the ball forward and back (fb), Right and Left step it away from and closer to the body (io)', () => {
     const f = armed(raw()); expect(f.ballPos()).toEqual({ fb: 0, io: 0 });
-    f.key('KeyW', true, 0); f.key('KeyW', true, 1); expect(f.ballPos()).toEqual({ fb: 2, io: 0 });
-    f.key('KeyS', true, 2); f.key('KeyS', true, 3); f.key('KeyS', true, 4); expect(f.ballPos()).toEqual({ fb: -1, io: 0 });
-    f.key('KeyD', true, 5); f.key('KeyD', true, 6); expect(f.ballPos()).toEqual({ fb: -1, io: 2 });
-    f.key('KeyA', true, 7); expect(f.ballPos()).toEqual({ fb: -1, io: 1 });
+    f.key('ArrowUp', true, 0); f.key('ArrowUp', true, 1); expect(f.ballPos()).toEqual({ fb: 2, io: 0 });
+    f.key('ArrowDown', true, 2); f.key('ArrowDown', true, 3); f.key('ArrowDown', true, 4); expect(f.ballPos()).toEqual({ fb: -1, io: 0 });
+    f.key('ArrowRight', true, 5); f.key('ArrowRight', true, 6); expect(f.ballPos()).toEqual({ fb: -1, io: 2 });
+    f.key('ArrowLeft', true, 7); expect(f.ballPos()).toEqual({ fb: -1, io: 1 });
   });
   it('steps clamp at -2 and +2', () => {
-    const f = armed(raw()); for (let i = 0; i < 6; i++) { f.key('KeyW', true, i); f.key('KeyD', true, i); } expect(f.ballPos()).toEqual({ fb: 2, io: 2 });
-    for (let i = 0; i < 9; i++) { f.key('KeyS', true, i); f.key('KeyA', true, i); } expect(f.ballPos()).toEqual({ fb: -2, io: -2 });
+    const f = armed(raw()); for (let i = 0; i < 6; i++) { f.key('ArrowUp', true, i); f.key('ArrowRight', true, i); } expect(f.ballPos()).toEqual({ fb: 2, io: 2 });
+    for (let i = 0; i < 9; i++) { f.key('ArrowDown', true, i); f.key('ArrowLeft', true, i); } expect(f.ballPos()).toEqual({ fb: -2, io: -2 });
   });
-  it('key releases do nothing; only presses step', () => { const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyW', false, 10); expect(f.ballPos().fb).toBe(1); });
-  it('the position is sent with the shot', () => { const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyD', true, 1); f.key('KeyD', true, 2); f.key('Space', true, 10); expect(shot(f.key('Space', false, 400)).msg).toMatchObject({ fb: 1, io: 2 }); });
+  it('key releases do nothing; only presses step', () => { const f = armed(raw()); f.key('ArrowUp', true, 0); f.key('ArrowUp', false, 10); expect(f.ballPos().fb).toBe(1); });
+  it('the position is sent with the shot', () => { const f = armed(raw()); f.key('ArrowUp', true, 0); f.key('ArrowRight', true, 1); f.key('ArrowRight', true, 2); f.key('Space', true, 10); expect(shot(f.key('Space', false, 400)).msg).toMatchObject({ fb: 1, io: 2 }); });
   it('ball keys are ignored once the backswing has started, and before the stance (idle)', () => {
-    const f = raw(); f.key('KeyW', true, 0); expect(f.ballPos()).toEqual({ fb: 0, io: 0 });          // idle
-    const g = full(); g.key('KeyD', true, 0); g.key('Space', true, 5); g.key('KeyW', true, 10); g.key('KeyA', true, 11); g.key('KeyS', true, 12);
+    const f = raw(); f.key('ArrowUp', true, 0); expect(f.ballPos()).toEqual({ fb: 0, io: 0 });          // idle
+    const g = full(); g.key('ArrowRight', true, 0); g.key('Space', true, 5); g.key('ArrowUp', true, 10); g.key('ArrowLeft', true, 11); g.key('ArrowDown', true, 12);
     expect(shot(g.key('Space', false, 300)).msg).toMatchObject({ fb: 0, io: 1 });
   });
-  it('a fresh machine (a new shot) starts at the centre', () => { const a = armed(raw()); a.key('KeyW', true, 0); expect(armed(raw()).ballPos()).toEqual({ fb: 0, io: 0 }); });
-  it('arrow keys and Z/X/C do nothing to the swing', () => { const f = full(); for (const k of ['ArrowUp', 'ArrowLeft', 'KeyZ', 'KeyX', 'KeyC']) expect(f.key(k, true, 0)).toBeNull(); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); f.key('Space', true, 5); expect(shot(f.key('Space', false, 250)).msg).toEqual({ t: 'shot', clubKey: '7', aimDeg: 12.5, holdMs: 245, fb: 0, io: 0 }); });
+  it('a fresh machine (a new shot) starts at the centre', () => { const a = armed(raw()); a.key('ArrowUp', true, 0); expect(armed(raw()).ballPos()).toEqual({ fb: 0, io: 0 }); });
+  it('arrow keys and Z/X/C do nothing to the swing', () => { const f = full(); for (const k of ['KeyW', 'KeyA', 'KeyZ', 'KeyX', 'KeyC']) expect(f.key(k, true, 0)).toBeNull(); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); f.key('Space', true, 5); expect(shot(f.key('Space', false, 250)).msg).toEqual({ t: 'shot', clubKey: '7', aimDeg: 12.5, holdMs: 245, fb: 0, io: 0 }); });
 });
 
 describe('SS-8 putter: same hold and release, no max effort, no ball position', () => {
@@ -67,7 +67,7 @@ describe('SS-8 putter: same hold and release, no max effort, no ball position', 
     const a = putter(); a.key('Space', true, 0); expect(a.key('Space', false, 300)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 300 } });
     const b = putter(); b.key('Space', true, 0); expect(b.tick(5000)).toBeNull(); expect(b.key('Space', false, 9000)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 750 } });
   });
-  it('ball-position keys are ignored for the putter', () => { const f = putter(); f.key('KeyW', true, 0); f.key('KeyD', true, 1); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); });
+  it('ball-position keys are ignored for the putter', () => { const f = putter(); f.key('ArrowUp', true, 0); f.key('ArrowRight', true, 1); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); });
   it('a quick tap strikes (the server floors the length)', () => { const f = putter(); f.key('Space', true, 0); expect(f.key('Space', false, 5)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 5 } }); });
 });
 
@@ -92,7 +92,7 @@ describe('mouse aim and club change in the stance (owner: both stay live until t
     expect(shot(f.key('Space', false, 300)).msg.aimDeg).toBe(41);
   });
   it('aim and ball position are kept across re-aims and club changes', () => {
-    const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyD', true, 1); f.setAim(77); f.setClub('9', false); f.setAim(78); f.key('Space', true, 5);
+    const f = armed(raw()); f.key('ArrowUp', true, 0); f.key('ArrowRight', true, 1); f.setAim(77); f.setClub('9', false); f.setAim(78); f.key('Space', true, 5);
     expect(shot(f.key('Space', false, 400)).msg).toEqual({ t: 'shot', clubKey: '9', aimDeg: 78, holdMs: 395, fb: 1, io: 1 });
   });
   it('a club change in the stance updates the club used; after the backswing starts it is ignored', () => {
@@ -100,9 +100,9 @@ describe('mouse aim and club change in the stance (owner: both stay live until t
     f.key('Space', true, 0); expect(f.setClub('3', false)).toBe(false); expect(shot(f.key('Space', false, 200)).msg.clubKey).toBe('1');
   });
   it('switching to the putter in the stance swaps to putt mode in place (no new stance), and back again restores ball-position keys', () => {
-    const f = armed(raw()); f.key('KeyW', true, 0); expect(f.setClub('P', true)).toBe(true); expect(f.phase).toBe('stance');
-    f.key('KeyD', true, 1); expect(f.ballPos()).toEqual({ fb: 1, io: 0 });                    // ball keys are ignored for the putter; earlier position kept
-    expect(f.setClub('7', false)).toBe(true); f.key('KeyD', true, 2); expect(f.ballPos()).toEqual({ fb: 1, io: 1 });
+    const f = armed(raw()); f.key('ArrowUp', true, 0); expect(f.setClub('P', true)).toBe(true); expect(f.phase).toBe('stance');
+    f.key('ArrowRight', true, 1); expect(f.ballPos()).toEqual({ fb: 1, io: 0 });                    // ball keys are ignored for the putter; earlier position kept
+    expect(f.setClub('7', false)).toBe(true); f.key('ArrowRight', true, 2); expect(f.ballPos()).toEqual({ fb: 1, io: 1 });
     const g = armed(raw()); g.setClub('P', true); g.key('Space', true, 0); expect(g.key('Space', false, 300)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 12.5, holdMs: 300 } });
   });
   it('putter to a full swing club: the shot uses full-swing mode and may auto-release at 1.10 s', () => {
