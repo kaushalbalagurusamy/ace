@@ -68,6 +68,12 @@ describe('SS-5 max effort accuracy: 70%, seeded', () => {
     expect(std(wide) / std(ref)).toBeGreaterThan(3 * 0.88); expect(std(wide) / std(ref)).toBeLessThan(3 * 1.12);
     expect(Math.abs(mean(wide))).toBeLessThan(0.25 * std(wide)); expect(std(wide)).toBeGreaterThan(3);
   });
+  it('absolute: max-effort driver offline std is pinned, and the same swing without max effort has zero offline spread', () => {
+    // Measured once with the current code: std of offlineM over seeds 1000..1499 = 32.02 m (mean -1.14 m).
+    const s = std(offlines(1)); expect(s).toBeGreaterThan(28); expect(s).toBeLessThan(36);
+    const clean = Array.from({ length: N }, (_, i) => simulateShot(launchFor(driver, { seed: 1000 + i })).offlineM);
+    expect(Math.max(...clean.map(Math.abs))).toBe(0);
+  });
   it('same seed, same shot; a different seed, a different shot; deterministic across calls', () => {
     const a = launchFor(driver, { maxEffort: true, seed: 7 }), b = launchFor(driver, { maxEffort: true, seed: 7 }), c = launchFor(driver, { maxEffort: true, seed: 8 });
     expect(a).toEqual(b); expect(a.azimuthDeg === c.azimuthDeg && a.spinAxisDeg === c.spinAxisDeg).toBe(false);
