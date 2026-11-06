@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import type { BallState, HoleInfo, PlayerRace, ServerMsg } from '../shared/protocol';
+import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
+import { cartSpawn, forwardSpeed } from '../shared/cart';
+import { makeCart, poseCart, type CartView } from './cartmodel';
 import { isCoastal, propSpots, terrainMesh } from './terrain';
 import { loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
@@ -10,6 +12,8 @@ export interface Ent {
   id: string; name: string; shade: string; ball: BallState; hole: number; done: boolean;
   golfer: THREE.Group; ballMesh: THREE.Mesh; tracer?: THREE.Line; hid?: boolean;
   anim?: { pts: THREE.Vector3[]; ts: number[]; t0: number; final: BallState };
+  /** the cart (PRD/07): its view, the drawn state, the spawn slot; `driving` hides the golfer; `remote` is the last server report for others */
+  cart: CartView; cs: CartState; slot: number; driving: boolean; remote?: Mover;
 }
 // Sim space is left-handed (x right, z forward); three is right-handed, so mirror x.
 const V = (x: number, y: number, z: number) => new THREE.Vector3(-x, y, z);
@@ -46,13 +50,14 @@ export class World {
     m.position.set(cx, y, cz); m.rotation.y = rotY; this.course.add(m); return m;
   }
   load(h: HoleInfo, players: PlayerRace[]) {
-    for (const e of this.ents.values()) this.scene.remove(e.golfer, e.ballMesh, ...(e.tracer ? [e.tracer] : [])); this.ents.clear();
+    for (const e of this.ents.values()) this.scene.remove(e.golfer, e.ballMesh, e.cart.root, ...(e.tracer ? [e.tracer] : [])); this.ents.clear();
     this.buildCourse(h); this.myHole = h.index;
     const rot = Math.atan2(-(h.pin.x - h.tee.x), h.pin.z - h.tee.z);
     players.forEach((p, i) => {
       const shade = SHADES[i % 4]!;
-      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')) };
-      this.scene.add(e.golfer, e.ballMesh); this.ents.set(p.id, e); this.setBall(e, p.ball);
+      const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: this.makeGolfer(shade, p.name), ballMesh: new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 8), this.mat('#ffffff')),
+        cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
+      this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
       e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
     });
   }
@@ -63,7 +68,15 @@ export class World {
     if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
     this.setBall(e, ball);
     e.golfer.position.copy(V(ball.x + 1, 0, ball.z - 0.5));
+    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(hole, e.slot), 0, 0);   // the cart comes to the new tee too
   }
+  /** Draws a cart state: position, heading, wheel spin and front-wheel lock. */
+  placeCart(e: Ent, s: CartState, steer: number, dt: number) {
+    e.cs = s; e.cart.root.position.copy(V(s.x, 0, s.z)); e.cart.root.rotation.y = -s.yaw;
+    poseCart(e.cart, forwardSpeed(s), steer, dt);
+  }
+  /** Another player's latest report; tick() eases their golfer and cart toward it. */
+  remote(m: Mover) { const e = this.ents.get(m.id); if (e && m.id !== this.selfId && m.hole === e.hole) { e.remote = m; e.driving = m.driving; } }
   /** Rebuilds the terrain for a hole without touching the players. */
   buildCourse(h: HoleInfo) {
     this.course.clear();
@@ -136,7 +149,16 @@ export class World {
   }
   /** Screen marker for the pin (flag top), for the pin indicator. */
   pinScreen(): Marker { const v = this.pinTop.clone().project(this.cam); return toMarker(v.x, v.y, v.z > 1, innerWidth, innerHeight); }
+  private lastTick = 0;
   tick(now: number) {
+    const dt = this.lastTick ? Math.min(0.1, (now - this.lastTick) / 1000) : 0; this.lastTick = now;
+    const k = 1 - Math.exp(-10 * dt);                                     // frame-rate independent easing toward the 10 Hz reports
+    for (const e of this.ents.values()) {
+      const r = e.remote; if (!r) continue;
+      const c = e.cs, dyaw = Math.atan2(Math.sin(r.cart.yaw - c.yaw), Math.cos(r.cart.yaw - c.yaw));
+      this.placeCart(e, { x: c.x + (r.cart.x - c.x) * k, z: c.z + (r.cart.z - c.z) * k, yaw: c.yaw + dyaw * k, vx: r.cart.vx, vz: r.cart.vz }, Math.max(-1, Math.min(1, dyaw * 4)), dt);
+      const g = e.golfer.position; g.x += (-r.x - g.x) * k; g.z += (r.z - g.z) * k; e.golfer.rotation.y = -r.yaw;
+    }
     const own = this.ents.get(this.selfId);
     this.beacon.visible = !!own && (!own.ball.holedOut || !!own.anim) && own.hole === this.myHole;
     if (own) this.beacon.position.set(own.ballMesh.position.x, 0, own.ballMesh.position.z);
@@ -153,10 +175,11 @@ export class World {
     for (const e of this.ents.values()) { // only players on my hole are drawn
       if (e.hole !== this.myHole) { e.hid = true; e.golfer.visible = false; e.ballMesh.visible = false; if (e.tracer) e.tracer.visible = false; }
       else if (e.hid) { e.hid = false; e.golfer.visible = true; e.ballMesh.visible = !e.ball.holedOut || !!e.anim; if (e.tracer) e.tracer.visible = true; }
+      e.cart.root.visible = !e.hid; if (!e.hid) e.golfer.visible = !e.driving;   // shortcut: the driver is hidden in the cart rather than seated; add a seated pose if it matters
     }
   }
-  render(x: number, z: number, yaw: number, pitch: number, y = 1.5) {
-    const dist = y > 1.5 ? 25 : 8, f = [Math.sin(yaw), Math.cos(yaw)] as const;
+  render(x: number, z: number, yaw: number, pitch: number, y = 1.5, dist = y > 1.5 ? 25 : 8) {
+    const f = [Math.sin(yaw), Math.cos(yaw)] as const;
     const target = V(x, y, z);
     this.cam.position.copy(V(x - f[0] * dist * Math.cos(pitch), y + dist * Math.sin(pitch), z - f[1] * dist * Math.cos(pitch)));
     this.cam.lookAt(target); this.renderer.render(this.scene, this.cam);
