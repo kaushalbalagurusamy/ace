@@ -26,7 +26,7 @@ The owner submits the form and the portal. No agent submits forms or posts on th
 - **Midnight to 08:00:** polish in place on the same URL: generated assets, audio, physics calibration. Re-test from a cold browser before 08:00.
 
 ## Demo video (ready 2026-11-05 about 20:10 CST)
-- **File:** `~/Movies/ace-clips/ace-demo.mp4` (61 s, 1280×720, captioned, no audio), recorded from the live site at deploy 21d88e1.
+- **File:** `~/Movies/ace-clips/ace-demo.mp4` (69 s, 1280×720, captioned, no audio), recorded from the live site at deploy 2d5aa26 (HD turf, Genesis cart).
 - **Contents:** title card, waiting room and a two-player lobby, the other player on the shared tee, stance and ball position, hold-and-release swing, flight with tracer, shot card, rangefinder auto-club, a draw from ball position, max effort (its shot card is blurred until the speed decision), and a closing card with the URL.
 - **Needs a public link for the portal:** upload it (YouTube unlisted, Loom or Drive) and paste the link.
 
