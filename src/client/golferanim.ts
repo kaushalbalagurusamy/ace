@@ -56,7 +56,7 @@ export const P_POS: readonly Pose[] = [
     grip: [-0.38, 1.22, 0.16], shaft: [0.05, 1, 0.12], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.1] }),
   // P4 top: shoulders 90°, hips 45°, lead arm across the chest, hands above the trail shoulder, trail elbow down, shaft along the line
   P({ ...STANCE, pelvis: [TILT, deg(-45), 0], shift: [-0.04, -0.1, -0.14], torso: [SPINE, deg(-45), deg(5)], head: [0.22, deg(85), 0], lHeel: 0.15,
-    grip: [-0.16, 1.58, -0.06], shaft: [1, 0.02, -0.1], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
+    grip: [-0.08, 1.56, -0.15], shaft: [0.6, 0.04, 0.8], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
   // P5 lead arm parallel down: hips 20° open and shifting, shoulders 45° closed, lag (shaft ~90° to the lead arm)
   P({ ...STANCE, pelvis: [TILT, deg(20), 0], shift: [0.04, -0.1, -0.14], torso: [SPINE, deg(-65), deg(10)], head: [0.22, deg(45), 0],
     grip: [-0.36, 1.18, 0.2], shaft: [0.2, 1, -0.05], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.2], rHeel: 0.05 }),
@@ -74,7 +74,7 @@ export const P_POS: readonly Pose[] = [
     rAnkle: [-0.05, 0.06, 0.06], grip: [0.32, 1.32, 0.12], shaft: [0.2, 1, -0.4], face: [0, 0, -1], lPole: [0, -1, 0.2], rPole: [0, -1, 0] }),
   // P10 finish: belt buckle and chest to the target or left of it, weight on the lead foot, trail toe up, club behind the head
   P({ ...STANCE, pelvis: [0.08, deg(92), 0], shift: [0.12, -0.02, 0], torso: [-0.08, deg(12), deg(3)], head: [0, deg(-30), 0], rHeel: 1.2,
-    rAnkle: [-0.02, 0.09, 0.09], grip: [-0.08, 1.58, -0.14], shaft: [-0.7, -0.35, -0.55], face: [0, 0, -1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),
+    rAnkle: [-0.02, 0.09, 0.09], grip: [0.02, 1.56, -0.2], shaft: [-0.55, -0.55, 0.62], face: [0, 0, -1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),
 ];
 
 /** Idle and putting poses. */
