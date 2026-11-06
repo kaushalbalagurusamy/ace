@@ -21,17 +21,16 @@ export interface Pose {
   free?: { l: V3; r: V3 };
 }
 
-/** Dunaway clip key frames (30 fps, frame 0 = clip start), stepped by hand with ffmpeg. */
-export const DUNAWAY = { fps: 30, takeaway: 28, hipHigh: 45, top: 75, delivery: 85, impact: 90, through: 97, finish: 118 } as const;
+/** Dunaway clip key frames (30 fps, frame 0 = clip start), stepped by hand with ffmpeg: takeaway, P2 (shaft parallel back),
+ *  P4 (top), P7 (impact), P10 (finish). */
+export const DUNAWAY = { fps: 30, takeaway: 28, p2: 45, top: 75, delivery: 85, impact: 90, through: 97, finish: 118 } as const;
 const D = DUNAWAY;
-/** Where hands-at-hip-height falls in the backswing (0..1 of the turn): (45-28)/(75-28). */
-export const HIP_DEPTH = (D.hipHigh - D.takeaway) / (D.top - D.takeaway);
 /** Backswing to downswing time, 47:15 frames, about 3:1 (tour tempo). */
 export const TEMPO = (D.top - D.takeaway) / (D.impact - D.top);
 /** The game turns the full backswing in FULL_TURN_MS (750 ms), so the clip's other phases scale by the same factor. */
 const MS_PER_FRAME = FULL_TURN_MS / (D.top - D.takeaway);
-export const DOWNSWING_MS = (D.impact - D.top) * MS_PER_FRAME;   // ~239 ms at full depth
-export const FOLLOW_MS = (D.finish - D.impact) * MS_PER_FRAME;   // ~447 ms impact to finish
+export const DOWNSWING_MS = (D.impact - D.top) * MS_PER_FRAME;   // ~239 ms P4 to P7 at full depth
+export const FOLLOW_MS = (D.finish - D.impact) * MS_PER_FRAME;   // ~447 ms P7 to P10
 export const HOLD_MS = 700, RETURN_MS = 400;                     // hold the finish, then ease back to standing
 
 const P = (p: Partial<Pose>): Pose => ({ ...BASE, ...p });
@@ -39,28 +38,56 @@ const BASE: Pose = {
   pelvis: [0, 0, 0], shift: [0, 0, 0], torso: [0, 0, 0], head: [0, 0, 0], lAnkle: [0, 0, 0], rAnkle: [0, 0, 0], lHeel: 0, rHeel: 0,
   grip: [0.05, 0.8, 0.36], shaft: [0, -0.7, 0.7], face: [1, 0, 0], lPole: [0.3, -0.2, -1], rPole: [-0.3, -0.2, -1],
 };
+const deg = (d: number) => (d * Math.PI) / 180;
+// Turns (y) are about the spine: pelvis = hip turn, pelvis + torso = shoulder turn; negative is away from the target.
+const STANCE = { lAnkle: [0.07, 0, 0] as V3, rAnkle: [-0.07, 0, 0] as V3 };
+const TILT = 0.58, SPINE = 0.12;   // ~40° forward from the hips (pelvis) plus a flat upper back; kept P1 to P7 (no standing up)
 
-/** Key poses for the full swing (right-handed). grip/shaft at address and impact are replaced per club by addressShaft(). */
+/** The ten standard swing positions (right-handed). P1 and P7 aim the shaft at the ball per club (withClub). */
+export const P_POS: readonly Pose[] = [
+  // P1 address: hip hinge, knees flexed, spine 5° away from the target, arms hanging, hands a fist off the thighs, slight shaft lean
+  P({ ...STANCE, pelvis: [TILT, 0, 0], shift: [0, -0.1, -0.14], torso: [SPINE, 0, deg(5)], head: [0.22, 0, 0],
+    grip: [0.06, 0.72, 0.24], lPole: [0.5, -0.3, -1], rPole: [-0.5, -0.3, -1] }),
+  // P2 shaft parallel back: shoulders 45°, hips 17°, head outside the hands, toe up, lead arm straight
+  P({ ...STANCE, pelvis: [TILT, deg(-17), 0], shift: [-0.02, -0.1, -0.14], torso: [SPINE, deg(-28), deg(5)], head: [0.22, deg(40), 0],
+    grip: [-0.3, 0.9, 0.3], shaft: [-1, 0.06, 0.14], face: [0, 0.15, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.3] }),
+  // P3 lead arm parallel: shoulders 75°, hips 35°, wrists fully hinged (shaft up), trail elbow folding
+  P({ ...STANCE, pelvis: [TILT, deg(-35), 0], shift: [-0.03, -0.1, -0.14], torso: [SPINE, deg(-40), deg(5)], head: [0.22, deg(70), 0], lHeel: 0.08,
+    grip: [-0.38, 1.22, 0.16], shaft: [0.05, 1, 0.12], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.1] }),
+  // P4 top: shoulders 90°, hips 45°, lead arm across the chest, hands above the trail shoulder, trail elbow down, shaft along the line
+  P({ ...STANCE, pelvis: [TILT, deg(-45), 0], shift: [-0.04, -0.1, -0.14], torso: [SPINE, deg(-45), deg(5)], head: [0.22, deg(85), 0], lHeel: 0.15,
+    grip: [-0.16, 1.58, -0.06], shaft: [1, 0.02, -0.1], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
+  // P5 lead arm parallel down: hips 20° open and shifting, shoulders 45° closed, lag (shaft ~90° to the lead arm)
+  P({ ...STANCE, pelvis: [TILT, deg(20), 0], shift: [0.04, -0.1, -0.14], torso: [SPINE, deg(-65), deg(10)], head: [0.22, deg(45), 0],
+    grip: [-0.36, 1.18, 0.2], shaft: [0.2, 1, -0.05], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.2], rHeel: 0.05 }),
+  // P6 shaft parallel down: hips 30° open, shoulders 20° closed, hands hip high, shaft along the line
+  P({ ...STANCE, pelvis: [TILT, deg(30), 0], shift: [0.06, -0.1, -0.13], torso: [SPINE, deg(-50), deg(10)], head: [0.22, deg(20), 0],
+    grip: [-0.22, 0.9, 0.3], shaft: [-1, 0.08, 0.12], face: [0, 0.2, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.4], rHeel: 0.12 }),
+  // P7 impact: hips 40° open, shoulders square, lead arm and shaft in line, hands ahead, weight forward, head behind the ball
+  P({ ...STANCE, pelvis: [TILT - 0.04, deg(40), 0], shift: [0.08, -0.08, -0.12], torso: [SPINE, deg(-38), deg(8)], head: [0.22, deg(5), 0], rHeel: 0.3,
+    grip: [0.11, 0.74, 0.25], lPole: [0.5, -0.3, -1], rPole: [-0.3, -0.4, -1] }),
+  // P8 shaft parallel through: arms extended, trail arm over, club head up (toe up)
+  P({ ...STANCE, pelvis: [0.42, deg(60), 0], shift: [0.1, -0.06, -0.1], torso: [0.1, deg(-10), deg(6)], head: [0.18, deg(-15), 0], rHeel: 0.6,
+    rAnkle: [-0.07, 0.03, 0.03], grip: [0.42, 0.95, 0.34], shaft: [1, 0.1, 0.1], face: [0, 0.15, 1], lPole: [0, -1, 0.3], rPole: [0, -1, -0.2] }),
+  // P9 trail arm parallel: chest to the target, wrists re-hinging
+  P({ ...STANCE, pelvis: [0.25, deg(78), 0], shift: [0.11, -0.04, -0.06], torso: [0.04, deg(14), deg(3)], head: [0.1, deg(-35), 0], rHeel: 0.9,
+    rAnkle: [-0.05, 0.06, 0.06], grip: [0.32, 1.32, 0.12], shaft: [0.2, 1, -0.4], face: [0, 0, -1], lPole: [0, -1, 0.2], rPole: [0, -1, 0] }),
+  // P10 finish: belt buckle and chest to the target or left of it, weight on the lead foot, trail toe up, club behind the head
+  P({ ...STANCE, pelvis: [0.08, deg(92), 0], shift: [0.12, -0.02, 0], torso: [-0.08, deg(12), deg(3)], head: [0, deg(-30), 0], rHeel: 1.2,
+    rAnkle: [-0.02, 0.09, 0.09], grip: [-0.08, 1.58, -0.14], shaft: [-0.7, -0.35, -0.55], face: [0, 0, -1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),
+];
+
+/** Idle and putting poses. */
 export const POSES = {
   idle: P({ free: { l: [0.24, 0.86, 0.04], r: [-0.24, 0.86, 0.04] }, shaft: [0, -0.62, 0.78], face: [0, 0, 1], lPole: [0, 0, -1], rPole: [0, 0, -1] }),
-  // critic v3: tilt from the hips (pelvis), a straighter spine, hands further out and elbows out so the forearms don't cross
-  address: P({ pelvis: [0.55, 0, 0], shift: [0, -0.1, -0.13], torso: [0.1, 0, 0], head: [0.15, 0, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
-    grip: [0.05, 0.8, 0.42], lPole: [0.8, -0.3, -0.6], rPole: [-0.8, -0.3, -0.6] }),
-  hipHigh: P({ pelvis: [0.38, -0.25, 0], shift: [-0.02, -0.1, -0.09], torso: [0.22, -0.5, -0.05], head: [0.1, 0.35, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
-    grip: [-0.38, 0.9, 0.34], shaft: [-1, 0.12, 0.05], face: [0, 0.2, 1], lPole: [0, -1, -0.3], rPole: [0, -1, -0.2] }),
-  top: P({ pelvis: [0.5, -0.75, 0], shift: [-0.04, -0.1, -0.13], torso: [0.1, -1.6, -0.1], head: [0.15, 1.5, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0], lHeel: 0.15,
-    grip: [-0.25, 1.45, 0.0], shaft: [1, -0.04, -0.12], face: [0, -0.3, 1], lPole: [0, -1, 0.2], rPole: [0, -1, -0.2] }),
-  delivery: P({ pelvis: [0.38, 0.2, 0], shift: [0.05, -0.1, -0.09], torso: [0.22, -0.55, 0.05], head: [0.1, 0.3, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0, 0],
-    grip: [-0.25, 0.92, 0.36], shaft: [-0.7, 0.65, 0.1], face: [0, 0.3, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.3] }),
-  impact: P({ pelvis: [0.34, 0.55, 0], shift: [0.08, -0.09, -0.08], torso: [0.22, -0.25, 0.08], head: [0.1, 0.1, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0.02, 0], rHeel: 0.25,
-    grip: [0.1, 0.84, 0.36] }),
-  through: P({ pelvis: [0.3, 1.0, 0], shift: [0.1, -0.05, -0.04], torso: [0.2, 0.35, 0.1], head: [0.05, -0.3, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.06, 0.04, 0.04], rHeel: 0.6,
-    grip: [0.45, 0.98, 0.3], shaft: [1, 0.15, 0.1], face: [0, 0.2, 1], lPole: [0, -1, 0.2], rPole: [0, -1, -0.2] }),
-  finish: P({ pelvis: [0.08, 1.45, 0], shift: [0.12, -0.02, 0], torso: [-0.1, 0.35, 0.05], head: [0, -0.5, 0], lAnkle: [0.06, 0, 0], rAnkle: [-0.02, 0.08, 0.08], rHeel: 1.1,
-    grip: [-0.08, 1.58, -0.14], shaft: [-0.7, -0.35, -0.55], face: [0, 0, -1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),
   puttAddress: P({ pelvis: [0.42, 0, 0], shift: [0, -0.07, -0.08], torso: [0.3, 0, 0], head: [0.25, 0, 0], lAnkle: [0.02, 0, 0], rAnkle: [-0.02, 0, 0],
     grip: [0.0, 0.8, 0.32], shaft: [0.02, -0.97, 0.25], face: [1, 0, 0], lPole: [0.2, 0, -1], rPole: [-0.2, 0, -1] }),
 } satisfies Record<string, Pose>;
+
+/** Hold fraction (0..1 of the 750 ms turn) at which P1..P4 are reached (owner spec, Dunaway tempo). */
+export const BACK_KEYS = [0, 0.25, 0.55, 1] as const;
+/** Release: P4->P5->P6->P7 over the downswing, P7->P8->P9->P10 over the follow-through (fractions of each phase). */
+export const DOWN_KEYS = [0, 0.45, 0.75, 1] as const, FOLLOW_KEYS = [0, 0.3, 0.6, 1] as const;
 
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const lv = (a: V3, b: V3, k: number): V3 => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
@@ -87,16 +114,22 @@ export function addressHead(grip: V3, length: number, ballX = 0.05): V3 {
 /** Address or impact pose for a given club: the shaft runs from the grip to the head resting at the ball. */
 function withClub(p: Pose, head: V3): Pose { return { ...p, shaft: norm([head[0] - p.grip[0], head[1] - p.grip[1], head[2] - p.grip[2]]) }; }
 /** The club's address head point (also where the ball sits relative to the golfer in the stance). */
-export function addressPoint(length: number, putt = false): V3 { return addressHead((putt ? POSES.puttAddress : POSES.address).grip, length, putt ? 0.02 : 0.05); }
+export function addressPoint(length: number, putt = false): V3 { return addressHead((putt ? POSES.puttAddress : P_POS[0]!).grip, length, putt ? 0.02 : 0.0); }   // ball just behind the hands: shaft lean
 
 /** Backswing depth from the hold time: 0 at the press, 1 at the full turn (750 ms); longer holds stay at the top. */
 export const backswingDepth = (holdMs: number) => clamp01(holdMs / FULL_TURN_MS);
 
-/** Backswing pose at a depth 0..1: address -> hands hip-high (at HIP_DEPTH) -> top, as in the clip. */
-export function backswingPose(depth: number, length: number): Pose {
-  const d = clamp01(depth), addr = withClub(POSES.address, addressPoint(length));
-  return d <= HIP_DEPTH ? lerpPose(addr, POSES.hipHigh, d / HIP_DEPTH) : lerpPose(POSES.hipHigh, POSES.top, (d - HIP_DEPTH) / (1 - HIP_DEPTH));
+/** Piecewise blend along `poses` at parameter t in 0..1 with `keys` (ascending, keys[0] = 0, last = 1). */
+function along(poses: readonly Pose[], keys: readonly number[], t: number): Pose {
+  const x = clamp01(t);
+  for (let i = 1; i < keys.length; i++) if (x <= keys[i]! || i === keys.length - 1) return lerpPose(poses[i - 1]!, poses[i]!, clamp01((x - keys[i - 1]!) / (keys[i]! - keys[i - 1]!)));
+  return poses[poses.length - 1]!;
 }
+/** P1 and P7 for a club: the shaft aimed from the hands to the head resting at the ball. */
+export const swingPoses = (length: number): Pose[] => { const h = addressPoint(length); return P_POS.map((p, i) => (i === 0 || i === 6 ? withClub(p, h) : p)); };
+
+/** Backswing pose at a hold fraction 0..1: P1 -> P2 (0.25) -> P3 (0.55) -> P4 (1.0). A partial swing stops part way. */
+export function backswingPose(depth: number, length: number): Pose { return along(swingPoses(length).slice(0, 4), BACK_KEYS, depth); }
 
 /** Putting stroke: a pendulum, back at `depth` 0..1 (shoulders rock, wrists quiet). */
 export function puttPose(t: number, length: number): Pose {   // t: -1 = full back, 0 = address, +1 = full through
@@ -113,7 +146,9 @@ export function releaseTimes(depth: number, putt = false) {
   return { down: Math.max(110, DOWNSWING_MS * d), follow: FOLLOW_MS * (0.5 + 0.5 * d), hold: HOLD_MS, back: RETURN_MS };
 }
 
-/** Pose `ms` after the release from a backswing of `depth`; done once the golfer is back at rest. */
+/** Pose `ms` after the release from a backswing of `depth`; done once the golfer is back at rest.
+ *  Full swing: (backswing pose) -> P5 -> P6 -> P7 eased in, then P7 -> P8 -> P9 -> P10 eased out; a partial swing joins the
+ *  downswing at its own depth and its follow-through stops at the matching fraction of the P7..P10 path. */
 export function releasePose(depth: number, ms: number, length: number, putt = false): { pose: Pose; done: boolean; impact: boolean } {
   const d = clamp01(depth), T = releaseTimes(d, putt);
   const end = T.down + T.follow + T.hold + T.back, impact = ms >= T.down;
@@ -124,19 +159,15 @@ export function releasePose(depth: number, ms: number, length: number, putt = fa
     if (ms <= T.down + T.follow + T.hold) return { pose, done: false, impact };
     return { pose: lerpPose(pose, POSES.idle, smooth((ms - T.down - T.follow - T.hold) / T.back)), done: ms >= end, impact };
   }
-  const head = addressPoint(length), imp = withClub(POSES.impact, head);
-  if (ms < T.down) {   // accelerating downswing, through the delivery position when the backswing got past hip height
-    const k = ease2(ms / T.down), from = backswingPose(d, length);
-    if (d <= HIP_DEPTH) return { pose: lerpPose(from, imp, k), done: false, impact };
-    const f = (D.delivery - D.top) / (D.impact - D.top);
-    return { pose: k < f ? lerpPose(from, POSES.delivery, k / f) : lerpPose(POSES.delivery, imp, (k - f) / (1 - f)), done: false, impact };
+  const S = swingPoses(length), from = backswingPose(d, length);
+  if (ms < T.down) {
+    // the downswing keys that lie "below" the backswing depth are skipped: a half swing goes straight to P6 and P7
+    const k = ease2(ms / T.down), path = d > BACK_KEYS[2] ? [from, S[4]!, S[5]!, S[6]!] : d > BACK_KEYS[1] ? [from, S[5]!, S[6]!] : [from, S[6]!];
+    const keys = path.length === 4 ? DOWN_KEYS : path.length === 3 ? [0, 0.6, 1] : [0, 1];
+    return { pose: along(path, keys, k), done: false, impact };
   }
-  const thr = lerpPose(imp, POSES.through, Math.min(1, d * 1.6)), fin = lerpPose(thr, POSES.finish, d);
-  const u = ms - T.down;
-  if (u < T.follow) {
-    const k = easeOut(u / T.follow), f = (D.through - D.impact) / (D.finish - D.impact);
-    return { pose: k < f ? lerpPose(imp, thr, k / f) : lerpPose(thr, fin, (k - f) / (1 - f)), done: false, impact };
-  }
+  const u = ms - T.down, fin = along(S.slice(6), FOLLOW_KEYS, d);   // where this swing's follow-through ends
+  if (u < T.follow) return { pose: along(S.slice(6), FOLLOW_KEYS, easeOut(u / T.follow) * d), done: false, impact };
   if (u < T.follow + T.hold) return { pose: fin, done: false, impact };
   return { pose: lerpPose(fin, POSES.idle, smooth((u - T.follow - T.hold) / T.back)), done: ms >= end, impact };
 }
