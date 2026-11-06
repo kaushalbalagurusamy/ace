@@ -2,10 +2,10 @@ import { SwingFSM, type Action } from './swingfsm';
 import { GameAudio } from './audio';
 import { isCoastal } from './terrain';
 import { SKY_PRESETS, type SkyPreset } from './environment';
-import type { HoleInfo, ServerMsg } from '../shared/protocol';
+import type { HoleInfo, PlayerRace, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 import { Net } from './net';
-import { BAG, PUTTER, UI, YD, errText } from './ui';
+import { BAG, PUTTER, UI, YD, errText, scorecard } from './ui';
 import { World } from './scene';
 import { backswingDepth } from './golferanim';
 
@@ -37,6 +37,8 @@ let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
 let pick: CourseId = (() => { try { const v = localStorage.getItem('ace.course'); return isCourseId(v) ? v : DEFAULT_COURSE; } catch { return DEFAULT_COURSE; } })();
 
 let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
+/** The live scorecard from the server (raceStart, then progress). */
+let racers: PlayerRace[] = [];
 let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.55, club = 0; // higher default camera so the golfer and ball both read at address
 const keys = new Set<string>();
 /** swing exists from the first Space press (stance, aim locked, WASD off) until the shot or putt is sent. */
@@ -107,7 +109,7 @@ function onMsg(m: ServerMsg) {
     case 'lobby': lobby = m.lobby; if (!lobby) count = null; menu(); break;
     case 'countdown': count = m.seconds; if (m.seconds === 4) void audio.play('vo-countdown', 0.9); menu(); break;
     case 'raceStart': {
-      count = null; hole = m.hole; goAt = m.goAtMs; endAt = 0; swing = null; world.load(m.hole, m.players);
+      count = null; hole = m.hole; racers = m.players; ui.toggleScorecard(false); goAt = m.goAtMs; endAt = 0; swing = null; world.load(m.hole, m.players);
       selfId = (m.players.find(p => p.id === sessionId) ?? m.players.find(p => p.name === name))?.id ?? '';
       const me = world.ents.get(selfId);
       pos = me ? { x: me.ball.x + 1, z: me.ball.z - 0.5 } : { ...m.hole.tee };
@@ -145,6 +147,7 @@ function onMsg(m: ServerMsg) {
       } else world.moveTo(m.playerId, m.ball, m.hole.index);
       board(); break;
     }
+    case 'progress': racers = m.players; board(); break;
     case 'movers': for (const p of m.players) world.remote(p); break;
     case 'bump':
       if (m.target === 'cart') { cart = { ...cart, x: cart.x + m.dx, z: cart.z + m.dz, vx: cart.vx + m.dvx, vz: cart.vz + m.dvz }; if (driving) pos = { x: cart.x, z: cart.z }; }
@@ -153,7 +156,7 @@ function onMsg(m: ServerMsg) {
     case 'snap': pos = { x: m.x, z: m.z }; driving = m.driving; cart = { ...m.cart }; break;
     case 'raceEnd':
       endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops(); audio.whir(0);
-      ui.showResults([...m.results].sort((a, b) => a.place - b.place), COURSES[m.course]?.name ?? ''); break;
+      ui.showResults([...m.results].sort((a, b) => a.place - b.place), COURSES[m.course]?.name ?? '', racers.length ? scorecard(racers, pars(), selfId) : ''); break;
   }
 }
 /** Quiet ambience under the effects: surf and gulls on the ocean holes, wind in the cypress elsewhere. */
@@ -172,7 +175,8 @@ function shotSounds(m: Extract<ServerMsg, { t: 'shotResult' }>) {
   const surface = m.penalty ? (m.penalty.startsWith('Water') ? 'water' : 'rough') : ({ green: 'green', fairway: 'fairway', firstCut: 'fairway', rough: 'rough', bunker: 'sand', fringe: 'green' } as Record<string, string>)[m.ball.surface] ?? 'fairway';
   setTimeout(() => void audio.play(`sfx-land-${surface}`, vol * 0.8), land * 1000);
 }
-const board = () => ui.board([...world.ents.values()].map(e => ({ id: e.id, name: e.name, hole: e.hole, strokes: e.ball.strokes, done: e.done })), selfId);
+const pars = () => COURSES[hole?.course ?? DEFAULT_COURSE].card.map(c => c.par);
+const board = () => ui.board(racers, pars(), selfId);
 
 // ---- input ----
 const canvas = world.renderer.domElement;
@@ -191,10 +195,11 @@ const aimDeg = (y: number) => ((y * 180 / Math.PI) % 360 + 360) % 360;
 
 addEventListener('keydown', e => {
   if (phase !== 'race' || ['INPUT', 'SELECT'].includes((e.target as HTMLElement).tagName)) return;
-  if (['Space', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+  if (['Tab', 'Space', 'Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
   keys.add(e.code);
   if (e.code === 'KeyN') { audio.toggleMute(); return; }
+  if (e.code === 'Tab') { ui.toggleScorecard(); board(); return; }
   if (e.code === 'Comma' || e.code === 'Period') { setLook(stepMult(lookMult, e.code === 'Period' ? 1 : -1)); ui.toast(lookLabel(lookMult)); return; }
   if (e.code === 'Escape' && !swing) { ui.toggleSettings(); return; }          // Esc opens the settings menu; in a stance it cancels the stance instead
   if (ui.settingsOpen()) return;
