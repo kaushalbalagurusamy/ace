@@ -1,4 +1,4 @@
-import { GRIDS } from '../shared/course-grid';
+import { gridOf, keyOf } from '../shared/courses';
 import { gridCanvas, rfView } from './terrain';
 import { edgePoint, mapArrowRotation, type Marker } from './overlay';
 import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
@@ -271,8 +271,8 @@ export class UI {
   /** Expanded mini map: terrain, markers, the target and the line from the ball to the hovered point (PRD/02 section 7). */
   drawRangefinder(h: HoleInfo, ball: { x: number; z: number }, golfer: { x: number; z: number }, target: { x: number; z: number } | null, hover: { x: number; z: number } | null, heading = 0) {
     const c = this.rfCanvas(); if (c.width !== c.clientWidth || c.height !== c.clientHeight) { c.width = c.clientWidth; c.height = c.clientHeight; }
-    const ctx = c.getContext('2d')!, v = rfView(h.index, c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(h.index, 2, false, true), v.x0, v.y0, v.w, v.h);
+    const ctx = c.getContext('2d')!, v = rfView(keyOf(h), c.width, c.height); ctx.fillStyle = '#10181a'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(gridCanvas(keyOf(h), 2, false, true), v.x0, v.y0, v.w, v.h);
     const dot = (p: { x: number; z: number }, col: string, r: number) => { const [x, y] = v.toScreen(p.x, p.z); ctx.fillStyle = col; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.stroke(); return [x, y] as const; };
     dot(h.tee, '#222', 5); dot(h.pin, '#ffe14d', 6); { const [gx, gy] = v.toScreen(golfer.x, golfer.z); this.heading(ctx, gx, gy, heading, 1.6); }
     const [bx, by] = dot(ball, '#fff', 6); ctx.strokeStyle = '#ffe14d'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(bx, by, 10, 0, 7); ctx.stroke(); ctx.lineWidth = 1;
@@ -310,7 +310,7 @@ export class UI {
       return [W / 2 + r * s, H - 10 - a * s];
     };
     c.fillStyle = '#233'; c.fillRect(0, 0, W, H);
-    const g = GRIDS[h.index]!, img = gridCanvas(h.index, 1, false, true);
+    const g = gridOf(keyOf(h)), img = gridCanvas(keyOf(h), 1, false, true);
     const [x0, zTop] = P(g.x0, g.z0 + g.nz * g.cell);                                // top-left of the grid image on the map
     c.imageSmoothingEnabled = false; c.drawImage(img, x0, zTop, g.nx * g.cell * s, g.nz * g.cell * s);
     const [px, pz] = P(h.pin.x, h.pin.z); c.fillStyle = '#111'; c.fillRect(px - 1, pz - 1, 3, 3);

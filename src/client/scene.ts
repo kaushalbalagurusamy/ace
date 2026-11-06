@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { BALL_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M } from '../sim/physics';
 import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } from '../shared/protocol';
 import { cartSpawn, forwardSpeed } from '../shared/cart';
+import { DEFAULT_COURSE, gridKey, keyOf, type CourseId } from '../shared/courses';
 import { makeCart, poseCart, type CartView } from './cartmodel';
 import { isCoastal, propSpots, setTurf, terrainMesh } from './terrain';
 import { SPEC, type Tier } from './graphics';
@@ -47,6 +48,7 @@ export class World {
   ents = new Map<string, Ent>();
   /** hole (0-based) the local player is on: other players' balls, golfers and tracers on other holes are hidden */
   myHole = 0;
+  courseId: CourseId = DEFAULT_COURSE;
   private course = new THREE.Group();
   private props = new THREE.Group();
   /** id of the local player: their ball gets a yellow beacon and a screen marker */
@@ -110,7 +112,7 @@ export class World {
       const shade = SHADES[i % 4]!;
       const look = this.makeGolfer(shade, p.name);
       const e: Ent = { id: p.id, name: p.name, shade, ball: p.ball, hole: p.hole, done: p.ball.holedOut, golfer: look.g, look: look.look, ballMesh: new THREE.Mesh(new THREE.SphereGeometry(BALL_VISUAL_RADIUS_M, 12, 8), this.mat('#ffffff')),
-        cart: makeCart(shade), cs: cartSpawn(p.hole, i), slot: i, driving: false };
+        cart: makeCart(shade), cs: cartSpawn(gridKey(h.course, p.hole), i), slot: i, driving: false };
       e.ballMesh.castShadow = true;
       this.scene.add(e.golfer, e.ballMesh, e.cart.root); this.ents.set(p.id, e); this.setBall(e, p.ball); this.placeCart(e, e.cs, 0, 0);
       e.golfer.position.copy(V(p.ball.x + 1, 0, p.ball.z - 0.5)); e.golfer.rotation.y = rot;
@@ -123,7 +125,7 @@ export class World {
     if (e.tracer) { this.scene.remove(e.tracer); e.tracer = undefined; }
     this.setBall(e, ball);
     e.golfer.position.copy(V(ball.x + 1, 0, ball.z - 0.5));
-    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(hole, e.slot), 0, 0);   // the cart comes to the new tee too
+    e.driving = false; e.remote = undefined; this.placeCart(e, cartSpawn(gridKey(this.courseId, hole), e.slot), 0, 0);   // the cart comes to the new tee too
   }
   /** Draws a cart state: position, heading, wheel spin and front-wheel lock. */
   placeCart(e: Ent, s: CartState, steer: number, dt: number) {
@@ -134,8 +136,8 @@ export class World {
   remote(m: Mover) { const e = this.ents.get(m.id); if (e && m.id !== this.selfId && m.hole === e.hole) { e.remote = m; e.driving = m.driving; } }
   /** Rebuilds the terrain for a hole without touching the players. */
   buildCourse(h: HoleInfo) {
-    this.course.clear();
-    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(h.index) ? '#3f86bd' : '#265c34'));
+    this.course.clear(); this.courseId = h.course;
+    const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.mat(isCoastal(keyOf(h)) ? '#3f86bd' : '#265c34'));
     base.position.y = -1; // well below the terrain: shallow depth buffers (software GL) z-fight at a few centimetres
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
@@ -148,7 +150,7 @@ export class World {
     const rim = new THREE.Mesh(new THREE.RingGeometry(CUP_VISUAL_RADIUS_M, CUP_VISUAL_RADIUS_M * 1.06, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#f2f2ee', polygonOffset: true, polygonOffsetFactor: -2 }));
     cup.position.set(pin.x, 0.012, pin.z); rim.position.set(pin.x, 0.013, pin.z);
     this.course.add(pole, flag, cup, rim);
-    this.spots = propSpots(h.index);
+    this.spots = propSpots(keyOf(h));
     void this.setProps(this.spots);
   }
 
@@ -304,7 +306,7 @@ export class World {
       const snap = 90 / this.sun.shadow.mapSize.x, c = this.tmpB.set(Math.round(target.x / snap) * snap, 0, Math.round(target.z / snap) * snap);
       this.sun.target.position.copy(c); this.sun.position.set(c.x + 50, 100, c.z + 30); this.sun.target.updateMatrixWorld();
     }
-    this.grass.update(this.myHole, this.cam.position.x, this.cam.position.z, performance.now() / 1000);
+    this.grass.update(gridKey(this.courseId, this.myHole), this.cam.position.x, this.cam.position.z, performance.now() / 1000);
     this.renderer.render(this.scene, this.cam);
   }
 }

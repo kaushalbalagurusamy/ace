@@ -1,6 +1,7 @@
 // Typed wire contract, JSON over WebSocket at /ws. Shared by client and server; no logic here.
 import type { ErrorCode, LobbyView } from '../server/lobby-types';
 import type { TrajectoryPoint } from '../sim/types';
+import type { CourseId } from './courses';
 
 export type ClientMsg =
   /** token = the secret from the last `welcome`; required to take over an existing session (reload/reconnect). */
@@ -25,7 +26,7 @@ export interface CartState { x: number; z: number; yaw: number; vx: number; vz: 
 export interface Mover { id: string; hole: number; x: number; z: number; yaw: number; driving: boolean; cart: CartState }
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
-export interface HoleInfo { index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
+export interface HoleInfo { course: CourseId; index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
 export interface PlayerRace { id: string; name: string; hole: number; ball: BallState; finishedAtS?: number }
 
 export type ServerMsg =

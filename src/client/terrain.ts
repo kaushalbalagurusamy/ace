@@ -1,6 +1,8 @@
+// Every `hole` parameter here is a courses.gridKey (course and hole in one number).
 // Draws the traced lie grid (the same data the server reads for physics) as terrain: a 3D ground mesh and the minimap.
 import * as THREE from 'three';
-import { GRIDS } from '../shared/course-grid';
+import { gridOf, keyOf } from '../shared/courses';
+import type { HoleGrid } from '../shared/course-grid';
 import { decodeGrid } from '../shared/gridtools';
 import { loadTexture, type PropSpot } from './assets';
 import type { HoleInfo } from '../shared/protocol';
@@ -16,7 +18,7 @@ const COL: Record<string, [number, number, number]> = {
 const COL_OPEN_SEA: [number, number, number] = [48, 112, 170];
 const COL_OOB: [number, number, number] = [26, 58, 36], COL_OOB_STRIPE: [number, number, number] = [36, 76, 48];
 /** A playable cell next to an out-of-bounds cell: drawn as the white boundary line so out of bounds is unmistakable. */
-function edgeOfOob(cells: Uint8Array, g: (typeof GRIDS)[number], cx: number, cz: number): boolean {
+function edgeOfOob(cells: Uint8Array, g: HoleGrid, cx: number, cz: number): boolean {
   for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) { const x = cx + dx, z = cz + dz; if (x < 0 || z < 0 || x >= g.nx || z >= g.nz || cells[z * g.nx + x] === 111) return true; }
   return false;
 }
@@ -24,17 +26,17 @@ const cache = new Map<string, HTMLCanvasElement>();
 const grids = new Map<number, Uint8Array>();
 const seaMasks = new Map<number, Uint8Array>();
 /** Cells outside the traced map that are within about 80 m of real water read as open sea; elsewhere outside reads as forest. */
-function openSea(hole: number, g: (typeof GRIDS)[number], cells: Uint8Array): Uint8Array {
+function openSea(hole: number, g: HoleGrid, cells: Uint8Array): Uint8Array {
   let m = seaMasks.get(hole); if (m) return m;
   const R = Math.round(80 / g.cell), tmp = new Uint8Array(g.nx * g.nz); m = new Uint8Array(g.nx * g.nz);
   for (let z = 0; z < g.nz; z++) { let last = -1e9; for (let x = 0; x < g.nx; x++) { if (cells[z * g.nx + x] === 119) last = x; if (x - last <= R) tmp[z * g.nx + x] = 1; } last = 1e9; for (let x = g.nx - 1; x >= 0; x--) { if (cells[z * g.nx + x] === 119) last = x; if (last - x <= R) tmp[z * g.nx + x] = 1; } }
   for (let x = 0; x < g.nx; x++) { let last = -1e9; for (let z = 0; z < g.nz; z++) { if (tmp[z * g.nx + x]) last = z; if (z - last <= R) m[z * g.nx + x] = 1; } last = 1e9; for (let z = g.nz - 1; z >= 0; z--) { if (tmp[z * g.nx + x]) last = z; if (last - z <= R) m[z * g.nx + x] = 1; } }
   seaMasks.set(hole, m); return m;
 }
-const decoded = (hole: number) => grids.get(hole) ?? (grids.set(hole, decodeGrid(GRIDS[hole]!)), grids.get(hole)!);
+const decoded = (hole: number) => grids.get(hole) ?? (grids.set(hole, decodeGrid(gridOf(hole))), grids.get(hole)!);
 /** Class char code at sim (x, z); no string allocation, for per-frame and per-instance lookups. */
 export const cellCode = (hole: number, x: number, z: number): number => {
-  const g = GRIDS[hole]!, cells = decoded(hole);
+  const g = gridOf(hole), cells = decoded(hole);
   const ix = Math.floor((x - g.x0) / g.cell), iz = Math.floor((z - g.z0) / g.cell);
   return ix < 0 || iz < 0 || ix >= g.nx || iz >= g.nz ? 111 : cells[iz * g.nx + ix]!;
 };
@@ -43,7 +45,7 @@ export const cellClass = (hole: number, x: number, z: number): string => String.
 /** One canvas pixel block per cell: `mirrorX` for the 3D plane (sim +x is three -x), `flipZ` for the minimap (far end at the top). */
 export function gridCanvas(hole: number, px: number, mirrorX: boolean, flipZ: boolean): HTMLCanvasElement {
   const key = `${hole}:${px}:${mirrorX}:${flipZ}`; const hit = cache.get(key); if (hit) return hit;
-  const g = GRIDS[hole]!, cells = grids.get(hole) ?? (grids.set(hole, decodeGrid(g)), grids.get(hole)!);
+  const g = gridOf(hole), cells = grids.get(hole) ?? (grids.set(hole, decodeGrid(g)), grids.get(hole)!);
   const sea = openSea(hole, g, cells);
   const c = document.createElement('canvas'); c.width = g.nx * px; c.height = g.nz * px;
   const ctx = c.getContext('2d')!, img = ctx.createImageData(c.width, c.height);
@@ -82,7 +84,7 @@ function boxBlur(a: Uint8Array, w: number, h: number, r: number, tmp: Uint8Array
 /** Per-surface weights from the lie grid (sim x, not mirrored), softened so surfaces blend over about a metre. A: fairway, first cut, rough, fringe. B: green, sand. */
 export function turfMasks(hole: number): [THREE.DataTexture, THREE.DataTexture] {
   const hit = masks.get(hole); if (hit) return hit;
-  const g = GRIDS[hole]!, cells = decoded(hole), W = g.nx * MASK_PX, H = g.nz * MASK_PX;
+  const g = gridOf(hole), cells = decoded(hole), W = g.nx * MASK_PX, H = g.nz * MASK_PX;
   const planes = Array.from({ length: 6 }, () => new Uint8Array(W * H)), tmp = new Uint8Array(W * H);
   const at = (x: number, z: number) => (x < 0 || z < 0 || x >= g.nx || z >= g.nz ? 111 : cells[z * g.nx + x]!);
   for (let cz = 0; cz < g.nz; cz++) for (let cx = 0; cx < g.nx; cx++) {
@@ -162,8 +164,8 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
 type TerrainU = { uDetail: { value: THREE.Texture | null }; uAlb: { value: THREE.Texture | null }; uNrm: { value: THREE.Texture | null }; uMaskA: { value: THREE.Texture | null }; uMaskB: { value: THREE.Texture | null }; uGrid: { value: THREE.Vector4 }; uStripe: { value: THREE.Vector2 } };
 /** Ground mesh for a hole in three space (x mirrored, as everywhere in the client). Starts with the lie grid's canvas colours;
  *  the HD turf replaces them once `turf` resolves (if it resolves to null, a generated grass texture is multiplied in as detail instead). */
-export function terrainMesh(h: Pick<HoleInfo, 'index' | 'tee' | 'pin'>, turf: Promise<Turf | null>, detail: boolean): THREE.Mesh {
-  const hole = h.index, g = GRIDS[hole]!, tex = new THREE.CanvasTexture(gridCanvas(hole, 4, true, false));
+export function terrainMesh(h: Pick<HoleInfo, 'course' | 'index' | 'tee' | 'pin'>, turf: Promise<Turf | null>, detail: boolean): THREE.Mesh {
+  const hole = keyOf(h), g = gridOf(hole), tex = new THREE.CanvasTexture(gridCanvas(hole, 4, true, false));
   tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const ax = h.pin.x - h.tee.x, az = h.pin.z - h.tee.z, al = Math.hypot(ax, az) || 1;
   const u: TerrainU = { uDetail: { value: null }, uAlb: { value: null }, uNrm: { value: null }, uMaskA: { value: null }, uMaskB: { value: null },
@@ -193,11 +195,11 @@ export function setTurf(m: THREE.Mesh, t: Turf | null, detail: boolean) {
     mat.defines = detail ? { HAS_TURF: '', TURF_DETAIL: '' } : { HAS_TURF: '' }; mat.needsUpdate = true;
   } else void loadTexture('tex-rough').then(d => { if (d && !u.uAlb.value) { u.uDetail.value = d; mat.defines = { HAS_DETAIL: '' }; mat.needsUpdate = true; } });
 }
-export const isCoastal = (hole: number) => GRIDS[hole]!.coastal;
+export const isCoastal = (hole: number) => gridOf(hole).coastal;
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
 export function propSpots(hole: number): PropSpot[] {
-  const g = GRIDS[hole]!; let seed = (hole + 1) * 2654435761 >>> 0;
+  const g = gridOf(hole); let seed = (hole + 1) * 2654435761 >>> 0;
   const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   const trees: PropSpot[] = [], rocks: PropSpot[] = [];
   for (let z = g.z0; z < g.z0 + g.nz * g.cell; z += 6) for (let x = g.x0; x < g.x0 + g.nx * g.cell; x += 6) {
@@ -210,7 +212,7 @@ export function propSpots(hole: number): PropSpot[] {
 
 /** Rangefinder view: fits the hole's grid into a W x H canvas, tee at the bottom, pin at the top, sim +x to the right. */
 export function rfView(hole: number, W: number, H: number) {
-  const g = GRIDS[hole]!, gw = g.nx * g.cell, gh = g.nz * g.cell, s = Math.min(W / gw, H / gh) * 0.98, cx = g.x0 + gw / 2, cz = g.z0 + gh / 2;
+  const g = gridOf(hole), gw = g.nx * g.cell, gh = g.nz * g.cell, s = Math.min(W / gw, H / gh) * 0.98, cx = g.x0 + gw / 2, cz = g.z0 + gh / 2;
   const toScreen = (x: number, z: number): [number, number] => [W / 2 + (x - cx) * s, H / 2 - (z - cz) * s];
   const toWorld = (sx: number, sy: number): { x: number; z: number } => ({ x: cx + (sx - W / 2) / s, z: cz - (sy - H / 2) / s });
   const [x0, y0] = toScreen(g.x0, g.z0 + gh);
