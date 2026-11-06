@@ -7,7 +7,7 @@ const { chromium } = createRequire(join(resolve(pwDir), 'x.js'))('playwright');
 const ROOT = resolve(import.meta.dirname, '../..');
 const VIEWS = { front: [0, 0, 1], side: [1, 0, 0], back: [0, 0, -1], top: [0, 1, 0.001], sole: [0, -1, 0.001], threequarter: [0.7, 0.45, 0.9] };
 const SETS = { golfer: ['front', 'side', 'back'], tree: ['threequarter', 'front', 'top'], rock: ['threequarter', 'front', 'top'], club: ['front', 'side', 'sole', 'threequarter'] };
-const kind = id => (id === 'golfer' ? 'golfer' : id.startsWith('tree') ? 'tree' : id.startsWith('rock') ? 'rock' : 'club');
+const kind = id => (id === 'golfer' ? 'golfer' : id.startsWith('tree') ? 'tree' : /^(rock|cliff|seawall)/.test(id) ? 'rock' : 'club');
 const HTML = `<!doctype html><meta charset=utf-8><body style="margin:0"><script type=importmap>{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
 <script type=module>
 import * as THREE from 'three'; import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'; import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
