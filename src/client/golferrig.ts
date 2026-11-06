@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import type { Pose, V3 } from './golferanim';
 import { clubMatrix } from './clubs';
+import { toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 const NAMES = ['Hips', 'Spine02', 'Spine01', 'Spine', 'Head', 'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'RightUpLeg', 'RightLeg', 'RightFoot',
   'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand'] as const;
@@ -105,6 +106,31 @@ export class GolferRig {
     const b = this.bones[n], mq = this.model.getWorldQuaternion(new THREE.Quaternion());
     _q.setFromEuler(_e.set(heel, 0, 0)).premultiply(mq).multiply(this.rest[n].mq);
     b.quaternion.copy(b.parent!.getWorldQuaternion(_q2).invert().multiply(_q)); b.updateMatrixWorld(true);
+  }
+}
+
+/** Smooth shading (critic: the face read blocky and faceted): normals averaged across faces meeting at under 60°, so creases such
+ *  as the collar stay sharp. Keeps the skin weights (the geometry is de-indexed with every attribute). */
+export function smoothShading(model: THREE.Object3D) {
+  model.traverse(o => { const m = o as THREE.SkinnedMesh; if (m.isMesh) m.geometry = toCreasedNormals(m.geometry, Math.PI / 3); });
+}
+
+let glowTex: THREE.Texture | null = null;
+/** Soft additive violet glows over both eyes so they read at play distance (critic: the texture alone gives specks). Placed from
+ *  the rig's `headfront` marker (on the face, between the eyes) and parented to the head so they follow every pose. */
+export function addEyeGlow(model: THREE.Object3D, spread = 0.031, size = 0.036) {
+  const head = model.getObjectByName('Head'), front = model.getObjectByName('headfront'); if (!head || !front) return;
+  if (!glowTex) {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d')!, g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(180,160,255,0.9)'); g.addColorStop(1, 'rgba(122,92,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 64, 64); glowTex = new THREE.CanvasTexture(c);
+  }
+  model.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(model.matrixWorld).invert(), at = new THREE.Vector3().setFromMatrixPosition(front.matrixWorld).applyMatrix4(inv);
+  const eyeY = 0.915 * new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3()).y;   // eye line, the same bind height the eye shader uses
+  for (const side of [-1, 1]) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: EYE, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+    s.scale.setScalar(size); s.position.set(at.x + side * spread, eyeY, at.z + 0.03); model.add(s); head.attach(s);
   }
 }
 

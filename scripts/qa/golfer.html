@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { normalise } from '/src/client/assets.ts';
-import { GolferRig, tintPolo } from '/src/client/golferrig.ts';
+import { GolferRig, addEyeGlow, smoothShading, tintPolo } from '/src/client/golferrig.ts';
 import { POSES, backswingPose, releasePose, puttPose, walkPose } from '/src/client/golferanim.ts';
 import { CLUBS, fitGeneratedHead, makeCodeClub } from '/src/client/clubs.ts';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -19,7 +19,7 @@ const club = async spec => { try { return fitGeneratedHead((await loader.loadAsy
 // show(view, pose, {club, tint, depth, ms}): pose is 'rest' | 'idle' | 'address' | 'top' | 'back' (depth) | 'release' (depth, ms) | 'putt' | 'walk'
 window.show = async (view, pose, o = {}) => {
   const model = normalise(cloneSkinned(gltf.scene), 1.8), rig = new GolferRig(model), spec = CLUBS[o.club ?? 6];
-  tintPolo(model, o.tint ?? '#ffffff');   // white polo = untinted; also lights the violet eyes
+  smoothShading(model); tintPolo(model, o.tint ?? '#ffffff'); addEyeGlow(model);   // white polo = untinted; also lights the violet eyes
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#8a8a8a'); scene.add(model);
   scene.add(new THREE.HemisphereLight('#ffffff', '#707070', 1.6)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(3, 5, 4); const fill = new THREE.DirectionalLight('#ffffff', 0.8); fill.position.set(-4, 2, -3); scene.add(key, fill);
   let p = null;
