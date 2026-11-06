@@ -90,6 +90,12 @@ for (const sp of specs) {
   const top = Math.max(...avg.map(r => r[4]!)), peak = sp.belt === null ? -0.02 : -0.03;
   avg.forEach((r, s) => { r[0] = clamp(leanS[s]!, -0.05, 0.35); for (const k of [4, 14, 17]) r[k] = r[k]! - top + peak;   // the wrists ride with the hips
     for (const k of [14, 17]) r[k] = clamp(r[k]!, 0.78, 1.5); });   // a hand never below the thigh (a mis-detected Muybridge frame put one at the knee)
+  if (sp.name === 'sprint') {
+    // supervisor review: the captured sprint's arm swing reads about half the clip's (the far arm is hidden, the near one blurred)
+    // and its trunk lean 9-13° against ~15°: the wrists swing twice as far fore and aft about their mean, the lean is centred on 15°
+    const mean = (k: number) => avg.reduce((t, r) => t + r[k]!, 0) / NS, mz = [mean(15), mean(18)], ml = mean(0);
+    for (const r of avg) { r[15] = mz[0]! + 2 * (r[15]! - mz[0]!); r[18] = mz[1]! + 2 * (r[18]! - mz[1]!); r[0] = r[0]! - ml + (15 * Math.PI) / 180; }
+  }
   // ---- foot locking ----
   // stance: the longest circular run of phases where the foot is at its lowest. Treadmill clips (one static camera, a level belt)
   // use the image: contact is the same image height every step, within 15% of the foot's vertical range. Muybridge's frames come
