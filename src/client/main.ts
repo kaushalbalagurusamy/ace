@@ -13,7 +13,7 @@ import { pinOpacity } from './overlay';
 import { label as lookLabel, loadMult, lookDelta, requestLock, resetMult, saveMult, sliderValue, stepMult } from './sensitivity';
 import { rfView } from './terrain';
 import { suggestClub, type Lie } from '../sim';
-import { keyOf } from '../shared/courses';
+import { COURSES, DEFAULT_COURSE, isCourseId, keyOf, type CourseId } from '../shared/courses';
 import { CART, canEnter, cartGround, cartSpawn, exitSpot, forwardSpeed, stepCart } from '../shared/cart';
 import type { CartState } from '../shared/protocol';
 /** The Box Buggy (PRD/07): my cart's state, whether I am in it, and the chase camera (mouse orbit offset, smoothed yaw, bump shake). */
@@ -29,6 +29,8 @@ let token = sessionStorage.getItem('ace.tok') ?? undefined;
 let name = localStorage.getItem('ace.name') ?? '';
 let welcomed = false, lobbies: LobbyView[] = [], lobby: LobbyView | null = null, error = '', count: number | null = null;
 let phase: 'name' | 'menu' | 'race' | 'results' | 'down' = 'name';
+/** The course for the next lobby I create (remembered); inside a lobby the host changes the lobby's course instead. */
+let pick: CourseId = (() => { try { const v = localStorage.getItem('ace.course'); return isCourseId(v) ? v : DEFAULT_COURSE; } catch { return DEFAULT_COURSE; } })();
 
 let hole: HoleInfo | null = null, selfId = '', goAt = 0, endAt = 0;
 let pos = { x: 0, z: 0 }, yaw = 0, pitch = 0.55, club = 0; // higher default camera so the golfer and ball both read at address
@@ -61,7 +63,11 @@ const ui = new UI((a, d, form) => {
     const v = form.querySelector<HTMLInputElement>('#nm')!.value.trim();
     if (!validName(v)) return ui.showName(v, 'Name must be 2 to 16 characters.');
     name = v; localStorage.setItem('ace.name', v); net.send({ t: 'hello', sessionId, name, token });
-  } else if (a === 'create') net.send({ t: 'createLobby' });
+  } else if (a === 'create') net.send({ t: 'createLobby', course: pick });
+  else if (a === 'course' && isCourseId(d.v)) {
+    if (lobby) net.send({ t: 'setCourse', course: d.v });
+    else { pick = d.v; try { localStorage.setItem('ace.course', pick); } catch { /* private mode: not remembered */ } menu(); }
+  }
   else if (a === 'join') net.send({ t: 'joinLobby', lobbyId: d.id! });
   else if (a === 'leave') net.send({ t: 'leaveLobby' });
   else if (a === 'ready') net.send({ t: 'ready', ready: !!d.v });
@@ -69,7 +75,7 @@ const ui = new UI((a, d, form) => {
   else if (a === 'solo') net.send({ t: 'startSolo' });
   else if (a === 'back') { net.send({ t: 'leaveLobby' }); lobby = null; phase = 'menu'; menu(); }
 });
-const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbies, lobby, error, count }); };
+const menu = () => { if (phase === 'menu') ui.showMenu({ self: sessionId, lobbies, lobby, error, count, pick }); };
 ui.setClub(0);
 
 const net = new Net(onMsg, () => {
@@ -139,7 +145,7 @@ function onMsg(m: ServerMsg) {
     case 'snap': pos = { x: m.x, z: m.z }; driving = m.driving; cart = { ...m.cart }; break;
     case 'raceEnd':
       endAt = performance.now(); swing = null; phase = 'results'; document.exitPointerLock(); audio.stopLoops(); audio.whir(0);
-      ui.showResults([...m.results].sort((a, b) => a.place - b.place)); break;
+      ui.showResults([...m.results].sort((a, b) => a.place - b.place), COURSES[m.course]?.name ?? ''); break;
   }
 }
 /** Quiet ambience under the effects: surf and gulls on the ocean holes, wind in the cypress elsewhere. */

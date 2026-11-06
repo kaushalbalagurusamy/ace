@@ -10,7 +10,7 @@ export const DEFAULT_COURSE: CourseId = 'pebble';
 export const isCourseId = (v: unknown): v is CourseId => typeof v === 'string' && (COURSE_IDS as readonly string[]).includes(v);
 
 export interface Course {
-  id: CourseId; name: string; place: string;
+  id: CourseId; name: string; /** for chips and captions */ short: string; place: string;
   /** coastal: ocean beyond the traced map, cypress and pine; parkland: forest beyond it, deciduous and oak tree lines */
   theme: 'coastal' | 'parkland';
   /** a one-line look for the scene and the lobby card */
@@ -27,23 +27,25 @@ const flat = () => 0;
 export const COURSES: Record<CourseId, Course> = {
   // docs/research/reference-sources.md: SFGATE 2000 U.S. Open card, hole 2 played as a par 5
   pebble: {
-    id: 'pebble', name: 'Pebble Beach Golf Links', place: 'Pebble Beach, California', theme: 'coastal', look: 'Coastal links on Carmel Bay', grids: PEBBLE_GRIDS, heightAt: flat,
+    id: 'pebble', name: 'Pebble Beach Golf Links', short: 'Pebble Beach', place: 'Pebble Beach, California', theme: 'coastal', look: 'Coastal links on Carmel Bay', grids: PEBBLE_GRIDS, heightAt: flat,
     card: card([[4, 381], [5, 502], [4, 390], [4, 331], [3, 188], [5, 524], [3, 106], [4, 418], [4, 466],
       [4, 446], [4, 380], [3, 202], [4, 406], [5, 573], [4, 397], [4, 403], [3, 208], [5, 543]]),
   },
   // BlueGolf course database, Blue (back) tees; layouts traced from its satellite hole maps (docs/research/reference-sources.md)
   'bethpage-black': {
-    id: 'bethpage-black', name: 'Bethpage Black', place: 'Farmingdale, New York', theme: 'parkland', look: 'Parkland: heavy tree lines, deep bunkers with fescue faces',
+    id: 'bethpage-black', name: 'Bethpage Black', short: 'Bethpage Black', place: 'Farmingdale, New York', theme: 'parkland', look: 'Parkland: heavy tree lines, deep bunkers with fescue faces',
     grids: BETHPAGE_GRIDS, heightAt: flat, card: card(BETHPAGE_CARD),
   },
   // BlueGolf course database, Black (back) tees
   aronimink: {
-    id: 'aronimink', name: 'Aronimink Golf Club', place: 'Newtown Square, Pennsylvania', theme: 'parkland', look: 'Donald Ross parkland: ponds, creeks and mature trees',
+    id: 'aronimink', name: 'Aronimink Golf Club', short: 'Aronimink', place: 'Newtown Square, Pennsylvania', theme: 'parkland', look: 'Donald Ross parkland: ponds, creeks and mature trees',
     grids: ARONIMINK_GRIDS, heightAt: flat, card: card(ARONIMINK_CARD),
   },
 };
 
 export const HOLES_PER_COURSE = 18;
+/** Par and yards for the whole card. */
+export const totals = (id: CourseId) => COURSES[id].card.reduce((t, h) => ({ par: t.par + h.par, yards: t.yards + h.yards }), { par: 0, yards: 0 });
 /** One number per hole of every course (Pebble's holes keep keys 0..17), so per-hole caches and lookups need a single key. */
 export const gridKey = (course: CourseId, hole: number): number => COURSE_IDS.indexOf(course) * HOLES_PER_COURSE + hole;
 export const gridOf = (key: number): HoleGrid => COURSES[COURSE_IDS[Math.floor(key / HOLES_PER_COURSE)]!].grids[key % HOLES_PER_COURSE]!;
