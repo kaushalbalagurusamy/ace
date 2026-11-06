@@ -16,3 +16,6 @@ public/
 
 # Python bytecode
 __pycache__/
+
+# elevation fetch cache (scripts/fetch_elevation.mjs)
+.elev-cache/

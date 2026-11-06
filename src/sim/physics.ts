@@ -1,11 +1,11 @@
 // Ball physics calibrated to TrackMan-grade numbers. Every constant cites docs/research/trackman-physics.md (§ = section there).
 import type { Club, Landing, Launch, ShotResult, Surface, TrajectoryPoint } from './types';
 import { lengthSpeedFactor } from './length';
-import { CENTRE, MAX_EFFORT, gauss, loftForFb, mulberry32, pathForIo } from './delivery';
+import { CENTRE, MAX_EFFORT, SLOPE_ATTACK_SHARE, SLOPE_LOFT_SHARE, gauss, loftForFb, mulberry32, pathForIo, sideSlopeFaceDeg } from './delivery';
 import type { Lie, Strike } from './delivery';
 
 const MASS = 0.04593;                 // kg, Rules of Golf max (§3.1)
-const RADIUS = 0.021335;              // m (§5.1)
+export const RADIUS = 0.021335;              // m (§5.1)
 const AREA = Math.PI * RADIUS * RADIUS;
 const G = 9.80665;
 const MPH = 0.44704;
@@ -53,7 +53,7 @@ export function rollDistance(v0: number, surface: Surface, stimp = 10): number {
 }
 
 // ---- Cup capture (§5.2, Penner): the fastest a ball can cross the cup at offset b from its centre and still drop. ----
-const CUP_R = 0.054;
+export const CUP_R = 0.054;
 /** Drawn ball radius (m). The ball is drawn about 10x real size so it reads on screen; the cup is drawn and hit-tested at the same
  *  scale (owner QoL, 2026-11-05) so what you see is what drops. Ball flight, roll and capture SPEEDS stay real (TrackMan/Penner). */
 export const BALL_VISUAL_RADIUS_M = 0.22;
@@ -68,10 +68,10 @@ export function captureSpeed(b: number): number {
 
 // ---- Bounce (§4.1): rigid bounce with friction off a Penner tilted plane, natural tee turf (Campaign B Penner fit). ----
 const TURF = { e: 0.222, mu: 0.999, kP: 2.973e-4 };
-const HOP_MIN_MS = 0.3;               // design constant: a rebound slower than this (a 5 mm hop) ends the hops and the ball rolls
+export const HOP_MIN_MS = 0.3;               // design constant: a rebound slower than this (a 5 mm hop) ends the hops and the ball rolls
 
 /** One bounce. vx along the travel line (may be negative), vy < 0, w > 0 is backspin for +vx travel (rad/s). */
-function bounce(vx: number, vy: number, w: number): [number, number, number] {
+export function bounce(vx: number, vy: number, w: number): [number, number, number] {
   const sg = vx < 0 ? -1 : 1;                                  // mirror a backward-moving ball so the plane tilts toward it
   vx *= sg; w *= sg;
   const beta = TURF.kP * (Math.hypot(vx, vy) / RADIUS) * Math.atan2(-vy, vx);
@@ -115,7 +115,8 @@ export function bounceRoll(l: Landing, surface: Surface): RunOut {
 // ---- Flight (§3.1): drag, Magnus lift along ω̂ × v, gravity, spin decay; RK4 at a fixed step. ----
 type S = { x: number; y: number; z: number; vx: number; vy: number; vz: number; w: number };
 
-export function simulateShot(launch: Launch, air: Air = {}): ShotResult {
+/** `ground(x, z)`: terrain height (m) in the launch frame relative to the ball's lie; the flight ends where it meets it (default flat, y = 0). */
+export function simulateShot(launch: Launch, air: Air = {}, ground?: (x: number, z: number) => number): ShotResult {
   const rho = airDensity(air), mu = viscosity(air.tempC ?? 21), k = (rho * AREA) / (2 * MASS);
   const la = launch.launchDeg * RAD, az = launch.azimuthDeg * RAD, th = launch.spinAxisDeg * RAD;
   // spin axis for heading +z: backspin = -x, tilt by th rotates toward +y so lift gains +x (curves right)
@@ -149,17 +150,18 @@ export function simulateShot(launch: Launch, air: Air = {}): ShotResult {
     const k1 = deriv(s), k2 = deriv(add(s, k1, DT / 2)), k3 = deriv(add(s, k2, DT / 2)), k4 = deriv(add(s, k3, DT));
     const sum = (key: keyof S) => s[key] + (DT / 6) * (k1[key] + 2 * k2[key] + 2 * k3[key] + k4[key]);
     const nx: S = { x: sum('x'), y: sum('y'), z: sum('z'), vx: sum('vx'), vy: sum('vy'), vz: sum('vz'), w: sum('w') };
-    if (nx.y <= 0) {
-      const f = s.y / (s.y - nx.y); // linear interpolation to y = 0 (§3.5)
+    const g1 = !ground ? 0 : n * DT > 0.1 ? ground(nx.x, nx.z) : -Infinity;   // the first 0.1 s clears the ball's own slope
+    if (nx.y <= g1) {
+      const g0 = ground ? ground(s.x, s.z) : 0, f = (s.y - g0) / (s.y - g0 - (nx.y - g1)); // linear interpolation to the ground (§3.5)
       s = add(s, { x: nx.x - s.x, y: nx.y - s.y, z: nx.z - s.z, vx: nx.vx - s.vx, vy: nx.vy - s.vy, vz: nx.vz - s.vz, w: nx.w - s.w }, f);
-      s.y = 0; t += DT * f; landed = true;
+      s.y = ground ? ground(s.x, s.z) : 0; t += DT * f; landed = true;
       break;
     }
     s = nx; t = n * DT; apex = Math.max(apex, s.y);
     if (n % SAMPLE_EVERY === 0) samples.push({ t, p: { x: s.x, y: s.y, z: s.z } });
   }
-  if (!landed) s = { ...s, y: 0 }; // safety cap: never reached for sane launches
-  samples.push({ t, p: { x: s.x, y: 0, z: s.z } });
+  if (!landed) s = { ...s, y: ground ? ground(s.x, s.z) : 0 }; // safety cap: never reached for sane launches
+  samples.push({ t, p: { x: s.x, y: s.y, z: s.z } });
 
   const vh = Math.hypot(s.vx, s.vz);
   const landing: Landing = { speedMs: Math.hypot(vh, s.vy), angleDeg: Math.atan2(-s.vy, vh) / RAD, spinRpm: (s.w * 60) / (2 * Math.PI) };
@@ -266,9 +268,11 @@ function launchAt(c: Club, strike: Strike, speedMul: number): Launch {
     P += gauss(rng) * MAX_EFFORT.sigmaPathDeg * s;
   }
   if (lie === 'rough' && !putter) F += (mulberry32(seed + 0x9e3779b9)() * 2 - 1) * ROUGH_FACE_NOISE_DEG;
-  const d = deliveryAt(c, lie);
+  const d = deliveryAt(c, lie), sl = !putter && lie !== 'tee' ? strike.slope : undefined;   // tee boxes are level
+  if (sl) F += sideSlopeFaceDeg(c.loftDeg, sl.sideDeg);                                  // the curve then comes from the D-plane, not added
   const l = impact({
-    clubMph: c.maxClubSpeedMph * lengthSpeedFactor(strike.length ?? 1) * speedMul, attackDeg: d.attackDeg, loftDeg: d.loftDeg + loftForFb(fb),
+    clubMph: c.maxClubSpeedMph * lengthSpeedFactor(strike.length ?? 1) * speedMul,
+    attackDeg: d.attackDeg + SLOPE_ATTACK_SHARE * (sl?.alongDeg ?? 0), loftDeg: d.loftDeg + loftForFb(fb) + SLOPE_LOFT_SHARE * (sl?.alongDeg ?? 0),
     faceDeg: F, pathDeg: P, smashBase: r.smashBase, smashFixed: r.smashFixed, k: r.k, kappaH: c.loftDeg < 20 ? 0.15 : 0.25,
   });
   return { ...l, ballSpeed: l.ballSpeed * lieSpeed, launchDeg: l.launchDeg + L.launch, backspinRpm: l.backspinRpm * L.spin };

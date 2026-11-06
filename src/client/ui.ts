@@ -111,6 +111,7 @@ kbd{display:inline-block;min-width:16px;padding:2px 5px;margin:0 2px 2px 0;borde
 #meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
 #toast{left:50%;top:70px;transform:translateX(-50%);display:none}
+#lie{left:10px;bottom:220px;display:none;font-size:12px;line-height:1.45;max-width:300px}#lie canvas{float:left;margin:2px 8px 0 0}
 #bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
 #pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
@@ -138,7 +139,7 @@ export class UI {
     this.hud.innerHTML = `<div class="hud" id="bag">${BAG.map(b => `<div class="slot"><b>${b.key}</b>${b.label}</div>`).join('')}</div>
       <div class="hud" id="lb"></div><div class="hud" id="mini"><canvas width="150" height="210"></canvas></div>
       <div class="hud" id="info"></div><div class="hud" id="card"></div><div class="hud" id="prompt"></div>
-      <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div>
+      <div class="hud" id="meter"><div id="mlabel"></div><div class="track"><div id="fill"></div><div class="max"></div></div></div><div class="hud" id="bpos"><canvas width="100" height="100"></canvas><span></span></div><div class="hud" id="lie"><canvas width="54" height="54"></canvas><div></div></div>
       <div class="hud" id="cd"></div><div class="hud" id="toast"></div><div class="hud" id="banner"></div><div class="hud" id="arrow"><i></i><span></span></div>
       <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
@@ -226,6 +227,20 @@ export class UI {
     x.fillStyle = '#ffe14d'; x.beginPath(); x.arc(50, 50, 2, 0, 7); x.fill();                                                          // the centre (stock)
     x.fillStyle = '#fff'; x.beginPath(); x.arc(at(p.io), at(-p.fb), 5, 0, 7); x.fill();
     e.querySelector('span')!.textContent = `${shotShape(p.fb, p.io)} · Fwd ${p.fb >= 0 ? '+' : ''}${p.fb} · Away ${p.io >= 0 ? '+' : ''}${p.io}`;
+  }
+  /** Lie panel at the ball: the lie's penalties and the stance angles (lieinfo.ts), with an icon of the fall line relative to the aim (up = target).
+   *  No curve number on purpose: the player reads the angles and judges the curve (owner). */
+  liePanel(info: { lines: string[] } | null, slope?: { alongDeg: number; sideDeg: number }) {
+    const e = this.$('lie'); e.style.display = info ? 'block' : 'none'; if (!info || !slope) return;
+    e.querySelector('div')!.innerHTML = info.lines.map((l, i) => (i ? esc(l) : `<b>${esc(l)}</b>`)).join('<br>');
+    const c = e.querySelector('canvas')!, x = c.getContext('2d')!, m = 27; x.clearRect(0, 0, 54, 54);
+    x.strokeStyle = 'rgba(255,255,255,.5)'; x.beginPath(); x.arc(m, m, 24, 0, 7); x.stroke();
+    x.fillStyle = '#ffe14d'; x.beginPath(); x.moveTo(m, 4); x.lineTo(m - 4, 11); x.lineTo(m + 4, 11); x.fill();          // the target is up
+    const dx = -slope.sideDeg, dy = slope.alongDeg, len = Math.hypot(dx, dy);                                          // downhill: screen right = right of the line
+    if (len < 0.2) { x.fillStyle = '#fff'; x.beginPath(); x.arc(m, m, 3, 0, 7); x.fill(); return; }
+    const k = Math.min(20, 4 + len * 2.5) / len, ex = m + dx * k, ey = m + dy * k, a = Math.atan2(ey - m, ex - m);
+    x.strokeStyle = x.fillStyle = '#7fd0ff'; x.lineWidth = 3; x.beginPath(); x.moveTo(m, m); x.lineTo(ex, ey); x.stroke(); x.lineWidth = 1;
+    x.beginPath(); x.moveTo(ex + Math.cos(a) * 4, ey + Math.sin(a) * 4); x.lineTo(ex + Math.cos(a + 2.4) * 7, ey + Math.sin(a + 2.4) * 7); x.lineTo(ex + Math.cos(a - 2.4) * 7, ey + Math.sin(a - 2.4) * 7); x.fill();
   }
   /** Pin indicator: a flag drawn over the pin at constant pixel size with the yardage from your ball when it is on screen, an edge arrow toward it when not. */
   pinMarker(m: Marker | null, yards: number, opacity: number) {

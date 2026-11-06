@@ -5,11 +5,10 @@ import type { Surface } from '../sim';
 import type { BallState, HoleInfo } from '../shared/protocol';
 import { GRIDS } from '../shared/course-grid';
 import { decodeGrid } from '../shared/gridtools';
+import { DEFAULT_COURSE, heightAt, normalAt, type Vec3 } from '../shared/height';
+import { CARD } from '../shared/pebble-card';
+export { CARD };
 
-export const CARD: readonly { par: number; yards: number }[] = [
-  [4, 381], [5, 502], [4, 390], [4, 331], [3, 188], [5, 524], [3, 106], [4, 418], [4, 466],
-  [4, 446], [4, 380], [3, 202], [4, 406], [5, 573], [4, 397], [4, 403], [3, 208], [5, 543],
-].map(([par, yards]) => ({ par: par!, yards: yards! }));
 export const HOLE_COUNT = CARD.length;
 
 const M_PER_YD = 0.9144;
@@ -22,6 +21,9 @@ export interface Hole {
   /** water or out of bounds (beyond the traced map counts as out of bounds); null when the spot is playable */
   penaltyAt(x: number, z: number): Penalty | null;
   outOfBounds(x: number, z: number): boolean;
+  /** ground height (m above the tee) and unit surface normal from the real elevation (shared/height.ts) */
+  heightAt(x: number, z: number): number;
+  normalAt(x: number, z: number): Vec3;
 }
 
 const LIE: Record<string, Surface> = { g: 'green', f: 'fairway', p: 'fairway', c: 'firstCut', r: 'rough', t: 'rough', k: 'rough', s: 'bunker', w: 'rough', o: 'rough' };
@@ -46,6 +48,8 @@ export function hole(index: number): Hole {
     surfaceAt: (x, z) => LIE[String.fromCharCode(cls(x, z))] ?? 'rough',
     penaltyAt,
     outOfBounds: (x, z) => penaltyAt(x, z) !== null,
+    heightAt: (x, z) => heightAt(DEFAULT_COURSE, index, x, z),
+    normalAt: (x, z) => normalAt(DEFAULT_COURSE, index, x, z),
   };
 }
 

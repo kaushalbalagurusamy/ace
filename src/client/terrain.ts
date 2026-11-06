@@ -6,6 +6,12 @@ import { loadTexture, type PropSpot } from './assets';
 import type { HoleInfo } from '../shared/protocol';
 import { TURF_LAYERS } from './turf-bake';
 import type { Turf } from './turf';
+import { COURSE_HEIGHTS, DEFAULT_COURSE, heightAt, normalAt, seaLevel } from '../shared/height';
+
+/** Ground height (m above the tee) at sim (x, z) on a hole of the course being played: the same field the server's physics uses. */
+export const ground = (hole: number, x: number, z: number) => heightAt(DEFAULT_COURSE, hole, x, z);
+export const groundNormal = (hole: number, x: number, z: number) => normalAt(DEFAULT_COURSE, hole, x, z);
+export const seaY = (hole: number) => seaLevel(DEFAULT_COURSE, hole);
 
 /** Class colours from assets/STYLE.md: o out of bounds, w water, r rough, c first cut, f fairway, g green, s sand, p path, t trees, k rock/shore. */
 const COL: Record<string, [number, number, number]> = {
@@ -176,12 +182,17 @@ export function terrainMesh(h: Pick<HoleInfo, 'index' | 'tee' | 'pin'>, turf: Pr
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>\n${TURF_COMMON}`)
       .replace('#include <map_fragment>', `#include <map_fragment>\n${TURF_MAP}`)
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\n#ifdef HAS_TURF\nroughnessFactor = mix(roughnessFactor, turfN.z, turfW);\n#endif')
-      // flat ground: the tangent frame is world x/z, so the baked slopes become a world normal directly
-      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n#ifdef HAS_TURF\nif (turfW > 0.0) { vec2 sl = (turfN.xy * 2.0 - 1.0) * turfW; normal = normalize((viewMatrix * vec4(normalize(vec3(sl.x, 1.0, sl.y)), 0.0)).xyz); }\n#endif');
+      // the baked turf slopes tilt the terrain's own world normal (gentle ground: adding them in world x/z is close enough)
+      .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n#ifdef HAS_TURF\nif (turfW > 0.0) { vec2 sl = (turfN.xy * 2.0 - 1.0) * turfW; vec3 gw = normalize((vec4(normal, 0.0) * viewMatrix).xyz); normal = normalize((viewMatrix * vec4(normalize(gw + vec3(sl.x, 0.0, sl.y)), 0.0)).xyz); }\n#endif');
   };
   mat.defines = {};
-  const w = g.nx * g.cell, d = g.nz * g.cell, m = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2), mat);
-  m.position.set(-(g.x0 + w / 2), 0, g.z0 + d / 2); m.receiveShadow = true; m.userData.hole = hole;
+  // one vertex per height node (4 m), displaced by the shared height field; the lie colours and turf masks stay on the 2 m grid as textures
+  const w = g.nx * g.cell, d = g.nz * g.cell, hh = COURSE_HEIGHTS[DEFAULT_COURSE]![hole]!, geo = new THREE.PlaneGeometry(w, d, hh.nx - 1, hh.nz - 1).rotateX(-Math.PI / 2);
+  const cx = -(g.x0 + w / 2), cz = g.z0 + d / 2, pos = geo.attributes.position!;
+  for (let i = 0; i < pos.count; i++) pos.setY(i, ground(hole, -(pos.getX(i) + cx), pos.getZ(i) + cz));   // three x is mirrored sim x
+  geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(cx, 0, cz); m.receiveShadow = true; m.userData.hole = hole;
   void turf.then(t => setTurf(m, t, detail));
   return m;
 }
