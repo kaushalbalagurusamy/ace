@@ -4,11 +4,11 @@ import { SURFACES, type SurfaceId } from './graphics';
 
 export interface TurfLayer { /** palette mean, sRGB 0-255: the olive Poa/rye turf and near-white sand of the real photos (docs/research/pebble-look.md) */ target: [number, number, number]; /** world metres per tile */ tile: number; /** relief of the blades in m */ depth: number }
 export const TURF: Record<SurfaceId, TurfLayer> = {
-  fairway: { target: [92, 124, 52], tile: 2.2, depth: 0.006 },
-  firstcut: { target: [82, 112, 48], tile: 2.6, depth: 0.01 },
-  rough: { target: [76, 94, 50], tile: 3.2, depth: 0.02 },
-  fringe: { target: [98, 130, 58], tile: 2, depth: 0.004 },
-  green: { target: [114, 144, 76], tile: 1.8, depth: 0.002 },
+  fairway: { target: [84, 134, 38], tile: 2.2, depth: 0.006 },
+  firstcut: { target: [76, 120, 36], tile: 2.6, depth: 0.01 },
+  rough: { target: [70, 96, 40], tile: 3.2, depth: 0.02 },
+  fringe: { target: [92, 140, 46], tile: 2, depth: 0.004 },
+  green: { target: [108, 152, 62], tile: 1.8, depth: 0.002 },
   sand: { target: [236, 230, 218], tile: 3.5, depth: 0.004 },
 };
 export const TURF_LAYERS = SURFACES.map(s => TURF[s]);

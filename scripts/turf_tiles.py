@@ -28,20 +28,21 @@ def seamless(src: pathlib.Path, out: pathlib.Path, n: int = 2048):
         run(base, "-roll", f"+{n // 2}+0", base, mx, "-fx", blend, a)          # centre columns from the original, edges from the rolled copy
         run(a, "-roll", f"+0+{n // 2}", a, my, "-fx", blend, out)             # same for rows; the x pass is already wrap-continuous
 
-ids = sys.argv[1:] or [p.stem for p in sorted((ROOT / "assets/images").glob("turf-*.png"))]
-rows = json.loads(MF.read_text())
-for i in ids:
-    src = ROOT / "assets/images" / f"{i}.png"
-    with tempfile.TemporaryDirectory() as d:
-        tile = pathlib.Path(d) / "tile.png"; seamless(src, tile)
-        variants = {}
-        for n in SIZES:
-            f = ROOT / f"assets/textures/turf/{n}/{i}.jpg"; f.parent.mkdir(parents=True, exist_ok=True)
-            run(tile, "-resize", f"{n}x{n}", "-strip", "-sampling-factor", "4:2:0", "-quality", QUALITY[n], f)
-            variants[str(n)] = {"file": str(f.relative_to(ROOT)), "sha256": sha(f), "bytes": f.stat().st_size}
-    row = next(r for r in rows if r["id"] == i)
-    top = variants["2048"]
-    row.update(file=top["file"], sha256=top["sha256"], shipped_bytes=top["bytes"], variants=variants, source_png=f"assets/images/{i}.png",
-               post_process="made seamless (variance-preserving half-offset smoothstep blend, x then y), resized to 2048/1024/512, JPEG q80/84/86 4:2:0 (ImageMagick, scripts/turf_tiles.py); original PNG kept local; normal and roughness are derived in the client")
-    print(i, {k: v["bytes"] for k, v in variants.items()})
-MF.write_text(json.dumps(rows, indent=2))
+if __name__ == "__main__":
+    ids = sys.argv[1:] or [p.stem for p in sorted((ROOT / "assets/images").glob("turf-*.png"))]
+    rows = json.loads(MF.read_text())
+    for i in ids:
+        src = ROOT / "assets/images" / f"{i}.png"
+        with tempfile.TemporaryDirectory() as d:
+            tile = pathlib.Path(d) / "tile.png"; seamless(src, tile)
+            variants = {}
+            for n in SIZES:
+                f = ROOT / f"assets/textures/turf/{n}/{i}.jpg"; f.parent.mkdir(parents=True, exist_ok=True)
+                run(tile, "-resize", f"{n}x{n}", "-strip", "-sampling-factor", "4:2:0", "-quality", QUALITY[n], f)
+                variants[str(n)] = {"file": str(f.relative_to(ROOT)), "sha256": sha(f), "bytes": f.stat().st_size}
+        row = next(r for r in rows if r["id"] == i)
+        top = variants["2048"]
+        row.update(file=top["file"], sha256=top["sha256"], shipped_bytes=top["bytes"], variants=variants, source_png=f"assets/images/{i}.png",
+                   post_process="made seamless (variance-preserving half-offset smoothstep blend, x then y), resized to 2048/1024/512, JPEG q80/84/86 4:2:0 (ImageMagick, scripts/turf_tiles.py); original PNG kept local; normal and roughness are derived in the client")
+        print(i, {k: v["bytes"] for k, v in variants.items()})
+    MF.write_text(json.dumps(rows, indent=2))

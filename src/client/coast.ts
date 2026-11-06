@@ -87,7 +87,7 @@ export function deriveNormal(t: THREE.Texture, strength = 2.5): THREE.DataTextur
 
 /** Triplanar rock material (no UVs needed on the extruded faces): albedo + derived normal, darker and wetter near the waterline. */
 export function rockMaterial(texId: string, metresPerTile: number, waterY: number, tint = '#ffffff'): THREE.MeshStandardMaterial {
-  const mat = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.92, metalness: 0 });
+  const mat = new THREE.MeshStandardMaterial({ color: tint, roughness: 0.92, metalness: 0, side: THREE.DoubleSide });
   const u = { uRock: { value: null as THREE.Texture | null }, uRockN: { value: null as THREE.Texture | null }, uScale: { value: 1 / metresPerTile }, uWater: { value: waterY } };
   void loadTexture(texId).then(t => { if (!t) return; u.uRock.value = t; u.uRockN.value = deriveNormal(t); mat.defines = { HAS_ROCK: '' }; mat.needsUpdate = true; });
   mat.onBeforeCompile = sh => {
@@ -137,10 +137,10 @@ export function shoreRockSpots(hole: number): { x: number; z: number; scale: num
 export function makeBuildings(hole: number, pinZ: number): THREE.Group | null {
   if (hole !== 17) return null;
   const g = new THREE.Group(), facade = facadeTexture();
-  const wall = new THREE.MeshStandardMaterial({ map: facade, roughness: 0.85 }), roof = new THREE.MeshStandardMaterial({ color: '#6f675f', roughness: 0.95 });
+  const wall = new THREE.MeshStandardMaterial({ map: facade, color: '#ddd5c2', roughness: 0.85 }), roof = new THREE.MeshStandardMaterial({ color: '#5e5650', roughness: 0.95 });
   const plain = new THREE.MeshStandardMaterial({ color: '#e6dfcc', roughness: 0.9 });
   // [sim x, z beyond the pin, width, depth, height]: one long two-storey block and smaller wings and houses, set back from the green
-  const B = [[-20, 70, 62, 16, 8.5], [24, 66, 26, 13, 7], [-62, 62, 22, 12, 7.5], [55, 80, 18, 12, 6.5], [-95, 78, 16, 11, 6.5], [85, 95, 16, 10, 6]] as const;
+  const B = BUILDINGS;
   for (const [x, dz, w, d, h] of B) {
     const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), [wall, wall, plain, plain, wall, wall]);
     facade.repeat.set(1, 1); body.position.set(-x, h / 2, pinZ + dz);
@@ -151,6 +151,14 @@ export function makeBuildings(hole: number, pinZ: number): THREE.Group | null {
   }
   // box UVs run 0..1 per face: the facade texture holds two storeys of windows, so wide walls get more columns
   g.name = 'buildings'; return g;
+}
+// [sim x, z beyond the pin, width, depth, height]: one long two-storey block and smaller wings and houses, set back from the green
+const BUILDINGS = [[-20, 75, 62, 16, 7.5], [24, 72, 26, 13, 6], [-62, 68, 22, 12, 6.5], [55, 86, 18, 12, 5.5], [-95, 84, 16, 11, 5.5], [85, 100, 16, 10, 5.5]] as const;
+/** Cypress and pines among the buildings behind 18 (the photos show the houses half hidden in trees). Sim space. */
+export function buildingTrees(hole: number, pinZ: number): { kind: 'cypress' | 'pine'; x: number; z: number; scale: number; rotY: number }[] {
+  if (hole !== 17) return [];
+  return [[-55, 52], [-8, 55], [40, 58], [70, 74], [-80, 70], [8, 98], [-40, 100], [100, 84], [-120, 76], [30, 110]].map(([x, z], i) =>
+    ({ kind: i % 3 === 2 ? 'pine' : 'cypress', x: x!, z: pinZ + z!, scale: 0.9 + hash3(x!, z!, 1) * 0.5, rotY: hash3(z!, x!, 2) * 6.28 }));
 }
 let facade: THREE.CanvasTexture | null = null;
 function facadeTexture(): THREE.CanvasTexture {
@@ -198,7 +206,8 @@ export function makeBackdrop(hole: number, farM: number): THREE.Group {
   const crowns = (a: number) => 14 + 7 * noise3(a * 40, 0, hole) + 5 * Math.abs(noise3(a * 160, 3, hole));
   if (hasSea) {
     const y = seaY(hole);
-    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => 22 + 26 * (0.5 + 0.5 * noise3(a * 3, 1, hole)) + 10 * noise3(a * 11, 2, hole), '#33443a', '#7f93a6', 0.25));
+    const taper = (a: number) => Math.min(1, (span - Math.abs(a - seaA)) / 0.35);   // the hills fall to the water at both ends, no cut-off slab
+    grp.add(band(cx, cz, R, seaA - span, seaA + span, y, a => taper(a) * (30 + 70 * (0.5 + 0.5 * noise3(a * 2.2, 1, hole)) ** 1.5 + 14 * noise3(a * 9, 2, hole)), '#3a4a44', '#7a8ea3', 0.3));
     grp.add(band(cx, cz, R - 3, seaA - span, seaA + span, y, a => 3 + 4 * Math.abs(noise3(a * 90, 5, hole)), '#d9d6cb', '#2a3a2c', 0.2));   // pale beach line and the dark shore trees
     grp.add(band(cx, cz, R * 0.75, seaA + span, seaA + Math.PI * 2 - span, 0, crowns, '#1f2a1f', '#2c3a2b', 0.3));
   } else grp.add(band(cx, cz, R * 0.75, 0, Math.PI * 2, 0, crowns, '#1f2a1f', '#2c3a2b', 0.3));

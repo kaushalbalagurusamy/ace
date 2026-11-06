@@ -14,7 +14,8 @@ import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
 import { fogDensity, makeEnvironment, SUN_DIR } from './environment';
 import { makeOcean, seaY } from './ocean';
-import { makeBackdrop, makeBuildings, makeCliffs, shorePieces, shoreRockSpots } from './coast';
+import { makeFescue } from './fescue';
+import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, shorePieces, shoreRockSpots } from './coast';
 import { GolferRig, hasRig, smoothShading } from './golferrig';
 import { POSES, addressPoint, backswingPose, lerpPose, puttPose, releasePose, strideRate, walkPose, type Pose } from './golferanim';
 import { CLUBS, clubMatrix, loadClub, makeCodeClub } from './clubs';
@@ -157,14 +158,14 @@ export class World {
     this.terrain = terrainMesh(h, this.turf, SPEC[this.tier].detail);
     this.course.add(base, this.terrain);
     // the coast (ocean.ts, coast.ts): water at sea level, cliffs or the 18th sea wall down to it, the far shore and the buildings behind 18
-    for (const o of [makeOcean(h.index), makeCliffs(h.index), makeBackdrop(h.index, SPEC[this.tier].far), makeBuildings(h.index, h.pin.z)]) if (o) this.course.add(o);
+    for (const o of [makeOcean(h.index), makeCliffs(h.index), makeBackdrop(h.index, SPEC[this.tier].far), makeBuildings(h.index, h.pin.z), makeFescue(h.index, this.tier === 'low' ? 0 : this.tier === 'medium' ? 3 : 6)]) if (o) this.course.add(o);
     const pin = V(h.pin.x, 0, h.pin.z); this.pinTop.set(pin.x, 2.6, pin.z);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 6), this.mat('#eee')); pole.position.set(pin.x, 1.2, pin.z);
     const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.55), new THREE.MeshLambertMaterial({ color: '#e8c23a', side: THREE.DoubleSide })); flag.position.set(pin.x + 0.45, 2.1, pin.z);
     pole.castShadow = flag.castShadow = true;
     this.course.add(pole, flag);
     void this.placeShorePieces(h.index);
-    this.spots = [...propSpots(h.index), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
+    this.spots = [...propSpots(h.index), ...buildingTrees(h.index, h.pin.z), ...(isCoastal(h.index) ? shoreRockSpots(h.index).map(r => ({ kind: 'rock' as const, ...r, y: seaY(h.index) - 0.6 })) : [])];
     void this.setProps(this.spots);
   }
 
@@ -182,7 +183,7 @@ export class World {
       if (token !== this.propToken) return;                      // a newer hole replaced this request
       tpl.updateMatrixWorld(true);
       // grade generated textures toward the photo swatches (pebble-look.md): near-black cypress greens, grey granite, not the brighter Rodin bake
-      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#7d8774' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; } });
+      if (id.startsWith('tree') || id.startsWith('rock')) tpl.traverse(o => { const mt = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined; if (mt?.color) { mt.color.set(id.startsWith('tree') ? '#a4ad97' : '#b8b5ad'); mt.roughness = 0.95; mt.metalness = 0; } });
       tpl.traverse(o => {
         const mesh = o as THREE.Mesh; if (!mesh.isMesh) return;
         const im = new THREE.InstancedMesh(mesh.geometry, mesh.material, gr.list.length);
