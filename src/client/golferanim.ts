@@ -58,10 +58,10 @@ export const P_POS: readonly Pose[] = [
     grip: [-0.4, 1.1, 0.2], shaft: [0.05, 1, 0.12], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.1] }),
   // P4 top: shoulders 90°, hips 45°, lead arm across the chest, hands above the trail shoulder, trail elbow down, shaft along the line
   P({ ...STANCE, pelvis: [TILT, deg(-45), 0], shift: [-0.04, -0.1, -0.14], torso: [SPINE, deg(-45), deg(5)], head: [0.22, deg(85), 0], lHeel: 0.15,
-    grip: [-0.25, 1.5, -0.1], tgrip: [-0.22, 0.3, -0.08], gripT: 1, shaft: [1, 0.02, -0.1], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0.15] }),
+    grip: [-0.25, 1.5, -0.1], tgrip: [-0.28, 0.13, -0.1], gripT: 1, shaft: [1, 0.02, -0.1], face: [0, -0.3, 1], lPole: [0, -1, 0], rPole: [0, -1, 0] }),   // hands at head height over the trail shoulder, trail elbow down
   // P5 lead arm parallel down: hands between shoulder and hip, shaft shallowed toward the trail side with ~90° lag, hips 25° open, pelvis 9 cm toward the target, shoulders 45° closed, lag (shaft ~90° to the lead arm)
-  P({ ...STANCE, pelvis: [TILT, deg(25), 0], shift: [0.09, -0.1, -0.14], torso: [SPINE, deg(-70), deg(12)], head: [0.22, deg(45), 0],
-    grip: [-0.3, 1.02, 0.26], shaft: [-0.55, 0.83, 0.08], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.2], rHeel: 0.05 }),
+  P({ ...STANCE, pelvis: [TILT, deg(30), 0], shift: [0.09, -0.1, -0.14], torso: [SPINE, deg(-75), deg(12)], head: [0.22, deg(45), 0],
+    grip: [-0.28, 0.98, 0.28], shaft: [-0.78, 0.3, -0.38], face: [0, 0.2, 1], lPole: [0, -1, 0], rPole: [0, -1, -0.2], rHeel: 0.05 }),
   // P6 shaft parallel down: hips about 38° open (seen from above), shoulders 20° closed, trail knee toward the ball, hands hip high
   P({ ...STANCE, pelvis: [TILT, deg(46), 0], shift: [0.11, -0.1, -0.13], torso: [SPINE, deg(-66), deg(13)], head: [0.22, deg(20), 0],
     grip: [-0.22, 0.9, 0.3], shaft: [-1, 0.08, 0.12], face: [0, 0.2, 1], lPole: [0, -1, -0.2], rPole: [0, -1, -0.4], rHeel: 0.25, rAnkle: [-0.05, 0.015, 0.02] }),

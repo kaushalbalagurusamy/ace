@@ -21,6 +21,18 @@ export function turnAngles(p: Pose): { hips: number; shoulders: number } {
   return { hips: ang(qp), shoulders: ang(qp.clone().multiply(qt)) };
 }
 
+/** Slides a lead-hand grip point (with its trail point rigidly below it) toward the mid-shoulder point until the lead target is within
+ *  `lReach` of the lead shoulder and the trail target within `rReach` of the trail shoulder. Returns the (possibly moved) lead point. */
+export function keepReachable(lead: V3, trail: V3, lSh: { x: number; y: number; z: number }, rSh: { x: number; y: number; z: number }, lReach: number, rReach: number): V3 {
+  const mid = [(lSh.x + rSh.x) / 2, (lSh.y + rSh.y) / 2, (lSh.z + rSh.z) / 2];
+  const at = (t: number, p: V3): V3 => [p[0] + (mid[0]! - lead[0]) * t, p[1] + (mid[1]! - lead[1]) * t, p[2] + (mid[2]! - lead[2]) * t];
+  const ok = (t: number) => { const a = at(t, lead), b = at(t, trail);
+    return Math.hypot(a[0] - lSh.x, a[1] - lSh.y, a[2] - lSh.z) <= lReach && Math.hypot(b[0] - rSh.x, b[1] - rSh.y, b[2] - rSh.z) <= rReach; };
+  if (ok(0)) return lead;
+  let lo = 0, hi = 1; for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (ok(m)) hi = m; else lo = m; }   // smallest slide that reaches
+  return at(hi, lead);
+}
+
 /** Vertical drop for a hip at `hip` so a limb of length `reach` touches `target` (0 when it already can). */
 export function requiredDrop(hip: V3, target: V3, reach: number): number {
   const dx = hip[0] - target[0], dy = hip[1] - target[1], dz = hip[2] - target[2], h2 = dx * dx + dz * dz;
@@ -47,6 +59,11 @@ export class GolferRig {
       m.decompose(mp, mq, new THREE.Vector3());
       this.rest[n] = { q: b.quaternion.clone(), p: b.position.clone(), mq, mp };
     }
+  }
+  /** After apply(): how far (m) each wrist ended from its grip point (QA reports this; 0 when the arms reach). */
+  handError = { lead: 0, trail: 0 };
+  private armLen(side: 'Left' | 'Right') {
+    const r = this.rest; return r[`${side}Arm`].mp.distanceTo(r[`${side}ForeArm`].mp) + r[`${side}ForeArm`].mp.distanceTo(r[`${side}Hand`].mp);
   }
   /** Rest position of a bone in model space (for tests and the QA page). */
   restPos(n: Name) { return this.rest[n].mp.clone(); }
@@ -78,11 +95,16 @@ export class GolferRig {
     this.foot('LeftFoot', p.lHeel); this.foot('RightFoot', p.rHeel);
     // arms
     const club = !p.free;
-    const tgt = club ? this.gripTarget(p) : null;
+    let tgt = club ? this.gripTarget(p) : null;
+    const below = (t: V3): V3 => [t[0] + p.shaft[0] * 0.07, t[1] + p.shaft[1] * 0.07, t[2] + p.shaft[2] * 0.07];   // trail hand 7 cm down the grip
+    // hard grip constraint: if either hand's grip point is out of reach, slide the whole grip toward the shoulders until both arms
+    // reach it, so the hands never come off the club (critic: hands separating at P6 and P7)
+    if (tgt) tgt = keepReachable(tgt, below(tgt), this.modelPos('LeftArm'), this.modelPos('RightArm'), this.armLen('Left') * 0.995, this.armLen('Right') * 0.995);
     const lT: V3 = tgt ?? p.free!.l;
-    const rT: V3 = tgt ? [tgt[0] + p.shaft[0] * 0.07, tgt[1] + p.shaft[1] * 0.07, tgt[2] + p.shaft[2] * 0.07] : p.free!.r;   // trail hand just below the lead on the grip
+    const rT: V3 = tgt ? below(tgt) : p.free!.r;
     this.ik('LeftArm', 'LeftForeArm', 'LeftHand', lT, p.lPole);
     this.ik('RightArm', 'RightForeArm', 'RightHand', rT, p.rPole);
+    this.handError = { lead: this.modelPos('LeftHand').distanceTo(new THREE.Vector3(...lT)), trail: this.modelPos('RightHand').distanceTo(new THREE.Vector3(...rT)) };
     // wrists: turn each hand most of the way from the forearm line toward the shaft so the hands wrap the grip
     if (club) for (const [f, h] of [['LeftForeArm', 'LeftHand'], ['RightForeArm', 'RightHand']] as const) {
       const hb = this.bones[h], hw = hb.getWorldPosition(new THREE.Vector3()), dir = hw.clone().sub(this.bones[f].getWorldPosition(_a)).normalize();
@@ -177,12 +199,13 @@ export function tintPolo(model: THREE.Object3D, colour: string) {
     // blotches on the shirt become white. Skin and the gold embroidery are strongly saturated, so they are left alone.
     float sat = (mx - mn) / max(mx, 1e-3);
     float legs = smoothstep(0.07, 0.09, vBindH) * (1.0 - smoothstep(0.54, 0.555, vBindH));
-    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.032, 0.034, 0.039) * (0.8 + 1.5 * mn), legs * smoothstep(0.09, 0.16, mx) * (1.0 - smoothstep(0.28, 0.4, sat)));
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.032, 0.034, 0.039) * (0.8 + 1.5 * mn), legs * smoothstep(0.065, 0.12, mx) * (1.0 - smoothstep(0.4, 0.5, sat)));
     float shirt = smoothstep(0.575, 0.59, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
-    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(mx), shirt * smoothstep(0.3, 0.4, mx) * smoothstep(0.06, 0.12, sat) * (1.0 - smoothstep(0.42, 0.52, sat)));
-    { float gr = diffuseColor.g / max(diffuseColor.r, 1e-3), warm = step(diffuseColor.b, diffuseColor.g) * shirt * smoothstep(0.2, 0.3, sat);
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.36, 0.06) * (0.6 + 0.6 * mx), warm * smoothstep(0.55, 0.65, gr));   // gold: richer, darker
-      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(max(mx, 0.7)), shirt * smoothstep(0.3, 0.4, sat) * (1.0 - smoothstep(0.45, 0.55, gr))); }   // red/orange specks: white
+    float br = diffuseColor.b / max(diffuseColor.r, 1e-3);   // skin is warm (blue far below red); the pink blotches are not
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(mx), shirt * smoothstep(0.3, 0.4, mx) * smoothstep(0.06, 0.12, sat) * (1.0 - smoothstep(0.42, 0.52, sat)) * smoothstep(0.45, 0.55, br));
+    { float gr = diffuseColor.g / max(diffuseColor.r, 1e-3), warm = step(diffuseColor.b, diffuseColor.g) * shirt * smoothstep(0.3, 0.4, sat) * smoothstep(0.3, 0.4, mx) * (1.0 - smoothstep(0.83, 0.845, vBindH));   // bright: not the beard
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.6, 0.42, 0.16) * (0.75 + 0.4 * mx), 0.45 * warm * smoothstep(0.55, 0.65, gr));   // gold: a little clearer, still fine-line
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(max(mx, 0.7)), shirt * smoothstep(0.3, 0.4, sat) * (1.0 - smoothstep(0.45, 0.55, gr)) * smoothstep(0.55, 0.65, mx)); }   // light red/orange specks: white (skin is darker)
     mx = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)); mn = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
     float white = smoothstep(0.30, 0.45, mx) * (1.0 - smoothstep(0.10, 0.2, (mx - mn) / max(mx, 1e-3)));
     float band = smoothstep(0.555, 0.575, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));

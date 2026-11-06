@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { requiredDrop, turnAngles } from '../src/client/golferrig';
+import { keepReachable, requiredDrop, turnAngles } from '../src/client/golferrig';
+
+describe('two hands on the grip', () => {
+  const l = { x: 0.17, y: 1.3, z: 0 }, r = { x: -0.17, y: 1.3, z: 0 };
+  it('keeps a reachable grip where it is', () => { expect(keepReachable([0, 0.9, 0.2], [0, 0.85, 0.22], l, r, 0.55, 0.55)).toEqual([0, 0.9, 0.2]); });
+  it('slides an out-of-reach grip toward the shoulders until both hands reach it', () => {
+    const g = keepReachable([0.1, 0.5, 0.5], [0.05, 0.45, 0.5], l, r, 0.55, 0.55), t = [g[0] - 0.05, g[1] - 0.05, g[2]];
+    expect(Math.hypot(g[0] - l.x, g[1] - l.y, g[2] - l.z)).toBeLessThanOrEqual(0.5501);
+    expect(Math.hypot(t[0]! - r.x, t[1]! - r.y, t[2]! - r.z)).toBeLessThanOrEqual(0.5501);
+  });
+});
 import { P_POS } from '../src/client/golferanim';
 
 describe('top-down turn of the P positions (closed > 0, open < 0)', () => {

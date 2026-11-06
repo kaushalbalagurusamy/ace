@@ -17,7 +17,7 @@ describe('Dunaway timings', () => {
 describe('P1-P10 key positions', () => {
   it('has ten positions with the owner\'s shoulder and hip turns (±5°)', () => {
     expect(P_POS).toHaveLength(10);
-    const want: [number, number, number][] = [[0, 0, 0], [1, -45, -17], [2, -75, -35], [3, -90, -45], [4, -45, 25], [5, -20, 46], [6, 28, 50]];
+    const want: [number, number, number][] = [[0, 0, 0], [1, -45, -17], [2, -75, -35], [3, -90, -45], [4, -45, 30], [5, -20, 46], [6, 28, 50]];
     for (const [i, sh, hip] of want) { expect(Math.abs(deg(shoulderTurn(P_POS[i]!)) - sh)).toBeLessThanOrEqual(5); expect(Math.abs(deg(P_POS[i]!.pelvis[1]!) - hip)).toBeLessThanOrEqual(5); }
     expect(deg(shoulderTurn(P_POS[9]!))).toBeGreaterThanOrEqual(90);   // P10: chest to the target or left of it
   });
