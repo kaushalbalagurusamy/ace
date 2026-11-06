@@ -253,6 +253,9 @@ diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uDetail, vWxz * 0.16).g;
 #ifdef HAS_SEA
   // steep ground by the sea is bare cliff (h08-chasm, h06-cliffs): tawny-ochre sandstone in bands, greying toward the water, dark and wet at it
   float rock = smoothstep(0.9, 0.74, vUpY) * smoothstep(0.0, 0.03, textureLod(uSea, (sim - uGrid.xy) * uGrid.zw, 3.0).r);
+#ifdef HAS_FINE
+  if (vFine > 0.5) rock = 0.0;   // a sculpted bunker face is turf, not cliff
+#endif
   if (rock > 0.0) {
     float hs = vWy - uSeaY, band = tNoise(vec2((vWxz.x + vWxz.y) * 0.08, vWy * 1.1)), grain = tNoise(vWxz * 1.7 + vWy);
     vec3 ochre = mix(vec3(0.36, 0.21, 0.09), vec3(0.55, 0.36, 0.17), band) * (0.8 + 0.4 * grain);
