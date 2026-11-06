@@ -65,8 +65,9 @@ while (!finished() && shots < 14 * HOLES) {
 }
 await sleep(1500);
 console.log(log.join('\n'));
+if (process.env.HOST || process.env.JOIN) { const t0 = Date.now(); while (!got.some(m => m.t === 'raceEnd') && Date.now() - t0 < 120000) await sleep(250); }   // others may still be playing
 const end = got.find(m => m.t === 'raceEnd'), me = end?.results?.find(x => x.id === mySid) ?? end?.results?.[0];
 console.log('raceEnd:', JSON.stringify(me));
 console.log('raceEnd course:', end?.course);
-const pass = (HOLES === 18 ? (!!me && me.holes === 18 && me.place === 1 && me.timeS > 0) : holesDone >= HOLES) && (!COURSE || end?.course === COURSE || HOLES < 18);
+const pass = (HOLES === 18 ? (!!me && me.holes === 18 && (process.env.HOST || process.env.JOIN ? me.place >= 1 : me.place === 1) && me.timeS > 0) : holesDone >= HOLES) && (!COURSE || end?.course === COURSE || HOLES < 18);
 console.log(pass ? 'HOLE-OUT PASS' : 'HOLE-OUT FAIL', `(${holesDone} holes, ${shots} shots)`); process.exit(pass ? 0 : 1);
