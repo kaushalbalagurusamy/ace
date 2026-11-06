@@ -34,7 +34,17 @@ export type Lie = 'tee' | 'fairway' | 'firstCut' | 'rough' | 'bunker' | 'fringe'
 
 export interface Strike {
   length?: number; ballPos?: BallPos; maxEffort?: boolean; seed?: number; lie?: Lie; dispersionScale?: number;
+  /** stance slope at the ball (shared/height stanceSlope): alongDeg + = uphill, sideDeg + = ball above the feet. Ignored on the tee box. */
+  slope?: { alongDeg: number; sideDeg: number };
 }
+
+/** UNVERIFIED design constants (docs/research/elevation.md §4): on an up/downhill lie the dynamic loft follows the slope degree for degree and the
+ *  attack angle half of it, so spin loft grows uphill (higher, spinnier, shorter) and shrinks downhill. */
+export const SLOPE_LOFT_SHARE = 1, SLOPE_ATTACK_SHARE = 0.5;
+/** Face change from a side slope: a ball above the feet tilts the toe up, and a lofted face tilted by phi points atan(tan(loft)·sin(phi)) left of
+ *  where it would (the lie-angle rule: about 0.7° per degree for a 7-iron, 0.14° for a driver). + = face right. Uses the static loft. */
+export const sideSlopeFaceDeg = (staticLoftDeg: number, sideDeg: number) =>
+  (-Math.atan(Math.tan((staticLoftDeg * Math.PI) / 180) * Math.sin((sideDeg * Math.PI) / 180)) * 180) / Math.PI;
 
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;

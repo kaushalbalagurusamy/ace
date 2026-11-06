@@ -1,6 +1,7 @@
 // Pure race logic: hand-built hole data, surface lookup, shot and putt resolution. No sockets, no timers.
-import { BAG, bounceRoll, captureSpeed, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, rollingDecel, simulateShot } from '../sim';
-import type { Lie, TrajectoryPoint } from '../sim';
+import { BAG, effortFromHold, isValidBallPos, isValidLength, launchFor, lengthSpeedFactor, maxEffortSpeedFactor, puttSpeedMs, roll, runOut, simulateShot } from '../sim';
+import type { Lie, Terrain, TrajectoryPoint } from '../sim';
+import { stanceSlope } from '../shared/height';
 import type { BallState, HoleInfo } from '../shared/protocol';
 
 const DROP_WAIT_S = 2;
@@ -17,24 +18,8 @@ export interface Played {
 }
 export interface ShotReq { clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number; seed?: number }
 
-/** Ball rolls from (x,z) at v0 along unit dir (dx,dz) with constant decel a. Drops if it crosses the cup below the capture speed for its offset. */
-function roll(h: Hole, x: number, z: number, dx: number, dz: number, v0: number, a: number, t0: number) {
-  const pts: TrajectoryPoint[] = [];
-  if (v0 <= 0 || !Number.isFinite(a)) return { pts, x, z, t: t0, holed: false };
-  const L = (v0 * v0) / (2 * a);
-  const { pin } = h.info;
-  const sStar = Math.min(L, Math.max(0, (pin.x - x) * dx + (pin.z - z) * dz));
-  const d = Math.hypot(x + dx * sStar - pin.x, z + dz * sStar - pin.z);
-  const vAt = Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sStar));
-  const holed = vAt < captureSpeed(d);
-  const sEnd = holed ? sStar : L;
-  const tEnd = (v0 - Math.sqrt(Math.max(0, v0 * v0 - 2 * a * sEnd))) / a;
-  const at = (s: number, t: number) => ({ t: t0 + t, p: { x: x + dx * s, y: 0, z: z + dz * s } });
-  for (let t = DT; t < tEnd; t += DT) pts.push(at(v0 * t - 0.5 * a * t * t, t));
-  const end = holed ? { t: t0 + tEnd, p: { x: pin.x, y: 0, z: pin.z } } : at(sEnd, tEnd);
-  pts.push(end);
-  return { pts, x: end.p.x, z: end.p.z, t: end.t, holed };
-}
+/** The hole as the run-out sees it: real ground, its lies, the cup, and penalty areas where a rolling ball stops. */
+const terrain = (h: Hole): Terrain => ({ height: h.heightAt, normal: h.normalAt, surface: h.surfaceAt, stops: h.outOfBounds, pin: h.info.pin, stimp: 10 });
 
 const CLUB_LEN_M = 1.2; // a driver-ish club length; relief is within two of them
 
@@ -76,21 +61,20 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   const { length, maxEffort } = effortFromHold(Math.max(0, req.holdMs), false);
   const onTee = Math.hypot(prev.x - h.info.tee.x, prev.z - h.info.tee.z) <= TEE_RADIUS_M;
   const lie: Lie = onTee ? 'tee' : h.surfaceAt(prev.x, prev.z);
-  const launch = launchFor(club, { length, ballPos, maxEffort, seed: req.seed ?? 0, lie });
-  const sim = simulateShot(launch);
+  const slope = stanceSlope(h.normalAt(prev.x, prev.z), req.aimDeg);           // the curve this lie predisposes comes out of the D-plane (launchFor)
+  const launch = launchFor(club, { length, ballPos, maxEffort, seed: req.seed ?? 0, lie, slope });
   const a = (req.aimDeg * Math.PI) / 180, sin = Math.sin(a), cos = Math.cos(a);
   const world = (sx: number, sz: number) => ({ x: prev.x + sx * cos + sz * sin, z: prev.z - sx * sin + sz * cos });
-  const samples: TrajectoryPoint[] = sim.samples.map(s => { const w = world(s.p.x, s.p.z); return { t: s.t, p: { x: w.x, y: s.p.y, z: w.z } }; });
+  const y0 = h.heightAt(prev.x, prev.z);
+  const sim = simulateShot(launch, {}, (sx, sz) => { const w = world(sx, sz); return h.heightAt(w.x, w.z) - y0; });   // carry ends on the real ground
+  const samples: TrajectoryPoint[] = sim.samples.map(s => { const w = world(s.p.x, s.p.z); return { t: s.t, p: { x: w.x, y: s.p.y + y0, z: w.z } }; });
   const n = samples.length, last = samples[n - 1]!, before = samples[n - 2] ?? samples[0]!;
   let x = last.p.x, z = last.p.z, holed = false, flightS = last.t;
   if (!h.outOfBounds(x, z)) {
     const hx = last.p.x - before.p.x, hz = last.p.z - before.p.z, hd = Math.hypot(hx, hz);
     if (hd > 0) {
-      const dx = hx / hd, dz = hz / hd, run = bounceRoll(sim.landing, h.surfaceAt(x, z));   // bounces off the landing turf, rolls on the turf it settles on
-      for (const p of run.hops) samples.push({ t: last.t + p.t, p: { x: x + dx * p.s, y: p.y, z: z + dz * p.s } });
-      x += dx * run.hopM; z += dz * run.hopM; flightS = samples.at(-1)!.t;
-      const back = run.rollMs < 0 ? -1 : 1;                                                   // a checked wedge spins back
-      const r = roll(h, x, z, back * dx, back * dz, Math.abs(run.rollMs), rollingDecel(h.surfaceAt(x, z)), flightS);
+      const { speedMs, angleDeg, spinRpm } = sim.landing, vh = speedMs * Math.cos((angleDeg * Math.PI) / 180);
+      const r = runOut(terrain(h), x, z, { x: (vh * hx) / hd, y: -speedMs * Math.sin((angleDeg * Math.PI) / 180), z: (vh * hz) / hd }, spinRpm, flightS);
       samples.push(...r.pts); ({ x, z, t: flightS, holed } = r);
     }
   }
@@ -106,9 +90,8 @@ export function playPutt(h: Hole, prev: BallState, aimDeg: number, holdMs: numbe
   const { length } = effortFromHold(Math.max(0, holdMs), true);
   const v0 = puttSpeedMs(length);
   const a = (aimDeg * Math.PI) / 180;
-  const decel = rollingDecel('green', 10);
-  const r = roll(h, prev.x, prev.z, Math.sin(a), Math.cos(a), v0, decel, 0);
-  const samples = [{ t: 0, p: { x: prev.x, y: 0, z: prev.z } }, ...r.pts];
+  const r = roll(terrain(h), prev.x, prev.z, v0 * Math.sin(a), v0 * Math.cos(a), 0);   // greens break: gravity along the slope
+  const samples = [{ t: 0, p: { x: prev.x, y: h.heightAt(prev.x, prev.z), z: prev.z } }, ...r.pts];
   return settle(h, prev, r.x, r.z, r.holed, {
     samples, carryM: 0, offlineM: 0, flightS: r.t, clubSpeedMph: 0, ballSpeedMs: v0, effort: { fb: 0, io: 0, maxEffort: false, length },
   });

@@ -3,7 +3,9 @@ import { BAG, PUTT_MAX_MS, launchFor, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
-const h = hole(0), pin = h.info.pin;
+/** Hole 1's lies and layout on flat ground: these tests pin the flat-ground physics (the terrain has its own tests in elevation.test.ts). */
+const flat = (x: ReturnType<typeof hole>): ReturnType<typeof hole> => ({ ...x, heightAt: () => 0, normalAt: () => ({ x: 0, y: 1, z: 0 }) });
+const h = flat(hole(0)), pin = h.info.pin;
 const ball = (x: number, z: number, strokes = 0): BallState => ({ x, z, strokes, holedOut: false, surface: h.surfaceAt(x, z) });
 const ok = (r: Played | { error: string }): Played => { if ('error' in r) throw new Error(r.error); return r; };
 const perfect = { holdMs: 750, seed: 1 };   // a full normal swing: the server turns the hold into length 1, no max effort
