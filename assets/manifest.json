@@ -6587,5 +6587,263 @@
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": false
     }
+  },
+  {
+    "id": "tree-oak-r20c",
+    "file": "assets/models/raw/rejected/tree-oak-r20c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r28.json",
+      "notes": "The broad, irregular, spreading crown on a thick short trunk with heavy limbs forking low (front view) matches the open-grown parkland oaks in aronimink-151 and the left edge of commons-bethpage-golf-course. The clear trunk is too short, though: under 1/4 of the height against about 1/3 in aronimink-151 and the bethpage-2009 treeline, so raise the crown base 1-2 m. The mid/yellow-green foliage is close to the Bethpage spring photo but slightly too saturated and light compared with the darker, duller greens of bethpage-2009 and aronimink-322, so darken the base by about 10-15% and desaturate it a little. Detail defects: loose leaf cards float clear of the crown on both sides of the front view (around x=130-170 and x=510, y=420), the card edges show jagged alpha-clip stairs, and the large see-through gaps in the upper crown (front, top-left) read as missing geometry rather than natural openings. Fix by culling or reattaching the orphan cards, using alpha-to-coverage or a softer cutoff, and adding inner-crown fill cards. The bark is a flat grey-brown with no visible furrowing, which is fine at game distance but plain up close.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r20c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r20b",
+    "file": "assets/models/raw/rejected/tree-maple-r20b.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0d3-7962-728d-aa5b-5858f8b73d98",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 3.0,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r28.json",
+      "notes": "The rounded-oval crown broadly fits the deciduous parkland trees behind the green in aronimink-327 (right) and aronimink-322. However, the trunk is too slender for a mature 14 m maple and reads as a young street tree; double the trunk radius at the base and thicken the main scaffold limbs. A bare leader with a small leaf tuft spikes above the crown in both side views, which breaks the dome. Trim it or fold it into the crown. The top view is the worst defect: the foliage is a hollow ring with an empty centre that shows bare branches and stray leaf cards, so from the game's aerial or chase camera it looks like a donut. Fill the crown interior or top with cards. The foliage colour is a plausible mid-green, close to the Bethpage spring photo, but it should also be darkened and desaturated slightly toward aronimink-322/327. Also fix the floating cards along the silhouette edges (threequarter at the left and top-left) and the jagged alpha-clip edges.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r20b/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r21c",
+    "file": "assets/models/raw/rejected/tree-oak-r21c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r29.json",
+      "notes": "Front view reads as an open-grown parkland oak: wide, lumpy, irregular crown with gaps and a stout trunk forking into spreading limbs, close to the big hardwoods framing the green in commons-bethpage-golf-course.jpg and the right-hand trees in aronimink-327. Clear trunk is short (about a quarter of the height); the Bethpage 2009 tree line and aronimink-151 show more bare trunk under a higher crown, so raise the crown base by about 15-20%. Foliage is a slightly cool, saturated green with near-black cavities between clumps; the photos read as softer olive to mid green, so warm the hue a little and lift the shadow floor. Detail is the weak point: hard-edged leaf-card clusters show clearly at the crown rim, thin stray branch slivers poke out of the canopy on the three-quarter view at right-centre, and the bark is flat untextured grey. Add bark normal/albedo variation, feather the card alpha edges and trim the orphan branch cards.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r21c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-maple-r21a",
+    "file": "assets/models/raw/rejected/tree-maple-r21a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-maple-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0d3-7962-728d-aa5b-5858f8b73d98",
+    "seed_images": [
+      "concept-maple-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 14.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 3
+      },
+      "mean": 3.25,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r29.json",
+      "notes": "The colour works: the brighter yellow-green foliage matches the sunlit deciduous canopy in commons-bethpage-golf-course.jpg better than the oak does. The form is a dense, symmetric egg or lollipop with an isolated foliage tuft sticking up at the apex in front.jpg. Mature parkland maples like the rounded tree at right in aronimink-327 have a broader, flatter-topped dome with a fuller lower skirt, so widen the crown about 15%, flatten the top and remove the apex tuft. top.jpg shows a doughnut: the crown centre is empty and shows bare branches and the grey background, which will look like a hole from elevated golf cameras, so fill the inner shell with foliage cards. The trunk is too thin for a 14 m tree and is visibly low-poly, with a flat triangular facet and a sharp wedge at the base in threequarter.jpg; thicken it by about 30%, add root flare, smooth the normals and add bark texture. Thin, straight stick branches show through the canopy gaps; taper them and give them proper bark material.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-maple-r21a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r22a",
+    "file": "assets/models/raw/rejected/tree-oak-r22a.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 3,
+        "colourMaterial": 3,
+        "detailTexture": 2,
+        "scale": 3
+      },
+      "mean": 2.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r30.json",
+      "notes": "The front view gets the parkland-oak shape broadly right. It has a short clear trunk forking low into several scaffold limbs under a broad rounded crown, much like the open-grown oak in commons-bmw-aronimink-tournament-151. But the crown has a large notch bitten out of the upper right in the front view and an obvious see-through hole in the three-quarter view. Stray leaf cards also float detached below the crown on the left, so it does not have the dense, layered mass of the oaks in commons-bethpage-golf-course and in the Bethpage 2009 US Open tree line. The foliage cards are far too large: each leaf reads at roughly half a metre, with jagged pixelated alpha edges. The canopy looks like lettuce or ivy rather than fine oak foliage, and this makes the tree read closer to 6-8 m than 16 m. The colour is plausible but too saturated and yellow-green on the highlights next to the deeper, more muted olive canopies in the Aronimink photos. The bark is flat grey with little furrowing, and the trunk is thin for a mature oak. Fixes: shrink the leaf cards about 3-4x and increase their count, clean the alpha edges (use alpha-to-coverage or a premultiplied mipmap), fill the crown gaps and remove the detached cards, thicken the trunk with root flare, add deeply furrowed dark grey-brown bark, and shift the foliage toward a darker olive green (around #4a5d32) with less yellow in the highlights.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r22a/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
+  },
+  {
+    "id": "tree-oak-r22c",
+    "file": "assets/models/raw/rejected/tree-oak-r22c.glb (local, not shipped)",
+    "tool": "post-process of a generated model (no new generation)",
+    "source_model": "tree-oak-r15d",
+    "source_tool": "Meshy image-to-3d",
+    "source_task_id": "01a1b0cf-9581-7339-a8da-577a59fcdab7",
+    "seed_images": [
+      "concept-oak-r5.png"
+    ],
+    "seed_photos": [
+      "refs/bethpage-black/photos/commons-bethpage-golf-course.jpg",
+      "refs/bethpage-black/photos/commons-2009-us-open-at-bethpage-black-3656112218.jpg",
+      "refs/aronimink/photos/commons-bmw-aronimink-tournament-151-43884329734.jpg"
+    ],
+    "credits_used": 0,
+    "target_height_m": 16.0,
+    "date": "2026-11-06",
+    "post_process": [
+      "node scripts/grade_glb.mjs (foliage and bark grade, optional --widen/--thicken)",
+      "node scripts/bake_detail.mjs on the concept trunk (r19+ only)",
+      "node scripts/foliage_cards.mjs with the tree's own concept image (r18+ with --drop-crown 1)",
+      "gltf-transform optimize --compress draco --texture-compress webp --texture-size 2048"
+    ],
+    "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
+    "subagent": "final model round (worktree session)",
+    "qa": {
+      "verdict": "FAIL",
+      "scores": {
+        "silhouette": 4,
+        "colourMaterial": 4,
+        "detailTexture": 3,
+        "scale": 4
+      },
+      "mean": 3.75,
+      "critic": "fresh independent subagent (renders + matching real photos + rubric only), scratchpad/critic-r31.json",
+      "notes": "Front view's broad, lumpy, irregular dome crown on a short thick trunk with low spreading scaffold limbs, plus the round, gappy top view, reads like the open-grown parkland oaks in the Aronimink 151 and 327 photos and the Bethpage 2009 US Open tree line. In the three-quarter view the lower crown hangs down almost to the trunk base and hides the trunk, so it loses the 4-5 m clear bole the reference oaks show. Raise the lowest foliage clusters about 15-20% or prune the lower skirt on that side. Foliage colour is plausible but slightly cool and blue-saturated compared with the warmer yellow-green of commons-bethpage-golf-course.jpg, and the bark is a flat grey-brown with no visible furrowing. Detail is the main defect: the foliage reads as obvious jagged flat leaf-card clumps with near-black seams between them, and in the three-quarter view a bare grey branch spike pokes out of the crown at centre, and there are stray card slivers at the right edge (around x 400, y 420). Fixes: remove or leaf the exposed bare branch tips, soften card alpha edges and lift the darkest in-crown shading, add more but smaller leaf clusters so individual cards stop reading, and give the trunk a furrowed bark normal or texture.",
+      "date": "2026-11-06",
+      "renders": "assets/qa/tree-oak-r22c/",
+      "rule": "pass = no score below 3 and mean >= 4.0",
+      "wired": false
+    }
   }
 ]
