@@ -1,82 +1,55 @@
-# Working state: gauntlet-game-week (handoff written 2026-11-05, about 11:20 CST)
+# Working state: gauntlet-game-week (2026-11-06, about 00:15 CST, overnight polish)
 
-This file supersedes the 2026-11-04 state, which described the space racer. Where this file and the repo disagree, **the cited file or commit wins**.
-
-Branch `intake/sources-profile-minesweep`, the only branch on GitLab. The PRD and skills commits run from `e8bea0b` to the commit that wrote this file.
+Supersedes the 2026-11-05 11:20 state. Where this file and the repo disagree, **the cited file or commit wins**.
 
 ## The one thing that matters
 
-Build the **multiplayer browser golf race** MVP described in `PRD/`, and have it playable from a public link **before judging, after 08:00 CST Fri 2026-11-06**. The brief says Thursday midnight CST, but the owner says judging is the real cutoff.
+The game **Ace** is submitted (portal + Google Form, before midnight). The game is live at https://ace-x92s.onrender.com and the demo video at https://ace-demo.onrender.com, which has no game link (an owner request). Polishing continues until judging after 08:00 CST Fri 2026-11-06. The owner's words: **"the crucial deliverable is the HD 3D asset generation"**, judged by "whether it looks accurate to the real photos of it". This covers the motion assets too: the golfer's swing and run, and the cart's movement.
 
-The owner has said development may start ("now you can make the MVP").
+## Live
 
-## Direction and decisions (owner, 2026-11-05)
+- GitLab `main` = live = `b73c265`, deployed via `scripts/deploy.sh`.
+- Working branch: `intake/sources-profile-minesweep`.
+- `b73c265` contains:
+  - real Pebble elevation and slope lies (`66d2990`)
+  - the captured swing, gait and seated driver, and the Rodin cart, which is still PENDING
+  - a ball-scale cup used as the hitbox. The run-out also captures on `CUP_VISUAL_RADIUS_M`.
+- Checks at `b73c265`: tsc clean; vitest 372 pass + 2 expected fail; the 18-hole bot passes on the local server (78 strokes).
 
-- **Game:** *Final Frontier* (the space racer) is scrapped. The game is now a golf race (brief Option 3, Multiplayer Racing).
-  - 3 lobbies × 4 players, entered from a waiting room.
-  - 14-club Callaway bag on keys `1`–`0`, `-`, `=`, `O`, `P`.
-  - WASD to move. Space enters swing mode, then the player times Z (hips), X (shoulders), C (release) against an automatic backswing.
-  - Fastest to hole out on 18 wins. Strokes break ties within 1 s.
-- **Decisions:** all answers are in the `PRD/README.md` "Decisions" table (Q1–Q11):
-  - shared course with visible tracers
-  - mini map plus rangefinder
-  - no aim line, and a post-shot TrackMan card (carry, total, offline)
-  - Z-pendulum putting
-  - 20-minute room limit, and 1 minute for the rest after the first finish, then progress freezes
-  - Rules of Golf penalties, each with a time cost (2 s drop wait)
-  - Tour speed ratios from a 130 mph driver
-  - reference swing clip https://www.youtube.com/watch?v=zJpTTF4wr7s
-  - solo time trial with stats
-  - generic HUD labels; Callaway names are for generating assets (Callaway is the sponsor)
-  - everything ships
-  - first map is Pebble Beach
-- **Visuals:** greyscale polygons first, to prove the physics. Asset generation runs in parallel through subagents (`PRD/06`).
-- **Engine:** Three.js (`three@0.186.1`, the version the skills pin), with a Node `ws` server that owns the shot simulation. Clients only replay the trajectories it sends. **No ADR written yet:** write ADR-0001 (engine, authority, host) first.
-- **Skills:** 14 project skills are vendored in `.claude/skills/`, commit `9854e5c`. Provenance is in `.claude/skills/PROVENANCE.md`. They come from the lecture's gamedev-skills repo @ `19d93f97c9c1`, Apache-2.0, and were reviewed before install:
-  - threejs-scene-setup, threejs-materials-lighting, threejs-gltf-loading
-  - prototype-fast, game-jam
-  - camera-systems, game-feel, input-systems, physics-tuning, procedural-gen, game-ui-ux
-  - create-game-assets, audio-design, performance-optimization
+## In flight (background agents, worktree isolation)
 
-## Still open: ask the owner, don't decide
+- **Realism:** photo-accurate Pebble assets (cypress, rocks, cliffs, ocean, sky, bunkers, sea wall) from `refs/pebble-photos`, using Rodin and Meshy, gated by a critic.
+- **Courses:** Bethpage Black and Aronimink, traced from BlueGolf, plus a course picker. Their height files exist in `src/shared/courses/` but are not yet registered in `COURSE_HEIGHTS`.
+- **Cart:** regenerate the Genesis body with Meshy multi-image (≤150 Meshy and ≤4 Rodin credits). The Rodin Low body came out silver and smeared, so it stays PENDING and the code body is shown.
+- **Swing critic:** compares the old hand-keyed swing (v12) with the new captured swing against the Dunaway clip. Output goes to `critic-swing.json` in the session scratchpad.
 
-1. **Q12, Pebble Beach rights:** use the name in the public build, or ship an unnamed "Monterey coastal links"? Default: unnamed (`PRD/06` §2).
-2. **Keys:** a Meshy Pro key for 3D generation and an OpenAI key for images. Neither exists yet.
-3. **F-044:** the spend ceiling.
-4. **F-007:** judge devices. The default is keyboard only, with a "keyboard required" screen on touch devices.
-5. **Host:** not chosen. Render free sleeps after 15 minutes (F-042, F-043).
-6. **`sf install install --project .`:** never run. The owner now wants development but hasn't explicitly authorised this command. Ask once.
+## Known gaps
 
-## Known gaps in the PRD (not decided, just unverified)
+- **Captured swing** (per the motion agent):
+  - the stance is too crouched
+  - at P4 the hands reach only head height
+  - at P8 the arms don't extend
+  - the P10 finish is off
+  - the club path is hand-keyed
+- **Sprint:** the arm swing is too small and the trunk lean too shallow.
+- **Walk:** built from 12 Muybridge frames.
+- **Clubs:** none passed the critic (best 3.8), so they stay gated.
+- **Cart suspension:** `heightAt` returns 0. The root follows the terrain tilt instead.
 
-- **Physics numbers:** every one in `PRD/03` is a placeholder. The Tour-average table is recalled from memory and marked UNVERIFIED. The 5 sources to pull are in `PRD/03` §8. No web research has been done.
-- **Pebble Beach data:** the pars come from memory. Yardages must come from the official scorecard. OpenStreetMap golf coverage and USGS 3DEP resolution at Pebble Beach are unchecked (`PRD/06` §2).
-- **Swing timing:** the Z/X/C windows and error weights in `PRD/02` §3 are invented starting values, to be tuned in playtest and against the clip.
-- **Requirements ledger:** `docs/requirements-ledger.md` doesn't exist yet. Build it from `docs/source/brief.md` line by line (`build-loop.md`).
+## Owner decisions not to undo
 
-## Access and keys (this Mac)
+- WASD moves; the arrows set ball position on a 7×7 grid.
+- One-button Space swing. Max effort is ×1.1 speed and 75% accuracy.
+- A Shift tap gives the chip stroke (≤25%).
+- Putt roll is about √hold, ~30 m at full.
+- The cup is drawn at ball scale and is the hitbox; physics are unchanged.
+- The golfer ships under owner override.
+- The title stays "Ace".
+- No extra spend beyond the current balances: the $30 top-up was asked and not answered.
 
-- **Git credentials:** GitHub and GitLab tokens are in the macOS Keychain, and `credential.helper osxkeychain` is set globally. `gh` is logged in. Plain `git push` works.
-- **Remote:** origin is `https://labs.gauntletai.com/kaushalbalagurusamy/gauntlet-game-week.git`.
-- **ElevenLabs key:** in `.env` as `ELEVENLABS_API_KEY`. The file is gitignored and readable only by the owner (mode 600). Starter plan; 40,000 credits as of 2026-11-04.
-- **Course repo:** `~/Projects/gauntlet` (GitHub `kaushalbalagurusamy/gauntlet`). Lectures are under `lectures/`.
+## Rules
 
-## Artifacts (private to the owner)
-
-- **Full PRD (7 tabs):** https://claude.ai/artifact/XWm2HzjKRsheuc48j66vFF
-- **Asset plan only:** https://claude.ai/artifact/XaY5hj7QGVCQjYxNbmAE1C
-- Both are built from `PRD/*.md` by a script in the old session's scratchpad (not in the repo). If the PRD changes, rebuild or republish them.
-- **Stale:** the space-racer research artifact (https://claude.ai/artifact/SogJj7fePYrLJEXSYG6eNY) and the deadline briefing (https://claude.ai/artifact/Gb27dNJAbL7zP3Hw4AMo7F).
-
-## Next concrete actions
-
-1. Ask the owner the open items above in one message. Don't block on them; use the defaults.
-2. Write ADR-0001. Scaffold the Vite + TypeScript client, the `ws` server and a shared `sim/`.
-3. Track A, following `PRD/05`. Tests come first: AC-P3, AC-P4, AC-S3, AC-S5, AC-R1.
-4. Track B: start the asset subagents (`PRD/06` §4–5), beginning with ElevenLabs audio since that key exists.
-
-## Disclosures carried over
-
-- Commit 94303ee says "31 findings"; the count was 33. Not amended.
-- The minesweeper ran on Sonnet, not the Opus its config names.
-- In this session, I (Claude) recommended 2D Phaser. That's withdrawn: golf needs 3D.
+- Commit with explicit paths.
+- Reference photos and clips in `refs/` are never committed or shipped.
+- Keys stay in `.env` or the Keychain.
+- Use `npm run build`; a bare vite build leaves the assets out.
