@@ -1,7 +1,7 @@
 // Ball physics calibrated to TrackMan-grade numbers. Every constant cites docs/research/trackman-physics.md (§ = section there).
 import type { Club, Landing, Launch, ShotResult, Surface, TrajectoryPoint } from './types';
 import { lengthSpeedFactor } from './length';
-import { CENTRE, LOFT_PER_FB_DEG, MAX_EFFORT, PATH_PER_IO_DEG, gauss, mulberry32 } from './delivery';
+import { CENTRE, MAX_EFFORT, gauss, loftForFb, mulberry32, pathForIo } from './delivery';
 import type { Lie, Strike } from './delivery';
 
 const MASS = 0.04593;                 // kg, Rules of Golf max (§3.1)
@@ -252,7 +252,7 @@ function launchAt(c: Club, strike: Strike, speedMul: number): Launch {
   const seed = strike.seed ?? 0;
   const L = LIE[lie], r = ROWS[c.key]!;
   const lieSpeed = lie === 'bunker' && c.loftDeg >= 50 ? L.wedgeSpeed! : putter && (lie === 'fringe' || lie === 'green') ? 1 : L.speed;
-  let F = 0, P = PATH_PER_IO_DEG * io;
+  let F = 0, P = pathForIo(io);
   if (!putter && strike.maxEffort) {
     const rng = mulberry32(seed), s = strike.dispersionScale ?? 1;
     F += gauss(rng) * MAX_EFFORT.sigmaFaceDeg * s;
@@ -261,7 +261,7 @@ function launchAt(c: Club, strike: Strike, speedMul: number): Launch {
   if (lie === 'rough' && !putter) F += (mulberry32(seed + 0x9e3779b9)() * 2 - 1) * ROUGH_FACE_NOISE_DEG;
   const d = deliveryAt(c, lie);
   const l = impact({
-    clubMph: c.maxClubSpeedMph * lengthSpeedFactor(strike.length ?? 1) * speedMul, attackDeg: d.attackDeg, loftDeg: d.loftDeg + LOFT_PER_FB_DEG * fb,
+    clubMph: c.maxClubSpeedMph * lengthSpeedFactor(strike.length ?? 1) * speedMul, attackDeg: d.attackDeg, loftDeg: d.loftDeg + loftForFb(fb),
     faceDeg: F, pathDeg: P, smashBase: r.smashBase, smashFixed: r.smashFixed, k: r.k, kappaH: c.loftDeg < 20 ? 0.15 : 0.25,
   });
   return { ...l, ballSpeed: l.ballSpeed * lieSpeed, launchDeg: l.launchDeg + L.launch, backspinRpm: l.backspinRpm * L.spin };

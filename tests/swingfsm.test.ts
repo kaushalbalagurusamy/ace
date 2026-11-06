@@ -47,9 +47,9 @@ describe('SS-8 ball position in the stance (W/S forward-back, A/D closer-away), 
     f.key('ArrowRight', true, 5); f.key('ArrowRight', true, 6); expect(f.ballPos()).toEqual({ fb: -1, io: 2 });
     f.key('ArrowLeft', true, 7); expect(f.ballPos()).toEqual({ fb: -1, io: 1 });
   });
-  it('steps clamp at -2 and +2', () => {
-    const f = armed(raw()); for (let i = 0; i < 6; i++) { f.key('ArrowUp', true, i); f.key('ArrowRight', true, i); } expect(f.ballPos()).toEqual({ fb: 2, io: 2 });
-    for (let i = 0; i < 9; i++) { f.key('ArrowDown', true, i); f.key('ArrowLeft', true, i); } expect(f.ballPos()).toEqual({ fb: -2, io: -2 });
+  it('steps clamp at -3 and +3 (7x7 grid)', () => {
+    const f = armed(raw()); for (let i = 0; i < 6; i++) { f.key('ArrowUp', true, i); f.key('ArrowRight', true, i); } expect(f.ballPos()).toEqual({ fb: 3, io: 3 });
+    for (let i = 0; i < 9; i++) { f.key('ArrowDown', true, i); f.key('ArrowLeft', true, i); } expect(f.ballPos()).toEqual({ fb: -3, io: -3 });
   });
   it('key releases do nothing; only presses step', () => { const f = armed(raw()); f.key('ArrowUp', true, 0); f.key('ArrowUp', false, 10); expect(f.ballPos().fb).toBe(1); });
   it('the position is sent with the shot', () => { const f = armed(raw()); f.key('ArrowUp', true, 0); f.key('ArrowRight', true, 1); f.key('ArrowRight', true, 2); f.key('Space', true, 10); expect(shot(f.key('Space', false, 400)).msg).toMatchObject({ fb: 1, io: 2 }); });

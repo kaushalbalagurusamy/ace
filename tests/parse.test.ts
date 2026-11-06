@@ -31,11 +31,11 @@ describe('parseClientMsg: untrusted wire input', () => {
     for (const bad of [1e308, -1e308, 1e12, null, 'x']) expect(p({ t: 'shot', clubKey: '1', aimDeg: bad, holdMs: 500 }), String(bad)).toBeNull();
     expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":1e999,"holdMs":500}')).toBeNull(); // parses to Infinity
   });
-  it('shot: holdMs finite and 0..5000; ball position integers -2..2; the exact fields pass through', () => {
+  it('shot: holdMs finite and 0..5000; ball position integers -3..3; the exact fields pass through', () => {
     expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 });
     expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 750 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 750, fb: 0, io: 0 });   // missing ball position = centre
     for (const bad of [-1, 5001, 1e9, null, '5', NaN]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: bad }), `holdMs ${bad}`).toBeNull();
-    for (const [fb, io] of [[3, 0], [0, -3], [0.5, 0], [0, 1.5], ['1', 0], [null, 0]]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, fb, io }), `${fb},${io}`).toBeNull();
+    for (const [fb, io] of [[4, 0], [0, -4], [0.5, 0], [0, 1.5], ['1', 0], [null, 0]]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, fb, io }), `${fb},${io}`).toBeNull();
     expect(p({ t: 'shot', clubKey: '1', aimDeg: 0 })).toBeNull();                                              // the hold time is required
     expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":0,"holdMs":1e999}')).toBeNull();
   });

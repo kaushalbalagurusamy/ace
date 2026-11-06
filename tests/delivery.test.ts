@@ -48,9 +48,9 @@ describe('SS-2 ball position (D-plane: loft from forward/back, path from closer/
     }
   });
   it('draw and fade are mirror images within 15%', () => { const a = simulateShot(launchFor(club('7'), { ballPos: { fb: 0, io: 1 } })).offlineM, b = simulateShot(launchFor(club('7'), { ballPos: { fb: 0, io: -1 } })).offlineM; expect(Math.abs(a + b)).toBeLessThan(0.15 * Math.abs(a)); });
-  it('isValidBallPos: integers -2..2 only', () => {
-    for (const p of [{ fb: 0, io: 0 }, { fb: -2, io: 2 }, { fb: 2, io: -2 }]) expect(isValidBallPos(p)).toBe(true);
-    for (const p of [{ fb: 3, io: 0 }, { fb: 0, io: -3 }, { fb: 0.5, io: 0 }, { fb: NaN, io: 0 }, { fb: '1', io: 0 }, { fb: 0 }, null, undefined, 5] as unknown[]) expect(isValidBallPos(p), JSON.stringify(p)).toBe(false);
+  it('isValidBallPos: integers -3..3 only (7x7 grid)', () => {
+    for (const p of [{ fb: 0, io: 0 }, { fb: -2, io: 2 }, { fb: 3, io: -3 }, { fb: -3, io: 3 }]) expect(isValidBallPos(p)).toBe(true);
+    for (const p of [{ fb: 4, io: 0 }, { fb: 0, io: -4 }, { fb: 0.5, io: 0 }, { fb: NaN, io: 0 }, { fb: '1', io: 0 }, { fb: 0 }, null, undefined, 5] as unknown[]) expect(isValidBallPos(p), JSON.stringify(p)).toBe(false);
   });
 });
 
@@ -111,4 +111,22 @@ describe('ball-position curve size (owner playtest, 2026-11-05)', () => {
     expect(-d2).toBeGreaterThanOrEqual(20); expect(-d2).toBeLessThanOrEqual(30);
     expect(Math.abs(i2)).toBeLessThan(Math.abs(d2));
   });
+});
+
+describe('7x7 shot shaping: the outer ring is a hook, slice, stinger or towering shot (owner, 2026-11-05)', () => {
+  const YD = 1.0936, drv = club('1'), five = club('5');
+  const shot = (c: Club, fb: number, io: number) => simulateShot(launchFor(c, { ballPos: { fb, io }, lie: c.key === '1' ? 'tee' : 'fairway' }));
+  it('the driver curve grows with the step: slight draw < draw < hook, mirrored for fade/slice', () => {
+    const off = [1, 2, 3].map(io => -shot(drv, 0, io).offlineM * YD), fade = [1, 2, 3].map(io => shot(drv, 0, -io).offlineM * YD);
+    expect(off[0]!).toBeGreaterThan(5); expect(off[1]!).toBeGreaterThan(off[0]!); expect(off[2]!).toBeGreaterThan(off[1]! * 1.5);
+    expect(off[2]!).toBeGreaterThan(40); for (let i = 0; i < 3; i++) expect(Math.abs(off[i]! - fade[i]!) / off[i]!).toBeLessThan(0.2);
+  });
+  it('a stinger (back 3) launches lower with less spin than a punch (back 2) and stock', () => {
+    for (const c of [club('2'), five]) {
+      const st = launchFor(c, { ballPos: { fb: -3, io: 0 } }), pu = launchFor(c, { ballPos: { fb: -2, io: 0 } }), stock = launchFor(c);
+      expect(st.launchDeg, c.label).toBeLessThan(pu.launchDeg); expect(pu.launchDeg).toBeLessThan(stock.launchDeg);
+      expect(st.backspinRpm, c.label).toBeLessThan(stock.backspinRpm);
+    }
+  });
+  it('forward 3 flies higher than forward 2', () => { expect(launchFor(five, { ballPos: { fb: 3, io: 0 } }).launchDeg).toBeGreaterThan(launchFor(five, { ballPos: { fb: 2, io: 0 } }).launchDeg); });
 });

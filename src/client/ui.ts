@@ -4,6 +4,7 @@ import { edgePoint, mapArrowRotation, type Marker } from './overlay';
 import { SLIDER_STEP, MIN_MULT, MAX_MULT, DEFAULT_MULT } from './sensitivity';
 import { TIERS, TIER_LABEL, type Pref, type Tier } from './graphics';
 import type { BallState, HoleInfo, ServerMsg } from '../shared/protocol';
+import { BALL_STEPS, shotShape } from '../sim/delivery';
 import type { LobbyView } from '../server/lobby-types';
 
 export const BAG = [
@@ -29,7 +30,7 @@ export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ??
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
 <li><b>Move</b> with <b>W A S D</b> (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
 <li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
-<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. The <b>arrow keys</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
+<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. The <b>arrow keys</b> set the ball position on a 7x7 grid (the outer ring hits a stinger, hook, slice or towering shot) (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
 <li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
 <li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
 <li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>
@@ -54,7 +55,7 @@ const CSS = `
 #meter{left:50%;bottom:50px;transform:translateX(-50%);width:300px;display:none}#fill{height:12px;background:#ddd;width:0}
 #cd{left:50%;top:35%;transform:translate(-50%);font-size:96px;background:none;display:none}
 #toast{left:50%;top:70px;transform:translateX(-50%);display:none}
-#bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px}#bpos canvas{display:block;margin:0 auto 2px}
+#bpos{left:10px;bottom:84px;display:none;text-align:center;font-size:11px;padding:6px 8px;max-width:150px}#bpos canvas{display:block;margin:0 auto 2px}
 #meter .track{position:relative;background:#444;height:12px}#meter .max{position:absolute;right:0;top:0;bottom:0;width:31.8%;background:rgba(210,40,40,.6)}#meter #fill{position:relative;z-index:1;opacity:.9}
 #pin{position:absolute;display:none;pointer-events:none;background:none;padding:0;text-align:center;color:#fff;font-weight:700;text-shadow:0 0 4px #000;width:110px}#pin svg{display:block;margin:0 auto}
 #gear{left:10px;top:84px;cursor:pointer;font-size:18px;padding:2px 8px;pointer-events:auto;user-select:none}
@@ -142,12 +143,13 @@ export class UI {
   /** Small grid showing where the ball sits against the feet in the stance (fb: up = forward, io: right = away from the body). */
   ballPosGrid(p: { fb: number; io: number } | null) {
     const e = this.$('bpos'); e.style.display = p ? 'block' : 'none'; if (!p) return;
-    const c = e.querySelector('canvas')!, x = c.getContext('2d')!; x.clearRect(0, 0, 100, 100); x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 0, 100, 100); x.strokeStyle = '#777';
-    for (let i = 0; i <= 4; i++) { x.beginPath(); x.moveTo(10 + i * 20, 10); x.lineTo(10 + i * 20, 90); x.moveTo(10, 10 + i * 20); x.lineTo(90, 10 + i * 20); x.stroke(); }
-    x.fillStyle = '#9ad'; x.fillRect(46, 90 - 28, 8, 28 + 4 - 4);                           // the feet / body line below the grid centre
-    x.fillStyle = '#fff'; x.beginPath(); x.arc(10 + (p.io + 2) * 20, 10 + (2 - p.fb) * 20, 6, 0, 7); x.fill();
-    x.fillStyle = '#ffe14d'; x.beginPath(); x.arc(50, 50, 2, 0, 7); x.fill();                // the centre (optimal)
-    e.querySelector('span')!.textContent = `Fwd ${p.fb >= 0 ? '+' : ''}${p.fb} · Away ${p.io >= 0 ? '+' : ''}${p.io}`;
+    const n = BALL_STEPS, cell = 80 / (2 * n), at = (k: number) => 10 + (k + n) * cell;          // 7x7 grid: -3..+3 on each axis
+    const c = e.querySelector('canvas')!, x = c.getContext('2d')!; x.clearRect(0, 0, 100, 100); x.fillStyle = 'rgba(255,255,255,.08)'; x.fillRect(0, 0, 100, 100);
+    x.strokeStyle = 'rgba(255,255,255,.18)'; for (let i = 0; i <= 2 * n; i++) { x.beginPath(); x.moveTo(10 + i * cell, 10); x.lineTo(10 + i * cell, 90); x.moveTo(10, 10 + i * cell); x.lineTo(90, 10 + i * cell); x.stroke(); }
+    x.strokeStyle = 'rgba(255,225,77,.55)'; x.strokeRect(at(-n) , at(-n), 80, 80); x.strokeRect(at(-1), at(-1), 2 * cell, 2 * cell);   // the outer ring = extreme shapes
+    x.fillStyle = '#ffe14d'; x.beginPath(); x.arc(50, 50, 2, 0, 7); x.fill();                                                          // the centre (stock)
+    x.fillStyle = '#fff'; x.beginPath(); x.arc(at(p.io), at(-p.fb), 5, 0, 7); x.fill();
+    e.querySelector('span')!.textContent = `${shotShape(p.fb, p.io)} · Fwd ${p.fb >= 0 ? '+' : ''}${p.fb} · Away ${p.io >= 0 ? '+' : ''}${p.io}`;
   }
   /** Pin indicator: a flag drawn over the pin at constant pixel size with the yardage from your ball when it is on screen, an edge arrow toward it when not. */
   pinMarker(m: Marker | null, yards: number, opacity: number) {
@@ -216,7 +218,7 @@ export class UI {
     const e = this.$('card'), y = (v: number) => (v * YD).toFixed(1), fx = (n: number) => (n === 0 ? '0' : n > 0 ? `+${n}` : `${n}`);
     const off = m.offlineM * YD;
     e.innerHTML = `<b>Shot</b><br>Carry ${y(m.carryM)} yd<br>Total ${y(m.totalM)} yd<br>Offline ${Math.abs(off).toFixed(1)} yd ${off < 0 ? 'L' : 'R'}<br>
-      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)}<br>Effort: ${m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
+      Club ${m.clubSpeedMph.toFixed(0)} mph &middot; Ball ${(m.ballSpeedMs * 2.23694).toFixed(0)} mph<br>Ball: Fwd ${fx(m.effort.fb)} / Away ${fx(m.effort.io)} &middot; ${esc(shotShape(m.effort.fb, m.effort.io))}<br>Effort: ${m.effort.maxEffort ? 'MAX' : 'Normal'} &middot; ${Math.round(m.effort.length * 100)}%${m.penalty ? `<br>Penalty: ${esc(m.penalty)}` : ''}`;
     e.style.display = 'block'; clearTimeout(this.cardT); this.cardT = window.setTimeout(() => (e.style.display = 'none'), 10000); // 10 s so a physics tester can read it; PRD said 4 s
   }
   /** Mini map oriented tee (bottom) to pin (top). */

@@ -72,7 +72,7 @@ export function playShot(h: Hole, prev: BallState, req: ShotReq): Played | { err
   if (!club || club.key === 'P') return { error: 'unknown club (use putt for the putter)' };
   if (!isValidLength(req.holdMs)) return { error: 'invalid hold time (must be a finite number)' };
   const ballPos = { fb: req.fb ?? 0, io: req.io ?? 0 };
-  if (!isValidBallPos(ballPos)) return { error: 'invalid ball position (fb and io are integers from -2 to 2)' };
+  if (!isValidBallPos(ballPos)) return { error: 'invalid ball position (fb and io are integers from -3 to 3)' };
   const { length, maxEffort } = effortFromHold(Math.max(0, req.holdMs), false);
   const onTee = Math.hypot(prev.x - h.info.tee.x, prev.z - h.info.tee.z) <= TEE_RADIUS_M;
   const lie: Lie = onTee ? 'tee' : h.surfaceAt(prev.x, prev.z);

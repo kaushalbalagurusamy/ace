@@ -118,9 +118,9 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(ok(sw(1100)).carryM).toBeGreaterThan(ok(sw(750)).carryM * 1.03);  // max effort (x1.1 club speed) carries further than a normal full swing
     for (const bad of [NaN, Infinity]) expect('error' in sw(bad), String(bad)).toBe(true);
   });
-  it('ball position and its range: fb/io outside -2..2 or non-integer are rejected; a draw lands left of a centre ball and a fade right', () => {
+  it('ball position and its range: fb/io outside -3..3 or non-integer are rejected; a draw lands left of a centre ball and a fade right', () => {
     const bp = (fb: number, io: number) => playShot(h, tee, { clubKey: '5', aimDeg: 0, holdMs: 750, fb, io, seed: 1 });
-    for (const [fb, io] of [[3, 0], [0, -3], [0.5, 0], [NaN, 0]] as const) expect('error' in bp(fb, io), `${fb},${io}`).toBe(true);
+    for (const [fb, io] of [[4, 0], [0, -4], [0.5, 0], [NaN, 0]] as const) expect('error' in bp(fb, io), `${fb},${io}`).toBe(true);
     expect(ok(bp(0, 2)).offlineM).toBeLessThan(ok(bp(0, 0)).offlineM - 1); expect(ok(bp(0, -2)).offlineM).toBeGreaterThan(ok(bp(0, 0)).offlineM + 1);
   });
   it('rejects the putter as a full-swing club and unknown clubs', () => {
