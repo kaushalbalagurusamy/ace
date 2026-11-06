@@ -1,0 +1,31 @@
+// Browser check of the one-button swing, run against a LOCAL server (never prod): node e2e-simple.mjs <screenshot-dir> [url]. Fails the HUD/help scan if any Timing or Z/X/C text survives.
+import { chromium } from 'playwright';
+const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const p = await (await b.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
+const errs = [], sent = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => m.type() === 'error' && errs.push(m.text()));
+p.on('websocket', ws => ws.on('framesent', f => { const t = String(f.payload); if (/"t":"(shot|putt)"/.test(t)) sent.push(t); }));
+const txt = async s => (await p.innerText(s).catch(() => '')).replace(/\s+/g, ' ');
+const sleep = ms => p.waitForTimeout(ms);
+const R = (k, v) => console.log(k.padEnd(34), v);
+await p.goto('http://localhost:3130/'); await p.fill('#nm', 'Simple'); await p.click('[data-act=name]');
+const help = await p.innerText('body'); R('help panel has Timing/Z X C:', /Timing|Z, X, C|Z X C|press Z/i.test(help));
+await p.click('[data-act=create]'); await p.click('[data-act=solo]');
+await p.waitForSelector('#bag', { state: 'visible', timeout: 15000 }); await sleep(7000);
+R('keys hint:', await txt('#keys')); R('pin indicator at the tee:', (await txt('#pin')) + ' | display ' + await p.evaluate(() => getComputedStyle(document.querySelector('#pin')).display));
+R('prompt at start:', await txt('#prompt'));
+await p.keyboard.down('KeyW'); await sleep(700); await p.keyboard.up('KeyW'); R('after holding W (no movement):', await txt('#prompt'));
+await p.keyboard.down('ArrowUp'); await sleep(1000); await p.keyboard.up('ArrowUp'); R('after holding ArrowUp 1 s:', await txt('#prompt'));
+await p.keyboard.down('ArrowDown'); await sleep(1000); await p.keyboard.up('ArrowDown'); R('after ArrowDown back:', await txt('#prompt'));
+await p.keyboard.press('Digit7'); await p.keyboard.press('Space'); await sleep(150);
+R('stance meter:', await txt('#meter')); R('ball grid shown:', await p.evaluate(() => getComputedStyle(document.querySelector('#bpos')).display));
+await p.keyboard.press('KeyW'); await p.keyboard.press('KeyD'); await p.keyboard.press('KeyD'); await sleep(100); R('ball position text:', await txt('#bpos'));
+await p.keyboard.press('Digit9'); await sleep(100); R('club change in stance:', await p.evaluate(() => document.querySelector('.slot.on')?.textContent));
+await p.mouse.move(640, 360); await p.mouse.down(); await p.mouse.move(640 - 40, 360, { steps: 4 }); await p.mouse.up();   // re-aim in the stance
+await p.keyboard.down('Space'); await sleep(700); R('meter at 700 ms:', await txt('#meter')); await sleep(600);
+R('auto-released (max effort) sent:', sent.at(-1) ?? 'none'); await sleep(1500);
+R('card:', (await txt('#card')).replace(/Club .* mph · Ball \d+ mph/, '').slice(0, 130));
+R('hud text has Timing/Z X C:', /Timing|Z, X, C|Z X C/.test(await p.innerText('body')));
+await p.keyboard.up('Space'); await sleep(14000);
+await p.click('#gear'); await sleep(200); R('settings panel:', (await txt('#settings')).slice(0, 80)); R('slider value:', await p.evaluate(() => document.querySelector('#sens').value));
+await p.keyboard.press('Escape'); await sleep(200); R('settings closed by Esc:', await p.evaluate(() => getComputedStyle(document.querySelector('#settings')).display));
+R('ERRORS:', errs.length ? errs : 'none'); await p.screenshot({ path: process.argv[2] + '/simple.png' }); await b.close();
