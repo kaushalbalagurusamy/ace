@@ -617,7 +617,7 @@
     },
     "qa": {
       "verdict": "PENDING",
-      "renders": "assets/qa/golfer-v5/",
+      "renders": "assets/qa/golfer-v6/",
       "compare_against": "refs/golfer/character-reference.png; swing: refs/swing/dunaway-dtl-sybervision.mp4",
       "views": [
         "p1-faceon",
@@ -647,14 +647,19 @@
         "face-side",
         "swing-strip.mp4"
       ],
-      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v5/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
+      "local_only": "compare-p1/p4/p7/p10.jpg (Dunaway frame beside our DTL render) are in assets/qa/golfer-v6/ but not committed: the clip's frames never ship (PRD/02 \u00a76)",
       "rule": "pass = no score below 3 and mean >= 4.0",
       "wired": true,
       "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
       "previous": {
-        "v4": "FAIL 3.33, swing 2 (third critic)",
-        "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
-      }
+        "v5": "supervisor review (not the critic): P9/P10 floating, P10 club out to the left, P4 hands against the head",
+        "v5_changes": "swing rebuilt on the P1-P10 positions (owner spec): backswing hold 0..1 interpolates P1-P2 (0.25)-P3 (0.55)-P4 (1.0); release P4-P5-P6-P7 over ~240 ms then P7-P8-P9-P10 over ~450 ms; spine angle kept P1-P7; feet planted except the P10 trail foot; both hands on the grip by IK; head narrowed (x 0.92) and lengthened (y 1.04); eye glow smaller and on the eyes",
+        "earlier": {
+          "v4": "FAIL 3.33, swing 2 (third critic)",
+          "v4_changes": "new likeness turnaround (image edit with the reference plus a face close-up: long narrow face, high cheekbones, slim nose) remeshed at 20,817 tris; smooth creased normals; violet glow sprites over the eyes; top with 45\u00b0 more thorax turn and hands at the trail shoulder; address tilted from the hips with elbows out (forearms uncrossed)"
+        }
+      },
+      "v6_changes": "supervisor review: feet pinned to the ground in every P position (the pelvis drops when a straightened leg cannot reach; lead foot flat, only the trail heel lifts); P10 club wrapped behind the head (hands at the lead shoulder, shaft down behind the back toward the trail shoulder); P4 hands above the trail shoulder about 29 cm clear of the head with the shaft visible across the down-the-line view; P5 checked: lead arm level, shaft about 90 degrees to it"
     },
     "edit_inputs": [
       "refs/golfer/character-reference.png",
