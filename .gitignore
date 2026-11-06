@@ -22,3 +22,6 @@ __pycache__/
 
 # Motion QA composites contain reference frames/photos: critic-only, never committed (the renders are)
 assets/qa/motion/**/compare*
+
+# QA composites that contain the refs/cart reference photos (scripts/qa/cart-compare.sh): local only
+assets/qa/motion/cart/compare/
