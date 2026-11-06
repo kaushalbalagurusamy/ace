@@ -2,7 +2,7 @@
 // straw-tipped grass). Code-generated: one InstancedMesh of blade clumps on every turf cell that borders sand.
 import * as THREE from 'three';
 import { GRIDS } from '../shared/course-grid';
-import { cellCode, ground } from './terrain';
+import { cellCode, ground, seaField } from './terrain';
 
 const SAND = 115, GREEN = 103;
 const hash = (x: number, z: number, k: number) => { const s = Math.sin(x * 127.1 + z * 311.7 + k * 74.7) * 43758.5453; return s - Math.floor(s); };
@@ -26,10 +26,10 @@ const mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.Doub
 /** Lip tufts for one hole (three space); `perCell` tufts on each 2 m turf cell next to sand (not on the green). */
 export function makeFescue(hole: number, perCell: number): THREE.InstancedMesh | null {
   if (perCell <= 0) return null;
-  const g = GRIDS[hole]!, spots: [number, number][] = [];
+  const g = GRIDS[hole]!, sea = seaField(hole).sea, spots: [number, number][] = [];
   for (let iz = 0; iz < g.nz; iz++) for (let ix = 0; ix < g.nx; ix++) {
     const x = g.x0 + (ix + 0.5) * g.cell, z = g.z0 + (iz + 0.5) * g.cell, c = cellCode(hole, x, z);
-    if (c === SAND || c === GREEN || c === 111 || c === 119) continue;
+    if (c === SAND || c === GREEN || c === 111 || c === 119 || sea[iz * g.nx + ix]) continue;   // not on stray land specks drawn as sea
     if (![[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => cellCode(hole, x + dx! * g.cell, z + dz! * g.cell) === SAND)) continue;
     for (let k = 0; k < perCell; k++) spots.push([x + (hash(x, z, k) - 0.5) * g.cell, z + (hash(z, x, k + 7) - 0.5) * g.cell]);
   }

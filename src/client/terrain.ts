@@ -47,13 +47,17 @@ export function seaField(hole: number): SeaField {
   const g = GRIDS[hole]!, cells = decoded(hole), open = openSea(hole, g, cells), n = g.nx * g.nz;
   const sea = new Float32Array(n), dist = new Float32Array(n).fill(1e9); let any = false;
   for (let i = 0; i < n; i++) if (cells[i] === 119 || (g.coastal && cells[i] === 111 && open[i])) sea[i] = 1;
-  // drop small water specks (the traced graphics' dotted OB lines read as water): only bodies of 300+ cells are sea
-  const seen = new Uint8Array(n);
-  for (let s = 0; s < n; s++) if (sea[s] && !seen[s]) {
-    const comp = [s]; seen[s] = 1;
-    for (let k = 0; k < comp.length; k++) { const i = comp[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && sea[j] && !seen[j]) { seen[j] = 1; comp.push(j); } }
-    if (comp.length < 300) for (const i of comp) sea[i] = 0; else any = true;
-  }
+  /** Flips every 4-connected component of cells equal to `v` that is smaller than `min` cells. */
+  const specks = (v: number, min: number) => {
+    const seen = new Uint8Array(n);
+    for (let s = 0; s < n; s++) if (sea[s] === v && !seen[s]) {
+      const comp = [s]; seen[s] = 1;
+      for (let k = 0; k < comp.length; k++) { const i = comp[k]!, x = i % g.nx; for (const j of [x > 0 ? i - 1 : -1, x < g.nx - 1 ? i + 1 : -1, i - g.nx, i + g.nx]) if (j >= 0 && j < n && sea[j] === v && !seen[j]) { seen[j] = 1; comp.push(j); } }
+      if (comp.length < min) for (const i of comp) sea[i] = 1 - v; else if (v) any = true;
+    }
+  };
+  specks(1, 300);   // drop small water specks (the traced graphics' dotted OB lines read as water): only bodies of 300+ cells are sea
+  if (any) specks(0, 40);   // and small land specks out in the sea (stray path/sand cells of the same dotted lines) are drawn as sea
   for (let i = 0; i < n; i++) if (!sea[i]) dist[i] = 0;
   // two-pass chamfer distance (3-4 metric) from land, in metres
   const D = (i: number, j: number, w: number) => { if (dist[j]! + w < dist[i]!) dist[i] = dist[j]! + w; };
@@ -258,11 +262,11 @@ const seaDefs = (hole: number): Record<string, string> => (GRIDS[hole]!.coastal 
 
 /** Deterministic prop spots from the traced grid: trees where the graphic shows trees, rocks on the shore, kept near the playing corridor. */
 export function propSpots(hole: number): PropSpot[] {
-  const g = GRIDS[hole]!; let seed = (hole + 1) * 2654435761 >>> 0;
+  const g = GRIDS[hole]!, sea = seaField(hole).sea; let seed = (hole + 1) * 2654435761 >>> 0;
   const rnd = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
   const trees: PropSpot[] = [], rocks: PropSpot[] = [];
   for (let z = g.z0; z < g.z0 + g.nz * g.cell; z += 6) for (let x = g.x0; x < g.x0 + g.nx * g.cell; x += 6) {
-    const px = x + rnd() * 6, pz = z + rnd() * 6, c = cellClass(hole, px, pz), r = rnd();
+    const px = x + rnd() * 6, pz = z + rnd() * 6, r = rnd(), c = sea[Math.floor((pz - g.z0) / g.cell) * g.nx + Math.floor((px - g.x0) / g.cell)] ? 'w' : cellClass(hole, px, pz);   // land specks drawn as sea get no props
     if (c === 't' && r < 0.22 && trees.length < 150) trees.push({ kind: rnd() < 0.6 ? 'cypress' : 'pine', x: px, z: pz, scale: 0.8 + rnd() * 0.5, rotY: rnd() * 6.28 });
     else if (c === 'k' && r < 0.12 && rocks.length < 30) rocks.push({ kind: 'rock', x: px, z: pz, scale: 0.7 + rnd() * 0.8, rotY: rnd() * 6.28 });
   }
