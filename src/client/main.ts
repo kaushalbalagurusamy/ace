@@ -1,6 +1,7 @@
 import { SwingFSM, type Action } from './swingfsm';
 import { GameAudio } from './audio';
 import { isCoastal } from './terrain';
+import { SKY_PRESETS, type SkyPreset } from './environment';
 import type { HoleInfo, ServerMsg } from '../shared/protocol';
 import type { LobbyView } from '../server/lobby-types';
 import { Net } from './net';
@@ -227,6 +228,13 @@ document.addEventListener('pointerlockchange', () => { if (!document.pointerLock
 /** One saved setting for the slider and the , . keys. */
 function setLook(v: number, byPlayer = true) { lookMult = v; saveMult(v, undefined, byPlayer); ui.syncSettings(); }
 ui.bindSettings(() => lookMult, v => setLook(sliderValue(v)), () => { lookMult = resetMult(); ui.syncSettings(); });
+// Sky preset: saved per browser; ?sky=marine overrides it for the QA shots
+const isSky = (v: string | null): v is SkyPreset => SKY_PRESETS.includes(v as SkyPreset);
+let sky: SkyPreset = 'sunny';
+try { const v = localStorage.getItem('ace.sky'); if (isSky(v)) sky = v; } catch { /* private mode: default */ }
+const skyQ = new URLSearchParams(location.search).get('sky'); if (isSky(skyQ)) sky = skyQ;
+if (sky !== 'sunny') world.setSky(sky);
+ui.bindSky(() => sky, v => { if (!isSky(v)) return; sky = v; try { localStorage.setItem('ace.sky', v); } catch { /* not remembered */ } world.setSky(v); });
 ui.bindGraphics(() => ({ pref: gfxPref, auto: adapt.tier }), p => {
   gfxPref = p; savePref(p); adapt.reset(performance.now());
   world.applyTier(p === 'auto' ? adapt.tier : p);

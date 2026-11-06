@@ -60,14 +60,14 @@ void main() {
   vec4 w3 = texture2D(uWave, p * 0.23 + vec2(uTime * 0.02, -uTime * 0.017));
   vec2 sl = (w1.xy - 0.5) * 0.9 + (w2.xy - 0.5) * 0.6 + (w3.xy - 0.5) * 0.35;
   vec3 V = normalize(cameraPosition - vW); float far = length(cameraPosition - vW);
-  sl *= mix(1.0, 0.35, smoothstep(150.0, 900.0, far));              // calmer-looking distance (and no shimmer)
+  sl *= mix(1.0, 0.12, smoothstep(60.0, 600.0, far));               // calmer distance: grazing reflections of the fine waves alias into horizontal streaks
   vec3 n = normalize(vec3(sl.x, 1.0, sl.y));
   float ndv = max(dot(n, V), 0.0), fres = 0.02 + 0.98 * pow(1.0 - ndv, 5.0);
   vec3 R = reflect(-V, n); R.y = abs(R.y);
   vec3 sky = mix(mix(uHaze, uZenith, 0.55), uZenith, pow(clamp(R.y, 0.0, 1.0), 0.4));
   float sd = max(dot(R, uSun), 0.0);
   vec3 glint = uSunCol * (pow(sd, 900.0) * 9.0 + pow(sd, 90.0) * 0.35);
-  float shallow = 1.0 - smoothstep(1.0, 45.0, d);
+  float shallow = 1.0 - smoothstep(1.0, 30.0, d);
   vec3 body = mix(uDeep, uShallow, shallow) * (0.55 + 0.45 * max(uSun.y, 0.0));
   vec3 col = mix(body, sky, fres * 0.75) + glint;
   // surf: a thin broken white edge plus swells that rise and break as they run in toward the shore
@@ -92,7 +92,7 @@ export function makeOcean(hole: number): THREE.Mesh | null {
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
       uField: { value: null }, uWave: { value: null }, uGrid: { value: new THREE.Vector4() }, uTime: { value: 0 },
       uSun: { value: SUN_DIR.clone() }, uSunCol: { value: new THREE.Color('#fff0dc') }, uZenith: { value: ZENITH.clone() }, uHaze: { value: HAZE.clone() },
-      uShallow: { value: new THREE.Color('#2f86ad') }, uDeep: { value: new THREE.Color('#1c4a72') }, uFoam: { value: new THREE.Color('#eef2f2') },
+      uShallow: { value: new THREE.Color('#3b7283') }, uDeep: { value: new THREE.Color('#284a68') }, uFoam: { value: new THREE.Color('#eef2f2') },
     }]),
   });
   mat.uniforms.uField!.value = f.tex; mat.uniforms.uWave!.value = waveTexture();

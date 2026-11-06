@@ -1,7 +1,7 @@
 // Instanced grass-blade clumps on the rough near the camera (High and Ultra). The clumps sit on a world-anchored jittered lattice,
 // so they do not swim when the set is refilled (only after the camera moves 3 m); wind sway is a vertex-shader sine, nothing per frame on the CPU.
 import * as THREE from 'three';
-import { cellCode, ground } from './terrain';
+import { cellCode, visualGround } from './terrain';
 
 const ROUGH = 114; // 'r'
 const hash = (x: number, z: number, k: number) => { const s = Math.sin(x * 127.1 + z * 311.7 + k * 74.7) * 43758.5453; return s - Math.floor(s); };
@@ -61,7 +61,7 @@ transformed.x += sw; transformed.z += sw * 0.5;
       if (d > R || n >= mesh.instanceMatrix.count || cellCode(hole, -wx, wz) !== ROUGH) continue;
       const fade = Math.min(1, (R - d) / (0.25 * R));   // shrink toward the edge so there is no hard ring
       this.s.setScalar((0.75 + 0.6 * hash(gx, gz, 3)) * fade);
-      this.m.compose(this.p.set(wx, ground(hole, -wx, wz), wz), this.q.setFromAxisAngle(Grass.UP, hash(gx, gz, 4) * 6.283), this.s);
+      this.m.compose(this.p.set(wx, visualGround(hole, -wx, wz), wz), this.q.setFromAxisAngle(Grass.UP, hash(gx, gz, 4) * 6.283), this.s);
       mesh.setMatrixAt(n, this.m);
       const v = 0.82 + 0.3 * hash(gx, gz, 5); mesh.setColorAt(n, this.c.setRGB(v, v * (0.97 + 0.06 * hash(gx, gz, 6)), v * 0.95));
       n++;

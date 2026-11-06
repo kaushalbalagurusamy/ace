@@ -13,7 +13,7 @@ export const VIEWS = {
   'h08-approach': ['h08-chasm.jpg', [8, -40, 14, 215, 40, -10, 320, 55]],
   'h18-seawall': ['h18-view-back.jpg', [18, 25, 9, 520, -10, 0, 260, 60]],
   'h17-green': ['h17-green.jpg', [17, 8, 1.7, 182, -25, 1, 225, 55]],
-  'cypress': ['h18-green-cypress.jpg', [18, 2, 2.5, 455, 25, 6, 494, 55]],
+  'cypress': ['h18-green-cypress.jpg', [18, 45, 10, 530, -5, 2, 440, 60]],   // from the Lodge terrace side behind the green, looking back down 18 with the bay on the right
   'bunker': ['bunker-close.jpg', [17, -2, 2.6, 162, -2, 0, 177, 50]],
 };
 const { chromium } = await import(pwPath);

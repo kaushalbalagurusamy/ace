@@ -147,7 +147,7 @@ export class UI {
       <div class="hud" id="keys">WASD move / drive · E cart · Shift walk / fine aim · Space swing · Arrows ball position · M rangefinder · N mute · , . look speed · F3 FPS</div>
       <div class="hud" id="pin"><svg width="26" height="30" viewBox="0 0 26 30"><line x1="5" y1="2" x2="5" y2="29" stroke="#fff" stroke-width="2.5"/><path d="M5 3 L24 9 L5 15 Z" fill="#e53935" stroke="#fff" stroke-width="1.5"/></svg><span></span></div>
       <div class="hud" id="gear" title="Settings">&#9881;</div>
-      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
+      <div class="hud" id="settings"><h3>Settings</h3><label>Camera sensitivity <b id="sensval"></b></label><input id="sens" type="range" min="${MIN_MULT}" max="${MAX_MULT}" step="${SLIDER_STEP}"><button id="sensreset">Reset to default (${DEFAULT_MULT}×)</button><div style="margin-top:10px;font-size:12px;opacity:.8">, and . also change it. Esc closes this menu.</div><label style="display:block;margin-top:16px">Graphics<select id="gfx">${['auto', ...TIERS].map(t => `<option value="${t}">${t === 'auto' ? 'Auto' : TIER_LABEL[t as Tier]}</option>`).join('')}</select></label><div style="margin-top:6px;font-size:12px;opacity:.8">Auto picks a level for your hardware and steps it down or up with the frame rate. Antialiasing changes apply on the next load. F3 shows FPS.</div><label style="display:block;margin-top:16px">Sky<select id="sky"><option value="sunny">Sunny</option><option value="marine">Marine layer</option></select></label></div><div class="hud" id="fps"></div><div id="rf"><canvas></canvas><div id="rftip"></div></div>`;
     this.home.id = 'home';
     this.home.append(new Backdrop().el, this.scr);
     this.home.insertAdjacentHTML('beforeend', `<button class="htp-btn" aria-haspopup="dialog"><i>?</i><span>How to play</span></button><div class="spons">Callaway · Genesis</div>${HELP}`);
@@ -276,6 +276,11 @@ export class UI {
     this.syncGraphics = sync; sync();
   }
   syncGraphics: () => void = () => {};
+  /** Sky select: sunny (default) or the overcast marine layer. */
+  bindSky(get: () => string, set: (v: string) => void) {
+    const sel = this.$('sky') as HTMLSelectElement; sel.value = get();
+    sel.onchange = () => { set(sel.value); sel.blur(); };
+  }
   /** F3 readout; `toggleFps` flips it, `fps` writes it (only while shown). */
   fpsOn = false;
   toggleFps() { this.fpsOn = !this.fpsOn; this.$('fps').style.display = this.fpsOn ? 'block' : 'none'; }

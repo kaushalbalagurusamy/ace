@@ -4,7 +4,7 @@ import type { BallState, CartState, HoleInfo, Mover, PlayerRace, ServerMsg } fro
 import { cartSpawn, forwardSpeed } from '../shared/cart';
 import { DEFAULT_COURSE, gridKey, keyOf, type CourseId } from '../shared/courses';
 import { makeCart, poseCart, type CartView } from './cartmodel';
-import { baseY, ground, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh, themeOf } from './terrain';
+import { baseY, dip, visualGround, groundNormal, isCoastal, propSpots, seaField, seaY, setTurf, terrainMesh, themeOf } from './terrain';
 import { gridOf } from '../shared/courses';
 import { hole as courseHole } from '../server/course';
 const holeInfo = (i: number) => courseHole(i).info;
@@ -14,7 +14,7 @@ import { Grass } from './grass';
 import { isGraded, loadModel, type PropSpot } from './assets';
 import { makeProp } from './props';
 import { toMarker, type Marker } from './overlay';
-import { fogDensity, makeEnvironment, SUN_DIR } from './environment';
+import { fogDensity, makeEnvironment, setSky, SUN_DIR, type Env, type SkyPreset } from './environment';
 import { makeOcean } from './ocean';
 import { makeFescue } from './fescue';
 import { buildingTrees, makeBackdrop, makeBuildings, makeCliffs, seaWallMeshes, shorePieces, shoreRockSpots } from './coast';
@@ -74,6 +74,8 @@ export class World {
   private propToken = 0; private propHole = 0;
   private pinTop = new THREE.Vector3();
   private fog: THREE.FogExp2;
+  private env!: Env;
+  private built: HoleInfo | null = null;
   private sun: THREE.DirectionalLight;
   private grass = new Grass(this.scene);
   private terrain: THREE.Mesh | null = null;
@@ -83,14 +85,14 @@ export class World {
   private turf: Promise<Turf | null>;
   private tmpA = new THREE.Vector3(); private tmpB = new THREE.Vector3(); private tmpQ = new THREE.Quaternion(); private tmpQ2 = new THREE.Quaternion();
   /** Ground height at sim (x, z) on a hole (default: the one I am on). */
-  groundAt(x: number, z: number, hole = this.myHole) { return ground(gridKey(this.courseId, hole), x, z); }
+  groundAt(x: number, z: number, hole = this.myHole) { return visualGround(gridKey(this.courseId, hole), x, z); }
   /** A three-space point standing on the ground of `hole` at sim (x, z), lifted by `dy`. */
   private onGround(hole: number, x: number, z: number, dy = 0) { return V(x, this.groundAt(x, z, hole) + dy, z); }
   constructor(canvas: HTMLCanvasElement, tier: Tier) {
     this.tier = tier; this.turf = loadTurf(tier);
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: SPEC[tier].antialias });   // MSAA is fixed per WebGL context: applies from the next load
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFShadowMap;
-    const env = makeEnvironment(this.renderer, this.scene); this.sun = env.sun; this.fog = env.fog;   // sky, sun, haze, ACES (environment.ts)
+    const env = this.env = makeEnvironment(this.renderer, this.scene); this.sun = env.sun; this.fog = env.fog;   // sky, sun, haze, ACES (environment.ts)
     this.scene.add(this.course, this.props, this.beacon);
     // the sun's shadow box (90 m) follows the player; sun.position/target are moved in render()
     const sc = this.sun.shadow.camera; sc.left = sc.bottom = -45; sc.right = sc.top = 45; sc.near = 1; sc.far = 320;
@@ -106,7 +108,7 @@ export class World {
     this.sun.castShadow = s.shadow > 0;
     if (s.shadow && this.sun.shadow.mapSize.x !== s.shadow) { this.sun.shadow.mapSize.set(s.shadow, s.shadow); this.sun.shadow.map?.dispose(); this.sun.shadow.map = null; }
     this.sun.shadow.radius = t === 'ultra' ? 3 : 1;
-    this.fog.density = fogDensity(s.fogFar); this.cam.far = s.far; this.cam.updateProjectionMatrix();
+    this.fog.density = fogDensity(s.fogFar) * this.env.fogMul; this.cam.far = s.far; this.cam.updateProjectionMatrix();
     this.grass.configure(s.grassM, s.grassSpacing);
     if (first) return;
     if (s.tex !== prev.tex) {
@@ -164,10 +166,15 @@ export class World {
   }
   /** Another player's latest report; tick() eases their golfer and cart toward it. */
   remote(m: Mover) { const e = this.ents.get(m.id); if (e && m.id !== this.selfId && m.hole === e.hole) { e.remote = m; e.driving = m.driving; } }
+  /** Sky preset (settings): relights the scene and rebuilds the hole so the water and far shore take the new haze. */
+  setSky(p: SkyPreset) {
+    setSky(this.env, this.renderer, this.scene, p); this.fog.density = fogDensity(SPEC[this.tier].fogFar) * this.env.fogMul;
+    if (this.built) this.buildCourse(this.built);
+  }
   /** Rebuilds the terrain for a hole without touching the players. */
   private courseToken = 0;
   buildCourse(h: HoleInfo) {
-    this.course.clear(); this.courseToken++; this.courseId = h.course;
+    this.course.clear(); this.courseToken++; this.courseId = h.course; this.built = h;
     const k = keyOf(h), coast = themeOf(k) === 'coastal';   // parkland courses have no sea: no ocean, cliffs, far shore or shore pieces
     const base = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), this.landBeyond(k));
     base.position.y = baseY(k) - 0.6; // just under sea level (the ocean covers it on coastal holes), inland under the lowest ground: shallow depth buffers z-fight at a few centimetres
@@ -334,7 +341,7 @@ export class World {
       const a = Math.atan2(m.ball.x - prev.x, m.ball.z - prev.z) - Math.atan2(last.x, last.z), c = Math.cos(a), s = Math.sin(a);
       pts = pts.map(p => ({ x: prev.x + p.x * c + p.z * s, y: p.y, z: prev.z - p.x * s + p.z * c }));
     }
-    const vs = pts.map(p => V(p.x, p.y + 0.22, p.z));
+    const k = gridKey(this.courseId, m.hole), vs = pts.map(p => V(p.x, p.y + 0.22 + dip(k, p.x, p.z), p.z));   // into the drawn bunker bowls too
     if (e.tracer) this.scene.remove(e.tracer);
     e.tracer = new THREE.Line(new THREE.BufferGeometry().setFromPoints(vs), new THREE.LineBasicMaterial({ color: e.shade }));
     e.tracer.geometry.setDrawRange(0, 1); e.tracer.frustumCulled = false; this.scene.add(e.tracer);
@@ -389,7 +396,7 @@ export class World {
     const i = Math.max(0, Math.min(17, (v[0] ?? 1) - 1)), hl = holeInfo(i);
     this.buildCourse(hl); this.myHole = i;
     const ex = v[1] ?? 0, ez = v[3] ?? 0, tx = v[4] ?? 0, tz = v[6] ?? 100;
-    this.cam.position.copy(V(ex, ground(i, ex, ez) + (v[2] ?? 1.6), ez)); this.cam.lookAt(V(tx, ground(i, tx, tz) + (v[5] ?? 1), tz));
+    this.cam.position.copy(V(ex, visualGround(i, ex, ez) + (v[2] ?? 1.6), ez)); this.cam.lookAt(V(tx, visualGround(i, tx, tz) + (v[5] ?? 1), tz));
     if (v[7]) { this.cam.fov = v[7]; this.cam.updateProjectionMatrix(); }
     this.qaTarget = this.tmpA.clone().copy(this.onGround(i, tx, tz));
   }
