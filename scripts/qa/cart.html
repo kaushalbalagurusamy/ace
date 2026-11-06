@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { makeCart, poseCart, fitBody } from '/src/client/cartmodel.ts';
 const W = 960, H = 640, r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); document.body.append(r.domElement);
-const gen = (await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/assets/models/cart-body.glb')).scene;
+const gen = (await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(new URLSearchParams(location.search).get('glb') ?? '/assets/models/cart-body.glb')).scene;   // ?glb= views a raw candidate
 const rows = await (await fetch('/assets/manifest.json')).json();
 const scene = new THREE.Scene(); scene.background = new THREE.Color('#9aa3ab');
 scene.add(new THREE.HemisphereLight('#ffffff', '#6a6a60', 1.5)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(4, 6, 5); scene.add(key);
@@ -27,7 +27,7 @@ window.show = (o = {}) => {
   }
   if (cart) scene.remove(cart.root);
   st = { x: 0, z: 0, yaw: 0, vx: 0, vz: 0 };
-  if (o.mode === 'raw') { cart = { root: new THREE.Group() }; cart.root.add(gen.clone()); }
+  if (o.mode === 'raw') { cart = { root: new THREE.Group() }; const g = gen.clone(); g.position.y = -new THREE.Box3().setFromObject(g).min.y; cart.root.add(g); }   // standing on the ground
   else { cart = makeCart('#e8c23a', false); if (o.mode === 'gen') fitBody(cart, gen.clone(), rows.findLast(r => r.id === 'cart-body')); }
   if (o.marker) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.06), new THREE.MeshBasicMaterial({ color: '#ff00ff' })); cart.seat.add(m); const w = m.clone(); cart.wheel.add(w); }
   scene.add(cart.root);

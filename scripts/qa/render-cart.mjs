@@ -8,7 +8,7 @@ await new Promise(r => setTimeout(r, 4000));
 try {
   const b = await chromium.launch({ executablePath: exe, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }), p = await b.newPage({ viewport: { width: 960, height: 640 } });
   p.on('pageerror', e => console.log('PAGEERR', e.message)); p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE', m.text()); });
-  await p.goto('http://127.0.0.1:5393/scripts/qa/cart.html', { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
+  await p.goto('http://127.0.0.1:5393/scripts/qa/cart.html' + (process.env.GLB ? `?glb=${process.env.GLB}` : ''), { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
   await mkdir(outDir, { recursive: true }); const out = {};
   for (const [name, opts] of SHOTS) { out[name] = await p.evaluate(o => window.show(o), opts); await p.screenshot({ path: join(outDir, `${name}.jpg`), type: 'jpeg', quality: 85 }); }
   console.log(JSON.stringify(out)); await b.close();
