@@ -67,7 +67,7 @@ void main() {
   vec3 sky = mix(mix(uHaze, uZenith, 0.55), uZenith, pow(clamp(R.y, 0.0, 1.0), 0.4));
   float sd = max(dot(R, uSun), 0.0);
   vec3 glint = uSunCol * (pow(sd, 900.0) * 9.0 + pow(sd, 90.0) * 0.35);
-  float shallow = 1.0 - smoothstep(1.0, 45.0, d);
+  float shallow = 1.0 - smoothstep(1.0, 30.0, d);
   vec3 body = mix(uDeep, uShallow, shallow) * (0.55 + 0.45 * max(uSun.y, 0.0));
   vec3 col = mix(body, sky, fres * 0.75) + glint;
   // surf: a thin broken white edge plus swells that rise and break as they run in toward the shore
@@ -92,7 +92,7 @@ export function makeOcean(hole: number): THREE.Mesh | null {
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
       uField: { value: null }, uWave: { value: null }, uGrid: { value: new THREE.Vector4() }, uTime: { value: 0 },
       uSun: { value: SUN_DIR.clone() }, uSunCol: { value: new THREE.Color('#fff0dc') }, uZenith: { value: ZENITH.clone() }, uHaze: { value: HAZE.clone() },
-      uShallow: { value: new THREE.Color('#3f8b96') }, uDeep: { value: new THREE.Color('#284a68') }, uFoam: { value: new THREE.Color('#eef2f2') },
+      uShallow: { value: new THREE.Color('#3b7283') }, uDeep: { value: new THREE.Color('#284a68') }, uFoam: { value: new THREE.Color('#eef2f2') },
     }]),
   });
   mat.uniforms.uField!.value = f.tex; mat.uniforms.uWave!.value = waveTexture();
