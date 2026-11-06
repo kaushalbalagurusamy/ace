@@ -176,8 +176,12 @@ float tNoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 *
 // (the second rotated, larger and offset, chosen by world noise), macro colour variation, and mowing stripes across the tee-pin axis.
 const TURF_MAP = /* glsl */`
 #ifdef HAS_FINE
-{ ivec2 fs = textureSize(uFine, 0); vec2 fu = (vec2(-vWxz.x, vWxz.y) - uGridF.xy) * uGridF.zw;
-  if (vFine < 0.5 && texelFetch(uFine, clamp(ivec2(floor(fu * vec2(fs))), ivec2(0), fs - 1), 0).r > 0.5) discard; }   // a fine tile is drawn here
+// a fine tile is drawn here. The coarse ground stays within 0.3 m of a tile's edge: overlapping the (identical, dip 0) fine edge closes the
+// pixel-wide cracks that cutting exactly on the edge left, which showed as a dashed white line along the tile seams.
+if (vFine < 0.5) { ivec2 fs = textureSize(uFine, 0); vec2 fu = (vec2(-vWxz.x, vWxz.y) - uGridF.xy) * uGridF.zw, e = 0.3 * uGridF.zw; float f = 1.0;
+  for (int i = 0; i < 4; i++) { vec2 o = i < 2 ? vec2(i == 0 ? e.x : -e.x, 0.0) : vec2(0.0, i == 2 ? e.y : -e.y);
+    f = min(f, texelFetch(uFine, clamp(ivec2(floor((fu + o) * vec2(fs))), ivec2(0), fs - 1), 0).r); }
+  if (f > 0.5) discard; }
 #endif
 #ifdef HAS_SEA
 if (textureLod(uSea, (vec2(-vWxz.x, vWxz.y) - uGrid.xy) * uGrid.zw, 0.0).r > 0.55) discard;   // the ocean (ocean.ts) and the cliffs (coast.ts) show through
