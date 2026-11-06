@@ -63,7 +63,7 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 - [ASSUMED] **Extraction method:**
   1. Download the clip locally, for reference only.
   2. Step through it frame by frame, slowed down.
-  3. Run 3D pose estimation (for example MediaPipe Pose landmarks) on the frames to get joint angles and the phase timings: address, takeaway, top, Z/X/C onsets, impact, finish.
+  3. Run 3D pose estimation (for example MediaPipe Pose landmarks) on the frames to get joint angles and the phase timings: address, takeaway, top (the Space release), impact, finish.
   4. Retarget those onto our own rig as keyframes.
 - [ASSUMED] **What ships:** only the extracted joint-angle curves, on our own model. The video and its frames are never shipped (brief: no pre-made assets), and the golfer isn't a likeness of the person in it.
 - [GIVEN] **MVP visuals:** greyscale polygons. The golfer is a code-built low-poly rigged figure, and the generated golfer replaces it later (06).
