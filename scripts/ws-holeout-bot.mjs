@@ -9,7 +9,7 @@ w.on('message', d => got.push(JSON.parse(d)));
 const send = o => w.send(JSON.stringify(o)), sleep = ms => new Promise(r => setTimeout(r, ms));
 await new Promise(r => w.on('open', r));
 // a unique name: two bots may share a server
-send({ t: 'hello', sessionId: 'bot-' + Date.now(), name: 'HoleBot' + String(Date.now()).slice(-4) }); await sleep(200);
+send({ t: 'hello', sessionId: 'bot-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), name: 'HoleBot' + Math.random().toString(36).slice(2, 6) }); await sleep(200);
 send({ t: 'createLobby', ...(COURSE && { course: COURSE }) }); await sleep(200); send({ t: 'startSolo' });
 let start; while (!(start = got.find(m => m.t === 'raceStart'))) await sleep(200);
 if (COURSE && start.hole.course !== COURSE) { console.log(`HOLE-OUT FAIL: asked for ${COURSE}, raced on ${start.hole.course}`); process.exit(1); }
