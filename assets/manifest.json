@@ -2120,7 +2120,7 @@
     "licence": "Meshy paid-tier terms (commercial use per plan): owner to confirm",
     "subagent": "cart asset agent (script)",
     "qa": {
-      "verdict": "PENDING",
+      "verdict": "PASS",
       "rule": "pass = no score below 3 and mean >= 4.0 (independent critic, renders beside refs/cart photos)",
       "renders": "assets/qa/motion/cart/meshy/",
       "rounds": [
@@ -2213,7 +2213,8 @@
       ],
       "open_issues": "critic (round 7, cart-meshy-5): Interior/dashboard geometry is broken: jagged white spikes, a mangled screen and smeared, stretched plaid textures in the genesis-4 view; Steering wheel, centre screen mount, vents and toggle switches are missing or crude compared with the reference; Rear white double stripes render as blurry chrome reflections instead of crisp white stripes, and the badge is unreadable; The GENESIS lettering on the rear red light bar is missing; The body looks taller and narrower than the low, wide reference; the B-pillar is heavier than the reference's continuous glass canopy; Seats are separate headrest buckets rather than the reference's low beige seats with plaid inserts",
       "local_only": "assets/qa/motion/cart/compare/meshy-genesis-*.jpg (photo beside render; gitignored, never committed)",
-      "critic_json": "local only: scratchpad cart-final/critic-r*.json (fresh critic per round: renders + refs/cart photos + rubric only)"
+      "critic_json": "local only: scratchpad cart-final/critic-r*.json (fresh critic per round: renders + refs/cart photos + rubric only)",
+      "owner_override": "Owner 2026-11-06 06:35 CST: \"just ship the best one\" (critic 3.25, below the 4.0 bar)"
     },
     "orient_deg": [
       0,
