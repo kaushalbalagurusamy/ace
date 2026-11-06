@@ -1,7 +1,9 @@
 // Retargets the pose-estimated Dunaway swing (scripts/motion/capture_pose.py output) onto the golfer rig as a continuous swing
 // curve, one Pose per captured frame from P1 (address) to P10 (finish), written to src/client/motion/swingcapture.ts.
 //
-// Usage: npx tsx scripts/motion/retarget-swing.ts <capture.json> <first> <last> [rigArmM]
+// Usage: npx tsx scripts/motion/retarget-swing.ts <capture.json> <first> <last> [rigArmM] [--uthana]
+//   --uthana: the capture is Uthana video-to-motion (scripts/motion/uthana-capture.ts), whose depth is recovered in 3D, so the
+//   prior only holds the top (P4) and impact (P7) and the other keys keep the capture within wider ranges; writes swingcapture-uthana.ts.
 //
 // What comes from the capture (down the line, so depth is the camera's weak axis):
 //   hip and shoulder turn (top-down angle of the hip and shoulder lines), forward spine tilt, head turn, the pelvis dip and
@@ -19,7 +21,8 @@ import { P_KEYED } from '../../src/client/swingprior';
 import { lerpPose, type Pose, type V3 } from '../../src/client/golferanim';
 import { LM, add, clamp, cross, dot, dtl, fill, fuse, len, load, mid, mul, norm, pole, r4, smooth, smoothSeries, sub, unwrap, type P3 } from './mocap';
 
-const [capPath, a0s, a1s, armS] = process.argv.slice(2);
+const UTHANA = process.argv.includes('--uthana');
+const [capPath, a0s, a1s, armS] = process.argv.slice(2).filter(a => a !== '--uthana');
 if (!capPath) throw new Error('usage: retarget-swing.ts <capture.json> <first> <last> [rigArmM]');
 const cap = load(capPath), A0 = Number(a0s ?? 0), A1 = Number(a1s ?? cap.frames.length - 1), RIG_ARM = Number(armS ?? 0.55);
 const deg = (d: number) => (d * Math.PI) / 180;
@@ -90,15 +93,15 @@ const r = (k: number, val: number, tol: number) => ({ f: KEYS[k]!, lo: val - tol
 const keysFor = (get: (p: Pose) => number, tol: (k: number) => number) => KEYS.map((_, k) => r(k, get(P_KEYED[k]!), tol(k)));
 // Critic round 2 (P3, P4, P7, P8 scored 2/5: the top too low and the arm bent, impact like address, the P3 shaft and P8 hands wrong):
 // at these keys the single camera's depth is weakest, so the prior holds them exactly (STRICT); the capture still shapes the frames between.
-const STRICT = new Set([2, 3, 4, 5, 6, 7, 8]);   // round 3 added P5 (hands at the face); round 4 P6 and P9
+const STRICT = new Set(UTHANA ? [3, 6] : [2, 3, 4, 5, 6, 7, 8]);   // round 3 added P5 (hands at the face); round 4 P6 and P9
 const turnTol = (k: number) => (k === 3 ? 0 : k <= 8 ? deg(4) : deg(12));   // P8 too: the capture over-turned the chest
 const pelY = fuse(capPelY, keysFor(p => p.pelvis[1], turnTol));
 const shY = fuse(capShY, keysFor(p => p.pelvis[1] + p.torso[1], turnTol));
 // P1-P8 keep the address spine angle (no standing up; critic round 2: at P8 too): those keys are held within 0.02 rad of the prior's P1 tilt
 const tilt0 = P_KEYED[0]!.pelvis[0] + P_KEYED[0]!.torso[0];
-const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 7 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], k === 8 ? 0.04 : 0.15))));
+const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= (UTHANA ? 6 : 7) ? { f, lo: tilt0 - (UTHANA ? 0.05 : 0.02), hi: tilt0 + (UTHANA ? 0.05 : 0.02) } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], k === 8 ? 0.04 : 0.15))));
 const headW = fuse(capHeadWorld.map((h, i) => clamp(h, shY[i]! - deg(100), shY[i]! + deg(100))), keysFor(p => p.pelvis[1] + p.torso[1] + p.head[1], k => (k <= 6 ? deg(12) : deg(25))));
-const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], k => (k <= 7 ? 0.01 : 0.03)));
+const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], k => (k <= 7 && !UTHANA ? 0.01 : 0.04)));
 const shiftZ = fuse(capShift.map(s => clamp(s[2] * S, -0.12, 0.2)), keysFor(p => p.shift[2] - P_KEYED[0]!.shift[2], k => (STRICT.has(k) ? 0.01 : 0.04)));
 const heelKeys = (side: 'l' | 'r') => keysFor(p => (side === 'l' ? p.lHeel : p.rHeel), k => (k === 0 ? 0 : k === 6 ? 0.05 : k >= 6 ? 0.2 : 0.1));
 const lHeel = fuse(capLHeel, heelKeys('l')).map(x => clamp(x, 0, 1.3)), rHeel = fuse(capRHeel, heelKeys('r')).map(x => clamp(x, 0, 1.3));
@@ -107,7 +110,7 @@ const lw = (i: number) => w(i, LM.lWr);
 const gripCap = W.map((_, i) => add(P_KEYED[0]!.grip as unknown as P3, mul(sub(lw(i), lw(p1)), S)));
 // x (toward the target) is the camera's depth axis, so it is held close to the prior; y and z (up, toward the ball) are seen well
 const grip = [0, 1, 2].map(ax => fuse(gripCap.map(g => g[ax]!), KEYS.map((f, k) => {
-  const pk = P_KEYED[k]!.grip[ax]!, tol = k === 0 || STRICT.has(k) ? 0 : ax === 0 ? 0.08 : 0.15; return { f, lo: pk - tol, hi: pk + tol };
+  const pk = P_KEYED[k]!.grip[ax]!, tol = k === 0 || STRICT.has(k) ? 0 : ax === 0 && !UTHANA ? 0.08 : 0.15; return { f, lo: pk - tol, hi: pk + tol };
 })));
 // lead wrist in the turned thorax frame (x lead shoulder line, y up the spine, z out of the chest), used around the top
 const tgrip = W.map((_, i) => {
@@ -148,9 +151,9 @@ const vis = cap.frames.slice(A0 + p1, A0 + p10 + 1).flatMap(f => (f.world ? [LM.
 const quality = { detected: r4(detected), meanVisibility: r4(vis.reduce((s, x) => s + x, 0) / vis.length), hipCorrectionDeg: moved(capPelY, pelY), shoulderCorrectionDeg: moved(capShY, shY) };
 console.log('quality', JSON.stringify(quality));
 
-const out = resolve(import.meta.dirname, '../../src/client/motion/swingcapture.ts');
+const out = resolve(import.meta.dirname, `../../src/client/motion/swingcapture${UTHANA ? '-uthana' : ''}.ts`);
 writeFileSync(out, `// GENERATED by scripts/motion/retarget-swing.ts — do not edit by hand. The Dunaway swing (refs/swing, down the line, ${cap.fps} fps),
-// pose-estimated per frame with MediaPipe Pose Landmarker (heavy, world landmarks), smoothed, fused with the P-system prior and
+// ${UTHANA ? 'captured in 3D by Uthana video-to-motion 2.0 (UE5 Manny skeleton, 30 fps) and' : 'pose-estimated per frame with MediaPipe Pose Landmarker (heavy, world landmarks),'} smoothed, fused with the P-system prior and
 // retargeted onto the golfer rig: one packed Pose per captured frame from P1 (address) to P10 (finish). See golferanim.ts unpack().
 export const SWING_CAPTURE = {
   source: 'refs/swing/dunaway-dtl-sybervision.mp4 frames ${A0 + p1}-${A0 + p10}',

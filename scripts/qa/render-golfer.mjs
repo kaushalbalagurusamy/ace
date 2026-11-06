@@ -11,7 +11,7 @@ await new Promise(r => setTimeout(r, 4000));
 try {
   const b = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }), p = await b.newPage({ viewport: { width: 640, height: 640 } });
   p.on('pageerror', e => console.log('PAGEERR', e.message)); p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE', m.text()); });
-  await p.goto('http://127.0.0.1:5392/scripts/qa/golfer.html', { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
+  await p.goto('http://127.0.0.1:5392/scripts/qa/golfer.html' + (process.env.QA_QUERY ?? ''), { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
   await mkdir(outDir, { recursive: true }); const out = {};
   for (const [name, view, pose, opts] of SHOTS) { out[name] = await p.evaluate(([v, ps, o]) => window.show(v, ps, o), [view, pose, opts ?? {}]); await p.screenshot({ path: join(outDir, `${name}.jpg`), type: 'jpeg', quality: 85 }); }
   console.log(JSON.stringify(out)); await b.close();

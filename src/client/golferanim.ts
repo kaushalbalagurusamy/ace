@@ -5,7 +5,8 @@
 // Euler triples are radians, three.js 'XYZ' order: x tilts forward, y turns (negative = away from the target), z side-bends.
 import { FULL_TURN_MS } from '../sim/length';
 import { BASE, P_KEYED, POSES } from './swingprior';
-import { SWING_CAPTURE } from './motion/swingcapture';
+import { SWING_CAPTURE as MEDIAPIPE_CAPTURE } from './motion/swingcapture';
+import { SWING_CAPTURE as UTHANA_CAPTURE } from './motion/swingcapture-uthana';
 import { GAIT_CAPTURE } from './motion/gaitcapture';
 
 export type V3 = readonly [number, number, number];
@@ -25,6 +26,11 @@ export interface Pose {
   /** walk/idle: each wrist has its own target and the club hangs from the trail hand */
   free?: { l: V3; r: V3 };
 }
+
+/** Which capture of the Dunaway swing plays: MediaPipe fused with the hand-keyed prior (default), or Uthana video-to-motion with
+ *  ?swing=uthana in the page URL. */
+export const SWING_SOURCE = typeof location !== 'undefined' && new URLSearchParams(location.search).get('swing') === 'uthana' ? 'uthana' : 'mediapipe';
+const SWING_CAPTURE = SWING_SOURCE === 'uthana' ? UTHANA_CAPTURE : MEDIAPIPE_CAPTURE;
 
 /** Unpacks one captured frame (the field order of pack() in scripts/motion/retarget-swing.ts). */
 export function unpack(f: readonly number[]): Pose {
