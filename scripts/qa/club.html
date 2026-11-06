@@ -1,0 +1,30 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">
+// QA view of a club head as the game fits it (src/client/clubs.ts fitGeneratedHead): orientation from the manifest row, real head
+// size, grip-end origin. Same background and lighting as scripts/qa/render-assets.mjs. No PASS gate: this page is what the critic judges.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { CLUBS, fitGeneratedHead } from '/src/client/clubs.ts';
+const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(640, 640); document.body.append(r.domElement);
+const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).setDRACOLoader(new DRACOLoader().setDecoderPath('/node_modules/three/examples/jsm/libs/draco/gltf/')), rows = await (await fetch('/assets/manifest.json')).json();
+// show(id, dir, {raw, orient, whole}): dir is the camera direction in the club frame (shaft +Y up to the grip, face +Z, toe -X);
+// raw = the file as loaded (for finding its orientation); whole = frame the full club instead of the head;
+// photo: dir (and up) are given in the file's own frame, i.e. as the reference photo saw it, and turned with the orientation.
+window.show = async (id, dir, o = {}) => {
+  const row = rows.find(x => x.id === id), spec = CLUBS.find(c => c.model === id), g = (await loader.loadAsync(`/assets/models/${id}.glb?${Date.now()}`)).scene;
+  const obj = o.raw ? g : fitGeneratedHead(g, spec, o.orient ?? row?.orient_deg);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#8a8a8a'); scene.add(obj);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#707070', 1.6)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(3, 5, 4); const fill = new THREE.DirectionalLight('#ffffff', 0.8); fill.position.set(-4, 2, -3); scene.add(key, fill);
+  obj.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(o.raw || o.whole ? obj : obj.children.at(-1));   // the fitted head is the group's last child
+  const deg = (o.orient ?? row?.orient_deg ?? [0, 0, 0]).map(THREE.MathUtils.degToRad), turn = new THREE.Euler(deg[0], deg[1], deg[2]);
+  const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()), d = Math.max(s.x, s.y, s.z) * 2.6;
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.001, 100), v = new THREE.Vector3(...dir).normalize(), up = new THREE.Vector3(...(o.up ?? [0, 1, 0]));
+  if (o.photo && !o.raw) { v.applyEuler(turn); up.applyEuler(turn); }
+  if (Math.abs(v.dot(up.normalize())) > 0.99) up.set(0, 0, 1);
+  cam.position.copy(c).addScaledVector(v, d); cam.up.copy(up); cam.lookAt(c); r.render(scene, cam);
+  return { size: new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3()).toArray().map(n => +n.toFixed(3)) };
+};
+window.ready = true;
+</script>
