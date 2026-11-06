@@ -1,174 +1,86 @@
 import { describe, it, expect } from 'vitest';
 import { SwingFSM, type Action } from '../src/client/swingfsm';
-import { durationScale, FULL_TURN_MS } from '../src/sim';
 
-const IMPACT_BASE = 300;
+type Shot = Extract<Action, { type: 'send-shot' }>;
 const raw = (putt = false) => new SwingFSM({ putt, aimDeg: putt ? 3 : 12.5, clubKey: putt ? 'P' : '7' });
-/** The first Space press (and its release) puts the machine in the stance; the tests then press Space again to start the backswing. */
+/** The first Space press (and its release) is the stance; tests then press Space again to start the backswing. */
 const armed = (f: SwingFSM) => { f.key('Space', true, -2000); f.key('Space', false, -1950); return f; };
 const full = () => armed(raw());
 const putter = () => armed(raw(true));
-type Shot = Extract<Action, { type: 'send-shot' }>;
 const shot = (a: Action | null | undefined): Shot => { expect(a?.type).toBe('send-shot'); return a as Shot; };
 
-describe('SH-6 full swing: Space hold sets length, release is the top, Z/X/C relative to release', () => {
-  it('the happy path sends one shot with continuous length and release-relative timings', () => {
-    const f = full();
-    expect(f.key('Space', true, 1000)).toBeNull();            // second Space press: backswing starts
-    expect(f.key('Space', false, 1375)).toBeNull();           // release at 375 ms = length 0.5
-    const d = durationScale(0.5);
-    expect(f.key('KeyZ', true, 1375)).toBeNull();
-    expect(f.key('KeyX', true, 1375 + 60 * d)).toBeNull();
-    expect(f.key('KeyC', true, 1375 + 150 * d)).toBeNull();
-    expect(f.tick(1375 + IMPACT_BASE * d - 1)).toBeNull();    // before the (scaled) impact deadline
-    const a = shot(f.tick(1375 + IMPACT_BASE * d));
-    expect(a.msg).toEqual({ t: 'shot', clubKey: '7', aimDeg: 12.5, length: 0.5, zMs: 0, xMs: 60 * d, cMs: 150 * d });
-    expect(f.tick(5000)).toBeNull();                          // no double send
-    expect(f.key('Space', true, 5001)).toBeNull();
-  });
-  it('holding past a full turn pauses at the top: length stays 1', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 5000);
-    const a = shot(f.tick(5000 + IMPACT_BASE)); expect(a.msg.length).toBe(1);
-  });
-  it('a quick tap floors at the minimum length 0.05', () => {
-    const f = full(); f.key('Space', true, 100); f.key('Space', false, 110);
-    expect(shot(f.tick(110 + IMPACT_BASE)).msg.length).toBe(0.05);
-  });
-  it('the impact deadline scales with length: a 25% swing strikes 180 ms after the release', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 0.25 * FULL_TURN_MS);
-    const top = 0.25 * FULL_TURN_MS;
-    expect(f.tick(top + 179)).toBeNull();
-    expect(shot(f.tick(top + 180)).msg.length).toBe(0.25);
-  });
-  it('meter(t) shows the fraction reached while holding, 0 in the stance, and freezes after release', () => {
-    const f = full();
-    expect(f.meter(500)).toBe(0);
-    f.key('Space', true, 1000);
-    expect(f.meter(1000)).toBe(0.05); expect(f.meter(1000 + 375)).toBeCloseTo(0.5, 10); expect(f.meter(9000)).toBe(1);
-    f.key('Space', false, 1000 + 375); expect(f.meter(9000)).toBeCloseTo(0.5, 10);
-  });
-  it('key auto-repeat of the second Space press is ignored (t0 does not move)', () => {
-    const f = full(); f.key('Space', true, 1000); f.key('Space', true, 1100); f.key('Space', true, 1200);
-    f.key('Space', false, 1375);
-    expect(shot(f.tick(1375 + IMPACT_BASE)).msg.length).toBeCloseTo(0.5, 10);
-  });
-});
-
-describe('SH-6 rollover: Space, Z, X and C can overlap without losing a key', () => {
-  it('Z pressed while Space is still down is kept as an early (negative) offset', () => {
-    const f = full(); f.key('Space', true, 1000); f.key('KeyZ', true, 1300); f.key('Space', false, 1375);
-    f.key('KeyX', true, 1375 + 45); f.key('KeyC', true, 1375 + 112.5);
-    const a = shot(f.tick(1375 + 225));
-    expect(a.msg.zMs).toBe(-75); expect(a.msg.xMs).toBeCloseTo(45, 10); expect(a.msg.cMs).toBeCloseTo(112.5, 10);
-  });
-  it('all four keys down together, then Space released: nothing is dropped', () => {
-    const f = full(); f.key('Space', true, 1000);
-    f.key('KeyZ', true, 1360); f.key('KeyX', true, 1362); f.key('KeyC', true, 1364); f.key('Space', false, 1375);
-    const a = shot(f.tick(1375 + 300));
-    expect([a.msg.zMs, a.msg.xMs, a.msg.cMs]).toEqual([-15, -13, -11]);
-  });
-  it('keys released in any order after impact do not matter; keys released early are omitted', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 750);
-    f.key('KeyZ', true, 750); f.key('KeyZ', false, 800);      // let go before impact: bail out
-    f.key('KeyX', true, 810); f.key('KeyC', true, 900);
-    const a = shot(f.tick(750 + 300));
-    expect(a.msg.zMs).toBeUndefined(); expect(a.msg.xMs).toBe(60); expect(a.msg.cMs).toBe(150);
-  });
-  it('a key never pressed is omitted; a key pressed twice keeps its first press', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 750);
-    f.key('KeyZ', true, 750); f.key('KeyZ', true, 790);
-    const a = shot(f.tick(1100));
-    expect(a.msg.zMs).toBe(0); expect(a.msg.xMs).toBeUndefined(); expect(a.msg.cMs).toBeUndefined();
-  });
-  it('a key pressed and released before the Space release (early bail) is omitted', () => {
-    const f = full(); f.key('Space', true, 0); f.key('KeyC', true, 200); f.key('KeyC', false, 300); f.key('Space', false, 750);
-    expect(shot(f.tick(1100)).msg.cMs).toBeUndefined();
-  });
-});
-
-describe('SH-6 Esc', () => {
-  it('Esc in the stance cancels', () => { const f = full(); expect(f.key('Escape', true, 10)?.type).toBe('cancel'); expect(f.key('Space', true, 20)).toBeNull(); expect(f.tick(5000)).toBeNull(); });
-  it('Esc during the backswing (Space still held) cancels with no shot', () => {
-    const f = full(); f.key('Space', true, 0);
-    expect(f.key('Escape', true, 400)?.type).toBe('cancel');
-    f.key('Space', false, 500); expect(f.tick(2000)).toBeNull();
-  });
-  it('Esc after the release is ignored and the shot still strikes', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 750);
-    expect(f.key('Escape', true, 800)).toBeNull();
-    shot(f.tick(1050));
-  });
-});
-
-describe('SH-6 putter: releasing Space strikes', () => {
-  it('sends one putt with the held fraction as length and ignores Z, X, C', () => {
-    const f = putter(); f.key('Space', true, 0);
-    f.key('KeyZ', true, 100); f.key('KeyX', true, 150);
-    const a = f.key('Space', false, 300);
-    expect(a).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, length: 300 / FULL_TURN_MS } });
-    expect(f.tick(10000)).toBeNull(); expect(f.key('Space', true, 10001)).toBeNull();
-  });
-  it('a long hold strikes at length 1; Esc before the release cancels; Esc after is ignored', () => {
-    const a = putter(); a.key('Space', true, 0);
-    expect((a.key('Space', false, 9000) as Extract<Action, { type: 'send-putt' }>).msg.length).toBe(1);
-    const b = putter(); b.key('Space', true, 0); expect(b.key('Escape', true, 200)?.type).toBe('cancel'); expect(b.key('Space', false, 300)).toBeNull();
-    const c = putter(); c.key('Space', true, 0); c.key('Space', false, 300); expect(c.key('Escape', true, 310)).toBeNull();
-  });
-  it('a quick tap strikes at the minimum length', () => {
-    const f = putter(); f.key('Space', true, 0);
-    expect((f.key('Space', false, 5) as Extract<Action, { type: 'send-putt' }>).msg.length).toBe(0.05);
-  });
-});
-
-describe('SH-6 stance rules (the first Space press is part of the machine)', () => {
-  it('a new machine is idle: Space release, Z/X/C and ticks do nothing; the first Space press starts the stance', () => {
+describe('SS-8 hold and release: the only swing input', () => {
+  it('first Space = stance, second Space held = backswing, release sends one shot with the hold time and the ball position', () => {
     const f = raw();
-    expect(f.phase).toBe('idle');
-    expect(f.key('Space', false, 5)).toBeNull(); expect(f.key('KeyZ', true, 6)).toBeNull(); expect(f.tick(100)).toBeNull();
-    expect(f.phase).toBe('idle');
-    f.key('Space', true, 10);
-    expect(f.phase).toBe('stance'); expect(f.meter(20)).toBe(0);
-  });
-  it('releasing the first press does not start the swing; the second press does', () => {
-    const f = raw(); f.key('Space', true, 0); f.key('Space', false, 80);
-    expect(f.phase).toBe('stance');
+    expect(f.phase).toBe('idle'); f.key('Space', true, 0); expect(f.phase).toBe('stance'); f.key('Space', false, 60); expect(f.phase).toBe('stance');
     f.key('Space', true, 200); expect(f.phase).toBe('backswing');
-    f.key('Space', false, 575);
-    expect(shot(f.tick(575 + IMPACT_BASE)).msg.length).toBeCloseTo(0.5, 10);
+    const a = shot(f.key('Space', false, 575));
+    expect(a.msg).toEqual({ t: 'shot', clubKey: '7', aimDeg: 12.5, holdMs: 375, fb: 0, io: 0 });
+    expect(f.phase).toBe('done'); expect(f.tick(9999)).toBeNull(); expect(f.key('Space', true, 10000)).toBeNull();
   });
-  it('holding the first press and never releasing it: auto-repeat does not start the backswing', () => {
-    const f = raw(); f.key('Space', true, 0);
-    for (let t = 30; t < 600; t += 30) f.key('Space', true, t);       // repeats would be filtered by the caller; the machine must not skip the stance
-    expect(f.phase).toBe('backswing');                               // a second keydown IS the second press: callers drop e.repeat
+  it('a normal hold between 0.75 s and 1.10 s is sent as held (the server turns it into a normal 100% shot)', () => {
+    const f = full(); f.key('Space', true, 0); expect(shot(f.key('Space', false, 900)).msg.holdMs).toBe(900);
   });
-  it('Esc in the idle or stance phase cancels', () => {
-    expect(raw().key('Escape', true, 0)?.type).toBe('cancel');
-    const f = full(); expect(f.key('Escape', true, 10)?.type).toBe('cancel');
-  });
-  it('Z, X, C pressed in the stance (before the second Space) are ignored', () => {
-    const f = full(); f.key('KeyZ', true, 5); f.key('Space', true, 100); f.key('Space', false, 850);
-    expect(shot(f.tick(1200)).msg.zMs).toBeUndefined();
+  it('key auto-repeat of Space during the backswing does not restart it', () => { const f = full(); f.key('Space', true, 1000); f.key('Space', true, 1100); f.key('Space', true, 1200); expect(shot(f.key('Space', false, 1375)).msg.holdMs).toBe(375); });
+  it('meter(t) shows the hold as a fraction of the full turn, passing 1 into the max-effort zone, and is 0 in the stance', () => {
+    const f = full(); expect(f.meter(500)).toBe(0); f.key('Space', true, 1000);
+    expect(f.meter(1000)).toBe(0); expect(f.meter(1000 + 375)).toBeCloseTo(0.5, 10); expect(f.meter(1000 + 750)).toBeCloseTo(1, 10); expect(f.meter(1000 + 1100)).toBeCloseTo(1100 / 750, 10);
   });
 });
 
-describe('review: keys after the impact deadline, and abort on blur or lost pointer lock', () => {
-  it('a Z/X/C press at or after the impact deadline (before the next frame tick) is ignored', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 750);   // length 1, impact at 750 + 300
-    f.key('KeyZ', true, 760); f.key('KeyX', true, 1049); f.key('KeyC', true, 1050); // C is exactly at the deadline
-    const a = shot(f.tick(1100));
-    expect(a.msg.zMs).toBe(10); expect(a.msg.xMs).toBe(299); expect(a.msg.cMs).toBeUndefined();
+describe('SS-8 max effort: auto-release at 1.10 s', () => {
+  it('tick fires the shot exactly when the hold reaches 1100 ms, once, with holdMs 1100; the later key-up does nothing', () => {
+    const f = full(); f.key('Space', true, 5000);
+    expect(f.tick(5000 + 1099)).toBeNull();
+    const a = shot(f.tick(5000 + 1100)); expect(a.msg.holdMs).toBe(1100);
+    expect(f.tick(5000 + 1500)).toBeNull(); expect(f.key('Space', false, 5000 + 2000)).toBeNull();
   });
-  it('abort() in the stance or backswing cancels (lost keyup, blur, lost pointer lock): no shot, no stuck state', () => {
-    const a = full(); expect(a.abort()?.type).toBe('cancel'); expect(a.tick(99999)).toBeNull(); expect(a.key('Space', false, 5)).toBeNull();
-    const b = full(); b.key('Space', true, 0); expect(b.abort()?.type).toBe('cancel');
-    expect(b.key('Space', false, 9999)).toBeNull(); expect(b.tick(99999)).toBeNull();           // the late keyup cannot fire a full-length shot
+  it('a release just before the limit is a normal shot, not a max-effort one', () => { const f = full(); f.key('Space', true, 0); expect(f.tick(1099)).toBeNull(); expect(shot(f.key('Space', false, 1099)).msg.holdMs).toBe(1099); });
+  it('if the key-up arrives after the deadline but before a tick, the hold is capped at 1100 (max effort)', () => { const f = full(); f.key('Space', true, 0); expect(shot(f.key('Space', false, 1400)).msg.holdMs).toBe(1100); });
+});
+
+describe('SS-8 ball position in the stance (W/S forward-back, A/D closer-away), 5 steps per axis, only in the stance', () => {
+  it('W and S step the ball forward and back (fb), D and A step it away from and closer to the body (io)', () => {
+    const f = armed(raw()); expect(f.ballPos()).toEqual({ fb: 0, io: 0 });
+    f.key('KeyW', true, 0); f.key('KeyW', true, 1); expect(f.ballPos()).toEqual({ fb: 2, io: 0 });
+    f.key('KeyS', true, 2); f.key('KeyS', true, 3); f.key('KeyS', true, 4); expect(f.ballPos()).toEqual({ fb: -1, io: 0 });
+    f.key('KeyD', true, 5); f.key('KeyD', true, 6); expect(f.ballPos()).toEqual({ fb: -1, io: 2 });
+    f.key('KeyA', true, 7); expect(f.ballPos()).toEqual({ fb: -1, io: 1 });
   });
-  it('abort() after the release does nothing: the shot still strikes', () => {
-    const f = full(); f.key('Space', true, 0); f.key('Space', false, 750);
-    expect(f.abort()).toBeNull(); shot(f.tick(1050));
+  it('steps clamp at -2 and +2', () => {
+    const f = armed(raw()); for (let i = 0; i < 6; i++) { f.key('KeyW', true, i); f.key('KeyD', true, i); } expect(f.ballPos()).toEqual({ fb: 2, io: 2 });
+    for (let i = 0; i < 9; i++) { f.key('KeyS', true, i); f.key('KeyA', true, i); } expect(f.ballPos()).toEqual({ fb: -2, io: -2 });
   });
-  it('abort() on a putter in the backswing cancels; after the strike it does nothing', () => {
-    const a = putter(); a.key('Space', true, 0); expect(a.abort()?.type).toBe('cancel');
-    const b = putter(); b.key('Space', true, 0); b.key('Space', false, 300); expect(b.abort()).toBeNull();
+  it('key releases do nothing; only presses step', () => { const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyW', false, 10); expect(f.ballPos().fb).toBe(1); });
+  it('the position is sent with the shot', () => { const f = armed(raw()); f.key('KeyW', true, 0); f.key('KeyD', true, 1); f.key('KeyD', true, 2); f.key('Space', true, 10); expect(shot(f.key('Space', false, 400)).msg).toMatchObject({ fb: 1, io: 2 }); });
+  it('ball keys are ignored once the backswing has started, and before the stance (idle)', () => {
+    const f = raw(); f.key('KeyW', true, 0); expect(f.ballPos()).toEqual({ fb: 0, io: 0 });          // idle
+    const g = full(); g.key('KeyD', true, 0); g.key('Space', true, 5); g.key('KeyW', true, 10); g.key('KeyA', true, 11); g.key('KeyS', true, 12);
+    expect(shot(g.key('Space', false, 300)).msg).toMatchObject({ fb: 0, io: 1 });
   });
+  it('a fresh machine (a new shot) starts at the centre', () => { const a = armed(raw()); a.key('KeyW', true, 0); expect(armed(raw()).ballPos()).toEqual({ fb: 0, io: 0 }); });
+  it('arrow keys and Z/X/C do nothing to the swing', () => { const f = full(); for (const k of ['ArrowUp', 'ArrowLeft', 'KeyZ', 'KeyX', 'KeyC']) expect(f.key(k, true, 0)).toBeNull(); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); f.key('Space', true, 5); expect(shot(f.key('Space', false, 250)).msg).toEqual({ t: 'shot', clubKey: '7', aimDeg: 12.5, holdMs: 245, fb: 0, io: 0 }); });
+});
+
+describe('SS-8 putter: same hold and release, no max effort, no ball position', () => {
+  it('release sends one putt with the hold time, capped at the full turn; holding longer never auto-releases', () => {
+    const a = putter(); a.key('Space', true, 0); expect(a.key('Space', false, 300)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 300 } });
+    const b = putter(); b.key('Space', true, 0); expect(b.tick(5000)).toBeNull(); expect(b.key('Space', false, 9000)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 750 } });
+  });
+  it('ball-position keys are ignored for the putter', () => { const f = putter(); f.key('KeyW', true, 0); f.key('KeyD', true, 1); expect(f.ballPos()).toEqual({ fb: 0, io: 0 }); });
+  it('a quick tap strikes (the server floors the length)', () => { const f = putter(); f.key('Space', true, 0); expect(f.key('Space', false, 5)).toEqual({ type: 'send-putt', msg: { t: 'putt', aimDeg: 3, holdMs: 5 } }); });
+});
+
+describe('SS-8 Esc and abort', () => {
+  it('Esc in the idle, stance or backswing cancels; after a release it is ignored', () => {
+    expect(raw().key('Escape', true, 0)?.type).toBe('cancel'); expect(full().key('Escape', true, 10)?.type).toBe('cancel');
+    const b = full(); b.key('Space', true, 0); expect(b.key('Escape', true, 200)?.type).toBe('cancel'); expect(b.key('Space', false, 300)).toBeNull(); expect(b.tick(9999)).toBeNull();
+    const c = full(); c.key('Space', true, 0); shot(c.key('Space', false, 300)); expect(c.key('Escape', true, 310)).toBeNull();
+  });
+  it('abort() cancels a stance or backswing (lost keyup, blur, lost pointer lock) so a late keyup cannot fire a shot', () => {
+    const a = full(); expect(a.abort()?.type).toBe('cancel'); expect(a.key('Space', false, 5)).toBeNull();
+    const b = full(); b.key('Space', true, 0); expect(b.abort()?.type).toBe('cancel'); expect(b.key('Space', false, 9999)).toBeNull(); expect(b.tick(99999)).toBeNull();
+    const c = full(); c.key('Space', true, 0); shot(c.key('Space', false, 300)); expect(c.abort()).toBeNull();
+  });
+  it('releasing the first press does not start the swing; the machine ignores Space release in idle', () => { const f = raw(); expect(f.key('Space', false, 5)).toBeNull(); f.key('Space', true, 10); f.key('Space', false, 80); expect(f.phase).toBe('stance'); });
 });

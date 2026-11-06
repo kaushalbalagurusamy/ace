@@ -31,20 +31,24 @@ describe('parseClientMsg: untrusted wire input', () => {
     for (const bad of [1e308, -1e308, 1e12, null, 'x']) expect(p({ t: 'shot', clubKey: '1', aimDeg: bad }), String(bad)).toBeNull();
     expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":1e999}')).toBeNull(); // parses to Infinity
   });
-  it('shot: key timings must be finite and within +-10 s; length must be finite', () => {
-    const ok = p({ t: 'shot', clubKey: '1', aimDeg: 0, zMs: -9999, xMs: 9999, cMs: 0, length: 0.5 });
-    expect(ok).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, zMs: -9999, xMs: 9999, cMs: 0, length: 0.5 });
-    for (const k of ['zMs', 'xMs', 'cMs']) for (const bad of [10001, -10001, 1e9, null, '5']) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, [k]: bad }), `${k}=${bad}`).toBeNull();
-    for (const bad of [null, '0.5', 1e999]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, length: bad })).toBeNull();
+  it('shot: holdMs finite and 0..5000; ball position integers -2..2; the exact fields pass through', () => {
+    expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 375, fb: 1, io: -2 });
+    expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 750 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 750, fb: 0, io: 0 });   // missing ball position = centre
+    for (const bad of [-1, 5001, 1e9, null, '5', NaN]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: bad }), `holdMs ${bad}`).toBeNull();
+    for (const [fb, io] of [[3, 0], [0, -3], [0.5, 0], [0, 1.5], ['1', 0], [null, 0]]) expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, fb, io }), `${fb},${io}`).toBeNull();
+    expect(p({ t: 'shot', clubKey: '1', aimDeg: 0 })).toBeNull();                                              // the hold time is required
+    expect(parseClientMsg('{"t":"shot","clubKey":"1","aimDeg":0,"holdMs":1e999}')).toBeNull();
+  });
+  it('Z/X/C timing fields and the old length field are gone: they are ignored, never passed through', () => {
+    expect(p({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, zMs: 5, xMs: 60, cMs: 150, length: 0.5 })).toEqual({ t: 'shot', clubKey: '1', aimDeg: 0, holdMs: 500, fb: 0, io: 0 });
   });
   it('shot: club key must be a short string', () => {
     expect(p({ t: 'shot', clubKey: 7, aimDeg: 0 })).toBeNull();
     expect(p({ t: 'shot', clubKey: 'x'.repeat(5), aimDeg: 0 })).toBeNull();
   });
-  it('putt: aim normalised, length required and finite', () => {
-    expect(p({ t: 'putt', aimDeg: 180, length: 0.3 })).toEqual({ t: 'putt', aimDeg: 180, length: 0.3 });
-    expect(p({ t: 'putt', aimDeg: 180 })).toBeNull();
-    expect(p({ t: 'putt', aimDeg: 1e308, length: 0.3 })).toBeNull();
-    expect(p({ t: 'putt', aimDeg: 0, length: null })).toBeNull();
+  it('putt: aim normalised, holdMs required, finite and 0..5000', () => {
+    expect(p({ t: 'putt', aimDeg: 180, holdMs: 300 })).toEqual({ t: 'putt', aimDeg: 180, holdMs: 300 });
+    expect(p({ t: 'putt', aimDeg: 180 })).toBeNull(); expect(p({ t: 'putt', aimDeg: 1e308, holdMs: 300 })).toBeNull();
+    for (const bad of [null, -1, 5001, '3', NaN]) expect(p({ t: 'putt', aimDeg: 0, holdMs: bad })).toBeNull();
   });
 });

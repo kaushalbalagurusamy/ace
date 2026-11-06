@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RANGE, canAddress, distance, golferSpot } from '../src/client/rules';
+import { RANGE, canAddress, distance, golferSpot, moveAxis } from '../src/client/rules';
 
 describe('RP-2/RP-3 address prompt and the golfer spot', () => {
   it('the spot where the client puts the golfer next to any ball is within address range', () => {
@@ -23,5 +23,18 @@ describe('RP-2/RP-3 address prompt and the golfer spot', () => {
     const tracerEnd = { x: 80, z: 250 }, dropped = { x: 5, z: 150 };
     expect(distance(golferSpot(dropped), dropped)).toBeLessThan(RANGE);
     expect(distance(golferSpot(dropped), tracerEnd)).toBeGreaterThan(RANGE);
+  });
+});
+
+describe('SS-9 movement is the arrow keys; WASD belongs to the stance', () => {
+  const keys = (...k: string[]) => new Set(k);
+  it('arrow keys move (up = forward, right = right)', () => {
+    expect(moveAxis(keys('ArrowUp'))).toEqual({ f: 1, r: 0 }); expect(moveAxis(keys('ArrowDown'))).toEqual({ f: -1, r: 0 });
+    expect(moveAxis(keys('ArrowRight'))).toEqual({ f: 0, r: 1 }); expect(moveAxis(keys('ArrowLeft'))).toEqual({ f: 0, r: -1 }); expect(moveAxis(keys('ArrowUp', 'ArrowRight'))).toEqual({ f: 1, r: 1 });
+    expect(moveAxis(keys('ArrowUp', 'ArrowDown'))).toEqual({ f: 0, r: 0 });
+  });
+  it('WASD never moves the golfer, alone or together with the arrows', () => {
+    for (const k of ['KeyW', 'KeyA', 'KeyS', 'KeyD']) expect(moveAxis(keys(k)), k).toEqual({ f: 0, r: 0 });
+    expect(moveAxis(keys('KeyW', 'KeyD', 'ArrowLeft'))).toEqual({ f: 0, r: -1 });
   });
 });

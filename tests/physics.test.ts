@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { rollDistance, rollingDecel, simulateShot, launchFor, BAG, scoreSwing, IDEAL_MS, type Launch } from '../src/sim';
+import { rollDistance, rollingDecel, simulateShot, launchFor, BAG, type Launch } from '../src/sim';
 
-const perfect = scoreSwing({ zMs: IDEAL_MS.z, xMs: IDEAL_MS.x, cMs: IDEAL_MS.c });
 const base: Launch = { ballSpeed: 60, launchDeg: 12, azimuthDeg: 0, backspinRpm: 3000, spinAxisDeg: 0 };
 
 describe('rolling', () => {
@@ -73,29 +72,15 @@ describe('bag and launch', () => {
   });
   it('AC-S3: perfect swing flies straight (<1% curvature) with every non-putter club', () => {
     for (const c of BAG.filter(c => c.key !== 'P')) {
-      const r = simulateShot(launchFor(c, perfect));
+      const r = simulateShot(launchFor(c));
       expect(r.carryM, c.label).toBeGreaterThan(10);
       expect(Math.abs(r.offlineM) / r.carryM, c.label).toBeLessThan(0.01);
     }
   });
   it('perfect swing: driver outcarries 7i outcarries PW outcarries 62-degree wedge', () => {
-    const carry = (k: string) => simulateShot(launchFor(BAG.find(c => c.key === k)!, perfect)).carryM;
+    const carry = (k: string) => simulateShot(launchFor(BAG.find(c => c.key === k)!)).carryM;
     expect(carry('1')).toBeGreaterThan(carry('7'));
     expect(carry('7')).toBeGreaterThan(carry('='));
     expect(carry('=')).toBeGreaterThan(carry('O'));
-  });
-  it('a worse swing carries less than the perfect swing (full bag sample)', () => {
-    const bad = scoreSwing({ zMs: 100, xMs: 160, cMs: 40 });
-    for (const k of ['1', '7', 'O']) {
-      const c = BAG.find(c => c.key === k)!;
-      expect(simulateShot(launchFor(c, bad)).carryM).toBeLessThan(simulateShot(launchFor(c, perfect)).carryM);
-    }
-  });
-  it('mis-timed X and C curve the ball in the PRD directions (late C opens the face: right)', () => {
-    const d = BAG[0]!;
-    const late = scoreSwing({ zMs: 0, xMs: 60, cMs: 150 + 120 });
-    const early = scoreSwing({ zMs: 0, xMs: 60, cMs: 150 - 120 });
-    expect(simulateShot(launchFor(d, late)).offlineM).toBeGreaterThan(0);
-    expect(simulateShot(launchFor(d, early)).offlineM).toBeLessThan(0);
   });
 });

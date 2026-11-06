@@ -21,7 +21,7 @@ describe('RP-1 the server rest position always matches what the client replays',
       for (let k = 0; k < 6 && n < 600; k++) {
         const c = cells[Math.floor(r() * cells.length)]!, prev: BallState = { x: c.x, z: c.z, strokes: 3, holedOut: false, surface: h.surfaceAt(c.x, c.z) };
         const aim = (Math.atan2(h.info.pin.x - c.x, h.info.pin.z - c.z) * 180) / Math.PI + (r() - 0.5) * 120, club = clubs[Math.floor(r() * clubs.length)]!;
-        const res = playShot(h, prev, { clubKey: club.key, aimDeg: (aim + 720) % 360, length: 0.3 + r() * 0.7, zMs: (r() - 0.5) * 80, xMs: 60 + (r() - 0.5) * 80, cMs: 150 + (r() - 0.5) * 80 });
+        const res = playShot(h, prev, { clubKey: club.key, aimDeg: (aim + 720) % 360, holdMs: 225 + r() * 525, fb: Math.floor(r() * 5) - 2, io: Math.floor(r() * 5) - 2, seed: Math.floor(r() * 1e6) });
         if ('error' in res) { failures.push(`hole ${hi + 1} ${lie}: ${res.error}`); continue; }
         n++;
         const last = res.samples.at(-1)!.p;
@@ -40,7 +40,7 @@ describe('RP-1 the server rest position always matches what the client replays',
     }
     const pc = { x: h.info.pin.x + 6, z: h.info.pin.z - 4 };                              // putts from the green
     if (!h.penaltyAt(pc.x, pc.z) && h.surfaceAt(pc.x, pc.z) === 'green') {
-      const prev: BallState = { x: pc.x, z: pc.z, strokes: 2, holedOut: false, surface: 'green' }, res = playPutt(h, prev, 200, 0.2 + r() * 0.5);
+      const prev: BallState = { x: pc.x, z: pc.z, strokes: 2, holedOut: false, surface: 'green' }, res = playPutt(h, prev, 200, 150 + r() * 375);
       if (!('error' in res)) { n++; const last = res.samples.at(-1)!.p; if (!res.penalty && Math.hypot(res.ball.x - last.x, res.ball.z - last.z) > 1e-6) failures.push(`hole ${hi + 1}: putt rest != last sample`); if (!res.penalty) seenLies.add(res.ball.surface); }
     }
   }

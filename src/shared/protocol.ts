@@ -11,10 +11,11 @@ export type ClientMsg =
   | { t: 'ready'; ready: boolean }
   | { t: 'start' }
   | { t: 'startSolo' }
-  /** Raw timings, ms relative to the top of the backswing. Server re-scores. Aim = degrees clockwise from +z (hole direction). */
-  | { t: 'shot'; clubKey: string; aimDeg: number; /** backswing length as a fraction (held Space), default 1; the server rejects non-finite values and clamps to 0.05..1 */ length?: number; zMs?: number; xMs?: number; cMs?: number }
-  /** Putter: length = fraction of the backswing reached when Space was released (strikes the ball). Speed = 15 m/s x length. */
-  | { t: 'putt'; aimDeg: number; length: number };
+  /** One-button swing (docs/slices/simple-swing/spec.md): how long Space was held (ms) and the ball position in the stance (fb: forward+/back-, io: away+/closer-,
+   *  integers -2..2, default 0). The server derives length (holdMs/750, 0.05..1) and max effort (holdMs >= 1100) itself. Aim = degrees clockwise from +z. */
+  | { t: 'shot'; clubKey: string; aimDeg: number; holdMs: number; fb?: number; io?: number }
+  /** Putter: hold and release Space; same length curve, no max effort. */
+  | { t: 'putt'; aimDeg: number; holdMs: number };
 
 export interface BallState { x: number; z: number; strokes: number; holedOut: boolean; surface: string }
 export interface HoleInfo { index: number; par: number; pin: { x: number; z: number }; tee: { x: number; z: number }; greenRadius: number; fairwayHalfWidth: number; lengthM: number }
@@ -27,7 +28,7 @@ export type ServerMsg =
   | { t: 'lobby'; lobby: LobbyView | null }
   | { t: 'countdown'; seconds: number }
   | { t: 'raceStart'; hole: HoleInfo; players: PlayerRace[]; goAtMs: number }
-  | { t: 'shotResult'; playerId: string; hole: number; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; grade: { z: number; x: number; c: number }; ball: BallState; penalty?: string }
+  | { t: 'shotResult'; playerId: string; hole: number; samples: TrajectoryPoint[]; carryM: number; totalM: number; offlineM: number; clubSpeedMph: number; ballSpeedMs: number; effort: { fb: number; io: number; maxEffort: boolean; length: number }; ball: BallState; penalty?: string }
   | { t: 'holedOut'; playerId: string; hole: number; strokes: number; splitS: number; /** true after hole 18 */ finished: boolean }
   /** Sent to the whole lobby 2 s after a hole-out: that player is now on the tee of `hole`. Strokes in `ball` are cumulative. */
   | { t: 'nextHole'; playerId: string; hole: HoleInfo; ball: BallState }

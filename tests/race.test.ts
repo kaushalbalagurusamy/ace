@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { IDEAL_MS, BAG, LAND_ROLL_FRACTION, launchFor, rollDistance, scoreSwing, simulateShot } from '../src/sim';
+import { BAG, LAND_ROLL_FRACTION, launchFor, rollDistance, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
 const h = hole(0), pin = h.info.pin;
 const ball = (x: number, z: number, strokes = 0): BallState => ({ x, z, strokes, holedOut: false, surface: h.surfaceAt(x, z) });
 const ok = (r: Played | { error: string }): Played => { if ('error' in r) throw new Error(r.error); return r; };
-const perfect = { zMs: IDEAL_MS.z, xMs: IDEAL_MS.x, cMs: IDEAL_MS.c };
+const perfect = { holdMs: 750, seed: 1 };   // a full normal swing: the server turns the hold into length 1, no max effort
 
 /** Finds a spot on the hole with the given lie and room around it (scans the traced grid; independent of any layout assumption). */
 function findLie(h: ReturnType<typeof hole>, lie: string, minZ = 40, maxZ = 200): { x: number; z: number } {
@@ -77,10 +77,10 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     expect(r.ball.strokes).toBe(1);
     expect(Math.abs(r.ball.x)).toBeLessThan(0.01 * r.carryM);
     expect(r.totalM).toBeGreaterThan(r.carryM);
-    expect(r.flightS).toBeGreaterThan(simulateShot(launchFor(BAG[0]!, scoreSwing(perfect))).flightTimeS);
+    expect(r.flightS).toBeGreaterThan(simulateShot(launchFor(BAG[0]!)).flightTimeS);
   });
   it('server total = sim carry + one roll-out from LAND_ROLL_FRACTION of the landing speed on the landing lie (one roll model)', () => {
-    const sim = simulateShot(launchFor(BAG[0]!, scoreSwing(perfect)));
+    const sim = simulateShot(launchFor(BAG[0]!));
     const r = ok(playShot(h, tee, { clubKey: '1', aimDeg: 0, ...perfect }));
     expect(r.penalty).toBeUndefined();
     const landing = h.surfaceAt(0, sim.carryM);
@@ -103,10 +103,17 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     const b = playShot(h, tee, { clubKey: '7', aimDeg: 3, zMs: 5, xMs: 70, cMs: 140, length: 0.75 });
     expect(a).toEqual(b);
   });
-  it('lengths: out-of-range values clamp, non-finite values are rejected', () => {
-    const sw = (length: number) => playShot(h, tee, { clubKey: '1', aimDeg: 0, ...perfect, length });
-    expect(sw(9)).toEqual(sw(1)); expect(sw(-2)).toEqual(sw(0.05));
+  it('hold times: short holds floor at the minimum length, long holds are one max-effort shot, non-finite holds are rejected', () => {
+    const sw = (holdMs: number) => playShot(h, tee, { clubKey: '1', aimDeg: 0, holdMs, seed: 5 });
+    expect(sw(-2)).toEqual(sw(0));                                  // floored at length 0.05
+    expect(sw(1100)).toEqual(sw(5000));                             // 1.10 s and beyond: the same max-effort shot (same seed)
+    expect(ok(sw(1100)).carryM).toBeGreaterThan(ok(sw(750)).carryM * 1.1);   // max effort carries clearly further than a normal full swing
     for (const bad of [NaN, Infinity]) expect('error' in sw(bad), String(bad)).toBe(true);
+  });
+  it('ball position and its range: fb/io outside -2..2 or non-integer are rejected; a draw lands left of a centre ball and a fade right', () => {
+    const bp = (fb: number, io: number) => playShot(h, tee, { clubKey: '5', aimDeg: 0, holdMs: 750, fb, io, seed: 1 });
+    for (const [fb, io] of [[3, 0], [0, -3], [0.5, 0], [NaN, 0]] as const) expect('error' in bp(fb, io), `${fb},${io}`).toBe(true);
+    expect(ok(bp(0, 2)).offlineM).toBeLessThan(ok(bp(0, 0)).offlineM - 1); expect(ok(bp(0, -2)).offlineM).toBeGreaterThan(ok(bp(0, 0)).offlineM + 1);
   });
   it('rejects the putter as a full-swing club and unknown clubs', () => {
     expect('error' in playShot(h, tee, { clubKey: 'P', aimDeg: 0 })).toBe(true);
@@ -126,7 +133,7 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
 
 describe('penalty area relief (PRD/04: +1 and the legal drop nearest the hole, plus the 2 s wait)', () => {
   const h18 = hole(17);                                         // ocean on the left of hole 18
-  const CLUB_LEN = 1.2, perfect7 = { zMs: 0, xMs: 60, cMs: 150 };
+  const CLUB_LEN = 1.2, perfect7 = { holdMs: 750, seed: 1 };
   /** Finds an aim from the tee that ends in water by scanning, so the test does not assume any layout. */
   function waterShot() {
     for (let aim = -170; aim <= 170; aim += 5) {
