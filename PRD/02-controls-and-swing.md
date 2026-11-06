@@ -53,8 +53,8 @@ Players always have one club equipped. No golf bag is shown. Keys use `KeyboardE
 
 ## 5. Putting
 
-- With the putter equipped: first Space press takes the stance; **hold Space** to draw the putter back; **release strikes**. Speed = 15 m/s x length (length 0.05 to 1 from the hold, as for full swings). **No max effort:** holding past full caps at the maximum putt. Ball position does not apply. Esc before the release cancels.
-- Full draw is about 15 m/s, enough for roughly 25 m on Stimp 10 [ASSUMED].
+- With the putter equipped: first Space press takes the stance; **hold Space** to draw the putter back; **release strikes**. Speed = 5.74 m/s x √length (length 0.05 to 1 from the hold, as for full swings), so roll distance is proportional to the hold. **No max effort:** holding past full caps at the maximum putt. Ball position does not apply. Esc before the release cancels.
+- A full hold rolls about 30 m on Stimp 10 [ASSUMED, supervisor 2026-11-05]. The earlier 15 m/s full speed rolled 205 m once the Stimp roll model was calibrated, which made putting uncontrollable.
 - A green slope overlay (arrows on a grid) shows within 10 m of the ball [ASSUMED].
 
 ## 6. Golfer animation

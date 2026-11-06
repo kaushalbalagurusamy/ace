@@ -35,4 +35,7 @@ const SPEED: Pts = [[0.05, 0.25], [0.25, 0.62], [0.5, 0.76], [0.75, 0.86], [1, 1
 
 export function lengthSpeedFactor(length: number): number { assertLength(length); return interp(SPEED, length); }
 /** Putt ball speed (m/s): 15 m/s x length, the old drawMs / 1500 x 15 curve. */
-export function puttSpeedMs(length: number): number { assertLength(length); return 15 * length; }
+/** Full-hold putt start speed: rolls about 30 m on Stimp 10 (v = sqrt(2 · 0.5486 · 30)). The old 15 m/s rolled 205 m. */
+export const PUTT_MAX_MS = 5.74;
+/** Putt ball speed (m/s) for a hold length in [0.05, 1]: roll distance is proportional to the hold (speed ∝ √length). */
+export function puttSpeedMs(length: number): number { assertLength(length); return PUTT_MAX_MS * Math.sqrt(length); }

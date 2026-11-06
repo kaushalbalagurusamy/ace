@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BAG, launchFor, simulateShot } from '../src/sim';
+import { BAG, PUTT_MAX_MS, launchFor, simulateShot } from '../src/sim';
 import { hole, playPutt, playShot, type Played } from '../src/server/race';
 import type { BallState } from '../src/shared/protocol';
 
@@ -20,31 +20,33 @@ function findLie(h: ReturnType<typeof hole>, lie: string, minZ = 40, maxZ = 200)
 
 describe('putting and holing out (AC-P3 roll, PRD/03 §6 cup capture, research §5.2)', () => {
   const start = ball(pin.x, pin.z - 1);
+  /** Hold (ms) that starts a putt at v m/s on the putt curve (speed = PUTT_MAX_MS * sqrt(length)), clamped to the 0.05 minimum. */
+  const holdFor = (v: number) => Math.max(0.05, (v / PUTT_MAX_MS) ** 2) * 750;
   it('a putt that stops at the cup drops: holedOut, one stroke', () => {
     // v0 = sqrt(2 a d) for d = 1 m at Stimp 10 is about 1.05 m/s => length 0.07 (the old 105 ms draw)
-    const r = ok(playPutt(h, start, 0, 0.07 * 750));
+    const r = ok(playPutt(h, start, 0, holdFor(1.05)));
     expect(r.ball.holedOut).toBe(true);
     expect(r.ball.strokes).toBe(1);
     expect(r.ball.x).toBeCloseTo(pin.x, 6);
     expect(r.ball.z).toBeCloseTo(pin.z, 6);
   });
   it('a putt hit too hard rolls past the cup without dropping (speed above the 1.31 m/s centred capture speed)', () => {
-    const r = ok(playPutt(h, start, 0, 0.15 * 750)); // 2.25 m/s: about 2.0 m/s over the cup, above the 1.31 m/s capture limit (research §5.2)
+    const r = ok(playPutt(h, start, 0, holdFor(2.25))); // 2.25 m/s: about 2.0 m/s over the cup, above the 1.31 m/s capture limit (research §5.2)
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeGreaterThan(pin.z);
     expect(r.ball.strokes).toBe(1);
   });
-  it('the shortest putt (length 0.05, 0.75 m/s) stops about half a metre out, short of the cup', () => {
-    const r = ok(playPutt(h, start, 0, 0.05 * 750));
+  it('the shortest putt (length 0.05, about 1.28 m/s, rolls about 1.5 m) from 3 m stops short of the cup', () => {
+    const far = ball(pin.x, pin.z - 3), r = ok(playPutt(h, far, 0, 0.05 * 750));
     expect(r.ball.holedOut).toBe(false);
     expect(r.ball.z).toBeLessThan(pin.z);
-    expect(r.ball.z).toBeGreaterThan(start.z);
+    expect(r.ball.z).toBeGreaterThan(far.z);
   });
   it('a putt aimed 10 degrees off the line misses', () => {
     expect(ok(playPutt(h, start, 10, 0.07 * 750)).ball.holedOut).toBe(false);
   });
-  it('AC-P3 on the course: 1.83 m/s (length 0.122) from the same spot rolls 3.05 m +-5%', () => {
-    const r = ok(playPutt(h, ball(pin.x + 5, pin.z - 8), 0, (183 / 1500) * 750)); // 9.4 m from the pin: on the green, aimed away from the cup
+  it('AC-P3 on the course: 1.83 m/s from the same spot rolls 3.05 m +-5%', () => {
+    const r = ok(playPutt(h, ball(pin.x + 5, pin.z - 8), 0, holdFor(1.83))); // 9.4 m from the pin: on the green, aimed away from the cup
     expect(r.ball.z - (pin.z - 8)).toBeGreaterThan(3.05 * 0.95);
     expect(r.ball.z - (pin.z - 8)).toBeLessThan(3.05 * 1.05);
   });

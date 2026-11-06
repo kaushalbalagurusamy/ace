@@ -66,6 +66,6 @@ export interface Club { key: string; label: string; loftDeg: number; maxClubSpee
 // contract: export function lengthFromHold(heldMs: number): number;       // clampLength(heldMs / FULL_TURN_MS); RangeError if not finite
 /** Club-speed multiplier: piecewise-linear through (0.05,0.25) (0.25,0.62) (0.5,0.76) (0.75,0.86) (1,1). RangeError outside [0.05,1]. */
 // contract: export function lengthSpeedFactor(length: number): number;
-/** Putt ball speed (m/s) = 15 x length (the old drawMs/1500 x 15 curve). RangeError outside [0.05,1]. */
+/** Putt ball speed (m/s) = PUTT_MAX_MS x sqrt(length), so roll distance is proportional to the hold; a full hold rolls about 30 m on Stimp 10. RangeError outside [0.05,1]. */
 // contract: export function puttSpeedMs(length: number): number;
 // contract: export const MAX_EFFORT_HOLD_MS = 1100; effortFromHold(holdMs, putt): { length, maxEffort }  // RangeError if not finite

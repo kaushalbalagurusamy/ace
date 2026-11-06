@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   BAG, MIN_LENGTH, MAX_LENGTH, FULL_TURN_MS, MAX_EFFORT_HOLD_MS, isValidLength, clampLength, lengthFromHold, effortFromHold,
-  lengthSpeedFactor, puttSpeedMs, launchFor, simulateShot,
+  lengthSpeedFactor, puttSpeedMs, rollDistance, launchFor, simulateShot,
 } from '../src/sim';
 
 const YD = 1.0936133;
@@ -54,9 +54,12 @@ describe('SS-3 length controls distance smoothly', () => {
     expect(carryYd('O', MIN_LENGTH)).toBeGreaterThan(2); expect(carryYd('O', MIN_LENGTH)).toBeLessThan(20);
     const ys = LENGTHS.map(L => carryYd('O', L)); for (let i = 1; i < ys.length; i++) { expect(ys[i]!).toBeGreaterThan(ys[i - 1]!); expect(ys[i]! - ys[i - 1]!).toBeLessThan(45); }
   });
-  it('literal anchors: speed factor 0.62 at 25% and 0.86 at 75%; putt speeds 1.05, 7.5 and 15 m/s at 0.07, 0.5 and 1', () => {
+  it('literal anchors: speed factor 0.62 at 25% and 0.86 at 75%; putt start speed 5.74 m/s at full hold, roll proportional to hold', () => {
     expect(lengthSpeedFactor(0.25)).toBeCloseTo(0.62, 12); expect(lengthSpeedFactor(0.75)).toBe(0.86);
-    expect(puttSpeedMs(0.07)).toBeCloseTo(1.05, 10); expect(puttSpeedMs(0.5)).toBe(7.5); expect(puttSpeedMs(1)).toBe(15);
-    for (const drawMs of [75, 105, 183, 600, 1500]) expect(puttSpeedMs(drawMs / 1500)).toBeCloseTo((drawMs / 1500) * 15, 10);
+    expect(puttSpeedMs(1)).toBeCloseTo(5.74, 10); expect(puttSpeedMs(0.25)).toBeCloseTo(2.87, 10);
+    // roll is proportional to the hold: half the hold rolls half as far, and a full putt rolls about 30 m on Stimp 10
+    const roll = (L: number) => rollDistance(puttSpeedMs(L), 'green');
+    expect(roll(1)).toBeGreaterThan(28); expect(roll(1)).toBeLessThan(32);
+    for (const L of [0.1, 0.3, 0.5, 0.8]) expect(roll(L) / roll(1)).toBeCloseTo(L, 6);
   });
 });
