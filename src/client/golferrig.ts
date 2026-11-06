@@ -61,7 +61,7 @@ export class GolferRig {
     hips.position.copy(hips.parent!.worldToLocal(_v));
     this.rot('Hips', p.pelvis, 1);
     // the chest and ribcage skin follows the lower spine bones most, so most of the turn goes there (an even split left the chest square)
-    this.rot('Spine02', p.torso, 0.55); this.rot('Spine01', p.torso, 0.3); this.rot('Spine', p.torso, 0.15);
+    this.rot('Spine02', p.torso, 0.7); this.rot('Spine01', p.torso, 0.2); this.rot('Spine', p.torso, 0.1);
     this.rot('Head', p.head, 1);
     this.model.updateMatrixWorld(true);
     // legs: ankles to the stance, knees forward (following half the pelvis turn). The ankle targets are pinned to the ground;
@@ -78,8 +78,9 @@ export class GolferRig {
     this.foot('LeftFoot', p.lHeel); this.foot('RightFoot', p.rHeel);
     // arms
     const club = !p.free;
-    const lT: V3 = club ? p.grip : p.free!.l;
-    const rT: V3 = club ? [p.grip[0] + p.shaft[0] * 0.1, p.grip[1] + p.shaft[1] * 0.1, p.grip[2] + p.shaft[2] * 0.1] : p.free!.r;
+    const tgt = club ? this.gripTarget(p) : null;
+    const lT: V3 = tgt ?? p.free!.l;
+    const rT: V3 = tgt ? [tgt[0] + p.shaft[0] * 0.07, tgt[1] + p.shaft[1] * 0.07, tgt[2] + p.shaft[2] * 0.07] : p.free!.r;   // trail hand just below the lead on the grip
     this.ik('LeftArm', 'LeftForeArm', 'LeftHand', lT, p.lPole);
     this.ik('RightArm', 'RightForeArm', 'RightHand', rT, p.rPole);
     // wrists: turn each hand most of the way from the forearm line toward the shaft so the hands wrap the grip
@@ -98,6 +99,16 @@ export class GolferRig {
   modelPos(n: Name, out = new THREE.Vector3()) { return out.setFromMatrixPosition(this.bones[n].matrixWorld).applyMatrix4(this.inv.copy(this.model.matrixWorld).invert()); }
 
   private add(a: THREE.Vector3, d: V3): V3 { return [a.x + d[0], a.y + d[1], a.z + d[2]]; }
+  /** The lead-wrist target: the model-space grip blended (by gripT) with tgrip, an offset from the mid-shoulder point in the turned
+   *  thorax frame (x lead side, y up the spine, z out of the chest), so hands keyed there turn with the chest (critic: at P4 the hands
+   *  sat in front of the face because they were placed in a frame that had not turned). */
+  private gripTarget(p: Pose): V3 {
+    if (!p.gripT) return p.grip;
+    const sp = this.bones.Spine, mq = this.model.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(sp.getWorldQuaternion(new THREE.Quaternion()));
+    const turn = mq.multiply(this.rest.Spine.mq.clone().invert());   // thorax rotation from rest, model space
+    const mid = this.modelPos('LeftArm').add(this.modelPos('RightArm')).multiplyScalar(0.5).add(new THREE.Vector3(...p.tgrip).applyQuaternion(turn));
+    const k = p.gripT; return [p.grip[0] + (mid.x - p.grip[0]) * k, p.grip[1] + (mid.y - p.grip[1]) * k, p.grip[2] + (mid.z - p.grip[2]) * k];
+  }
   /** How far (model metres) the hip joint must come down for this leg to reach its model-space ankle target with a soft knee. */
   private legDrop(a: Name, b: Name, c: Name, target: V3): number {
     const inv = this.inv.copy(this.model.matrixWorld).invert(), m = (n: Name) => this.bones[n].getWorldPosition(new THREE.Vector3()).applyMatrix4(inv);
@@ -146,25 +157,6 @@ export function smoothShading(model: THREE.Object3D) {
   model.traverse(o => { const m = o as THREE.SkinnedMesh; if (m.isMesh) m.geometry = toCreasedNormals(m.geometry, Math.PI / 3); });
 }
 
-let glowTex: THREE.Texture | null = null;
-/** Soft additive violet glows over both eyes so they read at play distance (critic: the texture alone gives specks). Placed from
- *  the rig's `headfront` marker (on the face, between the eyes) and parented to the head so they follow every pose. */
-export function addEyeGlow(model: THREE.Object3D, spread = 0.031, size = 0.022) {
-  const head = model.getObjectByName('Head'), front = model.getObjectByName('headfront'); if (!head || !front) return;
-  if (!glowTex) {
-    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d')!, g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(180,160,255,0.9)'); g.addColorStop(1, 'rgba(122,92,255,0)');
-    x.fillStyle = g; x.fillRect(0, 0, 64, 64); glowTex = new THREE.CanvasTexture(c);
-  }
-  model.updateMatrixWorld(true);
-  const inv = new THREE.Matrix4().copy(model.matrixWorld).invert(), at = new THREE.Vector3().setFromMatrixPosition(front.matrixWorld).applyMatrix4(inv);
-  const eyeY = 0.915 * new THREE.Box3().setFromObject(model).getSize(new THREE.Vector3()).y;   // eye line, the same bind height the eye shader uses
-  for (const side of [-1, 1]) {
-    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: EYE, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
-    s.scale.setScalar(size); s.position.set(at.x + side * spread, eyeY, at.z + 0.012); model.add(s); head.attach(s);
-  }
-}
-
 /** Dresses one golfer: the polo in the player's colour (near-white texels between the belt and the collar, by bind-pose height,
  *  are multiplied by it; skin, trousers, shoes and the gold embroidery keep their texture; '#ffffff' leaves it white) and the
  *  signature glowing violet eyes (bluish texels on the head become emissive #7a5cff). Materials are cloned per golfer. */
@@ -188,6 +180,9 @@ export function tintPolo(model: THREE.Object3D, colour: string) {
     diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.032, 0.034, 0.039) * (0.8 + 1.5 * mn), legs * smoothstep(0.09, 0.16, mx) * (1.0 - smoothstep(0.28, 0.4, sat)));
     float shirt = smoothstep(0.575, 0.59, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
     diffuseColor.rgb = mix(diffuseColor.rgb, vec3(mx), shirt * smoothstep(0.3, 0.4, mx) * smoothstep(0.06, 0.12, sat) * (1.0 - smoothstep(0.42, 0.52, sat)));
+    { float gr = diffuseColor.g / max(diffuseColor.r, 1e-3), warm = step(diffuseColor.b, diffuseColor.g) * shirt * smoothstep(0.2, 0.3, sat);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.36, 0.06) * (0.6 + 0.6 * mx), warm * smoothstep(0.55, 0.65, gr));   // gold: richer, darker
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(max(mx, 0.7)), shirt * smoothstep(0.3, 0.4, sat) * (1.0 - smoothstep(0.45, 0.55, gr))); }   // red/orange specks: white
     mx = max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)); mn = min(diffuseColor.r, min(diffuseColor.g, diffuseColor.b));
     float white = smoothstep(0.30, 0.45, mx) * (1.0 - smoothstep(0.10, 0.2, (mx - mn) / max(mx, 1e-3)));
     float band = smoothstep(0.555, 0.575, vBindH) * (1.0 - smoothstep(0.85, 0.865, vBindH));
@@ -196,7 +191,7 @@ export function tintPolo(model: THREE.Object3D, colour: string) {
     float blue = diffuseColor.b - max(diffuseColor.r, diffuseColor.g * 1.05);
     eyeMask = smoothstep(0.905, 0.915, vBindH) * (1.0 - smoothstep(0.94, 0.945, vBindH)) * smoothstep(-0.015, 0.01, blue) * smoothstep(0.12, 0.2, mx);   // bright: not the dark hair
     diffuseColor.rgb = mix(diffuseColor.rgb, uEye, eyeMask); }`)
-        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uEye * eyeMask * 3.0;');
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n  totalEmissiveRadiance += uEye * eyeMask * 4.5;');
     };
     m.material = mat;
   });
