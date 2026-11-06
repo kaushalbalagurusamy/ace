@@ -90,13 +90,13 @@ const r = (k: number, val: number, tol: number) => ({ f: KEYS[k]!, lo: val - tol
 const keysFor = (get: (p: Pose) => number, tol: (k: number) => number) => KEYS.map((_, k) => r(k, get(P_KEYED[k]!), tol(k)));
 // Critic round 2 (P3, P4, P7, P8 scored 2/5: the top too low and the arm bent, impact like address, the P3 shaft and P8 hands wrong):
 // at these keys the single camera's depth is weakest, so the prior holds them exactly (STRICT); the capture still shapes the frames between.
-const STRICT = new Set([2, 3, 4, 6, 7]);   // round 3 adds P5 (hands were still at the face)
-const turnTol = (k: number) => (k === 3 ? 0 : k <= 7 ? deg(4) : k === 9 ? deg(12) : deg(15));   // P8 too: the capture over-turned the chest
+const STRICT = new Set([2, 3, 4, 5, 6, 7, 8]);   // round 3 added P5 (hands at the face); round 4 P6 and P9
+const turnTol = (k: number) => (k === 3 ? 0 : k <= 8 ? deg(4) : deg(12));   // P8 too: the capture over-turned the chest
 const pelY = fuse(capPelY, keysFor(p => p.pelvis[1], turnTol));
 const shY = fuse(capShY, keysFor(p => p.pelvis[1] + p.torso[1], turnTol));
 // P1-P8 keep the address spine angle (no standing up; critic round 2: at P8 too): those keys are held within 0.02 rad of the prior's P1 tilt
 const tilt0 = P_KEYED[0]!.pelvis[0] + P_KEYED[0]!.torso[0];
-const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 7 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], 0.15))));
+const tilt = fuse(tiltAll, KEYS.map((f, k) => (k <= 7 ? { f, lo: tilt0 - 0.02, hi: tilt0 + 0.02 } : r(k, P_KEYED[k]!.pelvis[0] + P_KEYED[k]!.torso[0], k === 8 ? 0.04 : 0.15))));
 const headW = fuse(capHeadWorld.map((h, i) => clamp(h, shY[i]! - deg(100), shY[i]! + deg(100))), keysFor(p => p.pelvis[1] + p.torso[1] + p.head[1], k => (k <= 6 ? deg(12) : deg(25))));
 const shiftY = fuse(capShift.map(s => clamp(s[1] * S, -0.12, 0.08)), keysFor(p => p.shift[1] - P_KEYED[0]!.shift[1], k => (k <= 7 ? 0.01 : 0.03)));
 const shiftZ = fuse(capShift.map(s => clamp(s[2] * S, -0.12, 0.2)), keysFor(p => p.shift[2] - P_KEYED[0]!.shift[2], k => (STRICT.has(k) ? 0.01 : 0.04)));
