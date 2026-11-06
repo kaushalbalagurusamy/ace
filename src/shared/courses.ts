@@ -43,6 +43,10 @@ export const COURSES: Record<CourseId, Course> = {
   },
 };
 
+/** The elevation seam: ground height (m) at sim (x, z) on a course's hole. Flat until the OSM and USGS elevation work replaces
+ *  each course's heightAt; grids with `geo` give the tee's lat/lng and the bearing of +z to map (x, z) onto the Earth. */
+export const heightAt = (course: CourseId, hole: number, x: number, z: number): number => COURSES[course].heightAt(hole, x, z);
+
 export const HOLES_PER_COURSE = 18;
 /** Par and yards for the whole card. */
 export const totals = (id: CourseId) => COURSES[id].card.reduce((t, h) => ({ par: t.par + h.par, yards: t.yards + h.yards }), { par: 0, yards: 0 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { COURSES, COURSE_IDS, DEFAULT_COURSE, gridKey, gridOf, isCourseId } from '../src/shared/courses';
+import { COURSES, COURSE_IDS, DEFAULT_COURSE, gridKey, gridOf, heightAt, isCourseId } from '../src/shared/courses';
 import { hole, holesOf } from '../src/server/course';
 import { LobbyManager } from '../src/server';
 import { parseClientMsg } from '../src/server/parse';
@@ -26,7 +26,8 @@ describe('course registry', () => {
         const [lo, hi] = h.par === 3 ? [95, 260] : h.par === 4 ? [300, 560] : [440, 640];
         expect(h.yards, `${id} hole ${i + 1}`).toBeGreaterThanOrEqual(lo); expect(h.yards, `${id} hole ${i + 1}`).toBeLessThanOrEqual(hi);
       }
-      expect(c.heightAt(0, 0, 0)).toBe(0);
+      expect(c.heightAt(0, 0, 0)).toBe(0); expect(heightAt(id, 17, 10, 200)).toBe(0);
+      if (id !== 'pebble') for (const g of c.grids) { expect(g.geo, id).toBeDefined(); expect(g.margin).toBe(0); expect(g.pinZ).toBeGreaterThan(100); }
     }
   });
   it('grid keys are unique per course and hole, and Pebble keeps keys 0..17', () => {
