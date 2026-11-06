@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0"><script type="module">
+// QA view of the Genesis Box Buggy through the game's own cart code (src/client/cartmodel.ts). The generated body loads directly
+// here (no PASS gate) because this page is what the critic judges; the game keeps the code body until the row is PASS.
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { makeCart, poseCart, fitBody } from '/src/client/cartmodel.ts';
+const W = 960, H = 640, r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); document.body.append(r.domElement);
+const gen = (await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync('/assets/models/cart-body.glb')).scene;
+const rows = await (await fetch('/assets/manifest.json')).json();
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#9aa3ab');
+scene.add(new THREE.HemisphereLight('#ffffff', '#6a6a60', 1.5)); const key = new THREE.DirectionalLight('#ffffff', 2.2); key.position.set(4, 6, 5); scene.add(key);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: '#6b6e70' })); scene.add(ground);
+const grid = new THREE.GridHelper(60, 60, '#555', '#777'); grid.position.y = 0.002; scene.add(grid);
+import { stepCart, forwardSpeed } from '/src/shared/cart.ts';
+let cart = null, st = null;
+// show({mode: 'raw'|'code'|'gen', cam: [x,y,z], look: [x,y,z], fov, drive: [{speed, steer, dt, yaw, z}...]})
+window.show = (o = {}) => {
+  if (o.sim && cart && o.keep) {   // one 1/30 s frame of the real kinematics, drawn as scene.placeCart does (sim x mirrored)
+    for (let i = 0; i < 2; i++) {
+      const r = stepCart(st, { throttle: o.sim.throttle, steer: o.sim.steer }, 1 / 60, (x, z) => (o.sim.wall && z > o.sim.wall ? 'blocked' : 'full'));
+      st = r.s; cart.root.position.set(-st.x, 0, st.z); cart.root.rotation.y = -st.yaw; poseCart(cart, forwardSpeed(st), o.sim.steer, 1 / 60);
+    }
+    const c = cart.root.position, off = new THREE.Vector3(...(o.cam ?? [6, 2, 0])), cam = new THREE.PerspectiveCamera(o.fov ?? 35, W / H, 0.05, 200);
+    cam.position.copy(c).add(off); cam.lookAt(c.x, 0.9, c.z); r.render(scene, cam);
+    return { v: +forwardSpeed(st).toFixed(2), pitch: +cart.ride.pitch.toFixed(3), roll: +cart.ride.roll.toFixed(3), heave: +cart.ride.heave.toFixed(3) };
+  }
+  if (cart) scene.remove(cart.root);
+  st = { x: 0, z: 0, yaw: 0, vx: 0, vz: 0 };
+  if (o.mode === 'raw') { cart = { root: new THREE.Group() }; cart.root.add(gen.clone()); }
+  else { cart = makeCart('#e8c23a', false); if (o.mode === 'gen') fitBody(cart, gen.clone(), rows.findLast(r => r.id === 'cart-body')); }
+  if (o.marker) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.06), new THREE.MeshBasicMaterial({ color: '#ff00ff' })); cart.seat.add(m); const w = m.clone(); cart.wheel.add(w); }
+  scene.add(cart.root);
+  for (const s of o.drive ?? []) { cart.root.rotation.y = s.yaw ?? 0; cart.root.position.z = s.z ?? 0; poseCart(cart, s.speed, s.steer ?? 0, s.dt ?? 1 / 60); }
+  const cam = new THREE.PerspectiveCamera(o.fov ?? 35, W / H, 0.05, 200); cam.position.set(...(o.cam ?? [5, 2, 6])); cam.lookAt(new THREE.Vector3(...(o.look ?? [0, 1, 0])));
+  r.render(scene, cam);
+  const b = new THREE.Box3().setFromObject(cart.root);
+  return { min: b.min.toArray().map(v => +v.toFixed(2)), max: b.max.toArray().map(v => +v.toFixed(2)), body: cart.body ? { y: +cart.body.position.y.toFixed(3), pitch: +cart.body.rotation.x.toFixed(3), roll: +cart.body.rotation.z.toFixed(3) } : null };
+};
+window.ready = true;
+</script>

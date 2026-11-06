@@ -19,3 +19,6 @@ __pycache__/
 
 # elevation fetch cache (scripts/fetch_elevation.mjs)
 .elev-cache/
+
+# Motion QA composites contain reference frames/photos: critic-only, never committed (the renders are)
+assets/qa/motion/**/compare*

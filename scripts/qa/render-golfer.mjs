@@ -9,7 +9,7 @@ const SHOTS = shotsFile ? JSON.parse(await readFile(shotsFile, 'utf8')) : [
 const vite = spawn('npx', ['vite', '--port', '5392', '--strictPort', '--host', '127.0.0.1'], { cwd: resolve(import.meta.dirname, '../..'), stdio: 'ignore' });
 await new Promise(r => setTimeout(r, 4000));
 try {
-  const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }), p = await b.newPage({ viewport: { width: 640, height: 640 } });
+  const b = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] }), p = await b.newPage({ viewport: { width: 640, height: 640 } });
   p.on('pageerror', e => console.log('PAGEERR', e.message)); p.on('console', m => { if (m.type() === 'error') console.log('CONSOLE', m.text()); });
   await p.goto('http://127.0.0.1:5392/scripts/qa/golfer.html', { waitUntil: 'domcontentloaded' }); await p.waitForFunction('window.ready === true', null, { timeout: 60000 });
   await mkdir(outDir, { recursive: true }); const out = {};
