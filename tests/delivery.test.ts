@@ -54,26 +54,27 @@ describe('SS-2 ball position (D-plane: loft from forward/back, path from closer/
   });
 });
 
-describe('SS-4 max effort carries about 20% further', () => {
-  for (const key of ['1', '7', '0', 'O']) it(`${club(key).label}: mean carry over seeds is within 5% of 1.2x a normal full swing`, () => {
+describe('SS-4 max effort is a 10% club-speed boost (owner, 2026-11-05)', () => {
+  it('the speed factor is exactly 1.1 for every full-swing club', () => { for (const c of FULL) expect(maxEffortSpeedFactor(c), c.label).toBe(1.1); });
+  for (const key of ['1', '7', '0', 'O']) it(`${club(key).label}: ball speed x1.1 and mean carry over seeds longer than a normal full swing`, () => {
+    expect(launchFor(club(key), { maxEffort: true, seed: 1 }).ballSpeed / launchFor(club(key)).ballSpeed).toBeCloseTo(1.1, 4); // smash shifts a hair with the seeded face error
     const base = carry(club(key)), cs = Array.from({ length: 30 }, (_, i) => carry(club(key), { maxEffort: true, seed: i + 1 }));
-    expect(mean(cs) / base, club(key).label).toBeGreaterThan(1.15); expect(mean(cs) / base).toBeLessThan(1.25);
+    expect(mean(cs) / base, club(key).label).toBeGreaterThan(1.03); expect(mean(cs) / base).toBeLessThan(1.15);
   });
-  it('the speed factor is solved through the sim and is above 1 for every club', () => { for (const c of FULL) expect(maxEffortSpeedFactor(c), c.label).toBeGreaterThan(1); });
 });
 
-describe('SS-5 max effort accuracy: 70%, seeded', () => {
+describe('SS-5 max effort accuracy: 75%, seeded', () => {
   const N = 500, driver = club('1');
   const offlines = (scale: number) => Array.from({ length: N }, (_, i) => simulateShot(launchFor(driver, { maxEffort: true, seed: 1000 + i, dispersionScale: scale })).offlineM);
-  it('the spread over 500 seeded shots is about 3x the reference spread (within 12%) and centred', () => {
-    expect(MAX_EFFORT.accuracy).toBe(0.7); expect(MAX_EFFORT.distanceFactor).toBe(1.2);
-    const wide = offlines(1), ref = offlines(1 / 3);
-    expect(std(wide) / std(ref)).toBeGreaterThan(3 * 0.88); expect(std(wide) / std(ref)).toBeLessThan(3 * 1.12);
+  it('the spread over 500 seeded shots is about 2.5x the 0.4-degree reference spread (within 12%) and centred', () => {
+    expect(MAX_EFFORT.accuracy).toBe(0.75); expect(MAX_EFFORT.speedFactor).toBe(1.1); expect(MAX_EFFORT.sigmaFaceDeg).toBe(1.0);
+    const wide = offlines(1), ref = offlines(1 / 2.5);
+    expect(std(wide) / std(ref)).toBeGreaterThan(2.5 * 0.88); expect(std(wide) / std(ref)).toBeLessThan(2.5 * 1.12);
     expect(Math.abs(mean(wide))).toBeLessThan(0.25 * std(wide)); expect(std(wide)).toBeGreaterThan(3);
   });
   it('absolute: max-effort driver offline std is pinned, and the same swing without max effort has zero offline spread', () => {
-    // Measured once with the current code: std of offlineM over seeds 1000..1499 = 32.02 m (mean -1.14 m).
-    const s = std(offlines(1)); expect(s).toBeGreaterThan(28); expect(s).toBeLessThan(36);
+    // Measured once at 75% accuracy (sigma 1.0 degrees, x1.1 speed): std of offlineM over seeds 1000..1499 = 23.15 m.
+    const s = std(offlines(1)); expect(s).toBeGreaterThan(20); expect(s).toBeLessThan(26);
     const clean = Array.from({ length: N }, (_, i) => simulateShot(launchFor(driver, { seed: 1000 + i })).offlineM);
     expect(Math.max(...clean.map(Math.abs))).toBe(0);
   });

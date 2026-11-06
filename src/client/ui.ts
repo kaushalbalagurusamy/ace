@@ -29,7 +29,7 @@ export const errText = (m: Extract<ServerMsg, { t: 'error' }>) => ERR[m.code] ??
 const HELP = `<details class="help" open><summary>How to play</summary><ul>
 <li><b>Move</b> with the arrow keys (hold <b>Shift</b> to walk slowly and aim finely). <b>Look</b> with the mouse. There is no aim line: line up by eye, and use <b>M</b> for the rangefinder</li>
 <li><b>Clubs</b> 1 to 0, - , = , O ; <b>P</b> is the putter. You can change club right up until you start the backswing</li>
-<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. <b>W S A D</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 20% further, 70% accurate. <b>Esc</b> cancels before you release</li>
+<li><b>Swing</b> walk to your ball and press <b>Space</b> to take your stance: the mouse still turns your aim. <b>W S A D</b> set the ball position (forward = higher, back = lower, away from you = a draw, closer = a fade). Then <b>press and hold Space</b>: the meter fills, <b>release</b> to hit. A short hold is a short shot. Hold past full into the red zone for a MAX effort shot: 10% more club speed, 25% less accurate. <b>Esc</b> cancels before you release</li>
 <li><b>Putt</b> P, Space for the stance, hold Space to draw back, release to strike: the longer the hold, the harder the putt</li>
 <li><b>Shot card</b> after every shot: carry, total, offline, ball position and effort</li>
 <li>The red flag shows where the pin is; the yellow beacon shows your ball. White lines mark out of bounds</li>

@@ -11,8 +11,9 @@ export function isValidBallPos(p: unknown): p is BallPos {
 export const LOFT_PER_FB_DEG = 1.5;
 /** Swing path per away-from-body (io) step, degrees; + = in-to-out. */
 export const PATH_PER_IO_DEG = 1; // halved after the owner playtest: Away +2 drew a driver 50 yd, now about 25 yd
-/** Max effort: carry x1.2 (solved through the sim), 70% accuracy = 3x the normal-shot reference sigma/3. */
-export const MAX_EFFORT = { distanceFactor: 1.2, accuracy: 0.7, sigmaFaceDeg: 1.2, sigmaPathDeg: 1.2 } as const;
+/** Max effort (owner, 2026-11-05): club speed x1.1 (130 -> 143 mph driver) at 75% accuracy, i.e. random face and path
+ *  errors of sigma 1.0 degrees each (1.2 degrees was the earlier 70% setting; sigma scales with 1 - accuracy). */
+export const MAX_EFFORT = { speedFactor: 1.1, accuracy: 0.75, sigmaFaceDeg: 1.0, sigmaPathDeg: 1.0 } as const;
 
 export type Lie = 'tee' | 'fairway' | 'firstCut' | 'rough' | 'bunker' | 'fringe' | 'green';
 

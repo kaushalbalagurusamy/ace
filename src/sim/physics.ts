@@ -267,20 +267,8 @@ function launchAt(c: Club, strike: Strike, speedMul: number): Launch {
   return { ...l, ballSpeed: l.ballSpeed * lieSpeed, launchDeg: l.launchDeg + L.launch, backspinRpm: l.backspinRpm * L.spin };
 }
 
-/** Club-speed factor k >= 1 that makes a full centre swing carry MAX_EFFORT.distanceFactor times as far (bisection through the sim). */
-const effortCache = new Map<string, number>();
-export function maxEffortSpeedFactor(c: Club): number {
-  if (c.key === 'P') return 1;
-  const hit = effortCache.get(c.key);
-  if (hit !== undefined) return hit;
-  const carry = (k: number) => simulateShot(launchAt(c, {}, k)).carryM;
-  const target = carry(1) * MAX_EFFORT.distanceFactor;
-  let lo = 1, hi = 1.8;
-  for (let i = 0; i < 25; i++) { const mid = (lo + hi) / 2; if (carry(mid) < target) lo = mid; else hi = mid; }
-  const k = (lo + hi) / 2;
-  effortCache.set(c.key, k);
-  return k;
-}
+/** Club-speed factor for a max-effort swing: a flat x1.1 (owner decision), 1 for the putter. */
+export function maxEffortSpeedFactor(c: Club): number { return c.key === 'P' ? 1 : MAX_EFFORT.speedFactor; }
 
 export function launchFor(c: Club, strike: Strike = {}): Launch {
   const maxEffort = c.key !== 'P' && (strike.maxEffort ?? false);

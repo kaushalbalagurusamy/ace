@@ -115,7 +115,7 @@ describe('full shots: roll consistency (review finding 3) and penalties', () => 
     const sw = (holdMs: number) => playShot(h, tee, { clubKey: '1', aimDeg: 0, holdMs, seed: 5 });
     expect(sw(-2)).toEqual(sw(0));                                  // floored at length 0.05
     expect(sw(1100)).toEqual(sw(5000));                             // 1.10 s and beyond: the same max-effort shot (same seed)
-    expect(ok(sw(1100)).carryM).toBeGreaterThan(ok(sw(750)).carryM * 1.1);   // max effort carries clearly further than a normal full swing
+    expect(ok(sw(1100)).carryM).toBeGreaterThan(ok(sw(750)).carryM * 1.03);  // max effort (x1.1 club speed) carries further than a normal full swing
     for (const bad of [NaN, Infinity]) expect('error' in sw(bad), String(bad)).toBe(true);
   });
   it('ball position and its range: fb/io outside -2..2 or non-integer are rejected; a draw lands left of a centre ball and a fade right', () => {
