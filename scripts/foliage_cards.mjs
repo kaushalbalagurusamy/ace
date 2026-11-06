@@ -18,7 +18,7 @@ const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], cross = (a, b) =>
 const len = a => Math.hypot(...a), norm = a => { const l = len(a) || 1; return a.map(v => v / l); }, add = (a, b, s = 1) => a.map((v, i) => v + b[i] * s);
 
 // 1. Atlas: 4x4 tiles cut from the concept's foliage, alpha = foliage mask, colour graded to the target swatch.
-const T = 256, N = 4, CELL = 160;
+const T = 256, N = 4, CELL = +(opt.cell ?? 160);   // --cell: crop size in the 1024-wide concept (smaller = finer tufts per card)
 const { data: cd, info: ci } = await sharp(concept).resize({ width: 1024 }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 const fol = (x, y) => { const p = (y * ci.width + x) * 4, r = cd[p], g = cd[p + 1], b = cd[p + 2], l = (r + g + b) / 3; return l < 215 && (isGreen(r, g, b) || l < 55); };
 const cells = [];
